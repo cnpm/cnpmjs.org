@@ -1,0 +1,47 @@
+{
+  "name": "cnpmjs.org",
+  "version": "0.0.0",
+  "description": "cnpmjs.org",
+  "main": "index.js",
+  "scripts": {
+    "test": "make test-all",
+    "blanket": { 
+      "pattern": "cnpmjs.org/lib",
+      "data-cover-flags": {
+        "debug": false
+      }
+    },
+    "travis-cov": {
+      "threshold": 90
+    }
+  },
+  "dependencies": {
+
+  },
+  "devDependencies": {
+    "should": "*",
+    "blanket": "*",
+    "travis-cov": "*",
+    "coveralls": "*",
+    "mocha-lcov-reporter": "*",
+    "mocha": "*"
+  },
+  "homepage": "https://github.com/fengmk2/cnpmjs.org",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/fengmk2/cnpmjs.org.git",
+    "web": "https://github.com/fengmk2/cnpmjs.org"
+  },
+  "bugs": {
+    "url": "https://github.com/fengmk2/cnpmjs.org/issues",
+    "email": "fengmk2@gmail.com"
+  },
+  "keywords": [
+    "cnpmjs.org"
+  ],
+  "engines": {
+    "node": ">= 0.8.0"
+  },
+  "author": "fengmk2 <fengmk2@gmail.com> (http://fengmk2.github.com)",
+  "license": "MIT"
+}
