@@ -19,7 +19,6 @@ var mod = require('../controllers/registry/module');
 var pkg = require('../controllers/registry/package');
 var tag = require('../controllers/registry/tag');
 var user = require('../controllers/registry/user');
-var session = require('../controllers/registry/session');
 
 function routes(app) {
   app.get('/:name', mod.show);
