@@ -46,8 +46,8 @@ exports.show = function (req, res, next) {
 
 // json:
 //  { name: 'fengmk2',
-//    salt: 'f95a3f750bc29b7312bc6bd35622f07785c7e10b97b860b3662d700f3f5b',
-//    password_sha: 'ccd48f7cdddb5a96647e5f9002b7398e2d5f0f23',
+//    salt: 'xxxx',
+//    password_sha: 'xxxxxx',
 //    email: 'fengmk2@gmail.com',
 //    _id: 'org.couchdb.user:fengmk2',
 //    type: 'user',
@@ -121,7 +121,7 @@ exports.authSession = function (req, res, next) {
   });
 };
 
-exports.upload = function (req, res, next) {
+exports.update = function (req, res, next) {
   var name = req.params.name || '';
   name = name.split(':')[1];
   var rev = req.params.rev;
@@ -129,7 +129,7 @@ exports.upload = function (req, res, next) {
     return next();
   }
 
-  debug('upload: %s, rev: %s, session.name: %s', name, rev, req.session.name);
+  debug('update: %s, rev: %s, session.name: %s', name, rev, req.session.name);
 
   if (name !== req.session.name) {
     // must authSession first
