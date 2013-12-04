@@ -1,7 +1,7 @@
 {
   "name": "cnpmjs.org",
   "version": "0.0.0",
-  "description": "cnpmjs.org",
+  "description": "Private npm registry and web",
   "main": "dispatch.js",
   "scripts": {
     "test": "make test-all",
@@ -16,6 +16,8 @@
     }
   },
   "dependencies": {
+    "debug": "0.7.4",
+    "utility": "0.1.8",
     "ready": "0.1.1",
     "connect": "~2.11.0",
     "connect-rt": "~0.0.2",
@@ -31,6 +33,7 @@
     "response-cookie": "~0.0.2"
   },
   "devDependencies": {
+    "supertest": "*",
     "should": "*",
     "blanket": "*",
     "travis-cov": "*",
@@ -49,7 +52,7 @@
     "email": "fengmk2@gmail.com"
   },
   "keywords": [
-    "cnpmjs.org"
+    "cnpmjs.org", "npm", "npmjs", "npmjs.org", "registry"
   ],
   "engines": {
     "node": ">= 0.8.0"

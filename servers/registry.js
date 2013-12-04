@@ -25,6 +25,7 @@ var routes = require('../routes/registry');
 var logger = require('../common/logger');
 var config = require('../config');
 var session = require('../common/session');
+var auth = require('../middleware/auth');
 
 var app = connect();
 
@@ -38,6 +39,8 @@ app.use(connect.cookieParser());
 app.use(session);
 app.use(connect.query());
 app.use(connect.bodyParser());
+
+app.use(auth());
 
 /**
  * Routes

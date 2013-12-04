@@ -7,29 +7,25 @@ cnpmjs.org
 
 ![logo](https://raw.github.com/fengmk2/cnpmjs.org/master/logo.png)
 
-cnpmjs.org desc
+Private npm registry and web.
 
 ## Install
 
 ```bash
-$ npm install cnpmjs.org
+$ npm install
 ```
 
 ## Usage
 
 ```js
-var cnpmjs.org = require('cnpmjs.org');
-
-cnpmjs.org.foo(function (err) {
-
-});
+$ node dispatch.js
 ```
 
 ## License
 
 (The MIT License)
 
-Copyright (c) 2013 fengmk2 &lt;fengmk2@gmail.com&gt;
+Copyright(c) cnpmjs.org and other contributors.
 
 Permission is hereby granted, free of charge, to any person obtaining
 a copy of this software and associated documentation files (the

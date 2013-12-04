@@ -1,6 +1,6 @@
 This software is licensed under the MIT License.
 
-Copyright (C) 2013 fengmk2 <fengmk2@gmail.com>
+Copyright(c) cnpmjs.org and other contributors.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

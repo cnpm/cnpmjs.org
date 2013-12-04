@@ -1,13 +1,16 @@
-create table user (
-  id bigint unsigned  not null comment 'primary key' auto_increment,
-  gmt_create datetime  not null comment 'create time',
-  gmt_modified datetime not null comment 'modified time',
-  name varchar(200) not null comment 'user name',
-  password varchar(32) not null comment 'user password hash',
-  ip varchar(64) not null comment 'user last request ip',
-  session varchar(200) not null comment 'auth session',
-  primary key (id),
-  unique key name (name),
-  unique key name (session),
-  key gmt_modified (gmt_modified)
-) comment='user base info';
+CREATE TABLE `user` (
+ `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'primary key',
+ `gmt_create` datetime NOT NULL COMMENT 'create time',
+ `gmt_modified` datetime NOT NULL COMMENT 'modified time',
+ `name` varchar(100) NOT NULL COMMENT 'user name',
+ `salt` varchar(100) NOT NULL,
+ `password_sha` varchar(100) NOT NULL COMMENT 'user password hash',
+ `ip` varchar(64) NOT NULL COMMENT 'user last request ip',
+ `roles` varchar(200) NOT NULL DEFAULT '[]',
+ `rev` varchar(40) NOT NULL,
+ `email` varchar(400) NOT NULL,
+ PRIMARY KEY (`id`),
+ UNIQUE KEY `name` (`name`),
+ KEY `gmt_modified` (`gmt_modified`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='user base info';
+

@@ -1,6 +1,6 @@
-TESTS = test/*.test.js
+TESTS = $(shell ls -S `find test -type f -name "*.test.js" -print`)
 REPORTER = spec
-TIMEOUT = 1000
+TIMEOUT = 10000
 MOCHA_OPTS =
 
 install:
