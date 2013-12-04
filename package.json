@@ -5,7 +5,7 @@
   "main": "dispatch.js",
   "scripts": {
     "test": "make test-all",
-    "blanket": { 
+    "blanket": {
       "pattern": "//^((?!(node_modules|test)).)*$/",
       "data-cover-flags": {
         "debug": false
@@ -16,6 +16,7 @@
     }
   },
   "dependencies": {
+    "ready": "0.1.1",
     "connect": "~2.11.0",
     "connect-rt": "~0.0.2",
     "urlrouter": "~0.5.3",
@@ -24,7 +25,7 @@
     "logfilestream": "~0.1.0",
     "ms": "~0.6.1",
     "mkdirp": "~0.3.5",
-    "easymysql": "~0.2.7",
+    "mysql": "2.0.0-rc1",
     "response-patch": "~0.1.1"
   },
   "devDependencies": {

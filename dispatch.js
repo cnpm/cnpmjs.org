@@ -1,7 +1,12 @@
 /*!
- * cnpmjs.org - dispatch.js 
- * Copyright(c) 2013 
- * Author: dead_horse <dead_horse@qq.com>
+ * cnpmjs.org - dispatch.js
+ *
+ * Copyright(c) cnpmjs.org and other contributors.
+ * MIT Licensed
+ *
+ * Authors:
+ *  dead_horse <dead_horse@qq.com>
+ *  fengmk2 <fengmk2@gmail.com> (http://fengmk2.github.com)
  */
 
 'use strict';
@@ -15,11 +20,9 @@ var util = require('util');
 var fs = require('fs');
 var cluster = require('cluster');
 var config = require('./config');
+var workerPath = path.join(__dirname, 'worker.js');
 
 if (config.enableCluster) {
-  var workerPath = path.join(__dirname, 'worker.js');
-  var restartTime = 5000;
-
   cluster.setupMaster({
     exec: workerPath
   });
@@ -30,7 +33,7 @@ if (config.enableCluster) {
 
   cluster.on('disconnect', function (worker) {
     var w = cluster.fork();
-    console.error('[%s] [master:%s] wroker:%s disconnect! new worker:%s fork', 
+    console.error('[%s] [master:%s] wroker:%s disconnect! new worker:%s fork',
       new Date(), process.pid, worker.process.pid, w.process.pid);
   });
 
@@ -48,8 +51,5 @@ if (config.enableCluster) {
   }
 
 } else {
-  require('./worker');
+  require(workerPath);
 }
-
-console.log('[%s] [master:%d] Server started, listen at %d, cluster: %s',
-  new Date(), process.pid, config.webPort, config.enableCluster);
