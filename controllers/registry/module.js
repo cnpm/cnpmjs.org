@@ -29,7 +29,7 @@ exports.show = function (req, res) {
   res.json(MOCK_MODULE_DATA);
 };
 
-exports.update = function (req, res) {
+exports.add = function (req, res) {
   var params = req.params;
   if (params.module === 'exist') {
     res.statusCode = 409;
