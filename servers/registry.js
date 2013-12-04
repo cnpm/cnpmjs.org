@@ -19,6 +19,7 @@ require('response-patch');
 var http = require('http');
 var connect = require('connect');
 var rt = require('connect-rt');
+var responseCookie = require('response-cookie');
 var urlrouter = require('urlrouter');
 var routes = require('../routes/registry');
 var logger = require('../common/logger');
@@ -31,6 +32,7 @@ app.use(function (req, res, next) {
   res.req = req;
   next();
 });
+app.use(responseCookie());
 app.use(connect.query());
 app.use(connect.bodyParser());
 
