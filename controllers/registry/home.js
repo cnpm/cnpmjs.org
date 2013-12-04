@@ -14,6 +14,10 @@
  * Module dependencies.
  */
 
+var microtime = require('microtime');
+
+var startTime = '' + microtime.now();
+
 exports.show = function (req, res) {
   res.json({
     db_name: "registry",
@@ -24,7 +28,7 @@ exports.show = function (req, res) {
     compact_running: false,
     disk_size: 151819346055,
     data_size: 132303912087,
-    instance_start_time: "1384762053837984",
+    instance_start_time: startTime,
     disk_format_version: 6,
     committed_update_seq: 820897
   });
