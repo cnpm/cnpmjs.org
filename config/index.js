@@ -34,15 +34,17 @@ var config = {
   // mysql config
   mysqlServers: [
     {
-      host: '127.0.0.1',
+      host: 'db4free.net',
       port: 3306,
-      user: '',
-      password: ''
+      user: 'cnpmjs',
+      password: 'cnpmjs123'
     }
   ],
-  mysqlDatabase: 'cnpmjs_org',
+  mysqlDatabase: 'cnpmjstest',
   mysqlMaxConnections: 4,
   mysqlQueryTimeout: 5000,
+
+  sessionSecret: 'cnpmjs.org test session secret',
 };
 
 // load config/config.js, everything in config.js will cover the same key in index.js

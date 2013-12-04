@@ -37,6 +37,8 @@ function routes(app) {
   app.put('/-/user/:name/-rev/:rev', user.upload);
 
   app.post('/_session', session.add);
+  // _session
+  // app.post('/_session', user.authSession);
 }
 
 module.exports = routes;

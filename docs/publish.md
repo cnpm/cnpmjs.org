@@ -2,6 +2,36 @@
 
 code: https://github.com/isaacs/npm-registry-client/blob/master/lib/publish.js
 
+* couch login if token not exists: [couch-login](https://github.com/isaacs/couch-login)
+
+```js
+if (authRequired && !this.conf.get('always-auth')) {
+    var couch = this.couchLogin
+    , token = couch && (this.conf.get('_token') || couch.token)
+    , validToken = token && couch.valid(token)
+
+    if (!validToken) token = null
+    else this.conf.set('_token', token)
+
+    if (couch && !token) {
+      // login to get a valid token
+      var a = { name: this.conf.get('username'),
+                password: this.conf.get('_password') }
+      var args = arguments
+      return this.couchLogin.login(a, function (er, cr, data) {
+        if (er || !couch.valid(couch.token)) {
+          er = er || new Error('login error')
+          return cb(er, cr, data)
+        }
+        this.conf.set('_token', this.couchLogin.token)
+        return regRequest.call(this,
+                               method, where, what,
+                               etag, nofollow, reauthed, cb_)
+      }.bind(this))
+    }
+  }
+```
+
 * put full data to `https://registry.npmjs.org/packagename`
 
 ```

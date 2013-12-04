@@ -6,6 +6,7 @@
  *
  * Authors:
  *  dead_horse <dead_horse@qq.com>
+ *  fengmk2 <fengmk2@gmail.com> (http://fengmk2.github.com)
  */
 
 'use strict';
@@ -23,7 +24,7 @@ var MOCK_USER_DATA = {
   roles: [],
   date: '2013-12-04T02:03:08.540Z',
   mustChangePass: false,
-  _etag: '"24-29a410ffe8c2250d3ca1a856d8f913ad"' 
+  _etag: '"24-29a410ffe8c2250d3ca1a856d8f913ad"'
 };
 
 exports.show = function (req, res) {
@@ -35,7 +36,7 @@ exports.show = function (req, res) {
   if (auth !== 'ZXhpc3Q6MTIz') {
     res.statusCode = 401;
     return res.json({
-      error: 'unauthorized', 
+      error: 'unauthorized',
       reason: 'Name or password is incorrect.'
     });
   }
@@ -49,8 +50,8 @@ exports.add = function (req, res) {
   if (name === 'org.couchdb.user:exist') {
     res.statusCode = 409;
     return res.json({
-      error: 'conflict', 
-      reason: 'Document update conflict.' 
+      error: 'conflict',
+      reason: 'Document update conflict.'
     });
   }
   res.statusCode = 201;
