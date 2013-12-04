@@ -32,6 +32,8 @@ var pool = mysql.createPool({
   multipleStatements: true,
 });
 
+exports.pool = pool;
+
 exports.query = function (sql, values, cb) {
   pool.query(sql, values, cb);
 };

@@ -23,6 +23,7 @@ var urlrouter = require('urlrouter');
 var routes = require('../routes/web');
 var logger = require('../common/logger');
 var config = require('../config');
+var session = require('../common/session');
 
 var app = connect();
 
@@ -31,6 +32,8 @@ app.use(function (req, res, next) {
   res.req = req;
   next();
 });
+app.use(connect.cookieParser());
+app.use(session);
 app.use(connect.query());
 app.use(connect.bodyParser());
 

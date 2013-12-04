@@ -1,4 +1,4 @@
-/*!
+/**!
  * cnpmjs.org - routes/registry.js
  *
  * Copyright(c) cnpmjs.org and other contributors.
@@ -15,13 +15,15 @@
  * Module dependencies.
  */
 
+var home = require('../controllers/registry/home');
 var mod = require('../controllers/registry/module');
 var pkg = require('../controllers/registry/package');
 var tag = require('../controllers/registry/tag');
 var user = require('../controllers/registry/user');
-var session = require('../controllers/registry/session');
 
 function routes(app) {
+  app.get('/', home.show);
+
   app.get('/:name', mod.show);
   app.put('/:name', mod.add);
 
@@ -32,11 +34,13 @@ function routes(app) {
   app.put('/:name/:version/-tag/latest', tag.updateLatest);
 
   //try to create a new user
+  // https://registry.npmjs.org/-/user/org.couchdb.user:fengmk2
   app.put('/-/user/:name', user.add);
   app.get('/-/user/:name', user.show);
-  app.put('/-/user/:name/-rev/:rev', user.upload);
+  app.put('/-/user/:name/-rev/:rev', user.update);
 
-  app.post('/_session', session.add);
+  // _session
+  app.post('/_session', user.authSession);
 }
 
 module.exports = routes;
