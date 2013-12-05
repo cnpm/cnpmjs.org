@@ -27,12 +27,13 @@ function routes(app) {
 
   // module
   app.get('/:name', mod.show);
+  // try to add module
   app.put('/:name', login, mod.add);
 
   // put tarball
   // https://registry.npmjs.org/cnpmjs.org/-/cnpmjs.org-0.0.0.tgz/-rev/1-c85bc65e8d2470cc4d82b8f40da65b8e
   app.put('/:name/-/:filename/-rev/:rev', login, mod.upload);
-  // tag
+  // put package.json to module
   app.put('/:name/:version/-tag/latest', login, mod.updateLatest);
 
   // try to create a new user

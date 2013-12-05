@@ -50,6 +50,10 @@ app.use(auth());
 
 app.use(urlrouter(routes));
 
+app.use(function (req, res, next) {
+  res.json(404, {error: 'not_found', reason: 'document not found'});
+});
+
 /**
  * Error handler
  */

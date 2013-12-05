@@ -28,4 +28,3 @@ test-coveralls: test
 test-all: test test-cov
 
 .PHONY: test
-

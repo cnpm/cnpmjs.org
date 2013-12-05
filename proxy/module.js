@@ -101,7 +101,7 @@ exports.get = function (name, version, callback) {
   });
 };
 
-var SELECT_LATEST_MODULE_SQL = 'SELECT ' + MODULE_COLUMNS + ' FROM module WHERE name=? ORDER BY id DESC LIMIT 1;';
+var SELECT_LATEST_MODULE_SQL = 'SELECT ' + MODULE_COLUMNS + ' FROM module WHERE name=? AND version <> "next" ORDER BY id DESC LIMIT 1;';
 
 exports.getLatest = function (name, callback) {
   mysql.queryOne(SELECT_LATEST_MODULE_SQL, [name], function (err, row) {
@@ -138,3 +138,9 @@ exports.listByName = function (name, callback) {
     callback(err, rows);
   });
 };
+
+var DELETE_MODULE_BY_NAME_SQL = 'DELETE FROM module WHERE name=?;';
+exports.removeByName = function (name, callback) {
+  mysql.query(DELETE_MODULE_BY_NAME_SQL, [name], callback);
+};
+
