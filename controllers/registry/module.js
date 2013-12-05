@@ -5,7 +5,7 @@
  * MIT Licensed
  *
  * Authors:
- *  dead_horse <dead_horse@qq.com>
+ *  dead_horse <dead_horse@qq.com> (http://deadhorse.me)
  *  fengmk2 <fengmk2@gmail.com> (http://fengmk2.github.com)
  */
 
@@ -79,6 +79,17 @@ exports.show = function (req, res, next) {
     };
 
     res.json(info);
+  });
+};
+
+exports.get = function (req, res, next) {
+  var name = req.params.name;
+  var version = req.params.version;
+  Module.get(name, version, function(err, mod) {
+    if (err || !mod) {
+      return next(err);
+    }
+    res.json(mod.package);
   });
 };
 
