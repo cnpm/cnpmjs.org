@@ -85,7 +85,7 @@ PUT https://registry.npmjs.org/-/user/org.couchdb.user:cnpmjstest1/-rev/1-3b4fcb
   rev: '2-5f1bb73207a87ce218f3c22be3caf3e1' }
 ```
 
-## adduser fiirst time
+## adduser first time
 
 ```bash
 $ npm adduser cnpmjstest1 --verbose

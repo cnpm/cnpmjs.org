@@ -22,7 +22,7 @@
     "ready": "0.1.1",
     "connect": "~2.11.0",
     "connect-rt": "~0.0.2",
-    "connect-mysql": "0.3.3",
+    "connect-redis": "~1.4.6",
     "urlrouter": "~0.5.3",
     "graceful": "~0.0.5",
     "moment": "~2.4.0",
