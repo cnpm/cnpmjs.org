@@ -19,7 +19,7 @@ var User = require('../proxy/user');
 
 module.exports = function (options) {
   return function auth(req, res, next) {
-    if (req.session.name) {
+    if (req.session.name && req.session.email) {
       return next();
     }
     var authorization = (req.headers.authorization || '').split(' ')[1] || '';
@@ -35,6 +35,7 @@ module.exports = function (options) {
       if (err) {
         return next(err);
       }
+
       if (!row) {
         debug('auth fail user: %j, headers: %j', row, req.headers);
         return res.json(401, {
@@ -42,7 +43,9 @@ module.exports = function (options) {
           reason: 'Name or password is incorrect.'
         });
       }
+
       req.session.name = row.name;
+      req.session.email = row.email;
       debug('auth pass user: %j, headers: %j', row, req.headers);
       next();
     });

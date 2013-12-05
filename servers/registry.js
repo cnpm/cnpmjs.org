@@ -34,12 +34,14 @@ app.use(function (req, res, next) {
   res.req = req;
   next();
 });
+
+app.use('/dist', connect.static(config.uploadDir));
+
 app.use(responseCookie());
 app.use(connect.cookieParser());
-app.use(session);
 app.use(connect.query());
-app.use(connect.bodyParser());
-
+app.use(connect.json());
+app.use(session);
 app.use(auth());
 
 /**

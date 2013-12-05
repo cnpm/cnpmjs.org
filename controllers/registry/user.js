@@ -21,8 +21,7 @@ var User = require('../../proxy/user');
 var eventproxy = require('eventproxy');
 
 exports.show = function (req, res, next) {
-  var name = req.params.name || '';
-  name = name.split(':')[1];
+  var name = req.params.name;
   User.get(name, function (err, row) {
     if (err) {
       return next(err);
@@ -55,12 +54,7 @@ exports.show = function (req, res, next) {
 //    roles: [],
 //    date: '2013-12-04T12:56:13.714Z' } }
 exports.add = function (req, res, next) {
-  var name = req.params.name || '';
-  name = name.split(':')[1];
-  if (!name) {
-    return next();
-  }
-
+  var name = req.params.name;
   var body = req.body || {};
   var user = {
     name: body.name,
@@ -121,8 +115,7 @@ exports.authSession = function (req, res, next) {
 };
 
 exports.update = function (req, res, next) {
-  var name = req.params.name || '';
-  name = name.split(':')[1];
+  var name = req.params.name;
   var rev = req.params.rev;
   if (!name || !rev) {
     return next();

@@ -32,7 +32,7 @@ if (authRequired && !this.conf.get('always-auth')) {
   }
 ```
 
-* put full data to `https://registry.npmjs.org/packagename`
+* put full data with AuthSession to `https://registry.npmjs.org/packagename`
 
 ```
 var fullData =
@@ -54,7 +54,13 @@ npm http PUT https://registry.npmjs.org/cnpmjs.org
 npm http 201 https://registry.npmjs.org/cnpmjs.org
 ```
 
-* get data to check exists versions
+* 409 or 201
+
+```
+{ error: 'conflict', reason: 'Document update conflict.' }
+```
+
+* get data (with auth header) to check exists versions
 
 ```
 npm http GET https://registry.npmjs.org/cnpmjs.org
