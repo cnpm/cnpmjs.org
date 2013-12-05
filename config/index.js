@@ -45,6 +45,12 @@ var config = {
   mysqlQueryTimeout: 5000,
 
   sessionSecret: 'cnpmjs.org test session secret',
+
+  redis: {
+    host: 'pub-redis-19533.us-east-1-4.3.ec2.garantiadata.com',
+    port: 19533,
+    pass: 'cnpmjs_dev'
+  }
 };
 
 // load config/config.js, everything in config.js will cover the same key in index.js
