@@ -14,3 +14,20 @@ CREATE TABLE `user` (
  KEY `gmt_modified` (`gmt_modified`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='user base info';
 
+CREATE TABLE `module` (
+ `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'primary key',
+ `gmt_create` datetime NOT NULL COMMENT 'create time',
+ `gmt_modified` datetime NOT NULL COMMENT 'modified time',
+ `author` varchar(100) NOT NULL,
+ `name` varchar(100) NOT NULL COMMENT 'module name',
+ `version` varchar(30) NOT NULL COMMENT 'module version',
+ `package` longtext COMMENT 'package.json',
+ `dist_shasum` varchar(100) DEFAULT NULL,
+ `dist_tarball` varchar(2048) DEFAULT NULL,
+ `dist_size` int(10) unsigned NOT NULL DEFAULT '0',
+ PRIMARY KEY (`id`),
+ UNIQUE KEY `name` (`name`,`version`),
+ KEY `gmt_modified` (`gmt_modified`),
+ KEY `author` (`author`)
+) ENGINE=InnoDB AUTO_INCREMENT=25 DEFAULT CHARSET=utf8 COMMENT='module info'
+

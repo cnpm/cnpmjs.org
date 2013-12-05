@@ -35,7 +35,7 @@ app.use(function (req, res, next) {
 app.use(connect.cookieParser());
 app.use(session);
 app.use(connect.query());
-app.use(connect.bodyParser());
+app.use(connect.json());
 
 /**
  * Routes
