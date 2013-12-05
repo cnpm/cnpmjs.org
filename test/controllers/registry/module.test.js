@@ -184,24 +184,6 @@ describe('controllers/registry/module.test.js', function () {
       });
     });
 
-    // it('should upload tarball fail 403 when header size not match body size', function (done) {
-    //   var body = fs.readFileSync(path.join(fixtures, 'testputmodule-0.1.9.tgz'));
-    //   request(app)
-    //   .put('/' + pkg.name + '/-/' + pkg.name + '-0.1.9.tgz/-rev/' + lastRev)
-    //   .set('authorization', baseauth)
-    //   .set('content-type', 'application/octet-stream')
-    //   .set('content-length', '' + (body.length + 1))
-    //   .send(body)
-    //   .expect(404, function (err, res) {
-    //     should.not.exist(err);
-    //     res.body.should.eql({
-    //       error: 'size_wrong',
-    //       reason: 'document not found'
-    //     });
-    //     done();
-    //   });
-    // });
-
     it('should upload tarball fail 403 when rev not match current module', function (done) {
       var body = fs.readFileSync(path.join(fixtures, 'testputmodule-0.1.9.tgz'));
       request(app)
@@ -274,6 +256,17 @@ describe('controllers/registry/module.test.js', function () {
       });
     });
 
+    it('should get new package info', function (done) {
+      request(app)
+      .get('/testputmodule/0.1.9')
+      .expect(200, function (err, res) {
+        should.not.exist(err);
+        res.body.name.should.equal('testputmodule');
+        res.body.version.should.equal('0.1.9');
+        res.body.dist.tarball.should.include('/testputmodule/-/testputmodule-0.1.9.tgz');
+        done();
+      });
+    });
 
   });
 });

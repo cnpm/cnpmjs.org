@@ -51,6 +51,12 @@ var config = {
     pass: 'cnpmjs_dev'
   },
   uploadDir: path.join(root, 'public', 'dist'),
+  qn: {
+    accessKey: "iN7NgwM31j4-BZacMjPrOQBs34UG1maYCAQmhdCV",
+    secretKey: "6QTOr2Jg1gcZEWDQXKOGZh5PziC2MCV5KsntT70j",
+    bucket: "qtestbucket",
+    domain: "http://qtestbucket.qiniudn.com"
+  },
 };
 
 // load config/config.js, everything in config.js will cover the same key in index.js
