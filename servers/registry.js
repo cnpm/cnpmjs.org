@@ -54,8 +54,10 @@ app.use(urlrouter(routes));
 
 app.use(function (err, req, res, next) {
   err.url = err.url || req.url;
-  console.error(err.stack);
-  logger.error(err);
+  if (process.env.NODE_ENV !== 'test') {
+    console.error(err.stack);
+    logger.error(err);
+  }
   if (config.debug) {
     return next(err);
   }

@@ -6,7 +6,7 @@
   "scripts": {
     "test": "make test-all",
     "blanket": {
-      "pattern": "//^((?!(node_modules|test)).)*$/",
+      "pattern": "//^((?!(node_modules|test|common)).)*$/",
       "data-cover-flags": {
         "debug": false
       }
@@ -31,7 +31,8 @@
     "mkdirp": "~0.3.5",
     "mysql": "2.0.0-rc1",
     "response-patch": "~0.1.1",
-    "response-cookie": "~0.0.2"
+    "response-cookie": "~0.0.2",
+    "eventproxy": "~0.2.6"
   },
   "devDependencies": {
     "supertest": "*",
@@ -40,7 +41,8 @@
     "travis-cov": "*",
     "coveralls": "*",
     "mocha-lcov-reporter": "*",
-    "mocha": "*"
+    "mocha": "*",
+    "mm": "*"
   },
   "homepage": "https://github.com/fengmk2/cnpmjs.org",
   "repository": {

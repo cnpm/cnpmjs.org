@@ -29,6 +29,7 @@ function sha1(s) {
 function passwordSha(password, salt) {
   return sha1(password + salt);
 }
+exports.passwordSha = passwordSha;
 
 exports.get = function (name, callback) {
   mysql.queryOne(SELECT_USER_SQL, [name], function (err, row) {
@@ -86,7 +87,6 @@ exports.update = function (user, callback) {
     err.data = {user: user};
     return callback(err);
   }
-
   revNo++;
   var newRev = revNo + '-' + utility.md5(JSON.stringify(user));
   var roles = user.roles || [];
@@ -97,11 +97,11 @@ exports.update = function (user, callback) {
   }
 
   var values = [newRev, user.email, user.salt, user.password_sha, user.ip, roles, user.name, rev];
-  mysql.query(UPDATE_USER_SQL, values, function (err) {
-    callback(err, {rev: newRev});
+  mysql.query(UPDATE_USER_SQL, values, function (err, data) {
+    if (err || !data.affectedRows) {
+      return callback(err);
+    }
+    callback(null, {rev: newRev});
   });
 };
-
-
-
 
