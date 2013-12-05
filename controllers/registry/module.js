@@ -149,7 +149,7 @@ exports.upload = function (req, res, next) {
         });
       }
       shasum = shasum.digest('hex');
-      var key = '/' + name + '/' + filename;
+      var key = '/' + name + '/-/' + filename;
       nfs.upload(filepath, {key: key, size: length}, function (err, result) {
         // remove tmp file whatever
         fs.unlink(filepath, utility.noop);
