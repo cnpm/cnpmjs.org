@@ -105,7 +105,7 @@ exports.upload = function (req, res, next) {
   var name = req.params.name;
   var id = Number(req.params.rev);
   var filename = req.params.filename;
-  var version = filename.substring(filename.indexOf('-') + 1);
+  var version = filename.substring(name.length + 1);
   version = version.replace(/\.tgz$/, '');
   // save version on pkg upload
 
@@ -306,4 +306,86 @@ exports.add = function (req, res, next) {
       rev: String(nextMod.id),
     });
   });
+};
+
+
+exports.update = function (req, res, next) {
+  debug('update module %s, with info %j', req.body);
+  var name = req.params.name;
+  var username = req.session.name;
+  var versions = req.body.versions;
+  var ep = eventproxy.create();
+  ep.fail(next);
+
+  Module.listByName(name, ep.doneLater('list'));
+  ep.once('list', function (mods) {
+    if (!mods) {
+      return next();
+    }
+    //TODO replace this maintainer check
+    var match = mods[0].package.maintainers.filter(function (item) {
+      return item.name === username;
+    });
+    if (!match.length || mods[0].name !== name) {
+      return res.json(403, {
+        error: 'no_perms',
+        reason: 'Current user can not update this module'
+      });
+    }
+
+    var removeVersions = [];
+    for (var i = 0; i < mods.length; i++) {
+      var v = mods[i].version;
+      if (v !== 'next' && !versions[v]) {
+        removeVersions.push(v);
+      }
+    }
+
+    Module.removeByNameAndVersions(name, removeVersions, ep.done(function () {
+      res.statusCode = 201;
+      res.end();
+    }));
+  });
+};
+
+
+exports.removeTar = function (req, res, next) {
+  debug('remove tarball with filename: %s, id: %s', req.params.filename, req.params.rev);
+  var id = Number(req.params.rev);
+  var filename = req.params.filename;
+  var username = req.session.name;
+  var ep = eventproxy.create();
+  ep.fail(next);
+  
+  Module.getById(id, ep.doneLater('get'));
+  ep.once('get', function (mod) {
+    if (!mod) {
+      return next();
+    }
+    //TODO replace this maintainer check
+    var match = mod.package.maintainers.filter(function (item) {
+      return item.name === username;
+    });
+    if (!match.length || filename.indexOf(mod.name + '-') !== 0) {
+      return res.json(403, {
+        error: 'no_perms',
+        reason: 'Current user can not delete this tarball'
+      });
+    }
+    //TODO change local file to remote CDN file
+    var filePath = path.join(config.uploadDir, filename);
+    fs.unlink(filePath, ep.done(function () {
+      res.statusCode = 201;
+      res.send();
+    }));
+  });
+};
+
+exports.removeAll = function (req, res, next) {
+  debug('remove all the module with name: %s, id: %s', req.params.name, req.params.rev);
+  var id = Number(req.params.rev);
+  var name = req.params.name;
+  var username = req.session.name;
+  var ep = eventproxy.create();
+  ep.fail(next);
 };
