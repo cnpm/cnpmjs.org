@@ -40,7 +40,8 @@
     "travis-cov": "*",
     "coveralls": "*",
     "mocha-lcov-reporter": "*",
-    "mocha": "*"
+    "mocha": "*",
+    "mm": "*"
   },
   "homepage": "https://github.com/fengmk2/cnpmjs.org",
   "repository": {

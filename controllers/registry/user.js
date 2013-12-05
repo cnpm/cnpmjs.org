@@ -141,7 +141,6 @@ exports.update = function (req, res, next) {
   }
 
   var body = req.body || {};
-
   var user = {
     name: body.name,
     salt: body.salt,
@@ -154,6 +153,13 @@ exports.update = function (req, res, next) {
   User.update(user, function (err, result) {
     if (err) {
       return next(err);
+    }
+    //check rev error
+    if (!result) {
+      return res.json(409, {
+        error: 'conflict',
+        reason: 'Document update conflict.'
+      });      
     }
     res.json(201, {
       ok: true,
