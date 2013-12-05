@@ -14,24 +14,12 @@
  * Module dependencies.
  */
 
-var qn = require('qn');
 var config = require('../config');
+var nfs = config.nfs;
 
-var client = qn.create(config.qn);
+if (!nfs) {
+  // use qnfs by default
+  nfs = require('./qnfs');
+}
 
-/**
- * Upload file
- *
- * @param {String} filepath
- * @param {Object} options
- *  - {String} key
- *  - {Number} size
- * @param {Function(err, result)} callback
- *  - {Object} result
- *   - {String} url
- */
-exports.upload = function (filepath, options, callback) {
-  client.delete(options.key, function (err, data) {
-    client.uploadFile(filepath, {key: options.key, size: options.size}, callback);
-  });
-};
+module.exports = nfs;
