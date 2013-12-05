@@ -32,11 +32,19 @@ module.exports = function (options) {
     var password = authorization[1];
 
     User.auth(username, password, function (err, row) {
-      if (row) {
-        req.session.name = row.name;
+      if (err) {
+        return next(err);
       }
-      debug('auth user: %j, headers: %j', row, req.headers);
-      next(err);
+      if (!row) {
+        debug('auth fail user: %j, headers: %j', row, req.headers);
+        return res.json(401, {
+          error: 'unauthorized',
+          reason: 'Name or password is incorrect.'
+        });
+      }
+      req.session.name = row.name;
+      debug('auth pass user: %j, headers: %j', row, req.headers);
+      next();
     });
   };
 };
