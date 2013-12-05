@@ -67,8 +67,10 @@ app.use(function (err, req, res, next) {
   if (config.debug) {
     return next(err);
   }
-  res.statusCode = 500;
-  res.send('Server has some problems. :(');
+  res.json(500, {
+    error: err.name,
+    reason: err.message
+  });
 });
 
 app = http.createServer(app);

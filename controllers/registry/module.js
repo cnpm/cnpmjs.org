@@ -19,9 +19,11 @@ var debug = require('debug')('cnpmjs.org:controllers:registry:module');
 var path = require('path');
 var fs = require('fs');
 var crypto = require('crypto');
+var utility = require('utility');
 var eventproxy = require('eventproxy');
 var config = require('../../config');
 var Module = require('../../proxy/module');
+var nfs = require('../../common/nfs');
 
 exports.show = function (req, res, next) {
   var name = req.params.name;
@@ -147,20 +149,29 @@ exports.upload = function (req, res, next) {
         });
       }
       shasum = shasum.digest('hex');
-      var dist = {
-        tarball: 'http://' + req.headers.host + '/dist/' + filename,
-        shasum: shasum,
-        size: length
-      };
-      mod.package.dist = dist;
-      mod.package.version = version;
-      debug('%s module: save file to %s, size: %d, sha1: %s, dist: %j, version: %s',
-        id, filepath, length, shasum, dist, version);
-      Module.update(mod, function (err, result) {
+      var key = '/' + name + '/' + filename;
+      nfs.upload(filepath, {key: key, size: length}, function (err, result) {
+        // remove tmp file whatever
+        fs.unlink(filepath, utility.noop);
         if (err) {
           return next(err);
         }
-        res.json(201, {ok: true, rev: String(result.id)});
+
+        var dist = {
+          tarball: result.url,
+          shasum: shasum,
+          size: length
+        };
+        mod.package.dist = dist;
+        mod.package.version = version;
+        debug('%s module: save file to %s, size: %d, sha1: %s, dist: %j, version: %s',
+          id, filepath, length, shasum, dist, version);
+        Module.update(mod, function (err, result) {
+          if (err) {
+            return next(err);
+          }
+          res.json(201, {ok: true, rev: String(result.id)});
+        });
       });
     });
   });
