@@ -5,7 +5,7 @@
  * MIT Licensed
  *
  * Authors:
- *  dead_horse <dead_horse@qq.com>
+ *  dead_horse <dead_horse@qq.com> (http://deadhorse.me)
  *  fengmk2 <fengmk2@gmail.com> (http://fengmk2.github.com)
  */
 
@@ -18,6 +18,7 @@
 var debug = require('debug')('cnpmjs.org:controllers:registry');
 var logger = require('../../common/logger');
 var User = require('../../proxy/user');
+var eventproxy = require('eventproxy');
 
 exports.show = function (req, res, next) {
   var name = req.params.name || '';
@@ -76,28 +77,26 @@ exports.add = function (req, res, next) {
     });
   }
   debug('add user: %j', user);
-  User.get(name, function (err, row) {
-    if (err) {
-      return next(err);
-    }
+  var ep = eventproxy.create();
+  ep.fail(next);
+
+  User.get(name, ep.doneLater(function (row) {
     if (row) {
       return res.json(409, {
         error: 'conflict',
         reason: 'Document update conflict.'
       });
     }
+    User.add(user, ep.done('add'));
+  }));
 
-    User.add(user, function (err, result) {
-      if (err) {
-        return next(err);
-      }
-      res.setHeader('etag', '"' + result.rev + '"');
-      // location: 'http://registry.npmjs.org/_users/org.couchdb.user:cnpmjstest1',
-      res.json(201, {
-        ok: true,
-        id: 'org.couchdb.user:' + name,
-        rev: result.rev
-      });
+  ep.once('add', function (result) {
+    res.setHeader('etag', '"' + result.rev + '"');
+    // location: 'http://registry.npmjs.org/_users/org.couchdb.user:cnpmjstest1',
+    res.json(201, {
+      ok: true,
+      id: 'org.couchdb.user:' + name,
+      rev: result.rev
     });
   });
 };
