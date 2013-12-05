@@ -6,6 +6,7 @@
  *
  * Authors:
  *  fengmk2 <fengmk2@gmail.com> (http://fengmk2.github.com)
+ *  dead_horse <dead_horse@qq.com> (http://deadhorse.me)
  */
 
 'use strict';
@@ -46,6 +47,22 @@ describe('controllers/registry/module.test.js', function () {
           // "url": "http://fengmk2.github.com"
         });
         res.body.name.should.equal('cnpmjs.org');
+        done();
+      });
+    });
+  });
+
+  describe('GET /:name/:version', function () {
+    it('should return module@version info', function (done) {
+      request(app)
+      .get('/cnpmjs.org/0.0.2')
+      .expect(200, function (err, res) {
+        should.not.exist(err);
+        var body = res.body;
+        body.name.should.equal('cnpmjs.org');
+        body.version.should.equal('0.0.2');
+        body._id.should.equal('cnpmjs.org@0.0.2');
+        body.dist.should.have.keys('tarball', 'shasum', 'size');
         done();
       });
     });

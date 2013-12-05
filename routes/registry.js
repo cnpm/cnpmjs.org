@@ -27,6 +27,7 @@ function routes(app) {
 
   // module
   app.get('/:name', mod.show);
+  app.get('/:name/:version', mod.get);
   // try to add module
   app.put('/:name', login, mod.add);
 
