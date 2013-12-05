@@ -6,7 +6,7 @@
  *
  * Authors:
  *  fengmk2 <fengmk2@gmail.com> (http://fengmk2.github.com)
- *  dead_horse <dead_horse@qq.com>
+ *  dead_horse <dead_horse@qq.com> (http://deadhorse.me)
  */
 
 'use strict';
