@@ -16,10 +16,12 @@
  */
 
 require('response-patch');
+var path = require('path');
 var http = require('http');
 var connect = require('connect');
 var rt = require('connect-rt');
 var urlrouter = require('urlrouter');
+var connectMarkdown = require('connect-markdown');
 var routes = require('../routes/web');
 var logger = require('../common/logger');
 var config = require('../config');
@@ -36,6 +38,14 @@ app.use(connect.cookieParser());
 app.use(session);
 app.use(connect.query());
 app.use(connect.json());
+
+var rootdir = path.dirname(__dirname);
+var tplroot = path.join(rootdir, 'docs', 'web');
+app.use('/', connectMarkdown({
+  root: tplroot,
+  layout: path.join(tplroot, 'layout.html'),
+  indexName: 'readme'
+}));
 
 /**
  * Routes

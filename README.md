@@ -7,7 +7,11 @@ cnpmjs.org
 
 ![logo](https://raw.github.com/fengmk2/cnpmjs.org/master/logo.png)
 
-Private npm registry and web.
+## What is this?
+
+Private npm registry and web for Enterprise, base on MySQL and Simple File Store.
+
+@[JacksonTian](https://github.com/JacksonTian/) had a talk about [private npm](https://speakerdeck.com/jacksontian/qi-ye-ji-node-dot-jskai-fa).
 
 ## Install
 
