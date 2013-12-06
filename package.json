@@ -34,6 +34,7 @@
     "mysql": "2.0.0-rc1",
     "response-patch": "0.1.1",
     "response-cookie": "0.0.2",
+    "bagpipe": "0.3.5",
     "eventproxy": "0.2.6"
   },
   "devDependencies": {

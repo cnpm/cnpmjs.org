@@ -35,3 +35,7 @@ exports.upload = function (filepath, options, callback) {
     client.uploadFile(filepath, {key: options.key, size: options.size}, callback);
   });
 };
+
+exports.remove = function (key, callback) {
+  client.delete(key, callback);
+};
