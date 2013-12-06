@@ -454,7 +454,6 @@ function parseModsForList(mods) {
     pkg['dist-tags'] = {
       latest: pkg.version
     };
-
     results[mod.name] = pkg;
   }
   return results;
