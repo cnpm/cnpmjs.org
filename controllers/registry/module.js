@@ -21,9 +21,15 @@ var fs = require('fs');
 var crypto = require('crypto');
 var utility = require('utility');
 var eventproxy = require('eventproxy');
+var Bagpipe = require('bagpipe');
 var config = require('../../config');
 var Module = require('../../proxy/module');
 var nfs = require('../../common/nfs');
+var Url = require('url');
+
+function getCDNKey(name, filename) {
+  return '/' + name + '/-/' + filename;
+}
 
 exports.show = function (req, res, next) {
   var name = req.params.name;
@@ -105,7 +111,7 @@ exports.upload = function (req, res, next) {
   var name = req.params.name;
   var id = Number(req.params.rev);
   var filename = req.params.filename;
-  var version = filename.substring(filename.indexOf('-') + 1);
+  var version = filename.substring(name.length + 1);
   version = version.replace(/\.tgz$/, '');
   // save version on pkg upload
 
@@ -149,7 +155,7 @@ exports.upload = function (req, res, next) {
         });
       }
       shasum = shasum.digest('hex');
-      var key = '/' + name + '/-/' + filename;
+      var key = getCDNKey(name, filename);
       nfs.upload(filepath, {key: key, size: length}, function (err, result) {
         // remove tmp file whatever
         fs.unlink(filepath, utility.noop);
@@ -304,6 +310,128 @@ exports.add = function (req, res, next) {
       ok: true,
       id: name,
       rev: String(nextMod.id),
+    });
+  });
+};
+
+
+exports.removeWithVersions = function (req, res, next) {
+  debug('removeWithVersions module %s, with info %j', req.params.name, req.body);
+  var name = req.params.name;
+  var username = req.session.name;
+  var versions = req.body.versions || {};
+  var ep = eventproxy.create();
+  ep.fail(next);
+
+  Module.listByName(name, ep.doneLater('list'));
+  ep.once('list', function (mods) {
+    if (!mods || !mods.length) {
+      return next();
+    }
+    //TODO replace this maintainer check
+    var match = mods[0].package.maintainers.filter(function (item) {
+      return item.name === username;
+    });
+
+    if (!match.length || mods[0].name !== name) {
+      return res.json(403, {
+        error: 'no_perms',
+        reason: 'Current user can not update this module'
+      });
+    }
+
+    var removeVersions = [];
+    for (var i = 0; i < mods.length; i++) {
+      var v = mods[i].version;
+      if (v !== 'next' && !versions[v]) {
+        removeVersions.push(v);
+      }
+    }
+    if (!removeVersions.length) {
+      return res.json(201, {ok: true});
+    }
+    Module.removeByNameAndVersions(name, removeVersions, ep.done(function () {
+      res.json(201, {ok: true});
+    }));
+  });
+};
+
+
+exports.removeTar = function (req, res, next) {
+  debug('remove tarball with filename: %s, id: %s', req.params.filename, req.params.rev);
+  var id = Number(req.params.rev);
+  var filename = req.params.filename;
+  var name = req.params.name;
+  var username = req.session.name;
+  var ep = eventproxy.create();
+  ep.fail(next);
+  
+  Module.getById(id, ep.doneLater('get'));
+  ep.once('get', function (mod) {
+    if (!mod) {
+      return next();
+    }
+    //TODO replace this maintainer check
+    var match = mod.package.maintainers.filter(function (item) {
+      return item.name === username;
+    });
+    if (!match.length || mod.name !== name) {
+      return res.json(403, {
+        error: 'no_perms',
+        reason: 'Current user can not delete this tarball'
+      });
+    }
+    
+    var key = getCDNKey(mod.name, filename);
+    nfs.remove(key, ep.done(function () {
+      res.json(200, {ok: true});
+    }));
+  });
+};
+
+exports.removeAll = function (req, res, next) {
+  debug('remove all the module with name: %s, id: %s', req.params.name, req.params.rev);
+  var id = Number(req.params.rev);
+  var name = req.params.name;
+  var username = req.session.name;
+
+  var ep = eventproxy.create();
+  ep.fail(next);
+
+  Module.listByName(name, ep.doneLater('list'));
+  ep.once('list', function (mods) {
+    var mod = mods[0];
+    if (!mod) {
+      return next();
+    }
+    //TODO replace this maintainer check
+    var match = mod.package.maintainers.filter(function (item) {
+      return item.name === username;
+    });
+    if (!match.length || mod.name !== name) {
+      return res.json(403, {
+        error: 'no_perms',
+        reason: 'Current user can not delete this tarball'
+      });
+    }    
+    Module.removeByName(name, ep.done('remove'));
+  });
+
+  ep.all('list', 'remove', function (mods) {
+    var keys = [];
+    for (var i = 0; i < mods.length; i++) {
+      var key = Url.parse(mods[i].dist_tarball).path;
+      key && keys.push(key);
+    }
+    var queue = new Bagpipe(5);
+    keys.forEach(function (key) {
+      queue.push(nfs.remove, key, function () {
+        //ignore err here
+        ep.emit('removeTar');
+      });
+    });
+    ep.after('removeTar', keys.length, function () {
+      res.json(200, {});
     });
   });
 };

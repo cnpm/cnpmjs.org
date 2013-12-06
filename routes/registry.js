@@ -34,8 +34,15 @@ function routes(app) {
   // put tarball
   // https://registry.npmjs.org/cnpmjs.org/-/cnpmjs.org-0.0.0.tgz/-rev/1-c85bc65e8d2470cc4d82b8f40da65b8e
   app.put('/:name/-/:filename/-rev/:rev', login, mod.upload);
+  //delete tarball
+  app.delete('/:name/-/:filename/-rev/:rev', login, mod.removeTar);
+  
   // put package.json to module
   app.put('/:name/:version/-tag/latest', login, mod.updateLatest);
+
+  //update module, unpublish will PUT this
+  app.put('/:name/-rev/:rev', login, mod.removeWithVersions);
+  app.delete('/:name/-rev/:rev', login, mod.removeAll);
 
   // try to create a new user
   // https://registry.npmjs.org/-/user/org.couchdb.user:fengmk2

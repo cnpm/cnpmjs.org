@@ -144,3 +144,8 @@ exports.removeByName = function (name, callback) {
   mysql.query(DELETE_MODULE_BY_NAME_SQL, [name], callback);
 };
 
+var DELETE_MODULE_BY_NAME_AND_VERSIONS_SQL = 'DELETE FROM module WHERE name=? AND version IN(?)';
+exports.removeByNameAndVersions = function (name, versions, callback) {
+  mysql.query(DELETE_MODULE_BY_NAME_AND_VERSIONS_SQL, [name, versions], callback);
+};
+

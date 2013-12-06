@@ -21,6 +21,7 @@ var should = require('should');
 var request = require('supertest');
 var app = require('../../../servers/registry');
 var Module = require('../../../proxy/module');
+var mm = require('mm');
 
 var fixtures = path.join(path.dirname(path.dirname(__dirname)), 'fixtures');
 
@@ -31,7 +32,7 @@ describe('controllers/registry/module.test.js', function () {
   after(function (done) {
     app.close(done);
   });
-
+  afterEach(mm.restore);
   describe('GET /:name', function () {
     it('should return module info', function (done) {
       request(app)
@@ -268,5 +269,127 @@ describe('controllers/registry/module.test.js', function () {
       });
     });
 
+  });
+
+  describe('PUT /:name/-rev/:rev', function () { 
+    var baseauth = 'Basic ' + new Buffer('cnpmjstest10:cnpmjstest10').toString('base64');
+    var baseauthOther = 'Basic ' + new Buffer('cnpmjstest101:cnpmjstest101').toString('base64');
+    var lastRev;
+    before(function (done) {
+      request(app)
+      .get('/testputmodule')
+      .end(function (err, res) {
+        lastRev = res.body._rev;
+        done(err);
+      });
+    });
+
+    it('should update 401 when no auth', function (done) {
+      request(app)
+      .put('/testputmodule/-rev/123')
+      .expect(401, done);
+    });
+
+    it('should update 403 when auth error', function (done) {
+      request(app)
+      .put('/testputmodule/-rev/123')
+      .set('authorization', baseauthOther)
+      .expect(403, done);
+    });
+
+    it('should remove nothing removed ok', function (done) {
+      request(app)
+      .put('/testputmodule/-rev/' + lastRev)
+      .set('authorization', baseauth)
+      .send({
+        versions: {
+          '0.1.9': {}
+        }
+      })
+      .expect(201, done);
+    });
+
+    it('should remove version ok', function (done) {
+      //do not really remove it here
+      mm.empty(Module, 'removeByNameAndVersions');
+      request(app)
+      .put('/testputmodule/-rev/' + lastRev)
+      .set('authorization', baseauth)
+      .send({
+        versions: {
+        }
+      })
+      .expect(201, done);
+    });
+  });
+
+  describe('DELETE /:name/-/:filename/-rev/:rev', function () {
+    var baseauth = 'Basic ' + new Buffer('cnpmjstest10:cnpmjstest10').toString('base64');
+    var baseauthOther = 'Basic ' + new Buffer('cnpmjstest101:cnpmjstest101').toString('base64');
+    var lastRev;
+    before(function (done) {
+      request(app)
+      .get('/testputmodule')
+      .end(function (err, res) {
+        lastRev = res.body._rev;
+        done(err);
+      });
+    });
+
+    it('should delete 401 when no auth', function (done) {
+      request(app)
+      .del('/testputmodule/-/testputmodule-0.1.9.tgz/-rev/' + lastRev)
+      .expect(401, done);
+    });
+
+    it('should delete 403 when auth error', function (done) {
+      request(app)
+      .del('/testputmodule/-/testputmodule-0.1.9.tgz/-rev/' + lastRev)
+      .set('authorization', baseauthOther)
+      .expect(403, done);
+    });
+
+    it('should delete file ok', function (done) {
+      request(app)
+      .del('/testputmodule/-/testputmodule-0.1.9.tgz/-rev/' + lastRev)
+      .set('authorization', baseauth)
+      .expect(200, done);
+    });
+  });
+
+  describe('DELETE /:name/-rev/:rev', function (done) {
+    var baseauth = 'Basic ' + new Buffer('cnpmjstest10:cnpmjstest10').toString('base64');
+    var baseauthOther = 'Basic ' + new Buffer('cnpmjstest101:cnpmjstest101').toString('base64');
+    var lastRev;
+    before(function (done) {
+      request(app)
+      .get('/testputmodule')
+      .end(function (err, res) {
+        lastRev = res.body._rev;
+        done(err);
+      });
+    });
+
+    it('should delete 401 when no auth', function (done) {
+      request(app)
+      .del('/testputmodule/-rev/' + lastRev)
+      .expect(401, done);
+    });
+
+    it('should delete 403 when auth error', function (done) {
+      request(app)
+      .del('/testputmodule/-rev/' + lastRev)
+      .set('authorization', baseauthOther)
+      .expect(403, done);
+    });
+
+    it('shold remove all the module ok', function (done) {
+      //do not really remove
+      mm.empty(Module, 'removeByName');
+      request(app)
+      .del('/testputmodule/-rev/' + lastRev)
+      .set('authorization', baseauth)
+      .expect(200, done);
+    });
   });
 });
