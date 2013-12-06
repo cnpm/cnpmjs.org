@@ -315,8 +315,8 @@ exports.add = function (req, res, next) {
 };
 
 
-exports.update = function (req, res, next) {
-  debug('update module %s, with info %j', req.body);
+exports.removeWithVersions = function (req, res, next) {
+  debug('removeWithVersions module %s, with info %j', req.params.name, req.body);
   var name = req.params.name;
   var username = req.session.name;
   var versions = req.body.versions || {};
@@ -400,8 +400,11 @@ exports.removeAll = function (req, res, next) {
 
   Module.listByName(name, ep.doneLater('list'));
   ep.once('list', function (mods) {
-    //TODO replace this maintainer check
     var mod = mods[0];
+    if (!mod) {
+      return next();
+    }
+    //TODO replace this maintainer check
     var match = mod.package.maintainers.filter(function (item) {
       return item.name === username;
     });

@@ -41,7 +41,7 @@ function routes(app) {
   app.put('/:name/:version/-tag/latest', login, mod.updateLatest);
 
   //update module, unpublish will PUT this
-  app.put('/:name/-rev/:rev', login, mod.update);
+  app.put('/:name/-rev/:rev', login, mod.removeWithVersions);
   app.delete('/:name/-rev/:rev', login, mod.removeAll);
 
   // try to create a new user
