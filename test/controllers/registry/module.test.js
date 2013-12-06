@@ -268,7 +268,54 @@ describe('controllers/registry/module.test.js', function () {
         done();
       });
     });
+  });
 
+  describe('GET /-/all', function () {
+    it('should get 200', function (done) {
+      request(app)
+      .get('/-/all')
+      .expect(200, function (err, res) {
+        res.body.should.be.an.Object;
+        res.body._updated.should.be.a.Number;
+        Object.keys(res.body).length.should.be.above(1);
+        done();
+      });
+    });
+  });
+
+  describe('GET /-/all/since', function () {
+    it('should get 200', function (done) {
+      request(app)
+      .get('/-/all/since?stale=update_after&startkey=0')
+      .expect(200, function (err, res) {
+        res.body.should.be.an.Object;
+        res.body._updated.should.be.a.Number;
+        Object.keys(res.body).length.should.be.above(1);
+        done();
+      });
+    });
+    it('should get 200 but response empty', function (done) {
+      request(app)
+      .get('/-/all/since?stale=update_after&startkey=' + Date.now())
+      .expect(200, function (err, res) {
+        res.body.should.be.an.Object;
+        res.body._updated.should.be.a.Number;
+        Object.keys(res.body).length.should.equal(1);
+        done();
+      });
+    });
+  });
+
+  describe('GET /-/short', function () {
+    it('should get 200', function (done) {
+      request(app)
+      .get('/-/short')
+      .expect(200, function (err, res) {
+        res.body.should.be.an.Array;
+        res.body.length.should.be.above(1);
+        done();
+      });
+    });
   });
 
   describe('PUT /:name/-rev/:rev', function () { 

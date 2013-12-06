@@ -25,6 +25,13 @@ var user = require('../controllers/registry/user');
 function routes(app) {
   app.get('/', home.show);
 
+  //before /:name/:version
+  //get all modules, for npm search
+  app.get('/-/all', mod.listAllModules);
+  app.get('/-/all/since', mod.listAllModulesSince);
+  //get all module names, for auto completion
+  app.get('/-/short', mod.listAllModuleNames);
+
   // module
   app.get('/:name', mod.show);
   app.get('/:name/:version', mod.get);

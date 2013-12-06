@@ -139,6 +139,14 @@ exports.listByName = function (name, callback) {
   });
 };
 
+
+var LIST_SINCE_SQL = 'SELECT DISTINCT(name), gmt_modified, package \
+                     FROM module WHERE gmt_modified > ? AND version <> "next" \
+                     ORDER BY id DESC';
+exports.listSince = function (start, callback) {
+  mysql.query(LIST_SINCE_SQL, start, callback);
+};
+
 var DELETE_MODULE_BY_NAME_SQL = 'DELETE FROM module WHERE name=?;';
 exports.removeByName = function (name, callback) {
   mysql.query(DELETE_MODULE_BY_NAME_SQL, [name], callback);
