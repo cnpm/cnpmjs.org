@@ -24,6 +24,7 @@ var eventproxy = require('eventproxy');
 var Bagpipe = require('bagpipe');
 var config = require('../../config');
 var Module = require('../../proxy/module');
+var Total = require('../../proxy/total');
 var nfs = require('../../common/nfs');
 var Url = require('url');
 
@@ -365,7 +366,7 @@ exports.removeTar = function (req, res, next) {
   var username = req.session.name;
   var ep = eventproxy.create();
   ep.fail(next);
-  
+
   Module.getById(id, ep.doneLater('get'));
   ep.once('get', function (mod) {
     if (!mod) {
@@ -381,7 +382,7 @@ exports.removeTar = function (req, res, next) {
         reason: 'Current user can not delete this tarball'
       });
     }
-    
+
     var key = getCDNKey(mod.name, filename);
     nfs.remove(key, ep.done(function () {
       res.json(200, {ok: true});
@@ -413,7 +414,8 @@ exports.removeAll = function (req, res, next) {
         error: 'no_perms',
         reason: 'Current user can not delete this tarball'
       });
-    }    
+    }
+    Total.plusDeleteModule(utility.noop);
     Module.removeByName(name, ep.done('remove'));
   });
 
