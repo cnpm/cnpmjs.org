@@ -33,6 +33,7 @@ describe('controllers/registry/home.test.js', function () {
       .expect(200, function (err, res) {
         should.not.exist(err);
         res.body.db_name.should.equal('registry');
+        // console.log(res.body)
         done();
       });
     });

@@ -15,21 +15,19 @@
  */
 
 var microtime = require('microtime');
+var Total = require('../../proxy/total');
 
 var startTime = '' + microtime.now();
 
-exports.show = function (req, res) {
-  res.json({
-    db_name: "registry",
-    doc_count: 49723,
-    doc_del_count: 4528,
-    update_seq: 820897,
-    purge_seq: 0,
-    compact_running: false,
-    disk_size: 151819346055,
-    data_size: 132303912087,
-    instance_start_time: startTime,
-    disk_format_version: 6,
-    committed_update_seq: 820897
+exports.show = function (req, res, next) {
+  Total.get(function (err, total) {
+    if (err) {
+      return next(err);
+    }
+
+    total.db_name = 'registry';
+    total.instance_start_time = startTime;
+    total.donate = 'https://me.alipay.com/imk2';
+    res.json(total);
   });
 };

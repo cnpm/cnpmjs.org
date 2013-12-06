@@ -31,3 +31,10 @@ CREATE TABLE `module` (
  KEY `author` (`author`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='module info';
 
+CREATE TABLE `total` (
+ `name` varchar(100) NOT NULL COMMENT 'total name',
+ `gmt_modified` datetime NOT NULL COMMENT 'modified time',
+ `module_delete` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT 'module delete count',
+ PRIMARY KEY (`name`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='total info';
+INSERT INTO total(name, gmt_modified, module_delete) VALUES('total', now(), 0);

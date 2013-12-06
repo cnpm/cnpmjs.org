@@ -13,6 +13,8 @@ Private npm registry and web for Enterprise, base on MySQL and Simple File Store
 
 @[JacksonTian](https://github.com/JacksonTian/) had a talk about [private npm](https://speakerdeck.com/jacksontian/qi-ye-ji-node-dot-jskai-fa).
 
+![cnpm](https://docs.google.com/drawings/d/12QeQfGalqjsB77mRnf5Iq5oSXHCIUTvZTwECMonqCmw/pub?w=480&h=360)
+
 ## Install
 
 ```bash

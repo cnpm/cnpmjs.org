@@ -61,6 +61,10 @@ $ git summary
     13  dead_horse              40.6%
 ```
 
+## npm & cnpm
+
+![npm&cnpm](https://docs.google.com/drawings/d/12QeQfGalqjsB77mRnf5Iq5oSXHCIUTvZTwECMonqCmw/pub?w=960&h=720)
+
 ## 捐赠 Donate
 如果您觉得 [cnpmjs.org] 对您有帮助，欢迎请作者一杯咖啡.
 
