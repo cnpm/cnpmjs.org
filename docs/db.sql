@@ -29,5 +29,5 @@ CREATE TABLE `module` (
  UNIQUE KEY `name` (`name`,`version`),
  KEY `gmt_modified` (`gmt_modified`),
  KEY `author` (`author`)
-) ENGINE=InnoDB AUTO_INCREMENT=25 DEFAULT CHARSET=utf8 COMMENT='module info'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='module info';
 

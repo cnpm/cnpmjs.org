@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>{TITLE}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Bootstrap -->
+    <link href="http://cdn.staticfile.org/twitter-bootstrap/3.0.0-rc2/css/bootstrap.min.css" rel="stylesheet" media="screen">
+    <link href="http://cdn.staticfile.org/prettify/r298/prettify.min.css" rel="stylesheet" media="screen">
+    <style>
+      a{color:#09f;}
+      code{color:#080;}
+      pre{line-height: 1.4;}
+      pre.prettyprint{padding: 10px;}
+      h1, #tagline{display:inline;}
+      /*#wrapper{padding:5% 8%;min-width:480px;}*/
+      #tagline{font:0.8em serif;color:#888;display:inline-block;margin:0.1em 0 1.2em;}
+      #fork{position:fixed;top:0;right:0;_position:absolute;}
+    </style>
+  </head>
+  <body>
+    <div class="container">
+    {BODY}
+    <div class="bottom">
+      <hr/>
+      <p>Copyright 2013 - 2014 &copy; cnpmjs.org</p>
+      <a href="https://github.com/fengmk2/cnpmjs.org" id="fork" target="_blank">
+        <img alt="Fork me on GitHub" src="http://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png">
+    </a>
+    </div>
+    </div>
+    <!-- JavaScript plugins (requires jQuery) -->
+    <script src="http://cdn.staticfile.org/jquery/2.0.3/jquery.min.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="http://cdn.staticfile.org/twitter-bootstrap/3.0.0-rc2/js/bootstrap.min.js"></script>
+
+    <!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
+    <script src="http://cdn.staticfile.org/respond.js/1.2.0/respond.min.js"></script>
+
+    <script src="http://cdn.staticfile.org/prettify/r298/prettify.min.js"></script>
+
+    <!-- Specific to this page -->
+    <script>
+    $(function () {
+      $('pre code').parent().addClass('prettyprint');
+      prettyPrint();
+      $('table').addClass('table table-bordered table-striped');
+    });
+    </script>
+  </body>
+</html>
