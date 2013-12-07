@@ -139,12 +139,21 @@ exports.listByName = function (name, callback) {
   });
 };
 
+
+var LIST_SINCE_SQL = 'SELECT name, package FROM module WHERE id IN \
+                     (SELECT max(id) FROM module WHERE gmt_modified > ?\
+                      GROUP BY name )\
+                     ORDER BY name';
+exports.listSince = function (start, callback) {
+  mysql.query(LIST_SINCE_SQL, [start], callback);
+};
+
 var DELETE_MODULE_BY_NAME_SQL = 'DELETE FROM module WHERE name=?;';
 exports.removeByName = function (name, callback) {
   mysql.query(DELETE_MODULE_BY_NAME_SQL, [name], callback);
 };
 
-var DELETE_MODULE_BY_NAME_AND_VERSIONS_SQL = 'DELETE FROM module WHERE name=? AND version IN(?)';
+var DELETE_MODULE_BY_NAME_AND_VERSIONS_SQL = 'DELETE FROM module WHERE name=? AND version IN(?);';
 exports.removeByNameAndVersions = function (name, versions, callback) {
   mysql.query(DELETE_MODULE_BY_NAME_AND_VERSIONS_SQL, [name, versions], callback);
 };

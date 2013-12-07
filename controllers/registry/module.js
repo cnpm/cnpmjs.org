@@ -315,7 +315,6 @@ exports.add = function (req, res, next) {
   });
 };
 
-
 exports.removeWithVersions = function (req, res, next) {
   debug('removeWithVersions module %s, with info %j', req.params.name, req.body);
   var name = req.params.name;
@@ -435,5 +434,67 @@ exports.removeAll = function (req, res, next) {
     ep.after('removeTar', keys.length, function () {
       res.json(200, {});
     });
+  });
+};
+
+function parseModsForList(mods) {
+  var results = {
+    _updated: Date.now()
+  };
+
+  for (var i = 0; i < mods.length; i++) {
+    var mod = mods[i];
+    var pkg = {};
+    try {
+      pkg = JSON.parse(mod.package);
+    } catch (e) {
+      //ignore this pkg
+      continue;
+    }
+    pkg['dist-tags'] = {
+      latest: pkg.version
+    };
+    results[mod.name] = pkg;
+  }
+  return results;
+}
+
+exports.listAllModules = function (req, res, next) {
+  Module.listSince(new Date(0), function (err, mods) {
+    if (err) {
+      return next(err);
+    }
+    return res.json(parseModsForList(mods));
+  });
+};
+
+exports.listAllModulesSince = function (req, res, next) {
+  var query = req.query || {};
+  if (query.stale !== 'update_after') {
+    return res.json(400, {
+      error: 'query_parse_error',
+      reason: 'Invalid value for `stale`.'
+    });
+  }
+  debug('list all modules from %s', req.startkey);
+  var startkey = parseInt(query.startkey, 10) || 0;
+  Module.listSince(new Date(startkey), function (err, mods) {
+    if (err) {
+      return next(err);
+    }
+    res.json(parseModsForList(mods));
+  });
+};
+
+exports.listAllModuleNames = function (req, res, next) {
+  Module.listSince(new Date(0), function (err, mods) {
+    if (err) {
+      return next(err);
+    }
+    var results = [];
+    for (var i = 0; i < mods.length; i++) {
+      results.push(mods[i].name);
+    }
+    res.json(results);
   });
 };
