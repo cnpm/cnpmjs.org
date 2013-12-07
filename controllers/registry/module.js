@@ -495,6 +495,6 @@ exports.listAllModuleNames = function (req, res, next) {
     for (var i = 0; i < mods.length; i++) {
       results.push(mods[i].name);
     }
-    res.json(results.sort());
+    res.json(results);
   });
 };
