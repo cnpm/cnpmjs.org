@@ -19,7 +19,10 @@ Private npm registry and web for Enterprise, base on MySQL and Simple File Store
 alias it:
 
 ```bash
-$ alias cnpm='npm --registry=http://registry.cnpmjs.org'
+alias cnpm="npm --registry=http://registry.cnpmjs.org --cache=$HOME/.npm/.cache/cnpm"
+
+#Or alias it in .bashrc or .zshrc
+$ echo '\n#alias for cnpm\nalias cnpm="npm --registry=http://registry.cnpmjs.org --cache=$HOME/.npm/.cache/cnpm"' >> ~/.zshrc && source ~/.zshrc
 ```
 
 ### adduser
