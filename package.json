@@ -1,6 +1,6 @@
 {
   "name": "cnpmjs.org",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Private npm registry and web",
   "main": "dispatch.js",
   "scripts": {
@@ -16,6 +16,7 @@
     }
   },
   "dependencies": {
+    "urllib": "0.5.4",
     "connect-markdown": "0.0.3",
     "qn": "0.2.0",
     "microtime": "0.5.0",

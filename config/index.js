@@ -57,6 +57,15 @@ var config = {
     bucket: "qtestbucket",
     domain: "http://qtestbucket.qiniudn.com"
   },
+
+  sourceNpmRegistry: 'http://registry.npmjs.org',
+  enablePrivate: true, // enable private mode, only admin can publish, other use just can sync package from source npm
+  admins: {
+    admin: true,
+    fengmk2: true,
+    dead_horse: true,
+    cnpmjstest10: true,
+  },
 };
 
 // load config/config.js, everything in config.js will cover the same key in index.js

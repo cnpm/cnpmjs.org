@@ -20,8 +20,15 @@ var mysql = require('../common/mysql');
 
 var MODULE_COLUMNS = 'id, gmt_create, gmt_modified, author, name, version, package, dist_tarball, dist_shasum, dist_size';
 
-var INSERT_MODULE_SQL = 'INSERT INTO module(gmt_create, gmt_modified, author, name, version, package, dist_tarball, dist_shasum, dist_size) \
-  VALUES(now(), now(), ?, ?, ?, ?, ?, ?, ?);';
+// var INSERT_MODULE_SQL = 'INSERT INTO module(gmt_create, gmt_modified, author, name, version, package, dist_tarball, dist_shasum, dist_size) \
+//   VALUES(now(), now(), ?, ?, ?, ?, ?, ?, ?);';
+
+var INSERT_MODULE_SQL = 'INSERT INTO module(gmt_create, gmt_modified, \
+  author, name, version, package, dist_tarball, dist_shasum, dist_size) \
+  VALUES(now(), now(), ?, ?, ?, ?, ?, ?, ?) \
+  ON DUPLICATE KEY UPDATE gmt_modified=now(), \
+    author=VALUES(author), name=VALUES(name), version=VALUES(version), package=VALUES(package), \
+    dist_tarball=VALUES(dist_tarball), dist_shasum=VALUES(dist_shasum), dist_size=VALUES(dist_size);';
 
 exports.add = function (mod, callback) {
   var pkg;

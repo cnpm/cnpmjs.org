@@ -22,11 +22,13 @@ var crypto = require('crypto');
 var utility = require('utility');
 var eventproxy = require('eventproxy');
 var Bagpipe = require('bagpipe');
+var urllib = require('urllib');
+var urlparse = require('url').parse;
 var config = require('../../config');
 var Module = require('../../proxy/module');
 var Total = require('../../proxy/total');
 var nfs = require('../../common/nfs');
-var Url = require('url');
+var npm = require('../../proxy/npm');
 
 function getCDNKey(name, filename) {
   return '/' + name + '/-/' + filename;
@@ -421,7 +423,7 @@ exports.removeAll = function (req, res, next) {
   ep.all('list', 'remove', function (mods) {
     var keys = [];
     for (var i = 0; i < mods.length; i++) {
-      var key = Url.parse(mods[i].dist_tarball).path;
+      var key = urlparse(mods[i].dist_tarball).path;
       key && keys.push(key);
     }
     var queue = new Bagpipe(5);
@@ -432,8 +434,143 @@ exports.removeAll = function (req, res, next) {
       });
     });
     ep.after('removeTar', keys.length, function () {
-      res.json(200, {});
+      res.json(200, {ok: true});
     });
+  });
+};
+
+exports._syncModule = function (username, sourcePackage, callback) {
+  var downurl = sourcePackage.dist.tarball;
+  var filename = path.basename(downurl);
+  var filepath = path.join(config.uploadDir, filename);
+  var ws = fs.createWriteStream(filepath);
+  var options = {
+    writeStream: ws,
+  };
+  var ep = eventproxy.create();
+  ep.fail(callback);
+
+  var shasum = crypto.createHash('sha1');
+  var dataSize = 0;
+  urllib.request(downurl, options, ep.done(function (_, response) {
+    var statusCode = response && response.statusCode || -1;
+    if (statusCode !== 200) {
+      var err = new Error('Download ' + downurl + ' fail, status: ' + statusCode);
+      err.name = 'DownloadTarballError';
+      err.data = sourcePackage;
+      return ep.emit('error', err);
+    }
+
+    var rs = fs.createReadStream(filepath);
+    rs.once('error', ep.fail.bind(ep));
+    rs.on('data', function (data) {
+      shasum.update(data);
+      dataSize += data.length;
+    });
+    rs.on('end', function () {
+      shasum = shasum.digest('hex');
+      if (shasum !== sourcePackage.dist.shasum) {
+        var err = new Error('Download ' + downurl + ' shasum:' + shasum + ' not match ' + sourcePackage.dist.shasum);
+        err.name = 'DownloadTarballShasumError';
+        err.data = sourcePackage;
+        return ep.emit('error', err);
+      }
+
+      var key = getCDNKey(sourcePackage.name, filename);
+      nfs.upload(filepath, {key: key, size: dataSize}, ep.done('uploadResult'));
+    });
+  }));
+
+  ep.on('uploadResult', function (result) {
+    // remove tmp file whatever
+    fs.unlink(filepath, utility.noop);
+    var mod = {
+      version: sourcePackage.version,
+      name: sourcePackage.name,
+      package: sourcePackage,
+      author: username,
+    };
+    var dist = {
+      tarball: result.url,
+      shasum: shasum,
+      size: dataSize
+    };
+    mod.package.dist = dist;
+
+    debug('sync %s, size: %d, sha1: %s, dist: %j, version: %s',
+      downurl, dataSize, shasum, dist, mod.version);
+    Module.add(mod, ep.done(function (result) {
+      callback(null, result);
+    }));
+  });
+};
+
+exports.sync = function (req, res, next) {
+  var username = req.session.name;
+  var name = req.params.name;
+  var ep = eventproxy.create();
+  ep.fail(next);
+
+  npm.get(name, ep.done(function (pkg, response) {
+    if (!pkg._rev) {
+      return res.json(response.statusCode, pkg);
+    }
+    ep.emit('sourcePackage', pkg);
+  }));
+
+  Module.listByName(name, ep.done(function (rows) {
+    var map = {};
+    for (var i = 0; i < rows.length; i++) {
+      var r = rows[i];
+      if (r.version === 'next') {
+        continue;
+      }
+      map[r.version] = r;
+    }
+    ep.emit('existsMap', map);
+  }));
+
+  var missingVersions = [];
+  ep.all('sourcePackage', 'existsMap', function (pkg, map) {
+    var times = pkg.time || {};
+    var versions = [];
+    for (var v in times) {
+      var exists = map[v];
+      var version = pkg.versions[v];
+      if (!version || !version.dist) {
+        continue;
+      }
+      if (exists && exists.package.dist.shasum === version.shasum) {
+        continue;
+      }
+      version.gmt_modified = Date.parse(times[v]);
+      versions.push(version);
+    }
+
+    if (versions.length === 0) {
+      return ep.emit('done');
+    }
+
+    versions.sort(function (a, b) {
+      return a.gmt_modified - b.gmt_modified;
+    });
+    missingVersions = versions;
+    ep.emit('syncVersion', missingVersions.shift());
+  });
+
+  ep.on('syncVersion', function (version) {
+    exports._syncModule(username, version, ep.done(function (result) {
+      var nextVersion = missingVersions.shift();
+      if (!nextVersion) {
+        return ep.emit('done', result);
+      }
+      ep.emit('syncVersion', nextVersion);
+    }));
+  });
+
+  ep.on('done', function () {
+    // TODO: set latest version
+    res.json(201, {ok: true});
   });
 };
 

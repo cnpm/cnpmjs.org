@@ -16,10 +16,17 @@
 
 var debug = require('debug')('cnpmjs.org:middleware:auth');
 var User = require('../proxy/user');
+var config = require('../config');
 
 module.exports = function (options) {
   return function auth(req, res, next) {
-    if (req.session.name && req.session.email) {
+    req.session.onlySync = config.enablePrivate ? true : false;
+    if (req.session.name) {
+      if (config.admins[req.session.name] === true) {
+        req.session.isAdmin = true;
+      }
+      debug('auth exists user: %s, onlySync: %s, isAdmin: %s, headers: %j',
+        req.session.name, req.session.onlySync, req.session.isAdmin, req.headers);
       return next();
     }
     var authorization = (req.headers.authorization || '').split(' ')[1] || '';
@@ -45,8 +52,11 @@ module.exports = function (options) {
       }
 
       req.session.name = row.name;
-      req.session.email = row.email;
-      debug('auth pass user: %j, headers: %j', row, req.headers);
+      if (config.admins[req.session.name] === true) {
+        req.session.isAdmin = true;
+      }
+      debug('auth pass user: %j, onlySync: %s, isAdmin: %s, headers: %j',
+        row, req.session.onlySync, req.session.isAdmin, req.headers);
       next();
     });
   };
