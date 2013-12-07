@@ -300,7 +300,9 @@ describe('controllers/registry/module.test.js', function () {
       .expect(200, function (err, res) {
         res.body.should.be.an.Object;
         res.body._updated.should.be.a.Number;
-        Object.keys(res.body).length.should.equal(1);
+        res.body.should.eql({
+          _updated: res.body._updated
+        });
         done();
       });
     });
