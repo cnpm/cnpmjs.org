@@ -1,5 +1,5 @@
 /**!
- * cnpmjs.org - proxy/user.js
+ * cnpmjs.org - test/proxy/user.test.js
  *
  * Copyright(c) cnpmjs.org and other contributors.
  * MIT Licensed
@@ -39,7 +39,7 @@ function clean(done) {
   mysql.query('DELETE FROM user WHERE name=?', [mockUser.name], done);
 }
 
-describe('proxy/user.js', function () {
+describe('proxy/user.test.js', function () {
   before(clean);
   afterEach(mm.restore);
   afterEach(clean);
@@ -113,7 +113,7 @@ describe('proxy/user.js', function () {
         err.message.should.equal('mock error');
         done();
       });
-    });    
+    });
   });
 
   describe('update()', function () {
@@ -149,7 +149,7 @@ describe('proxy/user.js', function () {
       user.update(mockUser, function (err, data) {
         err.message.should.equal('mock error');
         done();
-      });      
+      });
     });
   });
 });

@@ -21,6 +21,7 @@ function request(url, callback) {
   url = config.sourceNpmRegistry + url;
   var options = {
     dataType: 'json',
+    timeout: 10000,
   };
   urllib.request(url, options, callback);
 }
@@ -30,6 +31,7 @@ exports.get = function (name, callback) {
     if (err) {
       return callback(err);
     }
+    res = res || {};
     if (res.statusCode === 404) {
       data = null;
     }

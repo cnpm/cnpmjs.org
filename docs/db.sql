@@ -31,6 +31,17 @@ CREATE TABLE `module` (
  KEY `author` (`author`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='module info';
 
+CREATE TABLE `module_log` (
+ `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'primary key',
+ `gmt_create` datetime NOT NULL COMMENT 'create time',
+ `gmt_modified` datetime NOT NULL COMMENT 'modified time',
+ `username` varchar(100) NOT NULL,
+ `name` varchar(100) NOT NULL COMMENT 'module name',
+ `log` longtext,
+ PRIMARY KEY (`id`),
+ KEY `name` (`name`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='module sync log';
+
 CREATE TABLE `total` (
  `name` varchar(100) NOT NULL COMMENT 'total name',
  `gmt_modified` datetime NOT NULL COMMENT 'modified time',

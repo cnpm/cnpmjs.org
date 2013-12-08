@@ -39,6 +39,9 @@ function routes(app) {
   // try to add module
   app.put('/:name', [login, publishable], mod.add);
 
+  // sync from source npm
+  app.put('/:name/sync', [login], mod.sync);
+
   // put tarball
   // https://registry.npmjs.org/cnpmjs.org/-/cnpmjs.org-0.0.0.tgz/-rev/1-c85bc65e8d2470cc4d82b8f40da65b8e
   app.put('/:name/-/:filename/-rev/:rev', [login, publishable], mod.upload);

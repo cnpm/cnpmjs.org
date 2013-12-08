@@ -19,10 +19,12 @@ var fs = require('fs');
 var path = require('path');
 var should = require('should');
 var request = require('supertest');
+var mm = require('mm');
+var config = require('../../../config');
 var app = require('../../../servers/registry');
 var Module = require('../../../proxy/module');
+var Npm = require('../../../proxy/npm');
 var controller = require('../../../controllers/registry/module');
-var mm = require('mm');
 
 var fixtures = path.join(path.dirname(path.dirname(__dirname)), 'fixtures');
 
@@ -30,18 +32,21 @@ describe('controllers/registry/module.test.js', function () {
   before(function (done) {
     app.listen(0, done);
   });
-  after(function (done) {
-    app.close(done);
-  });
+
   afterEach(mm.restore);
 
-  describe.only('sync source npm package', function () {
-    var sourcePackage = require(path.join(fixtures, 'testputmodule.json'));
-    it('should _syncModule() success', function (done) {
-      var pkg = sourcePackage.versions['0.0.1'];
-      controller._syncModule('unittest', pkg, function (err, result) {
+  var baseauth = 'Basic ' + new Buffer('cnpmjstest10:cnpmjstest10').toString('base64');
+  var baseauthOther = 'Basic ' + new Buffer('cnpmjstest101:cnpmjstest101').toString('base64');
+
+  describe('sync source npm package', function () {
+    it('should put /:name/sync success', function (done) {
+      mm.data(Npm, 'get', require(path.join(fixtures, 'utility.json')));
+      request(app)
+      .put('/utility/sync')
+      .set('authorization', baseauth)
+      .end(function (err, res) {
         should.not.exist(err);
-        console.log(result);
+        res.body.should.have.keys('ok', 'logId');
         done();
       });
     });
@@ -132,7 +137,9 @@ describe('controllers/registry/module.test.js', function () {
       });
     });
 
-    it('should try to add return 403 when not module user and only next module exists', function (done) {
+    it('should try to add return 403 when not module user and only next module exists',
+    function (done) {
+      mm(config, 'enablePrivate', false);
       request(app)
       .put('/' + pkg.name)
       .set('authorization', baseauthOther)
@@ -199,11 +206,11 @@ describe('controllers/registry/module.test.js', function () {
       });
     });
 
-    it('should upload tarball fail 403 when rev not match current module', function (done) {
+    it('should upload tarball fail 403 when user not admin', function (done) {
       var body = fs.readFileSync(path.join(fixtures, 'testputmodule-0.1.9.tgz'));
       request(app)
       .put('/' + pkg.name + '/-/' + pkg.name + '-0.1.9.tgz/-rev/25')
-      .set('authorization', baseauth)
+      .set('authorization', baseauthOther)
       .set('content-type', 'application/octet-stream')
       .set('content-length', '' + body.length)
       .send(body)
@@ -211,7 +218,7 @@ describe('controllers/registry/module.test.js', function () {
         should.not.exist(err);
         res.body.should.eql({
           error: 'no_perms',
-          reason: 'Current user can not publish this module'
+          reason: 'Private mode enable, only admin can publish this module'
         });
         done();
       });
@@ -387,8 +394,6 @@ describe('controllers/registry/module.test.js', function () {
   });
 
   describe('DELETE /:name/-/:filename/-rev/:rev', function () {
-    var baseauth = 'Basic ' + new Buffer('cnpmjstest10:cnpmjstest10').toString('base64');
-    var baseauthOther = 'Basic ' + new Buffer('cnpmjstest101:cnpmjstest101').toString('base64');
     var lastRev;
     before(function (done) {
       request(app)
