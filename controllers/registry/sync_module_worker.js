@@ -51,9 +51,9 @@ SyncModuleWorker.prototype.finish = function () {
 };
 
 SyncModuleWorker.prototype.log = function (format, arg1, arg2) {
-  var str = util.format.apply(util, arguments);
+  var str = '[' + utility.YYYYMMDDHHmmss() + '] ' + util.format.apply(util, arguments);
   debug(str);
-  Log.append(this._logId, '[' + utility.YYYYMMDDHHmmss() + '] ' + str, utility.noop);
+  Log.append(this._logId, str, utility.noop);
 };
 
 SyncModuleWorker.prototype.start = function () {
