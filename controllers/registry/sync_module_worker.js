@@ -77,7 +77,11 @@ SyncModuleWorker.prototype.next = function () {
   }
 
   var that = this;
-  npm.get(name, function (err, pkg) {
+  npm.get(name, function (err, pkg, response) {
+    if (!err && !pkg) {
+      err = new Error('Module ' + name + ' not exists, http status ' + response.statusCode);
+      err.name = 'NpmModuleNotExsitsError';
+    }
     if (err) {
       that.fails.push(name);
       that.log('[error] [%s] get package error: %s', name, err.stack);

@@ -447,7 +447,7 @@ exports.sync = function (req, res, next) {
       return next(err);
     }
 
-    if (!pkg._rev) {
+    if (!pkg || !pkg._rev) {
       return res.json(response.statusCode, pkg);
     }
 

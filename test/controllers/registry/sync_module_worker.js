@@ -18,20 +18,27 @@ var SyncModuleWorker = require('../../../controllers/registry/sync_module_worker
 var mysql = require('../../../common/mysql');
 var Log = require('../../../proxy/module_log');
 
+var name = process.argv[2] || 'address';
+
 Log.create({
-  name: 'address',
+  name: name,
   username: 'fengmk2',
 }, function (err, result) {
   var worker = new SyncModuleWorker({
     logId: result.id,
-    name: 'address',
+    name: name,
     username: 'fengmk2'
   });
 
-  mysql.query('delete from module where name=?', ['address'], function () {
-    worker.start();
-    worker.on('end', function () {
-      process.exit(0);
-    });
+  worker.start();
+  worker.on('end', function () {
+    process.exit(0);
   });
+
+  // mysql.query('delete from module where name=?', [name], function () {
+  //   worker.start();
+  //   worker.on('end', function () {
+  //     process.exit(0);
+  //   });
+  // });
 });
