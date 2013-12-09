@@ -33,7 +33,7 @@ exports.getModuleTotal = function (name, start, end, callback) {
   mysql.query(SELECT_ONE_TOTAL_SQL, [start, end, name], callback);
 };
 
-var SELECT_ALL_TOTAL_SQL = 'SELECT date, sum(count) \
+var SELECT_ALL_TOTAL_SQL = 'SELECT date, sum(count) AS count \
   FROM download_total \
   WHERE date>=? AND date<=? \
   GROUP BY date;';
