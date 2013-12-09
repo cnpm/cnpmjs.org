@@ -39,6 +39,7 @@ describe('controllers/registry/module.test.js', function () {
   var baseauthOther = 'Basic ' + new Buffer('cnpmjstest101:cnpmjstest101').toString('base64');
 
   describe('sync source npm package', function () {
+    var logId;
     it('should put /:name/sync success', function (done) {
       mm.data(Npm, 'get', require(path.join(fixtures, 'utility.json')));
       request(app)
@@ -47,6 +48,17 @@ describe('controllers/registry/module.test.js', function () {
       .end(function (err, res) {
         should.not.exist(err);
         res.body.should.have.keys('ok', 'logId');
+        logId = res.body.logId;
+        done();
+      });
+    });
+
+    it('should get sync log', function (done) {
+      request(app)
+      .get('/utility/sync/log/' + logId)
+      .end(function (err, res) {
+        should.not.exist(err);
+        res.body.should.have.keys('ok', 'log');
         done();
       });
     });

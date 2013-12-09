@@ -41,6 +41,7 @@ function routes(app) {
 
   // sync from source npm
   app.put('/:name/sync', [login], mod.sync);
+  app.get('/:name/sync/log/:id', mod.getSyncLog);
 
   // put tarball
   // https://registry.npmjs.org/cnpmjs.org/-/cnpmjs.org-0.0.0.tgz/-rev/1-c85bc65e8d2470cc4d82b8f40da65b8e

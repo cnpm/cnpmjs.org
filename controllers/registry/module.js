@@ -466,6 +466,17 @@ exports.sync = function (req, res, next) {
   });
 };
 
+exports.getSyncLog = function (req, res, next) {
+  var logId = req.params.id;
+  var name = req.params.name;
+  Log.get(logId, function (err, row) {
+    if (err || !row) {
+      return next(err);
+    }
+    res.json(200, {ok: true, log: row.log});
+  });
+};
+
 function parseModsForList(mods) {
   var results = {
     _updated: Date.now()
