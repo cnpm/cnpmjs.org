@@ -36,6 +36,10 @@ exports.upload = function (filepath, options, callback) {
   });
 };
 
+exports.url = function (key) {
+  return client.resourceURL(key);
+};
+
 exports.remove = function (key, callback) {
   client.delete(key, callback);
 };
