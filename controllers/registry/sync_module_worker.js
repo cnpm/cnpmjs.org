@@ -181,7 +181,11 @@ SyncModuleWorker.prototype._syncOneVersion = function (versionIndex, sourcePacka
     writeStream: ws,
   };
   var ep = eventproxy.create();
-  ep.fail(callback);
+  ep.fail(function (err) {
+    // remove tmp file whatever
+    fs.unlink(filepath, utility.noop);
+    callback(err);
+  });
 
   that.log('    [%s:%d] syncing, version: %s, dist: %j',
     sourcePackage.name, versionIndex, sourcePackage.version, sourcePackage.dist);
@@ -199,7 +203,6 @@ SyncModuleWorker.prototype._syncOneVersion = function (versionIndex, sourcePacka
   urllib.request(downurl, options, ep.done(function (_, response) {
     var statusCode = response && response.statusCode || -1;
     if (statusCode !== 200) {
-      fs.unlink(filepath, utility.noop);
       var err = new Error('Download ' + downurl + ' fail, status: ' + statusCode);
       err.name = 'DownloadTarballError';
       err.data = sourcePackage;
@@ -217,7 +220,6 @@ SyncModuleWorker.prototype._syncOneVersion = function (versionIndex, sourcePacka
     rs.on('end', function () {
       shasum = shasum.digest('hex');
       if (shasum !== sourcePackage.dist.shasum) {
-        fs.unlink(filepath, utility.noop);
         var err = new Error('Download ' + downurl + ' shasum:' + shasum + ' not match ' + sourcePackage.dist.shasum);
         err.name = 'DownloadTarballShasumError';
         err.data = sourcePackage;
