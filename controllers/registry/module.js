@@ -44,8 +44,22 @@ exports.show = function (req, res, next) {
   Module.listByName(name, ep.done('rows'));
 
   ep.all('tags', 'rows', function (tags, rows) {
+    //if module not exist in this registry, 
+    //sync the module backend and return package info from official registry
     if (rows.length === 0) {
-      return next();
+      if (!req.session.allowSync) {
+        return next();
+      }
+      var username = (req.session && req.session.username) || 'anonymous';
+      return _sync(name, username, function (err, result) {
+        if (err) {
+          return next(err);
+        }
+        if (!result.ok) {
+          return res.json(result.statusCode, result.pkg);
+        }
+        res.json(200, result.pkg);
+      });
     }
 
     var nextMod = rows[0];
@@ -107,25 +121,45 @@ exports.show = function (req, res, next) {
   });
 };
 
-var VERSION_RE = /^\d+\.\d+\.\d+/;
-
 exports.get = function (req, res, next) {
   var name = req.params.name;
   var version = req.params.version;
-  if (VERSION_RE.test(version)) {
-    Module.get(name, version, function (err, mod) {
-      if (err || !mod) {
-        return next(err);
-      }
-      res.json(mod.package);
-    });
-    return;
-  }
 
-  var tag = version;
-  Module.getByTag(name, tag, function (err, mod) {
-    if (err || !mod) {
-      return next(err);
+  var ep = eventproxy.create();
+  ep.fail(next);
+
+  //frist get by tag
+  Module.getByTag(name, version, ep.done(function (mod) {
+    if (mod) {
+      return res.json(mod.package);
+    }
+    ep.emit('notFoundByTag');
+  }));
+
+  ep.once('notFoundByTag', function () {
+    //then get by name
+    Module.get(name, version, ep.done('getByName'));
+  });
+
+  ep.once('getByName', function (mod) {
+    if (!mod) {
+      if (!req.session.allowSync) {
+        return next();
+      }
+      var username = (req.session && req.session.username) || 'anonymous';
+      return _sync(name, username, function (err, result) {
+        if (err) {
+          return next(err);
+        }
+        var pkg = result.pkg.versions[version];
+        if (!pkg) {
+          return res.json(404, {
+            error: 'not exist',
+            reason: 'version not found: ' + version
+          });
+        }
+        return res.json(pkg);
+      });
     }
     res.json(mod.package);
   });
@@ -528,22 +562,21 @@ exports.removeAll = function (req, res, next) {
   });
 };
 
-exports.sync = function (req, res, next) {
-  var username = req.session.name;
-  var name = req.params.name;
-
+function _sync(name, username, callback) {
   npm.get(name, function (err, pkg, response) {
     if (err) {
-      return next(err);
+      return callback(err);
     }
-
     if (!pkg || !pkg._rev) {
-      return res.json(response.statusCode, pkg);
+      return callback(null, {
+        ok: false,
+        statusCode: response.statusCode,
+        pkg: pkg
+      });
     }
-
     Log.create({name: name, username: username}, function (err, result) {
       if (err) {
-        return next(err);
+        return callback(err);
       }
       var worker = new SyncModuleWorker({
         logId: result.id,
@@ -551,7 +584,28 @@ exports.sync = function (req, res, next) {
         username: username,
       });
       worker.start();
-      res.json(201, {ok: true, logId: result.id});
+      callback(null, {
+        ok: true,
+        logId: result.id,
+        pkg: pkg
+      });
+    });
+  });
+}
+
+exports.sync = function (req, res, next) {
+  var username = req.session.name;
+  var name = req.params.name;
+  _sync(name, username, function (err, result) {
+    if (err) {
+      return next(err);
+    }
+    if (!result.ok) {
+      return res.json(result.statusCode, result.pkg);
+    }
+    res.json(201, {
+      ok: true,
+      logId: result.logId
     });
   });
 };

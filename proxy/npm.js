@@ -38,5 +38,3 @@ exports.get = function (name, callback) {
     callback(null, data, res);
   });
 };
-
-
