@@ -318,7 +318,7 @@ exports.updateLatest = function (req, res, next) {
       // set latest tag
       Module.addTag(name, 'latest', version, function (err) {
         if (err) {
-          return next();
+          return next(err);
         }
         // add a new next version
         nextMod.version = 'next';
