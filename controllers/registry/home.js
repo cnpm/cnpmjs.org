@@ -74,12 +74,7 @@ exports.show = function (req, res, next) {
   }));
 
   ep.all('total', 'download', function (total, download) {
-    total.download_count_today = download.today;
-    total.download_count_thisweek = download.thisweek;
-    total.download_count_thismonth = download.thismonth;
-    total.download_count_lastday = download.lastday;
-    total.download_count_lastweek = download.lastweek;
-    total.download_count_lastmonth = download.lastmonth;
+    total.download = download;
     total.db_name = 'registry';
     total.instance_start_time = startTime;
     total.donate = 'https://me.alipay.com/imk2';
