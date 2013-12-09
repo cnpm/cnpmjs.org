@@ -35,25 +35,32 @@ var SyncModuleWorker = require('./sync_module_worker');
 
 exports.show = function (req, res, next) {
   var name = req.params.name;
-  Module.listByName(name, function (err, rows) {
-    if (err || rows.length === 0) {
-      return next(err);
+  var ep = eventproxy.create();
+  ep.fail(next);
+
+  Module.listTags(name, ep.done('tags'));
+  Module.listByName(name, ep.done('rows'));
+
+  ep.all('tags', 'rows', function (tags, rows) {
+    if (rows.length === 0) {
+      return next();
     }
+
     var nextMod = rows[0];
-    var latest = rows[1];
     var startIndex = 1;
+    var latestMod = null;
     if (nextMod.version !== 'next') {
       // next create fail
-      latest = nextMod;
       startIndex = 0;
       nextMod = null;
     }
 
-    if (!latest) {
-      latest = nextMod;
+    var distTags = {};
+    for (var i = 0; i < tags.length; i++) {
+      var t = tags[i];
+      distTags[t.tag] = t.version;
     }
 
-    var distTags = {};
     var versions = {};
     var times = {};
     var attachments = {};
@@ -62,10 +69,13 @@ exports.show = function (req, res, next) {
       var pkg = row.package;
       versions[pkg.version] = pkg;
       times[pkg.version] = row.gmt_modified;
+      if ((!distTags.latest && !latestMod) || distTags.latest === row.version) {
+        latestMod = row;
+      }
     }
 
-    if (latest.package.version && latest.package.version !== 'next') {
-      distTags.latest = latest.package.version;
+    if (!latestMod) {
+      latestMod = nextMod;
     }
 
     var rev = '';
@@ -74,17 +84,17 @@ exports.show = function (req, res, next) {
     }
 
     var info = {
-      _id: latest.name,
+      _id: name,
       _rev: rev,
-      name: latest.name,
-      description: latest.package.description,
+      name: name,
+      description: latestMod.package.description,
       versions: versions,
       "dist-tags": distTags,
-      readme: latest.package.readme,
-      maintainers: latest.package.maintainers,
+      readme: latestMod.package.readme,
+      maintainers: latestMod.package.maintainers,
       time: times,
-      author: latest.package.author,
-      repository: latest.package.repository,
+      author: latestMod.package.author,
+      repository: latestMod.package.repository,
       _attachments: attachments
     };
 
@@ -92,10 +102,23 @@ exports.show = function (req, res, next) {
   });
 };
 
+var VERSION_RE = /^\d+\.\d+\.\d+/;
+
 exports.get = function (req, res, next) {
   var name = req.params.name;
   var version = req.params.version;
-  Module.get(name, version, function(err, mod) {
+  if (VERSION_RE.test(version)) {
+    Module.get(name, version, function (err, mod) {
+      if (err || !mod) {
+        return next(err);
+      }
+      res.json(mod.package);
+    });
+    return;
+  }
+
+  var tag = version;
+  Module.getByTag(name, tag, function (err, mod) {
     if (err || !mod) {
       return next(err);
     }
@@ -222,7 +245,6 @@ exports.updateLatest = function (req, res, next) {
     if (!body.author) {
       body.author = {
         name: username,
-        email: req.session.email,
       };
     }
     nextMod.package = body;
@@ -232,13 +254,19 @@ exports.updateLatest = function (req, res, next) {
       if (err) {
         return next(err);
       }
-      // add a new latest version
-      nextMod.version = 'next';
-      Module.add(nextMod, function (err, result) {
+      // set latest tag
+      Module.addTag(name, 'latest', version, function (err) {
         if (err) {
-          return next(err);
+          return next();
         }
-        res.json(201, {ok: true, rev: String(result.id)});
+        // add a new next version
+        nextMod.version = 'next';
+        Module.add(nextMod, function (err, result) {
+          if (err) {
+            return next(err);
+          }
+          res.json(201, {ok: true, rev: String(result.id)});
+        });
       });
     });
   });
@@ -417,9 +445,10 @@ exports.removeAll = function (req, res, next) {
     }
     Total.plusDeleteModule(utility.noop);
     Module.removeByName(name, ep.done('remove'));
+    Module.removeTags(name, ep.done('removeTags'));
   });
 
-  ep.all('list', 'remove', function (mods) {
+  ep.all('list', 'remove', 'removeTags', function (mods) {
     var keys = [];
     for (var i = 0; i < mods.length; i++) {
       var key = urlparse(mods[i].dist_tarball).path;

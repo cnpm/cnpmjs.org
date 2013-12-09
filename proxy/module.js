@@ -108,20 +108,66 @@ exports.get = function (name, version, callback) {
   });
 };
 
-var SELECT_LATEST_MODULE_SQL = 'SELECT ' + MODULE_COLUMNS + ' FROM module WHERE name=? AND version <> "next" ORDER BY id DESC LIMIT 1;';
+var INSERT_TAG_SQL = 'INSERT INTO tag(gmt_create, gmt_modified, \
+  name, tag, version) \
+  VALUES(now(), now(), ?, ?, ?) \
+  ON DUPLICATE KEY UPDATE gmt_modified=now(), \
+    name=VALUES(name), tag=VALUES(tag), version=VALUES(version);';
 
-exports.getLatest = function (name, callback) {
-  mysql.queryOne(SELECT_LATEST_MODULE_SQL, [name], function (err, row) {
+exports.addTag = function (name, tag, version, callback) {
+  mysql.query(INSERT_TAG_SQL, [name, tag, version], function (err, result) {
+    if (err) {
+      return callback(err);
+    }
+    callback(null, {id: result.insertId, gmt_modified: new Date()});
+  });
+};
+
+var SELECT_TAG_SQL = 'SELECT tag, version, gmt_modified FROM tag WHERE name=? AND tag=?;';
+
+exports.getByTag = function (name, tag, callback) {
+  mysql.queryOne(SELECT_TAG_SQL, [name, tag], function (err, row) {
     if (err || !row) {
       return callback(err, row);
     }
-    try {
-      parseRow(row);
-    } catch (e) {
-      e.data = row;
-      return callback(e);
+    exports.get(name, row.version, callback);
+  });
+};
+
+var DELETE_TAGS_SQL = 'DELETE FROM tag WHERE name=?;';
+
+exports.removeTags = function (name, callback) {
+  mysql.query(DELETE_TAGS_SQL, [name], callback);
+};
+
+var SELECT_ALL_TAGS_SQL = 'SELECT tag, version, gmt_modified FROM tag WHERE name=?;';
+
+exports.listTags = function (name, callback) {
+  mysql.query(SELECT_ALL_TAGS_SQL, [name], callback);
+};
+
+var SELECT_LATEST_MODULE_SQL = 'SELECT ' + MODULE_COLUMNS +
+  ' FROM module WHERE name=? AND version <> "next" ORDER BY id DESC LIMIT 1;';
+
+exports.getLatest = function (name, callback) {
+  exports.getByTag(name, 'latest', function (err, row) {
+    if (err || row) {
+      return callback(err, row);
     }
-    callback(null, row);
+
+    // get latest order by id
+    mysql.queryOne(SELECT_LATEST_MODULE_SQL, [name], function (err, row) {
+      if (err || !row) {
+        return callback(err, row);
+      }
+      try {
+        parseRow(row);
+      } catch (e) {
+        e.data = row;
+        return callback(e);
+      }
+      callback(null, row);
+    });
   });
 };
 

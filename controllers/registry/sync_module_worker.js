@@ -119,13 +119,26 @@ SyncModuleWorker.prototype._sync = function (pkg, callback) {
       if (r.version === 'next') {
         continue;
       }
+      if (!map.latest) {
+        map.latest = r;
+      }
       map[r.version] = r;
     }
     ep.emit('existsMap', map);
   }));
 
+  Module.listTags(name, ep.done(function (rows) {
+    var tags = {};
+    for (var i = 0; i < rows.length; i++) {
+      var r = rows[i];
+      tags[r.tag] = r.version;
+    }
+    ep.emit('existsTags', tags);
+  }));
+
   var missingVersions = [];
-  ep.on('existsMap', function (map) {
+  var missingTags = [];
+  ep.all('existsMap', 'existsTags', function (map, tags) {
     var times = pkg.time || {};
     var versions = [];
     for (var v in times) {
@@ -139,6 +152,14 @@ SyncModuleWorker.prototype._sync = function (pkg, callback) {
       }
       version.gmt_modified = Date.parse(times[v]);
       versions.push(version);
+    }
+
+    var sourceTags = pkg['dist-tags'] || {};
+    for (var t in sourceTags) {
+      var sourceTagVersion = sourceTags[t];
+      if (sourceTagVersion && tags[t] !== sourceTagVersion) {
+        missingTags.push([t, sourceTagVersion]);
+      }
     }
 
     if (versions.length === 0) {
@@ -160,10 +181,29 @@ SyncModuleWorker.prototype._sync = function (pkg, callback) {
     that._syncOneVersion(versionNames.length, syncModule, ep.done(function (result) {
       var nextVersion = missingVersions.shift();
       if (!nextVersion) {
-        return ep.emit('done', result);
+        return ep.emit('syncDone', result);
       }
       ep.emit('syncModule', nextVersion);
     }));
+  });
+
+  ep.on('syncDone', function () {
+    if (missingTags.length === 0) {
+      return ep.emit('done');
+    }
+
+    that.log('  [%s] adding %d tags', pkg.name, missingTags.length);
+    // sync tags
+    missingTags.forEach(function (item) {
+      Module.addTag(pkg.name, item[0], item[1], ep.done(function (result) {
+        that.log('    added tag %s:%s', item[0], item[1]);
+        ep.emit('addTag');
+      }));
+    });
+
+    ep.after('addTag', missingTags.length, function () {
+      ep.emit('done');
+    });
   });
 
   ep.on('done', function () {
