@@ -164,7 +164,7 @@ SyncModuleWorker.prototype._sync = function (pkg, callback) {
 
     if (versions.length === 0) {
       that.log('  [%s] all versions are exists', pkg.name);
-      return ep.emit('done');
+      return ep.emit('syncDone');
     }
 
     versions.sort(function (a, b) {
