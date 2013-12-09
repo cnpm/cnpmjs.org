@@ -28,6 +28,7 @@ var npm = require('../../proxy/npm');
 var common = require('./common');
 var Module = require('../../proxy/module');
 var Log = require('../../proxy/module_log');
+var ms = require('ms');
 
 function SyncModuleWorker(options) {
   EventEmitter.call(this);
@@ -221,6 +222,8 @@ SyncModuleWorker.prototype._syncOneVersion = function (versionIndex, sourcePacka
   var ws = fs.createWriteStream(filepath);
   var options = {
     writeStream: ws,
+    followRedirect: true,
+    timeout: ms('10s')
   };
   var ep = eventproxy.create();
   ep.fail(function (err) {

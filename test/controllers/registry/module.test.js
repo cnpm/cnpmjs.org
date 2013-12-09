@@ -294,6 +294,21 @@ describe('controllers/registry/module.test.js', function () {
       });
     });
 
+    it('should update package.json info version invalid: /:name/:version/-tag/latest', function (done) {
+      var pkg = require(path.join(fixtures, 'testputmodule.json')).versions['0.1.8'];
+      pkg.name = 'testputmodule';
+      pkg.version = '0.1.9.alpha';
+      request(app)
+      .put('/' + pkg.name + '/' + pkg.version + '/-tag/latest')
+      .set('authorization', baseauth)
+      .send(pkg)
+      .expect(400)
+      .expect({
+        error: 'Params Invalid',
+        reason: 'Invalid version: ' + pkg.version
+      }, done);
+    });
+
     it('should update package.json info again fail 403: /:name/:version/-tag/latest', function (done) {
       var pkg = require(path.join(fixtures, 'testputmodule.json')).versions['0.1.8'];
       pkg.name = 'testputmodule';
