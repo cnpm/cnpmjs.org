@@ -73,27 +73,41 @@ describe('controllers/registry/module.test.js', function () {
         res.body.should.have.keys('_id', '_rev', 'name', 'description',
           'versions', 'dist-tags', 'readme', 'maintainers',
           'time', 'author', 'repository', '_attachments');
-        res.body.author.should.eql({
-          "name": "fengmk2",
-          "email": "fengmk2@gmail.com",
-          "url": "http://fengmk2.github.com"
-        });
+        // res.body.author.should.eql({
+        //   "name": "fengmk2",
+        //   "email": "fengmk2@gmail.com",
+        //   "url": "http://fengmk2.github.com"
+        // });
         res.body.name.should.equal('cnpmjs.org');
         done();
       });
     });
   });
 
-  describe('GET /:name/:version', function () {
+  describe('GET /:name/:(version|tag)', function () {
     it('should return module@version info', function (done) {
       request(app)
-      .get('/cnpmjs.org/0.0.2')
+      .get('/cnpmjs.org/0.0.4')
       .expect(200, function (err, res) {
         should.not.exist(err);
         var body = res.body;
         body.name.should.equal('cnpmjs.org');
-        body.version.should.equal('0.0.2');
-        body._id.should.equal('cnpmjs.org@0.0.2');
+        body.version.should.equal('0.0.4');
+        body._id.should.equal('cnpmjs.org@0.0.4');
+        body.dist.should.have.keys('tarball', 'shasum', 'size');
+        done();
+      });
+    });
+
+    it('should return module@tag info', function (done) {
+      request(app)
+      .get('/cnpmjs.org/latest')
+      .expect(200, function (err, res) {
+        should.not.exist(err);
+        var body = res.body;
+        body.name.should.equal('cnpmjs.org');
+        body.version.should.equal('0.0.4');
+        body._id.should.equal('cnpmjs.org@0.0.4');
         body.dist.should.have.keys('tarball', 'shasum', 'size');
         done();
       });

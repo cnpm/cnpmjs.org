@@ -42,6 +42,17 @@ CREATE TABLE `module_log` (
  KEY `name` (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='module sync log';
 
+CREATE TABLE `tag` (
+ `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'primary key',
+ `gmt_create` datetime NOT NULL COMMENT 'create time',
+ `gmt_modified` datetime NOT NULL COMMENT 'modified time',
+ `name` varchar(100) NOT NULL COMMENT 'module name',
+ `tag` varchar(30) NOT NULL COMMENT 'tag name',
+ `version` varchar(30) NOT NULL COMMENT 'module version',
+ PRIMARY KEY (`id`),
+ UNIQUE KEY `name` (`name`, `tag`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='module tag';
+
 CREATE TABLE `total` (
  `name` varchar(100) NOT NULL COMMENT 'total name',
  `gmt_modified` datetime NOT NULL COMMENT 'modified time',

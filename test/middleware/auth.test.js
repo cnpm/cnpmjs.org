@@ -1,10 +1,11 @@
-/*!
- * cnpmjs.org - test/controllers/registry/user.test.js
+/**!
+ * cnpmjs.org - test/middleware/auth.test.js
  *
  * Copyright(c) cnpmjs.org and other contributors.
  * MIT Licensed
  *
  * Authors:
+ *  dead_horse <dead_horse@qq.com> (http://deadhorse.me)
  *  fengmk2 <fengmk2@gmail.com> (http://fengmk2.github.com)
  */
 
@@ -20,7 +21,7 @@ var app = require('../../servers/registry');
 var mm = require('mm');
 var mysql = require('../../common/mysql');
 
-describe('middleware/auth', function () {
+describe('middleware/auth.test.js', function () {
   before(function (done) {
     app.listen(0, done);
   });
@@ -56,6 +57,6 @@ describe('middleware/auth', function () {
       .get('/-/user/org.couchdb.user:cnpmjstest10')
       .set('authorization', 'basic ' + new Buffer('cnpmjstest10:cnpmjstest10').toString('base64'))
       .expect(500, done);
-    });    
+    });
   });
 });
