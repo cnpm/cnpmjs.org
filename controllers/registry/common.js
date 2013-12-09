@@ -27,3 +27,9 @@ exports.getTarballFilepath = function (filename) {
 exports.getCDNKey = function (name, filename) {
   return '/' + name + '/-/' + filename;
 };
+
+exports.downloadURL = function (pkg, req) {
+  if (pkg.dist && pkg.dist.tarball) {
+    pkg.dist.tarball = 'http://' + req.headers.host + '/' + pkg.name + '/download/' + path.basename(pkg.dist.tarball);
+  }
+};

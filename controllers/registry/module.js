@@ -44,7 +44,7 @@ exports.show = function (req, res, next) {
   Module.listByName(name, ep.done('rows'));
 
   ep.all('tags', 'rows', function (tags, rows) {
-    //if module not exist in this registry, 
+    //if module not exist in this registry,
     //sync the module backend and return package info from official registry
     if (rows.length === 0) {
       if (!req.session.allowSync) {
@@ -83,9 +83,7 @@ exports.show = function (req, res, next) {
     for (var i = startIndex; i < rows.length; i++) {
       var row = rows[i];
       var pkg = row.package;
-      if (pkg.dist && pkg.dist.tarball) {
-        pkg.dist.tarball = 'http://' + req.headers.host + '/' + pkg.name + '/download/' + path.basename(pkg.dist.tarball);
-      }
+      common.downloadURL(pkg, req);
       versions[pkg.version] = pkg;
       times[pkg.version] = row.gmt_modified;
       if ((!distTags.latest && !latestMod) || distTags.latest === row.version) {
@@ -124,13 +122,13 @@ exports.show = function (req, res, next) {
 exports.get = function (req, res, next) {
   var name = req.params.name;
   var version = req.params.version;
-
   var ep = eventproxy.create();
   ep.fail(next);
 
   //frist get by tag
   Module.getByTag(name, version, ep.done(function (mod) {
     if (mod) {
+      common.downloadURL(mod.package, req);
       return res.json(mod.package);
     }
     ep.emit('notFoundByTag');
@@ -142,26 +140,29 @@ exports.get = function (req, res, next) {
   });
 
   ep.once('getByName', function (mod) {
-    if (!mod) {
-      if (!req.session.allowSync) {
-        return next();
-      }
-      var username = (req.session && req.session.username) || 'anonymous';
-      return _sync(name, username, function (err, result) {
-        if (err) {
-          return next(err);
-        }
-        var pkg = result.pkg.versions[version];
-        if (!pkg) {
-          return res.json(404, {
-            error: 'not exist',
-            reason: 'version not found: ' + version
-          });
-        }
-        return res.json(pkg);
-      });
+    if (mod) {
+      common.downloadURL(mod.package, req);
+      return res.json(mod.package);
     }
-    res.json(mod.package);
+
+    if (!req.session.allowSync) {
+      return next();
+    }
+
+    var username = (req.session && req.session.username) || 'anonymous';
+    _sync(name, username, function (err, result) {
+      if (err) {
+        return next(err);
+      }
+      var pkg = result.pkg.versions[version];
+      if (!pkg) {
+        return res.json(404, {
+          error: 'not exist',
+          reason: 'version not found: ' + version
+        });
+      }
+      res.json(pkg);
+    });
   });
 };
 
@@ -626,7 +627,7 @@ exports.getSyncLog = function (req, res, next) {
   });
 };
 
-function parseModsForList(mods) {
+function parseModsForList(mods, req) {
   var results = {
     _updated: Date.now()
   };
@@ -643,6 +644,7 @@ function parseModsForList(mods) {
     pkg['dist-tags'] = {
       latest: pkg.version
     };
+    common.downloadURL(pkg, req);
     results[mod.name] = pkg;
   }
   return results;
@@ -653,7 +655,7 @@ exports.listAllModules = function (req, res, next) {
     if (err) {
       return next(err);
     }
-    return res.json(parseModsForList(mods));
+    return res.json(parseModsForList(mods, req));
   });
 };
 
@@ -666,12 +668,12 @@ exports.listAllModulesSince = function (req, res, next) {
     });
   }
   debug('list all modules from %s', req.startkey);
-  var startkey = parseInt(query.startkey, 10) || 0;
+  var startkey = Number(query.startkey) || 0;
   Module.listSince(new Date(startkey), function (err, mods) {
     if (err) {
       return next(err);
     }
-    res.json(parseModsForList(mods));
+    res.json(parseModsForList(mods, req));
   });
 };
 
