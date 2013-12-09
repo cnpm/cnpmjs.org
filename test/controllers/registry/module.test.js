@@ -129,8 +129,13 @@ describe('controllers/registry/module.test.js', function () {
     var lastRev;
 
     before(function (done) {
-      // clean up testputmodule
-      Module.removeByName('testputmodule', done);
+      // unpublish testputmodule
+      request(app)
+      .del('/' + pkg.name + '/-rev/1')
+      .set('authorization', baseauth)
+      .end(function (err, res) {
+        done();
+      });
     });
 
     it('should try to add not exists module return 201', function (done) {

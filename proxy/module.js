@@ -134,6 +134,12 @@ exports.getByTag = function (name, tag, callback) {
   });
 };
 
+var DELETE_TAGS_SQL = 'DELETE FROM tag WHERE name=?;';
+
+exports.removeTags = function (name, callback) {
+  mysql.query(DELETE_TAGS_SQL, [name], callback);
+};
+
 var SELECT_ALL_TAGS_SQL = 'SELECT tag, version, gmt_modified FROM tag WHERE name=?;';
 
 exports.listTags = function (name, callback) {

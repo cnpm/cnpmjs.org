@@ -445,9 +445,10 @@ exports.removeAll = function (req, res, next) {
     }
     Total.plusDeleteModule(utility.noop);
     Module.removeByName(name, ep.done('remove'));
+    Module.removeTags(name, ep.done('removeTags'));
   });
 
-  ep.all('list', 'remove', function (mods) {
+  ep.all('list', 'remove', 'removeTags', function (mods) {
     var keys = [];
     for (var i = 0; i < mods.length; i++) {
       var key = urlparse(mods[i].dist_tarball).path;
