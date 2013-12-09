@@ -6,6 +6,7 @@ coverage.html
 *.out
 *.pid
 *.gz
+dump.rdb
 
 pids
 logs
