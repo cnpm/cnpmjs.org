@@ -79,6 +79,7 @@ describe('controllers/registry/module.test.js', function () {
         //   "url": "http://fengmk2.github.com"
         // });
         res.body.name.should.equal('cnpmjs.org');
+        res.body.versions[Object.keys(res.body.versions)[0]].dist.tarball.should.include('/cnpmjs.org/download');
         done();
       });
     });
@@ -95,6 +96,7 @@ describe('controllers/registry/module.test.js', function () {
         body.version.should.equal('0.0.4');
         body._id.should.equal('cnpmjs.org@0.0.4');
         body.dist.should.have.keys('tarball', 'shasum', 'size');
+        body.dist.tarball.should.include('/cnpmjs.org/download/cnpmjs.org-0.0.4.tgz');
         done();
       });
     });
@@ -109,6 +111,7 @@ describe('controllers/registry/module.test.js', function () {
         body.version.should.equal('0.0.4');
         body._id.should.equal('cnpmjs.org@0.0.4');
         body.dist.should.have.keys('tarball', 'shasum', 'size');
+        body.dist.tarball.should.include('/cnpmjs.org/download/cnpmjs.org-0.0.4.tgz');
         done();
       });
     });
@@ -316,7 +319,7 @@ describe('controllers/registry/module.test.js', function () {
         should.not.exist(err);
         res.body.name.should.equal('testputmodule');
         res.body.version.should.equal('0.1.9');
-        res.body.dist.tarball.should.include('/testputmodule/-/testputmodule-0.1.9.tgz');
+        res.body.dist.tarball.should.include('/testputmodule/download/testputmodule-0.1.9.tgz');
         done();
       });
     });
@@ -342,20 +345,22 @@ describe('controllers/registry/module.test.js', function () {
       .expect(200, function (err, res) {
         res.body.should.be.an.Object;
         res.body._updated.should.be.a.Number;
-        Object.keys(res.body).length.should.be.above(1);
+        var keys = Object.keys(res.body);
+        keys.length.should.be.above(1);
+        res.body[keys[1]].dist.tarball.should.include('/download/');
         done();
       });
     });
+
     it('should get 200 but response empty', function (done) {
       request(app)
-      .get('/-/all/since?stale=update_after&startkey=' + Date.now())
+      .get('/-/all/since?stale=update_after&startkey=' + (Date.now() * 2))
       .expect(200, function (err, res) {
         res.body.should.be.an.Object;
         res.body._updated.should.be.a.Number;
-        // some erro happened at travis-ci
-        // res.body.should.eql({
-        //   _updated: res.body._updated
-        // });
+        res.body.should.eql({
+          _updated: res.body._updated
+        });
         done();
       });
     });
