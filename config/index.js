@@ -18,7 +18,6 @@
 var path = require('path');
 var fs = require('fs');
 var mkdirp = require('mkdirp');
-var ms = require('ms');
 
 fs.existsSync = fs.existsSync || path.existsSync;
 var pkg = require('../package.json');
@@ -67,8 +66,7 @@ var config = {
     dead_horse: true,
     cnpmjstest10: true,
   },
-  syncByInstall: true,
-  syncInterval: ms('3m')
+  syncByInstall: true
 };
 
 // load config/config.js, everything in config.js will cover the same key in index.js

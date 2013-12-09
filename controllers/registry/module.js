@@ -121,44 +121,45 @@ exports.show = function (req, res, next) {
   });
 };
 
-var VERSION_RE = /^\d+\.\d+\.\d+/;
-
 exports.get = function (req, res, next) {
   var name = req.params.name;
   var version = req.params.version;
-  if (VERSION_RE.test(version)) {
-    Module.get(name, version, function (err, mod) {
-      if (err) {
-        return next(err);
-      }
-      if (!mod) {
-        if (!req.session.allowSync) {
-          return next();
-        }
-        var username = (req.session && req.session.username) || 'anonymous';
-        return _sync(name, username, function (err, result) {
-          if (err) {
-            return next(err);
-          }
-          var pkg = result.pkg.versions[version];
-          if (!pkg) {
-            return res.json(404, {
-              error: 'not exist',
-              reason: 'version not found: ' + version
-            });
-          }
-          return res.json(pkg);
-        });
-      }      
-      res.json(mod.package);
-    });
-    return;
-  }
 
-  var tag = version;
-  Module.getByTag(name, tag, function (err, mod) {
-    if (err || !mod) {
-      return next(err);
+  var ep = eventproxy.create();
+  ep.fail(next);
+
+  //frist get by tag
+  Module.getByTag(name, version, ep.done(function (mod) {
+    if (mod) {
+      return res.json(mod.package);
+    }
+    ep.emit('notFoundByTag');
+  }));
+
+  ep.once('notFoundByTag', function () {
+    //then get by name
+    Module.get(name, version, ep.done('getByName'));
+  });
+
+  ep.once('getByName', function (mod) {
+    if (!mod) {
+      if (!req.session.allowSync) {
+        return next();
+      }
+      var username = (req.session && req.session.username) || 'anonymous';
+      return _sync(name, username, function (err, result) {
+        if (err) {
+          return next(err);
+        }
+        var pkg = result.pkg.versions[version];
+        if (!pkg) {
+          return res.json(404, {
+            error: 'not exist',
+            reason: 'version not found: ' + version
+          });
+        }
+        return res.json(pkg);
+      });
     }
     res.json(mod.package);
   });

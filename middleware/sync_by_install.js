@@ -21,12 +21,10 @@ var config = require('../config');
  */
 module.exports = function (req, res, next) {
   if (!config.syncByInstall) {
-    req.session.allowSync = false;
     return next();
   }
   // request not by node, consider it request from web
-  if (req.headers['user-agent'].indexOf('node') !== 0) {
-    req.session.allowSync = false;
+  if (req.headers['user-agent'] && req.headers['user-agent'].indexOf('node') !== 0) {
     return next();
   }
   req.session.allowSync = true;
