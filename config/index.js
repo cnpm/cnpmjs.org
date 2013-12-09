@@ -31,6 +31,7 @@ var config = {
   enableCluster: false,
   debug: true, // if debug
   logdir: path.join(root, '.tmp', 'logs'),
+  viewCache: false,
   // mysql config
   mysqlServers: [
     {

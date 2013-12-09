@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>{TITLE}</title>
+    <title><%- locals.title %></title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- Bootstrap -->
     <link href="http://cdn.staticfile.org/twitter-bootstrap/3.0.0-rc2/css/bootstrap.min.css" rel="stylesheet" media="screen">
@@ -19,7 +19,7 @@
   </head>
   <body>
     <div class="container">
-    {BODY}
+    <%- locals.body %>
     <div class="bottom">
       <hr/>
       <p>

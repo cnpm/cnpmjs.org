@@ -16,9 +16,12 @@
  */
 
 var home = require('../controllers/web/home');
-
+var pkg = require('../controllers/web/package');
 function routes(app) {
   app.get('/', home);
+
+  app.get('/package/:name', pkg.display);
+  app.get('/package/:name/:version', pkg.display);
 }
 
 module.exports = routes;
