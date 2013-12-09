@@ -31,7 +31,9 @@ var nfs = require('../../common/nfs');
 var npm = require('../../proxy/npm');
 var common = require('./common');
 var Log = require('../../proxy/module_log');
+var DownloadTotal = require('../../proxy/download');
 var SyncModuleWorker = require('./sync_module_worker');
+var logger = require('../../common/logger');
 
 exports.show = function (req, res, next) {
   var name = req.params.name;
@@ -67,6 +69,9 @@ exports.show = function (req, res, next) {
     for (var i = startIndex; i < rows.length; i++) {
       var row = rows[i];
       var pkg = row.package;
+      if (pkg.dist && pkg.dist.tarball) {
+        pkg.dist.tarball = 'http://' + req.headers.host + '/' + pkg.name + '/download/' + path.basename(pkg.dist.tarball);
+      }
       versions[pkg.version] = pkg;
       times[pkg.version] = row.gmt_modified;
       if ((!distTags.latest && !latestMod) || distTags.latest === row.version) {
@@ -88,14 +93,14 @@ exports.show = function (req, res, next) {
       _rev: rev,
       name: name,
       description: latestMod.package.description,
-      versions: versions,
       "dist-tags": distTags,
-      readme: latestMod.package.readme,
       maintainers: latestMod.package.maintainers,
       time: times,
       author: latestMod.package.author,
       repository: latestMod.package.repository,
-      _attachments: attachments
+      versions: versions,
+      readme: latestMod.package.readme,
+      _attachments: attachments,
     };
 
     res.json(info);
@@ -125,6 +130,62 @@ exports.get = function (req, res, next) {
     res.json(mod.package);
   });
 };
+
+var _downloads = {};
+
+exports.download = function (req, res, next) {
+  var name = req.params.name;
+  var filename = req.params.filename;
+  var cdnurl = nfs.url(common.getCDNKey(name, filename));
+  res.statusCode = 302;
+  res.setHeader('Location', cdnurl);
+  res.end();
+  _downloads[name] = (_downloads[name] || 0) + 1;
+};
+
+setInterval(function () {
+  // save download count
+  var totals = [];
+  for (var name in _downloads) {
+    var count = _downloads[name];
+    totals.push([name, count]);
+  }
+  _downloads = {};
+
+  if (totals.length === 0) {
+    return;
+  }
+
+  debug('save download total: %j', totals);
+
+  var date = utility.YYYYMMDD();
+  var next = function () {
+    var item = totals.shift();
+    if (!item) {
+      // done
+      return;
+    }
+
+    DownloadTotal.plusTotal({name: item[0], date: date, count: item[1]}, function (err) {
+      if (!err) {
+        return next();
+      }
+
+      logger.error(err);
+      debug('save download %j error: %s', item, err);
+
+      totals.push(item);
+      // save to _downloads
+      for (var i = 0; i < totals.length; i++) {
+        var v = totals[i];
+        var name = v[0];
+        _downloads[name] = (_downloads[name] || 0) + v[1];
+      }
+      // end
+    });
+  };
+  next();
+}, 5000);
 
 exports.upload = function (req, res, next) {
   var length = Number(req.headers['content-length']) || 0;
@@ -498,11 +559,16 @@ exports.sync = function (req, res, next) {
 exports.getSyncLog = function (req, res, next) {
   var logId = req.params.id;
   var name = req.params.name;
+  var offset = Number(req.query.offset) || 0;
   Log.get(logId, function (err, row) {
     if (err || !row) {
       return next(err);
     }
-    res.json(200, {ok: true, log: row.log});
+    var log = row.log.trim();
+    if (offset > 0) {
+      log = log.split('\n').slice(offset).join('\n');
+    }
+    res.json(200, {ok: true, log: log});
   });
 };
 

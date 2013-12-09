@@ -60,3 +60,14 @@ CREATE TABLE `total` (
  PRIMARY KEY (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='total info';
 INSERT INTO total(name, gmt_modified, module_delete) VALUES('total', now(), 0);
+
+CREATE TABLE `download_total` (
+ `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'primary key',
+ `gmt_create` datetime NOT NULL COMMENT 'create time',
+ `gmt_modified` datetime NOT NULL COMMENT 'modified time',
+ `date` varchar(10) NOT NULL COMMENT 'YYYY-MM-DD format',
+ `name` varchar(100) NOT NULL COMMENT 'module name',
+ `count` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT 'download count',
+ PRIMARY KEY (`id`),
+ UNIQUE KEY `date_name` (`date`, `name`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='module download total info';

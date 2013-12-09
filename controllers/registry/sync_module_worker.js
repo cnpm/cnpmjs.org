@@ -90,7 +90,7 @@ SyncModuleWorker.prototype.next = function () {
       return that.next();
     }
 
-    that.log('Start syncing %s', pkg.name);
+    that.log('[%s] Start...', pkg.name);
     that._sync(pkg, function (err, versions) {
       if (err) {
         that.fails.push(pkg.name);
