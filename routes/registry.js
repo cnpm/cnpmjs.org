@@ -17,6 +17,7 @@
 
 var login = require('../middleware/login');
 var publishable = require('../middleware/publishable');
+var syncByInstall = require('../middleware/sync_by_install');
 var home = require('../controllers/registry/home');
 var mod = require('../controllers/registry/module');
 var pkg = require('../controllers/registry/package');
@@ -34,8 +35,8 @@ function routes(app) {
   app.get('/-/short', mod.listAllModuleNames);
 
   // module
-  app.get('/:name', mod.show);
-  app.get('/:name/:version', mod.get);
+  app.get('/:name', [syncByInstall], mod.show);
+  app.get('/:name/:version', [syncByInstall], mod.get);
   // try to add module
   app.put('/:name', [login, publishable], mod.add);
 
