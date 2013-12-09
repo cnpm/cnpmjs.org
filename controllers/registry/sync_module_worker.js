@@ -14,7 +14,7 @@
  * Module dependencies.
  */
 
-var debug = require('debug')('cnpm:controllers:registry:sync_module_worker');
+var debug = require('debug')('cnpmjs.org:controllers:registry:sync_module_worker');
 var EventEmitter = require('events').EventEmitter;
 var util = require('util');
 var fs = require('fs');
@@ -32,6 +32,7 @@ var Log = require('../../proxy/module_log');
 function SyncModuleWorker(options) {
   EventEmitter.call(this);
   this._logId = options.logId;
+  this.startName = options.name;
   this.names = [options.name];
   this.username = options.username;
   this.nameMap = {};
@@ -44,7 +45,8 @@ util.inherits(SyncModuleWorker, EventEmitter);
 module.exports = SyncModuleWorker;
 
 SyncModuleWorker.prototype.finish = function () {
-  this.log('Finished, %d success, %d fail\nSuccess: [ %s ]\nFail: [ %s ]',
+  this.log('[done] Sync %s module finished, %d success, %d fail\nSuccess: [ %s ]\nFail: [ %s ]',
+    this.startName,
     this.successes.length, this.fails.length,
     this.successes.join(', '), this.fails.join(', '));
   this.emit('end');
