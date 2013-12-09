@@ -22,15 +22,16 @@ var crypto = require('crypto');
 var utility = require('utility');
 var eventproxy = require('eventproxy');
 var Bagpipe = require('bagpipe');
+var urllib = require('urllib');
+var urlparse = require('url').parse;
 var config = require('../../config');
 var Module = require('../../proxy/module');
 var Total = require('../../proxy/total');
 var nfs = require('../../common/nfs');
-var Url = require('url');
-
-function getCDNKey(name, filename) {
-  return '/' + name + '/-/' + filename;
-}
+var npm = require('../../proxy/npm');
+var common = require('./common');
+var Log = require('../../proxy/module_log');
+var SyncModuleWorker = require('./sync_module_worker');
 
 exports.show = function (req, res, next) {
   var name = req.params.name;
@@ -139,7 +140,7 @@ exports.upload = function (req, res, next) {
       });
     }
 
-    var filepath = path.join(config.uploadDir, filename);
+    var filepath = common.getTarballFilepath(filename);
     var ws = fs.createWriteStream(filepath);
     var shasum = crypto.createHash('sha1');
     req.pipe(ws);
@@ -156,7 +157,7 @@ exports.upload = function (req, res, next) {
         });
       }
       shasum = shasum.digest('hex');
-      var key = getCDNKey(name, filename);
+      var key = common.getCDNKey(name, filename);
       nfs.upload(filepath, {key: key, size: length}, function (err, result) {
         // remove tmp file whatever
         fs.unlink(filepath, utility.noop);
@@ -382,7 +383,7 @@ exports.removeTar = function (req, res, next) {
       });
     }
 
-    var key = getCDNKey(mod.name, filename);
+    var key = common.getCDNKey(mod.name, filename);
     nfs.remove(key, ep.done(function () {
       res.json(200, {ok: true});
     }));
@@ -421,7 +422,7 @@ exports.removeAll = function (req, res, next) {
   ep.all('list', 'remove', function (mods) {
     var keys = [];
     for (var i = 0; i < mods.length; i++) {
-      var key = Url.parse(mods[i].dist_tarball).path;
+      var key = urlparse(mods[i].dist_tarball).path;
       key && keys.push(key);
     }
     var queue = new Bagpipe(5);
@@ -432,7 +433,35 @@ exports.removeAll = function (req, res, next) {
       });
     });
     ep.after('removeTar', keys.length, function () {
-      res.json(200, {});
+      res.json(200, {ok: true});
+    });
+  });
+};
+
+exports.sync = function (req, res, next) {
+  var username = req.session.name;
+  var name = req.params.name;
+
+  npm.get(name, function (err, pkg, response) {
+    if (err) {
+      return next(err);
+    }
+
+    if (!pkg || !pkg._rev) {
+      return res.json(response.statusCode, pkg);
+    }
+
+    Log.create({name: name, username: username}, function (err, result) {
+      if (err) {
+        return next(err);
+      }
+      var worker = new SyncModuleWorker({
+        logId: result.id,
+        name: name,
+        username: username,
+      });
+      worker.start();
+      res.json(201, {ok: true, logId: result.id});
     });
   });
 };

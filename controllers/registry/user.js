@@ -100,8 +100,8 @@ exports.authSession = function (req, res, next) {
   var body = req.body || {};
   var name = body.name;
   var password = body.password;
-  debug('authSession %j', body);
   User.auth(name, password, function (err, user) {
+    debug('authSession %s: %j', name, user);
     if (err) {
       return next(err);
     }
@@ -151,7 +151,7 @@ exports.update = function (req, res, next) {
       return res.json(409, {
         error: 'conflict',
         reason: 'Document update conflict.'
-      });      
+      });
     }
     res.json(201, {
       ok: true,
