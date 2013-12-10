@@ -78,6 +78,12 @@ exports.show = function (req, res, next) {
     total.db_name = 'registry';
     total.instance_start_time = startTime;
     total.donate = 'https://me.alipay.com/imk2';
-    res.json(total);
+    var callback = req.query.callback;
+    if (callback) {
+      // support jsonp
+      res.jsonp(total, callback);
+    } else {
+      res.json(total);
+    }
   });
 };

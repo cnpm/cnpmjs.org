@@ -52,6 +52,7 @@ var config = {
     pass: 'cnpmjs_dev'
   },
   uploadDir: path.join(root, 'public', 'dist'),
+  // qiniu cdn: http://www.qiniu.com/, it free for dev.
   qn: {
     accessKey: "iN7NgwM31j4-BZacMjPrOQBs34UG1maYCAQmhdCV",
     secretKey: "6QTOr2Jg1gcZEWDQXKOGZh5PziC2MCV5KsntT70j",
