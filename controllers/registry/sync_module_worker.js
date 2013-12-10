@@ -247,6 +247,14 @@ SyncModuleWorker.prototype._syncOneVersion = function (versionIndex, sourcePacka
   var dataSize = 0;
   urllib.request(downurl, options, ep.done(function (_, response) {
     var statusCode = response && response.statusCode || -1;
+    if (statusCode === 404) {
+      // just copy source dist
+      shasum = sourcePackage.dist.shasum;
+      return ep.emit('uploadResult', {
+        url: downurl
+      });
+    }
+
     if (statusCode !== 200) {
       var err = new Error('Download ' + downurl + ' fail, status: ' + statusCode);
       err.name = 'DownloadTarballError';
@@ -288,7 +296,8 @@ SyncModuleWorker.prototype._syncOneVersion = function (versionIndex, sourcePacka
     var dist = {
       tarball: result.url,
       shasum: shasum,
-      size: dataSize
+      size: dataSize,
+      noattachment: dataSize === 0,
     };
     mod.package.dist = dist;
 
