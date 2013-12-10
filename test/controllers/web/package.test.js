@@ -29,7 +29,7 @@ describe('controllers/web/package.test.js', function () {
   describe('GET /package/:name', function (done) {
     it('should get 200', function (done) {
       request(app)
-      .get('/package/moduletest')
+      .get('/package/cutter')
       .expect(200)
       .expect(/<div id="package">/)
       .expect(/<th>Maintainers<\/th>/)
@@ -46,7 +46,7 @@ describe('controllers/web/package.test.js', function () {
   describe('GET /package/:name/:version', function (done) {
     it('should 200 when get by version', function (done) {
       request(app)
-      .get('/package/moduletest/0.0.2')
+      .get('/package/cutter/0.0.2')
       .expect(200)
       .expect(/<div id="package">/)
       .expect(/<th>Maintainers<\/th>/)
@@ -55,7 +55,7 @@ describe('controllers/web/package.test.js', function () {
 
     it('should 200 when get by tag', function (done) {
       request(app)
-      .get('/package/moduletest/latest')
+      .get('/package/cutter/latest')
       .expect(200)
       .expect(/<div id="package">/)
       .expect(/<th>Maintainers<\/th>/)
@@ -63,13 +63,13 @@ describe('controllers/web/package.test.js', function () {
     });
     it('should 404 when get by version not exist', function (done) {
       request(app)
-      .get('/package/moduletest/1.1.2')
+      .get('/package/cutter/1.1.2')
       .expect(404, done);
     });
 
     it('should 404 when get by tag', function (done) {
       request(app)
-      .get('/package/moduletest/notexisttag')
+      .get('/package/cutter/notexisttag')
       .expect(404, done);
     });
   });

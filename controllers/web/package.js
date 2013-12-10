@@ -41,7 +41,7 @@ exports.display = function (req, res, next) {
       return next();
     }
     pkg = pkg.package;
-    pkg.readme = marked(pkg.readme);
+    pkg.readme = marked(pkg.readme || '');
 
     setLicense(pkg);
     
