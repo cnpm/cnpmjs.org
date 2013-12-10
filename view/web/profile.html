@@ -1,0 +1,26 @@
+<style>
+#profile {
+  margin-top: 50px;
+}
+
+#profile .package {
+  padding: 10px;
+  font-size: 18px;
+  border-bottom: 1px solid #ddd;
+}
+</style>
+<div id="profile">
+  <h1>
+    Packages by <%= user.name %>
+    <% if (user.email) { %>
+      <small>(<a href="mailto:"<%= user.email %>><%= user.email %></a>)</small>
+    <% } %>
+  </h1>
+  <hr />
+  <% for (var i = 0; i < packages.length; i++) { %>
+    <div class="package">
+      <a href="/package/<%= packages[i].name %>" class="package-name"><%= packages[i].name %></a>
+      <span class="package-description"><%= packages[i].description %></span>
+    </div>
+  <% } %>
+</div>

@@ -15,13 +15,14 @@
  * Module dependencies.
  */
 
-var home = require('../controllers/web/home');
 var pkg = require('../controllers/web/package');
-function routes(app) {
-  app.get('/', home);
+var user = require('../controllers/web/user');
 
+function routes(app) {
   app.get('/package/:name', pkg.display);
   app.get('/package/:name/:version', pkg.display);
+
+  app.get('/~:name', user.display);
 }
 
 module.exports = routes;
