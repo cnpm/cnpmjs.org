@@ -26,9 +26,12 @@ exports.display = function (req, res, next) {
   User.get(name, ep.done('user'));
 
   ep.all('modules', 'user', function (modules, user) {
-    if (!user) {
+    //because of sync, maybe no this user in database,
+    //but his modules in this registry
+    if (!user && !modules.length) {
       return next();
     }
+    user = user || {};
     var packages = modules.map(function (m) {
       try {
         m.package = JSON.parse(m.package);
@@ -41,7 +44,7 @@ exports.display = function (req, res, next) {
       };
     });
     user = {
-      name: user.name,
+      name: name,
       email: user.email
     };
 

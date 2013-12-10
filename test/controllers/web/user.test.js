@@ -40,5 +40,13 @@ describe('controllers/web/user.test.js', function () {
       .get('/~not_exist_user')
       .expect(404, done);
     });
+
+    it('should get not eixst user but have modules 200', function (done) {
+      request(app)
+      .get('/~jdalton')
+      .expect(200)
+      .expect(/<div id="profile">/)
+      .expect(/Packages by jdalton/, done);
+    });
   });
 });
