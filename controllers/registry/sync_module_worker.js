@@ -287,11 +287,19 @@ SyncModuleWorker.prototype._syncOneVersion = function (versionIndex, sourcePacka
   ep.on('uploadResult', function (result) {
     // remove tmp file whatever
     fs.unlink(filepath, utility.noop);
+    
+    //make sure sync module have the correct author info
+    //only if can not get maintainers, use the username
+    var author = username;
+    if (Array.isArray(sourcePackage.maintainers)){
+      author = sourcePackage.maintainers[0].name || username;
+    }
+
     var mod = {
       version: sourcePackage.version,
       name: sourcePackage.name,
       package: sourcePackage,
-      author: username,
+      author: author,
     };
     var dist = {
       tarball: result.url,

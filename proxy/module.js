@@ -210,3 +210,11 @@ var DELETE_MODULE_BY_NAME_AND_VERSIONS_SQL = 'DELETE FROM module WHERE name=? AN
 exports.removeByNameAndVersions = function (name, versions, callback) {
   mysql.query(DELETE_MODULE_BY_NAME_AND_VERSIONS_SQL, [name, versions], callback);
 };
+
+var LIST_BY_AUTHOR_SQL = 'SELECT name, package FROM module WHERE id IN \
+                          (SELECT max(id) FROM module WHERE author=?\
+                          GROUP BY name )\
+                          ORDER BY name';
+exports.listByAuthor = function (author, callback) {
+  mysql.query(LIST_BY_AUTHOR_SQL, [author], callback);
+};
