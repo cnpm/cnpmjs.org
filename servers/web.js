@@ -26,7 +26,7 @@ var routes = require('../routes/web');
 var logger = require('../common/logger');
 var config = require('../config');
 var session = require('../common/session');
-
+var render = require('connect-render');
 var app = connect();
 
 app.use(rt({headerName: 'X-ReadTime'}));
@@ -40,11 +40,27 @@ app.use(connect.query());
 app.use(connect.json());
 
 var rootdir = path.dirname(__dirname);
-var tplroot = path.join(rootdir, 'docs', 'web');
+var viewDir = path.join(rootdir, 'view', 'web');
+var docDir = path.join(rootdir, 'docs', 'web');
+
 app.use('/', connectMarkdown({
-  root: tplroot,
-  layout: path.join(tplroot, 'layout.html'),
+  root: docDir,
+  layout: path.join(viewDir, 'layout.html'),
+  titleHolder: '<%- locals.title %>',
+  bodyHolder: '<%- locals.body %>',
   indexName: 'readme'
+}));
+
+var helpers = {
+  config: config
+};
+
+app.use(render({
+  root: viewDir,
+  viewExt: '.html',
+  layout: 'layout',
+  cache: config.viewCache,
+  helpers: helpers
 }));
 
 /**

@@ -34,6 +34,7 @@ var Log = require('../../proxy/module_log');
 var DownloadTotal = require('../../proxy/download');
 var SyncModuleWorker = require('./sync_module_worker');
 var logger = require('../../common/logger');
+var semver = require('semver');
 
 exports.show = function (req, res, next) {
   var name = req.params.name;
@@ -121,30 +122,24 @@ exports.show = function (req, res, next) {
 
 exports.get = function (req, res, next) {
   var name = req.params.name;
-  var version = req.params.version;
+  var tag = req.params.version;
+  var version = semver.valid(tag);
+
   var ep = eventproxy.create();
   ep.fail(next);
 
-  //frist get by tag
-  Module.getByTag(name, version, ep.done(function (mod) {
+  var method = version ? 'get' : 'getByTag';
+  var queryLabel = version ? version : tag;
+  
+  Module[method](name, queryLabel, ep.done(function (mod) {
     if (mod) {
       common.downloadURL(mod.package, req);
       return res.json(mod.package);
     }
-    ep.emit('notFoundByTag');
+    ep.emit('notFound');
   }));
 
-  ep.once('notFoundByTag', function () {
-    //then get by name
-    Module.get(name, version, ep.done('getByName'));
-  });
-
-  ep.once('getByName', function (mod) {
-    if (mod) {
-      common.downloadURL(mod.package, req);
-      return res.json(mod.package);
-    }
-
+  ep.once('notFound', function () {
     if (!req.session.allowSync) {
       return next();
     }
@@ -307,7 +302,13 @@ exports.upload = function (req, res, next) {
 exports.updateLatest = function (req, res, next) {
   var username = req.session.name;
   var name = req.params.name;
-  var version = req.params.version;
+  var version = semver.valid(req.params.version);
+  if (!version) {
+    return res.json(400, {
+      error: 'Params Invalid',
+      reason: 'Invalid version: ' + req.params.version,
+    });
+  }
   Module.get(name, 'next', function (err, nextMod) {
     if (err) {
       return next(err);
