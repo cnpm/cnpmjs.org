@@ -18,7 +18,7 @@ var should = require('should');
 var request = require('supertest');
 var app = require('../../../servers/web');
 
-describe.only('controllers/web/package.test.js', function () {
+describe('controllers/web/package.test.js', function () {
   before(function (done) {
     app.listen(0, done);
   });

@@ -41,11 +41,7 @@
       <tr>
         <th>License</th>
         <td>
-          <% if (typeof package.license === 'string') { %>
-            <%= package.license %>
-          <% } else { %>
-            <a href="<%= package.license.url %>"><%= package.license.name %></a>
-          <% } %>
+          <a href="<%= package.license.url %>"><%= package.license.name %></a>
         </td>
       </tr>
       <% } %>
