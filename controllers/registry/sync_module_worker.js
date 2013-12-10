@@ -178,14 +178,21 @@ SyncModuleWorker.prototype._sync = function (pkg, callback) {
 
   var versionNames = [];
   ep.on('syncModule', function (syncModule) {
-    versionNames.push(syncModule.version);
-    that._syncOneVersion(versionNames.length, syncModule, ep.done(function (result) {
+    var index = versionNames.length;
+    that._syncOneVersion(index, syncModule, function (err, result) {
+      if (err) {
+        that.log('    [%s:%d] error, version: %s, %s: %s',
+          syncModule.name, index, syncModule.version, err.name, err.message);
+      } else {
+        versionNames.push(syncModule.version);
+      }
+
       var nextVersion = missingVersions.shift();
       if (!nextVersion) {
         return ep.emit('syncDone', result);
       }
       ep.emit('syncModule', nextVersion);
-    }));
+    });
   });
 
   ep.on('syncDone', function () {
@@ -287,7 +294,7 @@ SyncModuleWorker.prototype._syncOneVersion = function (versionIndex, sourcePacka
   ep.on('uploadResult', function (result) {
     // remove tmp file whatever
     fs.unlink(filepath, utility.noop);
-    
+
     //make sure sync module have the correct author info
     //only if can not get maintainers, use the username
     var author = username;
