@@ -30,20 +30,31 @@ exports.display = function (req, res, next) {
     if (version) {
       Module.get(name, version, ep.done('pkg'));
     } else {
-      Module.getTag(name, tag, ep.done('pkg'));
+      Module.getByTag(name, tag, ep.done('pkg'));
     }
   } else {
     Module.getByTag(name, 'latest', ep.done('pkg'));
   }
 
   ep.once('pkg', function (pkg) {
-    if (!pkg.package) {
+    if (!pkg || !pkg.package) {
       return next();
     }
-    pkg.package.readme = marked(pkg.package.readme);
+    pkg = pkg.package;
+    pkg.readme = marked(pkg.readme);
+
+    //parse pkg.license
+    pkg.license = pkg.license || pkg.licenses;
+    if (Array.isArray(pkg.license)) {
+      pkg.license = pkg.license[0];
+    }
+    if (typeof pkg.license === 'object') {
+      pkg.license.name = pkg.license.name || pkg.license.type;
+    }
+
     res.render('package', {
       title: pkg.name,
-      package: pkg.package
+      package: pkg
     });
   });
 };

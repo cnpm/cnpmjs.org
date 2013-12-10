@@ -17,18 +17,11 @@
       <tr>
         <th>Maintainers</th>
         <td>
-        <%
-        package.maintainers.forEach(function (m) {
-          %>
+        <% package.maintainers.forEach(function (m) { %>
           <div class="user">
-          <a class="username" href="/~<%= m.name %>"><%
-            if (m.avatar) {
-            %><img src="<%= m.avatar %>" class="avatar">
-            <% } %><%= m.name %></a>
+          <a class="username" href="/~<%= m.name %>"><%= m.name %></a>
           </div>
-          <%
-        })
-        %>
+        <% }) %>
         </td>
       </tr>
       <% } %>
@@ -48,7 +41,11 @@
       <tr>
         <th>License</th>
         <td>
+          <% if (typeof package.license === 'string') { %>
+            <%= package.license %>
+          <% } else { %>
             <a href="<%= package.license.url %>"><%= package.license.name %></a>
+          <% } %>
         </td>
       </tr>
       <% } %>
