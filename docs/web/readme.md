@@ -44,7 +44,7 @@ Total Packages: <span id="total-packages"></span>
 
 <script>
 $(function () {
-  $.getJSON('http://localhost.shu.taobao.com:7001/?callback=?', function (data) {
+  $.getJSON('http://registry.cnpmjs.org/?callback=?', function (data) {
     $('#total-packages').html(data.doc_count);
     var downloads = $('table.downloads');
     downloads.find('tr:eq(0) td.count').html(data.download.today);
