@@ -91,7 +91,7 @@ SyncModuleWorker.prototype.next = function () {
       return that.next();
     }
 
-    that.log('[%s] Start...', pkg.name);
+    that.log('[%s] start...', pkg.name);
     that._sync(pkg, function (err, versions) {
       if (err) {
         that.fails.push(pkg.name);
@@ -132,6 +132,10 @@ SyncModuleWorker.prototype._sync = function (pkg, callback) {
     var tags = {};
     for (var i = 0; i < rows.length; i++) {
       var r = rows[i];
+      if (!r.module_id) {
+        // no module_id, need to sync tags
+        continue;
+      }
       tags[r.tag] = r.version;
     }
     ep.emit('existsTags', tags);
@@ -143,12 +147,18 @@ SyncModuleWorker.prototype._sync = function (pkg, callback) {
     var times = pkg.time || {};
     var versions = [];
     for (var v in times) {
-      var exists = map[v];
       var version = pkg.versions[v];
       if (!version || !version.dist) {
         continue;
       }
-      if (exists && exists.package.dist.shasum === version.dist.shasum) {
+      var exists = map[v] || {};
+      var sourceAuthor = exists.author;
+      if (Array.isArray(version.maintainers)) {
+        sourceAuthor = version.maintainers[0].name || exists.author;
+      }
+      if (exists.package && exists.package.dist.shasum === version.dist.shasum && exists.author === sourceAuthor) {
+        // * author make sure equal
+        // * shasum make sure equal
         continue;
       }
       version.gmt_modified = Date.parse(times[v]);
@@ -204,7 +214,7 @@ SyncModuleWorker.prototype._sync = function (pkg, callback) {
     // sync tags
     missingTags.forEach(function (item) {
       Module.addTag(pkg.name, item[0], item[1], ep.done(function (result) {
-        that.log('    added tag %s:%s', item[0], item[1]);
+        that.log('    added tag %s:%s, module_id: %s', item[0], item[1], result && result.module_id);
         ep.emit('addTag');
       }));
     });
@@ -298,7 +308,7 @@ SyncModuleWorker.prototype._syncOneVersion = function (versionIndex, sourcePacka
     //make sure sync module have the correct author info
     //only if can not get maintainers, use the username
     var author = username;
-    if (Array.isArray(sourcePackage.maintainers)){
+    if (Array.isArray(sourcePackage.maintainers)) {
       author = sourcePackage.maintainers[0].name || username;
     }
 
@@ -316,8 +326,8 @@ SyncModuleWorker.prototype._syncOneVersion = function (versionIndex, sourcePacka
     };
     mod.package.dist = dist;
 
-    that.log('    [%s:%s] done, version: %s, size: %d',
-      sourcePackage.name, versionIndex, mod.version, dataSize);
+    that.log('    [%s:%s] done, author: %s, version: %s, size: %d',
+      sourcePackage.name, versionIndex, author, mod.version, dataSize);
     Module.add(mod, ep.done(function (result) {
       callback(null, result);
     }));

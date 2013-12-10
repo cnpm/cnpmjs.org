@@ -109,21 +109,29 @@ exports.get = function (name, version, callback) {
 };
 
 var INSERT_TAG_SQL = 'INSERT INTO tag(gmt_create, gmt_modified, \
-  name, tag, version) \
-  VALUES(now(), now(), ?, ?, ?) \
-  ON DUPLICATE KEY UPDATE gmt_modified=now(), \
+  name, tag, version, module_id) \
+  VALUES(now(), now(), ?, ?, ?, ?) \
+  ON DUPLICATE KEY UPDATE gmt_modified=now(), module_id=VALUES(module_id), \
     name=VALUES(name), tag=VALUES(tag), version=VALUES(version);';
 
+var SELECT_MODULE_ID_SQL = 'SELECT id FROM module WHERE name=? AND version=?;';
+
 exports.addTag = function (name, tag, version, callback) {
-  mysql.query(INSERT_TAG_SQL, [name, tag, version], function (err, result) {
+  mysql.queryOne(SELECT_MODULE_ID_SQL, [name, version], function (err, row) {
     if (err) {
       return callback(err);
     }
-    callback(null, {id: result.insertId, gmt_modified: new Date()});
+    var module_id = row && row.id || 0;
+    mysql.query(INSERT_TAG_SQL, [name, tag, version, module_id], function (err, result) {
+      if (err) {
+        return callback(err);
+      }
+      callback(null, {id: result.insertId, gmt_modified: new Date(), module_id: module_id});
+    });
   });
 };
 
-var SELECT_TAG_SQL = 'SELECT tag, version, gmt_modified FROM tag WHERE name=? AND tag=?;';
+var SELECT_TAG_SQL = 'SELECT tag, version, gmt_modified, module_id FROM tag WHERE name=? AND tag=?;';
 
 exports.getByTag = function (name, tag, callback) {
   mysql.queryOne(SELECT_TAG_SQL, [name, tag], function (err, row) {
@@ -140,7 +148,7 @@ exports.removeTags = function (name, callback) {
   mysql.query(DELETE_TAGS_SQL, [name], callback);
 };
 
-var SELECT_ALL_TAGS_SQL = 'SELECT tag, version, gmt_modified FROM tag WHERE name=?;';
+var SELECT_ALL_TAGS_SQL = 'SELECT tag, version, gmt_modified, module_id FROM tag WHERE name=?;';
 
 exports.listTags = function (name, callback) {
   mysql.query(SELECT_ALL_TAGS_SQL, [name], callback);

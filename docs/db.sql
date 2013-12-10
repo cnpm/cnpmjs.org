@@ -49,9 +49,11 @@ CREATE TABLE `tag` (
  `name` varchar(100) NOT NULL COMMENT 'module name',
  `tag` varchar(30) NOT NULL COMMENT 'tag name',
  `version` varchar(30) NOT NULL COMMENT 'module version',
+ `module_id` bigint(20) unsigned NOT NULL COMMENT 'module id',
  PRIMARY KEY (`id`),
  UNIQUE KEY `name` (`name`, `tag`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='module tag';
+-- ALTER TABLE  `tag` ADD  `module_id` BIGINT( 20 ) UNSIGNED NOT NULL;
 
 CREATE TABLE `total` (
  `name` varchar(100) NOT NULL COMMENT 'total name',
