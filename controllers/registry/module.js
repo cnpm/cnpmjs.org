@@ -1,4 +1,4 @@
-/*!
+/**!
  * cnpmjs.org - controllers/registry/module.js
  *
  * Copyright(c) cnpmjs.org and other contributors.
@@ -22,7 +22,6 @@ var crypto = require('crypto');
 var utility = require('utility');
 var eventproxy = require('eventproxy');
 var Bagpipe = require('bagpipe');
-var urllib = require('urllib');
 var urlparse = require('url').parse;
 var config = require('../../config');
 var Module = require('../../proxy/module');
@@ -130,7 +129,7 @@ exports.get = function (req, res, next) {
 
   var method = version ? 'get' : 'getByTag';
   var queryLabel = version ? version : tag;
-  
+
   Module[method](name, queryLabel, ep.done(function (mod) {
     if (mod) {
       common.downloadURL(mod.package, req);
