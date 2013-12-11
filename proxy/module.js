@@ -15,6 +15,7 @@
  */
 
 var utility = require('utility');
+var eventproxy = require('eventproxy');
 var config = require('../config');
 var mysql = require('../common/mysql');
 
@@ -223,11 +224,26 @@ exports.removeByNameAndVersions = function (name, versions, callback) {
   mysql.query(DELETE_MODULE_BY_NAME_AND_VERSIONS_SQL, [name, versions], callback);
 };
 
-var LIST_BY_AUTHOR_SQL = 'SELECT name, package FROM module WHERE id IN \
+var LIST_RECENTLY_NAMES_SQL = 'SELECT distinct(name) AS name FROM module WHERE author = ? ORDER BY id DESC LIMIT 100;';
+var LIST_BY_NAMES_SQL = 'SELECT name, package FROM module WHERE id IN \
   ( \
-    SELECT module_id FROM tag WHERE tag="latest" AND name IN \
-    (SELECT distinct(name) FROM module WHERE author = ? ORDER BY id DESC LIMIT 10) \
-  );';
+    SELECT module_id FROM tag WHERE tag="latest" AND name IN (?) \
+  ) ORDER BY id DESC;';
 exports.listByAuthor = function (author, callback) {
-  mysql.query(LIST_BY_AUTHOR_SQL, [author], callback);
+  var ep = eventproxy.create();
+  ep.fail(callback);
+  mysql.query(LIST_RECENTLY_NAMES_SQL, [author], ep.done(function (rows) {
+    if (!rows || rows.length === 0) {
+      return callback(null, []);
+    }
+    ep.emit('names', rows.map(function (r) {
+      return r.name;
+    }));
+  }));
+  ep.on('names', function (names) {
+    mysql.query(LIST_BY_NAMES_SQL, [names], ep.done('modules'));
+  });
+  ep.on('modules', function (modules) {
+    callback(null, modules);
+  });
 };

@@ -13,7 +13,7 @@
   <h1>
     Packages by <%= user.name %>
     <% if (user.email) { %>
-      <small>(<a href="mailto:"<%= user.email %>><%= user.email %></a>)</small>
+      <small>(<a href="mailto:<%= user.email %>"><%= user.email %></a>)</small>
     <% } %>
   </h1>
   <hr />

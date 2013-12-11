@@ -19,11 +19,23 @@ var connect = require('connect');
 var RedisStore = require('connect-redis')(connect);
 var config = require('../config');
 
-var session = connect.session({
-  key: 'AuthSession',
-  secret: config.sessionSecret,
-  store: new RedisStore(config.redis),
-  cookie: { path: '/', httpOnly: true, maxAge: 3600000 * 24 * 30 },
-});
+var session;
+var key = 'AuthSession';
+var cookie = { path: '/', httpOnly: true, maxAge: 3600000 * 24 * 30 };
+
+if (config.debug) {
+  session = connect.cookieSession({
+    secret: config.sessionSecret,
+    key: key,
+    cookie: cookie
+  });
+} else {
+  session = connect.session({
+    key: key,
+    secret: config.sessionSecret,
+    store: new RedisStore(config.redis),
+    cookie: cookie,
+  });
+}
 
 module.exports = session;
