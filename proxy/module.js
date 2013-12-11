@@ -19,7 +19,7 @@ var eventproxy = require('eventproxy');
 var config = require('../config');
 var mysql = require('../common/mysql');
 
-var MODULE_COLUMNS = 'id, publish_time, gmt_create, gmt_modified, author, name, version, package, dist_tarball, dist_shasum, dist_size';
+var MODULE_COLUMNS = 'id, publish_time, gmt_create, gmt_modified, author, name, version, description, package, dist_tarball, dist_shasum, dist_size';
 
 // var INSERT_MODULE_SQL = 'INSERT INTO module(gmt_create, gmt_modified, author, name, version, package, dist_tarball, dist_shasum, dist_size) \
 //   VALUES(now(), now(), ?, ?, ?, ?, ?, ?, ?);';
@@ -27,7 +27,7 @@ var MODULE_COLUMNS = 'id, publish_time, gmt_create, gmt_modified, author, name, 
 var INSERT_MODULE_SQL = 'INSERT INTO module(gmt_create, gmt_modified, \
   publish_time, author, name, version, package, dist_tarball, dist_shasum, dist_size, description) \
   VALUES(now(), now(), ?, ?, ?, ?, ?, ?, ?, ?, ?) \
-  ON DUPLICATE KEY UPDATE gmt_modified=now(), publish_time=VALUES(publish_time), \
+  ON DUPLICATE KEY UPDATE gmt_modified=now(), publish_time=VALUES(publish_time), description=VALUES(description), \
     author=VALUES(author), name=VALUES(name), version=VALUES(version), package=VALUES(package), \
     dist_tarball=VALUES(dist_tarball), dist_shasum=VALUES(dist_shasum), dist_size=VALUES(dist_size);';
 
@@ -46,7 +46,7 @@ exports.add = function (mod, callback) {
   dist.size = 0;
   var publish_time = mod.publish_time || Date.now();
   var values = [
-    publish_time, mod.author, mod.name, mod.version, pkg, 
+    publish_time, mod.author, mod.name, mod.version, pkg,
     dist.tarball, dist.shasum, dist.size, description
   ];
   mysql.query(INSERT_MODULE_SQL, values, function (err, result) {
@@ -55,6 +55,11 @@ exports.add = function (mod, callback) {
     }
     callback(null, {id: result.insertId, gmt_modified: new Date()});
   });
+};
+
+var UPDATE_DESC_SQL = 'UPDATE module SET description=? WHERE id=?;';
+exports.updateDescription = function (id, description, callback) {
+  mysql.query(UPDATE_DESC_SQL, [description, id], callback);
 };
 
 var UPDATE_DIST_SQL = 'UPDATE module SET version=?, package=?, dist_tarball=?, dist_shasum=?, dist_size=? WHERE id=?;';
