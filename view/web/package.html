@@ -9,7 +9,7 @@
       <p class="description"><%= package.description %></p>
     <% } %>
 
-    <pre class="sh"><code>npm install <%= package.name %></code></pre>
+    <pre class="sh"><code>$ cnpm install <%= package.name %></code></pre>
 
     <table class="metadata">
       <% if (package.maintainers) { %>
@@ -18,7 +18,7 @@
         <td>
         <% package.maintainers.forEach(function (m) { %>
           <div class="user">
-          <a class="username" href="/~<%= m.name %>"><%= m.name %></a>
+            <a class="username" href="/~<%= m.name %>"><%= m.name %></a>
           </div>
         <% }) %>
         </td>

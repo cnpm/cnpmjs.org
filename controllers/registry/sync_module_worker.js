@@ -152,16 +152,20 @@ SyncModuleWorker.prototype._sync = function (pkg, callback) {
         continue;
       }
       var exists = map[v] || {};
-      var sourceAuthor = exists.author;
-      if (Array.isArray(version.maintainers)) {
-        sourceAuthor = version.maintainers[0].name || exists.author;
+
+      version.publish_time = Date.parse(times[v]);
+      if (!version.maintainers || !version.maintainers[0]) {
+        version.maintainers = pkg.maintainers;
       }
+      var sourceAuthor = version.maintainers && version.maintainers[0] && version.maintainers[0].name || exists.author;
       if (exists.package && exists.package.dist.shasum === version.dist.shasum && exists.author === sourceAuthor) {
         // * author make sure equal
         // * shasum make sure equal
-        continue;
+        if (version.publish_time === exists.publish_time) {
+          // * publish_time make sure equal
+          continue;
+        }
       }
-      version.gmt_modified = Date.parse(times[v]);
       versions.push(version);
     }
 
@@ -179,7 +183,7 @@ SyncModuleWorker.prototype._sync = function (pkg, callback) {
     }
 
     versions.sort(function (a, b) {
-      return a.gmt_modified - b.gmt_modified;
+      return a.publish_time - b.publish_time;
     });
     missingVersions = versions;
     that.log('  [%s] %d versions', pkg.name, versions.length);
@@ -187,8 +191,9 @@ SyncModuleWorker.prototype._sync = function (pkg, callback) {
   });
 
   var versionNames = [];
+  var syncIndex = 0;
   ep.on('syncModule', function (syncModule) {
-    var index = versionNames.length;
+    var index = syncIndex++;
     that._syncOneVersion(index, syncModule, function (err, result) {
       if (err) {
         that.log('    [%s:%d] error, version: %s, %s: %s',
@@ -240,7 +245,7 @@ SyncModuleWorker.prototype._syncOneVersion = function (versionIndex, sourcePacka
   var options = {
     writeStream: ws,
     followRedirect: true,
-    timeout: ms('10s')
+    timeout: 600000, // 10 minutes download
   };
   var ep = eventproxy.create();
   ep.fail(function (err) {
@@ -317,6 +322,7 @@ SyncModuleWorker.prototype._syncOneVersion = function (versionIndex, sourcePacka
       name: sourcePackage.name,
       package: sourcePackage,
       author: author,
+      publish_time: sourcePackage.publish_time,
     };
     var dist = {
       tarball: result.url,
@@ -325,10 +331,11 @@ SyncModuleWorker.prototype._syncOneVersion = function (versionIndex, sourcePacka
       noattachment: dataSize === 0,
     };
     mod.package.dist = dist;
-
-    that.log('    [%s:%s] done, author: %s, version: %s, size: %d',
-      sourcePackage.name, versionIndex, author, mod.version, dataSize);
     Module.add(mod, ep.done(function (result) {
+      that.log('    [%s:%s] done, insertId: %s, author: %s, version: %s, size: %d, publish_time: %j',
+        sourcePackage.name, versionIndex,
+        result.id,
+        author, mod.version, dataSize, new Date(mod.publish_time));
       callback(null, result);
     }));
   });

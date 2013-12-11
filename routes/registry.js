@@ -20,7 +20,6 @@ var publishable = require('../middleware/publishable');
 var syncByInstall = require('../middleware/sync_by_install');
 var home = require('../controllers/registry/home');
 var mod = require('../controllers/registry/module');
-var pkg = require('../controllers/registry/package');
 var tag = require('../controllers/registry/tag');
 var user = require('../controllers/registry/user');
 
