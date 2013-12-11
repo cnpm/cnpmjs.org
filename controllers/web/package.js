@@ -132,6 +132,7 @@ function setLicense(pkg) {
     }
   }
 }
+exports.setLicense = setLicense;
 
 function getOssLicenseUrlFromName(name) {
   var base = 'http://opensource.org/licenses/';

@@ -16,7 +16,10 @@
 
 var should = require('should');
 var request = require('supertest');
+var mm = require('mm');
+var mysql = require('../../../common/mysql');
 var app = require('../../../servers/web');
+var pkg = require('../../../controllers/web/package');
 
 describe('controllers/web/package.test.js', function () {
   before(function (done) {
@@ -25,6 +28,8 @@ describe('controllers/web/package.test.js', function () {
   after(function (done) {
     app.close(done);
   });
+
+  afterEach(mm.restore);
 
   describe('GET /package/:name', function (done) {
     it('should get 200', function (done) {
@@ -87,6 +92,42 @@ describe('controllers/web/package.test.js', function () {
       .get('/browse/keyword/notexistpackage')
       .expect(200)
       .expect(/Can not found package match notexistpackage/, done);
+    });
+
+    it('should 500 when mysql error', function (done) {
+      mm.error(mysql, 'query');
+      request(app)
+      .get('/browse/keyword/notexistpackage')
+      .expect(500)
+      .expect(/MockError: mm mock error/, done);
+    });
+  });
+
+  describe('setLicense()', function () {
+    it('should only use the first license', function () {
+      var p = {license: ['MIT']};
+      pkg.setLicense(p);
+      p.license.should.have.keys('name', 'url');
+      p.license.should.eql({
+        name: 'MIT',
+        url: 'http://opensource.org/licenses/MIT'
+      });
+
+      var p = {license: ['http://foo/MIT']};
+      pkg.setLicense(p);
+      p.license.should.have.keys('name', 'url');
+      p.license.should.eql({
+        name: 'http://foo/MIT',
+        url: 'http://foo/MIT'
+      });
+
+      var p = {license: {name: 'mit', url: 'http://foo/mit'}};
+      pkg.setLicense(p);
+      p.license.should.have.keys('name', 'url');
+      p.license.should.eql({
+        name: 'mit',
+        url: 'http://foo/mit'
+      });
     });
   });
 

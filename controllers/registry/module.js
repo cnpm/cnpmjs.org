@@ -61,15 +61,8 @@ exports.show = function (req, res, next) {
       });
     }
 
-    var nextMod = rows[0];
-    var startIndex = 1;
+    var nextMod = null;
     var latestMod = null;
-    if (nextMod.version !== 'next') {
-      // next create fail
-      startIndex = 0;
-      nextMod = null;
-    }
-
     var distTags = {};
     for (var i = 0; i < tags.length; i++) {
       var t = tags[i];
@@ -79,8 +72,12 @@ exports.show = function (req, res, next) {
     var versions = {};
     var times = {};
     var attachments = {};
-    for (var i = startIndex; i < rows.length; i++) {
+    for (var i = 0; i < rows.length; i++) {
       var row = rows[i];
+      if (row.version === 'next') {
+        nextMod = row;
+        continue;
+      }
       var pkg = row.package;
       common.downloadURL(pkg, req);
       versions[pkg.version] = pkg;
@@ -91,7 +88,7 @@ exports.show = function (req, res, next) {
     }
 
     if (!latestMod) {
-      latestMod = nextMod;
+      latestMod = nextMod || rows[0];
     }
 
     var rev = '';
@@ -113,6 +110,8 @@ exports.show = function (req, res, next) {
       readme: latestMod.package.readme,
       _attachments: attachments,
     };
+
+    debug('show module %s: %s, latest: %s', name, rev, latestMod.version);
 
     res.json(info);
   });
@@ -342,6 +341,7 @@ exports.updateLatest = function (req, res, next) {
         name: username,
       };
     }
+    body._publish_on_cnpm = true;
     nextMod.package = body;
     debug('update %s:%s %j', nextMod.package.name, nextMod.package.version, nextMod.package.dist);
     // change latest to version

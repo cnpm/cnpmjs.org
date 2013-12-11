@@ -113,6 +113,19 @@ describe('controllers/registry/module.test.js', function () {
         done();
       });
     });
+
+    it('should get cnpmjs.org@0.1.0 with _publish_on_cnpm=true', function (done) {
+      request(app)
+      .get('/cnpmjs.org/0.1.0')
+      .expect(200, function (err, res) {
+        should.not.exist(err);
+        var body = res.body;
+        body.name.should.equal('cnpmjs.org');
+        body.version.should.equal('0.1.0');
+        body._publish_on_cnpm.should.equal(true);
+        done();
+      });
+    });
   });
 
   describe('PUT /:name', function () {
