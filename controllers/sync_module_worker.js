@@ -1,5 +1,5 @@
 /**!
- * cnpmjs.org - controllers/registry/sync_module_worker.js
+ * cnpmjs.org - controllers/sync_module_worker.js
  *
  * Copyright(c) cnpmjs.org and other contributors.
  * MIT Licensed
@@ -23,11 +23,11 @@ var crypto = require('crypto');
 var eventproxy = require('eventproxy');
 var urllib = require('urllib');
 var utility = require('utility');
-var nfs = require('../../common/nfs');
-var npm = require('../../proxy/npm');
+var nfs = require('../common/nfs');
+var npm = require('../proxy/npm');
 var common = require('./common');
-var Module = require('../../proxy/module');
-var Log = require('../../proxy/module_log');
+var Module = require('../proxy/module');
+var Log = require('../proxy/module_log');
 var ms = require('ms');
 
 function SyncModuleWorker(options) {
@@ -367,5 +367,36 @@ SyncModuleWorker.prototype._syncOneVersion = function (versionIndex, sourcePacka
         author, mod.version, dataSize, new Date(mod.publish_time));
       callback(null, result);
     }));
+  });
+};
+
+SyncModuleWorker.sync = function (name, username, callback) {
+  npm.get(name, function (err, pkg, response) {
+    if (err) {
+      return callback(err);
+    }
+    if (!pkg || !pkg._rev) {
+      return callback(null, {
+        ok: false,
+        statusCode: response.statusCode,
+        pkg: pkg
+      });
+    }
+    Log.create({name: name, username: username}, function (err, result) {
+      if (err) {
+        return callback(err);
+      }
+      var worker = new SyncModuleWorker({
+        logId: result.id,
+        name: name,
+        username: username,
+      });
+      worker.start();
+      callback(null, {
+        ok: true,
+        logId: result.id,
+        pkg: pkg
+      });
+    });
   });
 };

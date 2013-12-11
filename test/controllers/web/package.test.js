@@ -86,8 +86,17 @@ describe('controllers/web/package.test.js', function () {
       request(app)
       .get('/browse/keyword/notexistpackage')
       .expect(200)
-      .expect(/Packages match/)
       .expect(/Can not found package match notexistpackage/, done);
+    });
+  });
+
+  describe('GET /sync/:name', function (done) {
+    it('should display ok', function (done) {
+      request(app)
+      .get('/sync/cutter')
+      .expect(200)
+      .expect(/Sync Package/)
+      .expect(/Log/, done);
     });
   });
 });

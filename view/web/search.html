@@ -4,19 +4,39 @@
   font-size: 18px;
   border-bottom: 1px solid #ddd;
 }
+
+#search .alert a {
+  font-size: 20px;
+}
+#search .package.match {
+  font-size: 25px;
+  font-weight: bolder;
+}
 </style>
 <div id="search">
-  <h1>
-    Packages match <span style="color: #09f;"><%= keyword %></span>
-  </h1>
-  <hr />
   <% if (!packages.length) { %>
-    <div class="alert alert-warning">Can not found package match <%= keyword %>.</div>
-  <% } %>
-  <% for (var i = 0; i < packages.length; i++) { %>
-    <div class="package">
-      <a href="/package/<%= packages[i].name %>" class="package-name"><%= packages[i].name %></a>
-      <span class="package-description"><%= packages[i].description %></span>
+    <div class="alert alert-warning">
+      Can not found package match <%= keyword %>. You can 
+      <a href="/sync/<%= keyword %>" target="_blank">SYNC</a> from official npm registry or
+      <a href="https://npmjs.org/search?q=<%= keyword %>" target="_blank">SEARCH</a> in official npm website.
     </div>
+  <% } else if (packages[0].name !== keyword) { %>
+    <div class="alert alert-info">
+      Can not found package <%= keyword %>. You can 
+      <a href="/sync/<%= keyword %>" target="_blank">SYNC</a> from official npm registry or
+      <a href="https://npmjs.org/search?q=<%= keyword %>" target="_blank">SEARCH</a> in official npm website.
+    </div>    
+  <% } %>
+  <% if (packages.length) { %>
+    <h1>
+      Packages match <span style="color: #09f;"><%= keyword %></span>
+    </h1>
+    <hr />
+    <% for (var i = 0; i < packages.length; i++) { %>
+      <div class="package <%= packages[i].name === keyword ? 'match' : '' %>">
+        <a href="/package/<%= packages[i].name %>" class="package-name"><%= packages[i].name %></a>
+        <span class="package-description"><%= packages[i].description %></span>
+      </div>
+    <% } %>
   <% } %>
 </div>

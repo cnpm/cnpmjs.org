@@ -22,6 +22,8 @@ var gravatar = require('gravatar');
 var humanize = require('humanize-number');
 var Module = require('../../proxy/module');
 var down = require('../download');
+var sync = require('../sync');
+var Log = require('../../proxy/module_log');
 
 exports.display = function (req, res, next) {
   var params = req.params;
@@ -87,6 +89,12 @@ exports.search = function (req, res, next) {
       keyword: word,
       packages: packages || []
     });
+  });
+};
+
+exports.displaySync = function (req, res, next) {
+  res.render('sync', {
+    name: req.params.name
   });
 };
 

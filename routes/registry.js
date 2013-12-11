@@ -20,8 +20,8 @@ var publishable = require('../middleware/publishable');
 var syncByInstall = require('../middleware/sync_by_install');
 var home = require('../controllers/registry/home');
 var mod = require('../controllers/registry/module');
-var tag = require('../controllers/registry/tag');
 var user = require('../controllers/registry/user');
+var sync = require('../controllers/sync');
 
 function routes(app) {
   app.get('/', home.show);
@@ -40,8 +40,8 @@ function routes(app) {
   app.put('/:name', [login, publishable], mod.add);
 
   // sync from source npm
-  app.put('/:name/sync', [login], mod.sync);
-  app.get('/:name/sync/log/:id', mod.getSyncLog);
+  app.put('/:name/sync', sync.sync);
+  app.get('/:name/sync/log/:id', sync.getSyncLog);
 
   app.get('/:name/download/:filename', mod.download);
 
