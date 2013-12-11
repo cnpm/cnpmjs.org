@@ -1,6 +1,6 @@
 {
   "name": "cnpmjs.org",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "Private npm registry and web",
   "main": "dispatch.js",
   "scripts": {

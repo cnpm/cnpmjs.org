@@ -18,6 +18,7 @@ var microtime = require('microtime');
 var eventproxy = require('eventproxy');
 var Total = require('../../proxy/total');
 var down = require('../download');
+var version = require('../../package.json').version;
 
 var startTime = '' + microtime.now();
 
@@ -31,6 +32,8 @@ exports.show = function (req, res, next) {
     total.download = download;
     total.db_name = 'registry';
     total.instance_start_time = startTime;
+    total.node_version = process.version;
+    total.app_version = version;
     total.donate = 'https://me.alipay.com/imk2';
     var callback = req.query.callback;
     if (callback) {
