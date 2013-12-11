@@ -32,7 +32,7 @@ describe('controllers/web/user.test.js', function () {
       .get('/~dead_horse')
       .expect(200)
       .expect(/<div id="profile">/)
-      .expect(/Packages by dead_horse/, done);
+      .expect(/Packages by /, done);
     });
 
     it('should get 404', function (done) {
@@ -46,7 +46,7 @@ describe('controllers/web/user.test.js', function () {
       .get('/~jdalton')
       .expect(200)
       .expect(/<div id="profile">/)
-      .expect(/Packages by jdalton/, done);
+      .expect(/Packages by/, done);
     });
   });
 });
