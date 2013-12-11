@@ -33,6 +33,7 @@ start()
    get_pid
    if [ -z $PID ]; then
       echo "Starting $PROJECT_NAME ..."
+      echo "nohup $NODEJS $NODE_DISPATH_PATH > $STDOUT_LOG 2>&1 &"
       nohup $NODEJS $NODE_DISPATH_PATH > $STDOUT_LOG  2>&1 &
       sleep 2
       get_pid
@@ -66,8 +67,13 @@ status()
 {
   get_pid
   if [ ! -z $PID ]; then
-    echo "PID: $PID"
-    ps -ef | grep $PID
+    echo "$PROJECT_NAME PID: $PID"
+    node_processes=`ps -ef | grep $PID | grep -v grep`
+    echo "master:"
+    echo "$node_processes" | grep dispatch.js
+    worker_count=`echo "$node_processes" | grep -v dispatch.js | wc -l`
+    echo "workers: $worker_count"
+    echo "$node_processes" | grep -v dispatch.js
   else
     echo "$PROJECT_NAME is not running"
   fi

@@ -25,7 +25,9 @@ $ vim config/config.js
 
 ```js
 module.exports = {
+  debug: false,
   enableCluster: true, // enable cluster mode
+  logdir: 'your application log dir',
   mysqlServers: [
     {
       host: 'your mysql host',
@@ -70,10 +72,10 @@ $ npm install
 ## start
 
 ```bash
- $ node dispatch.js
+$ ./bin/nodejsctl start
 
-[Tue Dec 10 2013 22:50:41 GMT+0800 (CST)] [worker:9006] Server started, registry server listen at 7001, web listen at 7002, cluster: false
-[Tue Dec 10 2013 22:50:42 GMT+0800 (CST)] [worker:9006] mysql ready, got 6 tables
+Starting cnpmjs.org ...
+Start nodejs success. PID=27175
 ```
 
 ## open registry and web
