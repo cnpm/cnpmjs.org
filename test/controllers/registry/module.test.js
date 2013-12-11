@@ -88,30 +88,28 @@ describe('controllers/registry/module.test.js', function () {
   describe('GET /:name/:(version|tag)', function () {
     it('should return module@version info', function (done) {
       request(app)
-      .get('/cnpmjs.org/0.0.4')
+      .get('/cnpmjs.org/0.0.0')
       .expect(200, function (err, res) {
         should.not.exist(err);
         var body = res.body;
         body.name.should.equal('cnpmjs.org');
-        body.version.should.equal('0.0.4');
-        body._id.should.equal('cnpmjs.org@0.0.4');
-        body.dist.should.have.keys('tarball', 'shasum', 'size');
-        body.dist.tarball.should.include('/cnpmjs.org/download/cnpmjs.org-0.0.4.tgz');
+        body.version.should.equal('0.0.0');
+        body._id.should.equal('cnpmjs.org@0.0.0');
+        body.dist.tarball.should.include('cnpmjs.org-0.0.0.tgz');
         done();
       });
     });
 
     it('should return module@tag info', function (done) {
       request(app)
-      .get('/cnpmjs.org/latest')
+      .get('/cutter/latest')
       .expect(200, function (err, res) {
         should.not.exist(err);
         var body = res.body;
-        body.name.should.equal('cnpmjs.org');
-        body.version.should.equal('0.0.4');
-        body._id.should.equal('cnpmjs.org@0.0.4');
-        body.dist.should.have.keys('tarball', 'shasum', 'size');
-        body.dist.tarball.should.include('/cnpmjs.org/download/cnpmjs.org-0.0.4.tgz');
+        body.name.should.equal('cutter');
+        body.version.should.equal('0.0.3');
+        body._id.should.equal('cutter@0.0.3');
+        body.dist.tarball.should.include('/cutter/download/cutter-0.0.3.tgz');
         done();
       });
     });

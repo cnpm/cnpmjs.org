@@ -678,14 +678,13 @@ exports.listAllModulesSince = function (req, res, next) {
 };
 
 exports.listAllModuleNames = function (req, res, next) {
-  Module.listSince(new Date(0), function (err, mods) {
+  Module.listShort(function (err, mods) {
     if (err) {
       return next(err);
     }
-    var results = [];
-    for (var i = 0; i < mods.length; i++) {
-      results.push(mods[i].name);
-    }
+    var results = mods.map(function (m) {
+      return m.name;
+    });
     res.json(results);
   });
 };
