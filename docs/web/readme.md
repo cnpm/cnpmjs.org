@@ -26,7 +26,6 @@ Total Packages: <span id="total-packages"></span>
   }
   table.downloads td.count {
     width: 30%;
-    text-align: right;
   }
 </style>
 <table class="downloads">

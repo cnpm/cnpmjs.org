@@ -19,7 +19,9 @@ var eventproxy = require('eventproxy');
 var semver = require('semver');
 var marked = require('marked');
 var gravatar = require('gravatar');
+var humanize = require('humanize-number');
 var Module = require('../../proxy/module');
+var down = require('../download');
 
 exports.display = function (req, res, next) {
   var params = req.params;
@@ -39,7 +41,9 @@ exports.display = function (req, res, next) {
     Module.getByTag(name, 'latest', ep.done('pkg'));
   }
 
-  ep.once('pkg', function (pkg) {
+  down.total(name, ep.done('download'));
+
+  ep.all('pkg', 'download', function (pkg, download) {
     if (!pkg || !pkg.package) {
       return next();
     }
@@ -58,9 +62,14 @@ exports.display = function (req, res, next) {
 
     setLicense(pkg);
 
+    for (var k in download) {
+      download[k] = humanize(download[k]);
+    }
+
     res.render('package', {
       title: 'Package - ' + pkg.name,
-      package: pkg
+      package: pkg,
+      download: download
     });
   });
 };

@@ -11,6 +11,21 @@
 
     <pre class="sh"><code>$ cnpm install <%= package.name %></code></pre>
 
+    <table class="downloads">
+      <tbody>
+        <tr>
+          <td class="count"><%- download.today %></td><td> downloads today</td>
+          <td class="count"><%- download.thisweek %></td><td> downloads in this week</td>
+          <td class="count"><%- download.thismonth %></td><td> downloads in this month</td>
+        </tr>
+        <tr>
+          <td class="count"><%- download.lastday %></td><td> downloads in the last day</td>
+          <td class="count"><%- download.lastweek %></td><td> downloads in the last week</td>
+          <td class="count"><%- download.lastmonth %></td><td> downloads in the last month</td>
+        </tr>
+      </tbody>
+    </table>
+
     <table class="metadata">
       <% if (package.maintainers) { %>
       <tr>
