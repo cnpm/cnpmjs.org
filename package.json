@@ -16,6 +16,7 @@
     }
   },
   "dependencies": {
+    "gravatar": "1.0.6",
     "urllib": "0.5.5",
     "connect-markdown": "0.0.3",
     "qn": "0.2.0",

@@ -18,7 +18,12 @@
         <td>
         <% package.maintainers.forEach(function (m) { %>
           <div class="user">
-            <a class="username" href="/~<%= m.name %>"><%= m.name %></a>
+            <a class="username" href="/~<%= m.name %>">
+              <% if (m.gravatar) { %>
+              <img src="<%- m.gravatar %>" class="avatar">
+              <% } %>
+              <%= m.name %>
+            </a>
           </div>
         <% }) %>
         </td>
@@ -40,7 +45,7 @@
       <tr>
         <th>License</th>
         <td>
-          <a href="<%= package.license.url %>"><%= package.license.name %></a>
+          <a href="<%= package.license.url %>" target="_blank"><%= package.license.name %></a>
         </td>
       </tr>
       <% } %>
@@ -71,7 +76,7 @@
       <tr>
         <th>Repository</td>
         <td>
-          <% if (gh) { %><a href="<%= gh %>"><% } %>
+          <% if (gh) { %><a href="<%= gh %>" target="_blank"><% } %>
           <%= package.repository.url %><% if (gh) { %></a><% } %>
           (<%= package.repository.type %>)
         </td>
@@ -81,7 +86,7 @@
       <tr>
         <th>Homepage</td>
         <td>
-          <a href="<%= encodeURI(package.homepage) %>"><%= package.homepage.replace(/</g, '&lt;') %></a>
+          <a href="<%= encodeURI(package.homepage) %>" target="_blank"><%= package.homepage.replace(/</g, '&lt;') %></a>
         </td>
       </tr>
       <% } %>
@@ -89,7 +94,7 @@
       <tr>
         <th>Bugs</td>
         <td>
-          <a href="<%= package.bugs.url %>"><%= package.bugs.url %></a>
+          <a href="<%= package.bugs.url %>" target="_blank"><%= package.bugs.url %></a>
         </td>
       </tr>
       <% } %>

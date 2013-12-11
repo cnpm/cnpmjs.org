@@ -42,15 +42,24 @@ Total Packages: <span id="total-packages"></span>
 
 <script>
 $(function () {
+  function humanize(n, options) {
+    options = options || {};
+    var d = options.delimiter || ',';
+    var s = options.separator || '.';
+    n = n.toString().split('.');
+    n[0] = n[0].replace(/(\d)(?=(\d\d\d)+(?!\d))/g, '$1' + d);
+    return n.join(s);
+  }
+
   $.getJSON('http://registry.cnpmjs.org/?callback=?', function (data) {
-    $('#total-packages').html(data.doc_count);
+    $('#total-packages').html(humanize(data.doc_count));
     var downloads = $('table.downloads');
-    downloads.find('tr:eq(0) td.count').html(data.download.today);
-    downloads.find('tr:eq(1) td.count').html(data.download.thisweek);
-    downloads.find('tr:eq(2) td.count').html(data.download.thismonth);
-    downloads.find('tr:eq(3) td.count').html(data.download.lastday);
-    downloads.find('tr:eq(4) td.count').html(data.download.lastweek);
-    downloads.find('tr:eq(5) td.count').html(data.download.lastmonth);
+    downloads.find('tr:eq(0) td.count').html(humanize(data.download.today));
+    downloads.find('tr:eq(1) td.count').html(humanize(data.download.thisweek));
+    downloads.find('tr:eq(2) td.count').html(humanize(data.download.thismonth));
+    downloads.find('tr:eq(3) td.count').html(humanize(data.download.lastday));
+    downloads.find('tr:eq(4) td.count').html(humanize(data.download.lastweek));
+    downloads.find('tr:eq(5) td.count').html(humanize(data.download.lastmonth));
   });
 });
 </script>

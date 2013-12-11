@@ -20,6 +20,10 @@
       #fork{position:fixed;top:0;right:0;_position:absolute;}
       #search-input {width: 600px; height: 50px; display: inline; font-size: 30px;}
       #content-header {margin: 20px 0 50px 0;}
+      .user .avatar {
+        width: 32px;
+        height: 32px;
+      }
     </style>
     <script>
       $(function () {
@@ -37,10 +41,10 @@
   </head>
   <body>
     <div class="container">
-      <div id="content-header">        
+      <div id="content-header">
         <a href="/"><img src="http://ww4.sinaimg.cn/large/69c1d4acgw1ebfly5kjlij208202oglr.jpg"></a>
         <input type="text" id="search-input" class="form-control" placeholder="Search Packages">
-      </div>      
+      </div>
       <div id="content-body"><%- locals.body %></div>
     <div class="bottom">
       <hr/>
