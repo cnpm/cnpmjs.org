@@ -1,5 +1,5 @@
 /**!
- * cnpmjs.org - controllers/registry/sync_module_worker.js
+ * cnpmjs.org - controllers/sync_module_worker.js
  *
  * Copyright(c) cnpmjs.org and other contributors.
  * MIT Licensed
@@ -23,11 +23,11 @@ var crypto = require('crypto');
 var eventproxy = require('eventproxy');
 var urllib = require('urllib');
 var utility = require('utility');
-var nfs = require('../../common/nfs');
-var npm = require('../../proxy/npm');
+var nfs = require('../common/nfs');
+var npm = require('../proxy/npm');
 var common = require('./common');
-var Module = require('../../proxy/module');
-var Log = require('../../proxy/module_log');
+var Module = require('../proxy/module');
+var Log = require('../proxy/module_log');
 var ms = require('ms');
 
 function SyncModuleWorker(options) {

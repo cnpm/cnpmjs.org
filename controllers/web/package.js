@@ -22,6 +22,8 @@ var gravatar = require('gravatar');
 var humanize = require('humanize-number');
 var Module = require('../../proxy/module');
 var down = require('../download');
+var sync = require('../sync');
+var Log = require('../../proxy/module_log');
 
 exports.display = function (req, res, next) {
   var params = req.params;
@@ -87,6 +89,44 @@ exports.search = function (req, res, next) {
       keyword: word,
       packages: packages || []
     });
+  });
+};
+
+exports.displaySync = function (req, res, next) {
+  res.render('sync', {
+    name: req.params.name
+  });
+};
+
+exports.handleSync = function (req, res, next) {
+  var name = req.params.name;
+  sync(name, 'anonymous', function (err, result) {
+    if (err) {
+      return next(err);
+    }
+    if (!result.ok) {
+      return res.json(result.statusCode, result.pkg);
+    }
+    res.json(201, {
+      ok: true,
+      logId: result.logId
+    });
+  });
+};
+
+exports.getSyncLog = function (req, res, next) {
+  var logId = req.params.id;
+  var name = req.params.name;
+  var offset = Number(req.query.offset) || 0;
+  Log.get(logId, function (err, row) {
+    if (err || !row) {
+      return next(err);
+    }
+    var log = row.log.trim();
+    if (offset > 0) {
+      log = log.split('\n').slice(offset).join('\n');
+    }
+    res.json(200, {ok: true, log: log});
   });
 };
 

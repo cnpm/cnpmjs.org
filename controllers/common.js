@@ -16,7 +16,7 @@
 
 var crypto = require('crypto');
 var path = require('path');
-var config = require('../../config');
+var config = require('../config');
 
 exports.getTarballFilepath = function (filename) {
   // ensure download file path unique

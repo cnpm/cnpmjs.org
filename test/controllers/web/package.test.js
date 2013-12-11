@@ -86,7 +86,6 @@ describe('controllers/web/package.test.js', function () {
       request(app)
       .get('/browse/keyword/notexistpackage')
       .expect(200)
-      .expect(/Packages match/)
       .expect(/Can not found package match notexistpackage/, done);
     });
   });

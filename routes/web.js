@@ -24,6 +24,10 @@ function routes(app) {
   app.get('/browse/keyword/:word', pkg.search);
 
   app.get('/~:name', user.display);
+
+  app.get('/sync/:name', pkg.displaySync);
+  app.put('/sync/:name', pkg.handleSync);
+  app.get('/sync/:name/log/:id', pkg.getSyncLog);
 }
 
 module.exports = routes;

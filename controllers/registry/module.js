@@ -27,11 +27,10 @@ var config = require('../../config');
 var Module = require('../../proxy/module');
 var Total = require('../../proxy/total');
 var nfs = require('../../common/nfs');
-var npm = require('../../proxy/npm');
-var common = require('./common');
+var common = require('../common');
 var Log = require('../../proxy/module_log');
 var DownloadTotal = require('../../proxy/download');
-var SyncModuleWorker = require('./sync_module_worker');
+var sync = require('../sync');
 var logger = require('../../common/logger');
 var semver = require('semver');
 
@@ -51,7 +50,7 @@ exports.show = function (req, res, next) {
         return next();
       }
       var username = (req.session && req.session.username) || 'anonymous';
-      return _sync(name, username, function (err, result) {
+      return sync(name, username, function (err, result) {
         if (err) {
           return next(err);
         }
@@ -144,7 +143,7 @@ exports.get = function (req, res, next) {
     }
 
     var username = (req.session && req.session.username) || 'anonymous';
-    _sync(name, username, function (err, result) {
+    sync(name, username, function (err, result) {
       if (err) {
         return next(err);
       }
@@ -563,41 +562,10 @@ exports.removeAll = function (req, res, next) {
   });
 };
 
-function _sync(name, username, callback) {
-  npm.get(name, function (err, pkg, response) {
-    if (err) {
-      return callback(err);
-    }
-    if (!pkg || !pkg._rev) {
-      return callback(null, {
-        ok: false,
-        statusCode: response.statusCode,
-        pkg: pkg
-      });
-    }
-    Log.create({name: name, username: username}, function (err, result) {
-      if (err) {
-        return callback(err);
-      }
-      var worker = new SyncModuleWorker({
-        logId: result.id,
-        name: name,
-        username: username,
-      });
-      worker.start();
-      callback(null, {
-        ok: true,
-        logId: result.id,
-        pkg: pkg
-      });
-    });
-  });
-}
-
 exports.sync = function (req, res, next) {
   var username = req.session.name;
   var name = req.params.name;
-  _sync(name, username, function (err, result) {
+  sync(name, username, function (err, result) {
     if (err) {
       return next(err);
     }

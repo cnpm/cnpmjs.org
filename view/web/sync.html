@@ -1,0 +1,48 @@
+<div id="sync">
+  <h1>Sync Package <span style="color:#09f;"><%= name %></span></h1>
+  <div id="sync-notify">
+    <div class="alert alert-success">Sync start, please wait patiently.</div>
+  </div>
+  <h2>Log</h2>
+  <div id="sync-log"></div>
+</div>
+<script>
+  var $log = $('#sync-log');
+  var $notify = $('#sync-notify');
+  $(function() {
+    $.ajax({
+      url: location.pathname,
+      type: 'PUT',
+      dataType: 'json',
+      success: handleSyncSucess,
+      error: function (err) {
+        $notify.html('<div class="alert alert-error">Sync request error.</div>');
+      }
+    });
+  });
+  function handleSyncSucess(data) {
+    if (data.ok) {
+      setInterval(getSyncLog.bind(null, data.logId), 2000);
+      return;
+    }
+    $notify.html('<div class="alert alert-error">Sync request error.</div>');
+  }
+
+  var offset = 0;
+  function getSyncLog(id) {
+    $.ajax({
+      url: location.pathname + '/log/' + id + '?offset=' + offset,
+      type: 'GET',
+      dataType: 'json',
+      success: function (data) {
+        if (!data.ok) {
+          return;
+        }
+
+        var log = data.log.split('\n');
+        offset += log.length;
+        $log.html($log.html() + '<br />' + log.join('<br />'));
+      }
+    })
+  }
+</script>
