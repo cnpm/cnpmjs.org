@@ -284,10 +284,7 @@ describe('controllers/registry/module.test.js', function () {
       .send(pkg)
       .expect(201, function (err, res) {
         should.not.exist(err);
-        res.body.should.eql({
-          ok: true,
-          rev: (Number(lastRev) + 1).toString()
-        });
+        res.body.should.have.keys('ok', 'rev');
         done();
       });
     });

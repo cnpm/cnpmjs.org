@@ -21,15 +21,20 @@ CREATE TABLE `module` (
  `author` varchar(100) NOT NULL,
  `name` varchar(100) NOT NULL COMMENT 'module name',
  `version` varchar(30) NOT NULL COMMENT 'module version',
+ `description` longtext,
  `package` longtext COMMENT 'package.json',
  `dist_shasum` varchar(100) DEFAULT NULL,
  `dist_tarball` varchar(2048) DEFAULT NULL,
  `dist_size` int(10) unsigned NOT NULL DEFAULT '0',
+ `publish_time` bigint(20) unsigned,
  PRIMARY KEY (`id`),
  UNIQUE KEY `name` (`name`,`version`),
  KEY `gmt_modified` (`gmt_modified`),
+ KEY `publish_time` (`publish_time`),
  KEY `author` (`author`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='module info';
+-- ALTER TABLE `module` ADD `description` longtext;
+-- ALTER TABLE `module` ADD `publish_time` bigint(20) unsigned, ADD KEY `publish_time` (`publish_time`);
 
 CREATE TABLE `module_log` (
  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'primary key',

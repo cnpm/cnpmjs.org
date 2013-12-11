@@ -13,10 +13,12 @@
 /**
  * Module dependencies.
  */
-var Module = require('../../proxy/module');
+
+var moment = require('moment');
 var eventproxy = require('eventproxy');
 var semver = require('semver');
 var marked = require('marked');
+var Module = require('../../proxy/module');
 
 exports.display = function (req, res, next) {
   var params = req.params;
@@ -40,11 +42,13 @@ exports.display = function (req, res, next) {
     if (!pkg || !pkg.package) {
       return next();
     }
+
+    pkg.package.fromNow = moment(pkg.publish_time).fromNow();
     pkg = pkg.package;
     pkg.readme = marked(pkg.readme || '');
 
     setLicense(pkg);
-    
+
     res.render('package', {
       title: 'Package - ' + pkg.name,
       package: pkg
@@ -79,7 +83,7 @@ exports.search = function (req, res, next) {
   });
 };
 
-function setLicense (pkg) {
+function setLicense(pkg) {
   var license;
   license = pkg.license || pkg.licenses || pkg.licence || pkg.licences;
   if (!license) {
@@ -112,7 +116,7 @@ function setLicense (pkg) {
   }
 }
 
-function getOssLicenseUrlFromName (name) {
+function getOssLicenseUrlFromName(name) {
   var base = 'http://opensource.org/licenses/';
 
   var licenseMap = {
@@ -135,6 +139,6 @@ function getOssLicenseUrlFromName (name) {
     'lgplv2': 'LGPL-2.1'
   };
 
-  return licenseMap[name.toLowerCase()] ? 
-          base + licenseMap[name.toLowerCase()] : base + name;
+  return licenseMap[name.toLowerCase()] ?
+    base + licenseMap[name.toLowerCase()] : base + name;
 }

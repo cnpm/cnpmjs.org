@@ -19,15 +19,15 @@ var eventproxy = require('eventproxy');
 var config = require('../config');
 var mysql = require('../common/mysql');
 
-var MODULE_COLUMNS = 'id, gmt_create, gmt_modified, author, name, version, package, dist_tarball, dist_shasum, dist_size';
+var MODULE_COLUMNS = 'id, publish_time, gmt_create, gmt_modified, author, name, version, package, dist_tarball, dist_shasum, dist_size';
 
 // var INSERT_MODULE_SQL = 'INSERT INTO module(gmt_create, gmt_modified, author, name, version, package, dist_tarball, dist_shasum, dist_size) \
 //   VALUES(now(), now(), ?, ?, ?, ?, ?, ?, ?);';
 
 var INSERT_MODULE_SQL = 'INSERT INTO module(gmt_create, gmt_modified, \
-  author, name, version, package, dist_tarball, dist_shasum, dist_size) \
-  VALUES(now(), now(), ?, ?, ?, ?, ?, ?, ?) \
-  ON DUPLICATE KEY UPDATE gmt_modified=now(), \
+  publish_time, author, name, version, package, dist_tarball, dist_shasum, dist_size) \
+  VALUES(now(), now(), ?, ?, ?, ?, ?, ?, ?, ?) \
+  ON DUPLICATE KEY UPDATE gmt_modified=now(), publish_time=VALUES(publish_time), \
     author=VALUES(author), name=VALUES(name), version=VALUES(version), package=VALUES(package), \
     dist_tarball=VALUES(dist_tarball), dist_shasum=VALUES(dist_shasum), dist_size=VALUES(dist_size);';
 
@@ -42,7 +42,10 @@ exports.add = function (mod, callback) {
   dist.tarball = '';
   dist.shasum = '';
   dist.size = 0;
-  var values = [mod.author, mod.name, mod.version, pkg, dist.tarball, dist.shasum, dist.size];
+  var publish_time = mod.publish_time || Date.now();
+  var values = [
+    publish_time, mod.author, mod.name, mod.version, pkg, dist.tarball, dist.shasum, dist.size
+  ];
   mysql.query(INSERT_MODULE_SQL, values, function (err, result) {
     if (err) {
       return callback(err);
@@ -156,7 +159,7 @@ exports.listTags = function (name, callback) {
 };
 
 var SELECT_LATEST_MODULE_SQL = 'SELECT ' + MODULE_COLUMNS +
-  ' FROM module WHERE name=? AND version <> "next" ORDER BY id DESC LIMIT 1;';
+  ' FROM module WHERE name=? AND version <> "next" ORDER BY publish_time DESC LIMIT 1;';
 
 exports.getLatest = function (name, callback) {
   exports.getByTag(name, 'latest', function (err, row) {
@@ -224,11 +227,11 @@ exports.removeByNameAndVersions = function (name, versions, callback) {
   mysql.query(DELETE_MODULE_BY_NAME_AND_VERSIONS_SQL, [name, versions], callback);
 };
 
-var LIST_RECENTLY_NAMES_SQL = 'SELECT distinct(name) AS name FROM module WHERE author = ? ORDER BY id DESC LIMIT 100;';
+var LIST_RECENTLY_NAMES_SQL = 'SELECT distinct(name) AS name FROM module WHERE author = ? ORDER BY publish_time DESC LIMIT 100;';
 var LIST_BY_NAMES_SQL = 'SELECT name, package FROM module WHERE id IN \
   ( \
     SELECT module_id FROM tag WHERE tag="latest" AND name IN (?) \
-  ) ORDER BY id DESC;';
+  ) ORDER BY publish_time DESC;';
 exports.listByAuthor = function (author, callback) {
   var ep = eventproxy.create();
   ep.fail(callback);
@@ -250,7 +253,7 @@ exports.listByAuthor = function (author, callback) {
 
 var SEARCH_SQL = 'SELECT name, package FROM module WHERE id IN\
   (SELECT module_id FROM tag WHERE name LIKE ? AND  tag="latest")\
-  ORDER BY id DESC LIMIT 20';
+  ORDER BY publish_time DESC LIMIT 20';
 exports.search = function (word, callback) {
   mysql.query(SEARCH_SQL, [word + '%'], callback);
 };

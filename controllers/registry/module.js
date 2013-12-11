@@ -85,7 +85,7 @@ exports.show = function (req, res, next) {
       var pkg = row.package;
       common.downloadURL(pkg, req);
       versions[pkg.version] = pkg;
-      times[pkg.version] = row.gmt_modified;
+      times[pkg.version] = row.publish_time ? new Date(row.publish_time) : row.gmt_modified;
       if ((!distTags.latest && !latestMod) || distTags.latest === row.version) {
         latestMod = row;
       }
