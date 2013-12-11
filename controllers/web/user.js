@@ -22,30 +22,18 @@ exports.display = function (req, res, next) {
 
   var ep = eventproxy.create();
   ep.fail(next);
-  Module.listByAuthor(name, ep.done('modules'));
+  Module.listByAuthor(name, ep.done('packages'));
   User.get(name, ep.done('user'));
 
-  ep.all('modules', 'user', function (modules, user) {
+  ep.all('packages', 'user', function (packages, user) {
     //because of sync, maybe no this user in database,
-    //but his modules in this registry
-    if (!user && !modules.length) {
+    //but his packages in this registry
+    if (!user && !packages.length) {
       return next();
     }
-    user = user || {};
-    var packages = modules.map(function (m) {
-      try {
-        m.package = JSON.parse(m.package);
-      } catch (err) {
-        m.package = {};
-      }
-      return {
-        name: m.package.name,
-        description: m.package.description
-      };
-    });
     user = {
       name: name,
-      email: user.email
+      email: user && user.email
     };
 
     return res.render('profile', {

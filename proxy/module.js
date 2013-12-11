@@ -25,8 +25,8 @@ var MODULE_COLUMNS = 'id, publish_time, gmt_create, gmt_modified, author, name, 
 //   VALUES(now(), now(), ?, ?, ?, ?, ?, ?, ?);';
 
 var INSERT_MODULE_SQL = 'INSERT INTO module(gmt_create, gmt_modified, \
-  publish_time, author, name, version, package, dist_tarball, dist_shasum, dist_size) \
-  VALUES(now(), now(), ?, ?, ?, ?, ?, ?, ?, ?) \
+  publish_time, author, name, version, package, dist_tarball, dist_shasum, dist_size, description) \
+  VALUES(now(), now(), ?, ?, ?, ?, ?, ?, ?, ?, ?) \
   ON DUPLICATE KEY UPDATE gmt_modified=now(), publish_time=VALUES(publish_time), \
     author=VALUES(author), name=VALUES(name), version=VALUES(version), package=VALUES(package), \
     dist_tarball=VALUES(dist_tarball), dist_shasum=VALUES(dist_shasum), dist_size=VALUES(dist_size);';
@@ -38,13 +38,16 @@ exports.add = function (mod, callback) {
   } catch (e) {
     return callback(e);
   }
+  var description = mod.package && mod.package.description || '';
+
   var dist = mod.package.dist || {};
   dist.tarball = '';
   dist.shasum = '';
   dist.size = 0;
   var publish_time = mod.publish_time || Date.now();
   var values = [
-    publish_time, mod.author, mod.name, mod.version, pkg, dist.tarball, dist.shasum, dist.size
+    publish_time, mod.author, mod.name, mod.version, pkg, 
+    dist.tarball, dist.shasum, dist.size, description
   ];
   mysql.query(INSERT_MODULE_SQL, values, function (err, result) {
     if (err) {
@@ -228,7 +231,7 @@ exports.removeByNameAndVersions = function (name, versions, callback) {
 };
 
 var LIST_RECENTLY_NAMES_SQL = 'SELECT distinct(name) AS name FROM module WHERE author = ? ORDER BY publish_time DESC LIMIT 100;';
-var LIST_BY_NAMES_SQL = 'SELECT name, package FROM module WHERE id IN \
+var LIST_BY_NAMES_SQL = 'SELECT name, description FROM module WHERE id IN \
   ( \
     SELECT module_id FROM tag WHERE tag="latest" AND name IN (?) \
   ) ORDER BY publish_time DESC;';
@@ -251,9 +254,9 @@ exports.listByAuthor = function (author, callback) {
   });
 };
 
-var SEARCH_SQL = 'SELECT name, package FROM module WHERE id IN\
+var SEARCH_SQL = 'SELECT name, description FROM module WHERE id IN\
   (SELECT module_id FROM tag WHERE name LIKE ? AND  tag="latest")\
-  ORDER BY publish_time DESC LIMIT 20';
+  ORDER BY name LIMIT 20';
 exports.search = function (word, callback) {
   mysql.query(SEARCH_SQL, [word + '%'], callback);
 };

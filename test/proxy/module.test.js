@@ -37,11 +37,10 @@ describe('proxy/module.test.js', function () {
       Module.listByAuthor('fengmk2', function (err, rows) {
         should.not.exist(err);
         rows.forEach(function (r) {
-          r.should.have.keys('name', 'package');
+          r.should.have.keys('name', 'description');
         });
         done();
       });
     });
   });
-
 });
