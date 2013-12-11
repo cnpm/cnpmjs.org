@@ -1,4 +1,4 @@
-# cnpmjs: Private npm registry and web for Enterprise
+# cnpmjs.org: Private npm registry and web for Enterprise
 
 [![Build Status](https://secure.travis-ci.org/fengmk2/cnpmjs.org.png)](http://travis-ci.org/fengmk2/cnpmjs.org) [![Coverage Status](https://coveralls.io/repos/fengmk2/cnpmjs.org/badge.png)](https://coveralls.io/r/fengmk2/cnpmjs.org)
 
@@ -6,7 +6,7 @@
 
 ## What is this?
 
-Private npm registry and web for Enterprise, base on MySQL and Simple File Store.
+> Private npm registry and web for Enterprise, base on MySQL and Simple File Store.
 
 @[JacksonTian](https://github.com/JacksonTian/) had a talk about [private npm](https://speakerdeck.com/jacksontian/qi-ye-ji-node-dot-jskai-fa).
 
@@ -16,28 +16,27 @@ Private npm registry and web for Enterprise, base on MySQL and Simple File Store
 
 ## Registry
 
-* Our public registry: http://registry.cnpmjs.org
+* Our public registry: [registry.cnpmjs.org](http://registry.cnpmjs.org)
+* Current [cnpmjs.org](/) version: <span id="app-version"></span>
 
 Total Packages: <span id="total-packages"></span>
 
-<style type="text/css">
-  table.downloads {
-    width: 30%;
-  }
-  table.downloads td.count {
-    width: 30%;
-  }
-</style>
 <table class="downloads">
   <tbody>
-    <tr><td class="count"></td><td> downloads today</td></tr>
-    <tr><td class="count"></td><td> downloads in this week</td></tr>
-    <tr><td class="count"></td><td> downloads in this month</td></tr>
-    <tr><td class="count"></td><td> downloads in the last day</td></tr>
-    <tr><td class="count"></td><td> downloads in the last week</td></tr>
-    <tr><td class="count"></td><td> downloads in the last month</td></tr>
+    <tr>
+      <td class="count"></td><td> downloads today</td>
+      <td class="count"></td><td> downloads in this week</td>
+      <td class="count"></td><td> downloads in this month</td>
+    </tr>
+    <tr>
+      <td class="count"></td><td> downloads in the last day</td>
+      <td class="count"></td><td> downloads in the last week</td>
+      <td class="count"></td><td> downloads in the last month</td>
+    </tr>
   </tbody>
 </table>
+
+Running on [Node.js](http://nodejs.org), version <span id="node-version"></span>.
 
 <script>
 $(function () {
@@ -53,12 +52,15 @@ $(function () {
   $.getJSON('http://registry.cnpmjs.org/?callback=?', function (data) {
     $('#total-packages').html(humanize(data.doc_count));
     var downloads = $('table.downloads');
-    downloads.find('tr:eq(0) td.count').html(humanize(data.download.today));
-    downloads.find('tr:eq(1) td.count').html(humanize(data.download.thisweek));
-    downloads.find('tr:eq(2) td.count').html(humanize(data.download.thismonth));
-    downloads.find('tr:eq(3) td.count').html(humanize(data.download.lastday));
-    downloads.find('tr:eq(4) td.count').html(humanize(data.download.lastweek));
-    downloads.find('tr:eq(5) td.count').html(humanize(data.download.lastmonth));
+    downloads.find('td.count:eq(0)').html(humanize(data.download.today));
+    downloads.find('td.count:eq(1)').html(humanize(data.download.thisweek));
+    downloads.find('td.count:eq(2)').html(humanize(data.download.thismonth));
+    downloads.find('td.count:eq(3)').html(humanize(data.download.lastday));
+    downloads.find('td.count:eq(4)').html(humanize(data.download.lastweek));
+    downloads.find('td.count:eq(5)').html(humanize(data.download.lastmonth));
+
+    $('#node-version').html(data.node_version || 'v0.10.22');
+    $('#app-version').html(data.app_version || '0.0.0');
   });
 });
 </script>
@@ -121,13 +123,13 @@ $ cnpm publish [name]
 $ git summary
 
  project  : cnpmjs.org
- repo age : 7 days
- active   : 36 days
- commits  : 88
- files    : 63
+ repo age : 8 days
+ active   : 47 days
+ commits  : 118
+ files    : 69
  authors  :
-    53  fengmk2                 60.2%
-    35  dead_horse              39.8%
+    69  fengmk2                 58.5%
+    49  dead_horse              41.5%
 ```
 
 ## npm and cnpm relation
