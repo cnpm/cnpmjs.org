@@ -143,6 +143,7 @@ SyncModuleWorker.prototype._sync = function (pkg, callback) {
 
   var missingVersions = [];
   var missingTags = [];
+  var missingDescriptions = [];
   ep.all('existsMap', 'existsTags', function (map, tags) {
     var times = pkg.time || {};
     var versions = [];
@@ -163,6 +164,13 @@ SyncModuleWorker.prototype._sync = function (pkg, callback) {
         // * shasum make sure equal
         if (version.publish_time === exists.publish_time) {
           // * publish_time make sure equal
+          if (exists.description === null && version.description) {
+            // * make sure description exists
+            missingDescriptions.push({
+              id: exists.id,
+              description: version.description
+            });
+          }
           continue;
         }
       }
@@ -211,8 +219,29 @@ SyncModuleWorker.prototype._sync = function (pkg, callback) {
   });
 
   ep.on('syncDone', function () {
+    if (missingDescriptions.length === 0) {
+      return ep.emit('descriptionDone');
+    }
+
+    that.log('  [%s] saving %d descriptions', pkg.name, missingDescriptions.length);
+    missingDescriptions.forEach(function (item) {
+      Module.updateDescription(item.id, item.description, function (err, result) {
+        if (err) {
+          return that.log('    save error, %s: description %j, error: %s', item.id, item.description, err);
+        }
+        that.log('    saved, id: %s, description length: %d', item.id, item.description.length);
+        ep.emit('saveDescription');
+      });
+    });
+
+    ep.after('saveDescription', missingDescriptions.length, function () {
+      ep.emit('descriptionDone');
+    });
+  });
+
+  ep.on('syncDone', function () {
     if (missingTags.length === 0) {
-      return ep.emit('done');
+      return ep.emit('tagDone');
     }
 
     that.log('  [%s] adding %d tags', pkg.name, missingTags.length);
@@ -225,11 +254,11 @@ SyncModuleWorker.prototype._sync = function (pkg, callback) {
     });
 
     ep.after('addTag', missingTags.length, function () {
-      ep.emit('done');
+      ep.emit('tagDone');
     });
   });
 
-  ep.on('done', function () {
+  ep.all('tagDone', 'descriptionDone', function () {
     // TODO: set latest version
     callback(null, versionNames);
   });
