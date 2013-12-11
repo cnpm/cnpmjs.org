@@ -1,20 +1,17 @@
 <style>
-#profile .package {
+#search .package {
   padding: 10px;
   font-size: 18px;
   border-bottom: 1px solid #ddd;
 }
 </style>
-<div id="profile">
+<div id="search">
   <h1>
-    Packages by <span style="color:#09f;"><%= user.name %></span>
-    <% if (user.email) { %>
-      <small>(<a href="mailto:<%= user.email %>"><%= user.email %></a>)</small>
-    <% } %>
+    Packages match <span style="color: #09f;"><%= keyword %></span>
   </h1>
   <hr />
   <% if (!packages.length) { %>
-    <div class="alert alert-warning">Can not found package by <%= user.name %>.</div>
+    <div class="alert alert-warning">Can not found package match <%= keyword %>.</div>
   <% } %>
   <% for (var i = 0; i < packages.length; i++) { %>
     <div class="package">

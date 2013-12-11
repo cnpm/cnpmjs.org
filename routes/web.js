@@ -21,6 +21,7 @@ var user = require('../controllers/web/user');
 function routes(app) {
   app.get('/package/:name', pkg.display);
   app.get('/package/:name/:version', pkg.display);
+  app.get('/browse/keyword/:word', pkg.search);
 
   app.get('/~:name', user.display);
 }

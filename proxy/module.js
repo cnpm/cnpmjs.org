@@ -247,3 +247,10 @@ exports.listByAuthor = function (author, callback) {
     callback(null, modules);
   });
 };
+
+var SEARCH_SQL = 'SELECT name, package FROM module WHERE id IN\
+  (SELECT module_id FROM tag WHERE name LIKE ? AND  tag="latest")\
+  ORDER BY id DESC LIMIT 20';
+exports.search = function (word, callback) {
+  mysql.query(SEARCH_SQL, [word + '%'], callback);
+};
