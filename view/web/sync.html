@@ -1,7 +1,7 @@
 <div id="sync">
   <h1>Sync Package <span style="color:#09f;"><%= name %></span></h1>
   <div id="sync-notify">
-    <div class="alert alert-success">Sync start, please wait patiently.</div>
+    <div class="alert alert-success">Sync started, please wait patiently.</div>
   </div>
   <h2>Log</h2>
   <pre style="min-height: 400px;" id="sync-log"></pre>
@@ -12,6 +12,11 @@
   var timer;
   var name = '<%= name %>';
   $(function() {
+    var checkLogId = location.hash.match(/logid=(\d+)/);
+    var logid = checkLogId ? checkLogId[1] : '';
+    if (logid) {
+      return getSyncLog(logid);
+    }
     $.ajax({
       url: location.pathname,
       type: 'PUT',
@@ -19,7 +24,7 @@
       success: handleSyncSucess,
       error: function (err) {
         var alert = $('<div class="alert alert-error"></div>');
-        var message = 'Sync request error.';
+        var message = 'Sync request error. ';
         if (err.status === 404) {
           message += 'Package ' + name + ' not exist in official registry.';
         }
@@ -35,6 +40,7 @@
   function handleSyncSucess(data) {
     if (data.ok) {
       timer = setInterval(getSyncLog.bind(null, data.logId), 2000);
+      location.hash = '#logid=' + data.logId;
       return;
     }
     $notify.html('<div class="alert alert-error">Sync request error.</div>');
@@ -44,6 +50,7 @@
   var logs = '';
   var successFlag = false;
   var failFlag = false;
+  var hasFail = false;
   function getSyncLog(id) {
     $.ajax({
       url: location.pathname + '/log/' + id + '?offset=' + offset,
@@ -54,16 +61,24 @@
           return;
         }
         offset += data.log.split('\n').length;
-        logs += data.log;
+        logs = logs + '\n' + data.log;
 
         if (data.log.indexOf('Success: [') >= 0) {
           successFlag = true;
         }
         if (data.log.indexOf('Fail: [') >= 0) {
           failFlag = true;
+          var failInfo = data.log.match(/Fail: \[ (.*?) \]/);
+          if (failInfo && failInfo[1]) {
+            hasFail = true;
+          }
         }
         if (successFlag && failFlag) {
           logs += '\nSync package ' + name + ' complete!';
+          if (hasFail) {
+            logs += ' But some packages sync failed, you can refresh to sync again.';
+            location.hash = '';
+          }
           clearInterval(timer);
         }
         $log.html(logs);
