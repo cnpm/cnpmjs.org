@@ -93,8 +93,10 @@ exports.search = function (req, res, next) {
 };
 
 exports.displaySync = function (req, res, next) {
+  var name = req.params.name;
   res.render('sync', {
-    name: req.params.name
+    name: name,
+    title: 'Sync - ' + name
   });
 };
 
