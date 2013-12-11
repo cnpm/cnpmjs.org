@@ -1,5 +1,8 @@
   <div id="package">
-    <h1><%= package.name %></h1>
+    <h1>
+      <%= package.name %>
+      <small>(<a href="/sync/<%= package.name %>" target="_blank">SYNC</a> missed versions from official npm registry)</small>
+    </h1>
 
     <% if (package.deprecated) { %>
       <p class="deprecated"><%= package.deprecated %></p>
