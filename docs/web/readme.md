@@ -123,13 +123,13 @@ $ cnpm publish [name]
 $ git summary
 
  project  : cnpmjs.org
- repo age : 8 days
- active   : 47 days
- commits  : 118
- files    : 69
+ repo age : 9 days
+ active   : 49 days
+ commits  : 126
+ files    : 70
  authors  :
-    69  fengmk2                 58.5%
-    49  dead_horse              41.5%
+    73  fengmk2                 57.9%
+    53  dead_horse              42.1%
 ```
 
 ## npm and cnpm relation
