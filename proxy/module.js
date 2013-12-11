@@ -223,9 +223,11 @@ exports.removeByNameAndVersions = function (name, versions, callback) {
   mysql.query(DELETE_MODULE_BY_NAME_AND_VERSIONS_SQL, [name, versions], callback);
 };
 
-var LIST_BY_AUTHOR_SQL = 'SELECT name, package FROM module WHERE id IN\
-                          (SELECT module_id FROM tag WHERE tag="latest" AND name IN\
-                          (SELECT distinct(name) FROM module WHERE author = ?))';
+var LIST_BY_AUTHOR_SQL = 'SELECT name, package FROM module WHERE id IN \
+  ( \
+    SELECT module_id FROM tag WHERE tag="latest" AND name IN \
+    (SELECT distinct(name) FROM module WHERE author = ? ORDER BY id DESC LIMIT 10) \
+  );';
 exports.listByAuthor = function (author, callback) {
   mysql.query(LIST_BY_AUTHOR_SQL, [author], callback);
 };
