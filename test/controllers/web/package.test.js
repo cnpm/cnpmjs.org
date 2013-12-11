@@ -73,4 +73,21 @@ describe('controllers/web/package.test.js', function () {
       .expect(404, done);
     });
   });
+
+  describe('GET　/browse/keyword/:word', function () {
+    it('should list by keyword ok', function (done) {
+      request(app)
+      .get('/browse/keyword/cnpm')
+      .expect(200)
+      .expect(/Packages match/, done);
+    });
+
+    it('should list no match ok', function (done) {
+      request(app)
+      .get('/browse/keyword/notexistpackage')
+      .expect(200)
+      .expect(/Packages match/)
+      .expect(/Can not found package match notexistpackage/, done);
+    });
+  });
 });

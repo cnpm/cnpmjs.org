@@ -49,6 +49,7 @@ exports.display = function (req, res, next) {
     };
 
     return res.render('profile', {
+      title: 'User - ' + name,
       packages: packages || [],
       user: user
     });

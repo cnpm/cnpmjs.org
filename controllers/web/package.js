@@ -46,8 +46,35 @@ exports.display = function (req, res, next) {
     setLicense(pkg);
     
     res.render('package', {
-      title: pkg.name,
+      title: 'Package - ' + pkg.name,
       package: pkg
+    });
+  });
+};
+
+exports.search = function (req, res, next) {
+  var params = req.params;
+  var word = req.params.word;
+  Module.search(word, function (err, mods) {
+    if (err) {
+      return next(err);
+    }
+    var packages = mods.map(function (m) {
+      try {
+        m.package = JSON.parse(m.package);
+      } catch (err) {
+        m.package = {};
+      }
+      return {
+        name: m.package.name,
+        description: m.package.description
+      };
+    });
+
+    res.render('search', {
+      title: 'Keyword - ' + word,
+      keyword: word,
+      packages: packages
     });
   });
 };

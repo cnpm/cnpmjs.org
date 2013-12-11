@@ -4,8 +4,6 @@
 
 [![NPM](https://nodei.co/npm/cnpmjs.org.png?downloads=true&stars=true)](https://nodei.co/npm/cnpmjs.org/)
 
-![logo](https://raw.github.com/fengmk2/cnpmjs.org/master/logo.png)
-
 ## What is this?
 
 Private npm registry and web for Enterprise, base on MySQL and Simple File Store.
