@@ -146,7 +146,7 @@ exports.get = function (req, res, next) {
       if (err) {
         return next(err);
       }
-      var pkg = result.pkg.versions[version];
+      var pkg = result.pkg && result.pkg.versions[version];
       if (!pkg) {
         return res.json(404, {
           error: 'not exist',
