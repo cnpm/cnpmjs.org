@@ -30,12 +30,15 @@ var render = require('connect-render');
 var opensearch = require('../middleware/opensearch');
 var app = connect();
 
+var rootdir = path.dirname(__dirname);
+
 app.use(rt({headerName: 'X-ReadTime'}));
 app.use(function (req, res, next) {
   res.req = req;
   next();
 });
 
+app.use('/public', connect.static(path.join(rootdir, 'public')));
 app.use('/opensearch.xml', opensearch);
 
 app.use(connect.cookieParser());
@@ -43,7 +46,6 @@ app.use(session);
 app.use(connect.query());
 app.use(connect.json());
 
-var rootdir = path.dirname(__dirname);
 var viewDir = path.join(rootdir, 'view', 'web');
 var docDir = path.join(rootdir, 'docs', 'web');
 
