@@ -51,7 +51,8 @@
     "coveralls": "*",
     "mocha-lcov-reporter": "*",
     "mocha": "*",
-    "mm": "*"
+    "mm": "*",
+    "pedding": "*"
   },
   "homepage": "https://github.com/fengmk2/cnpmjs.org",
   "repository": {
