@@ -21,7 +21,7 @@ function request(url, callback) {
   url = config.sourceNpmRegistry + url;
   var options = {
     dataType: 'json',
-    timeout: 10000,
+    timeout: 10000
   };
   urllib.request(url, options, callback);
 }
