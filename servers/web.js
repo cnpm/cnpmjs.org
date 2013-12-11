@@ -27,6 +27,7 @@ var logger = require('../common/logger');
 var config = require('../config');
 var session = require('../common/session');
 var render = require('connect-render');
+var opensearch = require('../middleware/opensearch');
 var app = connect();
 
 app.use(rt({headerName: 'X-ReadTime'}));
@@ -34,6 +35,9 @@ app.use(function (req, res, next) {
   res.req = req;
   next();
 });
+
+app.use('/opensearch.xml', opensearch);
+
 app.use(connect.cookieParser());
 app.use(session);
 app.use(connect.query());
