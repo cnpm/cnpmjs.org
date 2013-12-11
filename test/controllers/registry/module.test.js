@@ -197,7 +197,7 @@ describe('controllers/registry/module.test.js', function () {
         res.body.time.should.eql({});
         res.body['dist-tags'].should.eql({});
         lastRev = res.body._rev;
-        console.log('lastRev: %s', lastRev);
+        // console.log('lastRev: %s', lastRev);
         done();
       });
     });

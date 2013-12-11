@@ -369,3 +369,34 @@ SyncModuleWorker.prototype._syncOneVersion = function (versionIndex, sourcePacka
     }));
   });
 };
+
+SyncModuleWorker.sync = function (name, username, callback) {
+  npm.get(name, function (err, pkg, response) {
+    if (err) {
+      return callback(err);
+    }
+    if (!pkg || !pkg._rev) {
+      return callback(null, {
+        ok: false,
+        statusCode: response.statusCode,
+        pkg: pkg
+      });
+    }
+    Log.create({name: name, username: username}, function (err, result) {
+      if (err) {
+        return callback(err);
+      }
+      var worker = new SyncModuleWorker({
+        logId: result.id,
+        name: name,
+        username: username,
+      });
+      worker.start();
+      callback(null, {
+        ok: true,
+        logId: result.id,
+        pkg: pkg
+      });
+    });
+  });
+};

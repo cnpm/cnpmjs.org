@@ -17,6 +17,7 @@
 
 var pkg = require('../controllers/web/package');
 var user = require('../controllers/web/user');
+var sync = require('../controllers/sync');
 
 function routes(app) {
   app.get('/package/:name', pkg.display);
@@ -26,8 +27,8 @@ function routes(app) {
   app.get('/~:name', user.display);
 
   app.get('/sync/:name', pkg.displaySync);
-  app.put('/sync/:name', pkg.handleSync);
-  app.get('/sync/:name/log/:id', pkg.getSyncLog);
+  app.put('/sync/:name', sync.sync);
+  app.get('/sync/:name/log/:id', sync.getSyncLog);
 }
 
 module.exports = routes;

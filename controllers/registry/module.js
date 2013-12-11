@@ -30,7 +30,7 @@ var nfs = require('../../common/nfs');
 var common = require('../common');
 var Log = require('../../proxy/module_log');
 var DownloadTotal = require('../../proxy/download');
-var sync = require('../sync');
+var SyncModuleWorker = require('../sync_module_worker');
 var logger = require('../../common/logger');
 var semver = require('semver');
 
@@ -50,7 +50,7 @@ exports.show = function (req, res, next) {
         return next();
       }
       var username = (req.session && req.session.username) || 'anonymous';
-      return sync(name, username, function (err, result) {
+      return SyncModuleWorker.sync(name, username, function (err, result) {
         if (err) {
           return next(err);
         }
@@ -143,7 +143,7 @@ exports.get = function (req, res, next) {
     }
 
     var username = (req.session && req.session.username) || 'anonymous';
-    sync(name, username, function (err, result) {
+    SyncModuleWorker.sync(name, username, function (err, result) {
       if (err) {
         return next(err);
       }
@@ -559,39 +559,6 @@ exports.removeAll = function (req, res, next) {
     ep.after('removeTar', keys.length, function () {
       res.json(200, {ok: true});
     });
-  });
-};
-
-exports.sync = function (req, res, next) {
-  var username = req.session.name;
-  var name = req.params.name;
-  sync(name, username, function (err, result) {
-    if (err) {
-      return next(err);
-    }
-    if (!result.ok) {
-      return res.json(result.statusCode, result.pkg);
-    }
-    res.json(201, {
-      ok: true,
-      logId: result.logId
-    });
-  });
-};
-
-exports.getSyncLog = function (req, res, next) {
-  var logId = req.params.id;
-  var name = req.params.name;
-  var offset = Number(req.query.offset) || 0;
-  Log.get(logId, function (err, row) {
-    if (err || !row) {
-      return next(err);
-    }
-    var log = row.log.trim();
-    if (offset > 0) {
-      log = log.split('\n').slice(offset).join('\n');
-    }
-    res.json(200, {ok: true, log: log});
   });
 };
 

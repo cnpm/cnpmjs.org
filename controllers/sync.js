@@ -13,39 +13,38 @@
 /**
  * Module dependencies.
  */
-var npm = require('../proxy/npm');
 var Log = require('../proxy/module_log');
 var SyncModuleWorker = require('./sync_module_worker');
 
-function _sync(name, username, callback) {
-  npm.get(name, function (err, pkg, response) {
+exports.sync = function (req, res, next) {
+  var username = req.session.name || 'anonymous';
+  var name = req.params.name;
+  SyncModuleWorker.sync(name, username, function (err, result) {
     if (err) {
-      return callback(err);
+      return next(err);
     }
-    if (!pkg || !pkg._rev) {
-      return callback(null, {
-        ok: false,
-        statusCode: response.statusCode,
-        pkg: pkg
-      });
+    if (!result.ok) {
+      return res.json(result.statusCode, result.pkg);
     }
-    Log.create({name: name, username: username}, function (err, result) {
-      if (err) {
-        return callback(err);
-      }
-      var worker = new SyncModuleWorker({
-        logId: result.id,
-        name: name,
-        username: username,
-      });
-      worker.start();
-      callback(null, {
-        ok: true,
-        logId: result.id,
-        pkg: pkg
-      });
+    res.json(201, {
+      ok: true,
+      logId: result.logId
     });
   });
-}
+};
 
-module.exports = _sync;
+exports.getSyncLog = function (req, res, next) {
+  var logId = req.params.id;
+  var name = req.params.name;
+  var offset = Number(req.query.offset) || 0;
+  Log.get(logId, function (err, row) {
+    if (err || !row) {
+      return next(err);
+    }
+    var log = row.log.trim();
+    if (offset > 0) {
+      log = log.split('\n').slice(offset).join('\n');
+    }
+    res.json(200, {ok: true, log: log});
+  });
+};
