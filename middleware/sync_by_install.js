@@ -21,13 +21,20 @@ var config = require('../config');
  */
 
 module.exports = function (req, res, next) {
-  if (!config.syncByInstall) {
+  if (!config.syncByInstall || !config.enablePrivate) {
+    // only config.enablePrivate should enable sync on install
     return next();
   }
   // request not by node, consider it request from web
   if (req.headers['user-agent'] && req.headers['user-agent'].indexOf('node') !== 0) {
     return next();
   }
+
   req.session.allowSync = true;
+  if (req.session.isAdmin) {
+    // if current user is admin, should not enable auto sync on install, because it would be unpublish
+    req.session.allowSync = false;
+  }
+
   next();
 };
