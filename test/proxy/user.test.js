@@ -121,6 +121,7 @@ describe('proxy/user.test.js', function () {
     it('should update ok', function (done) {
       user.update(mockUser, function (err, data) {
         should.not.exist(err);
+        should.exist(data);
         data.should.have.keys(['rev']);
         done();
       });

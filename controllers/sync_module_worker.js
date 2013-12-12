@@ -117,6 +117,14 @@ SyncModuleWorker.prototype._sync = function (pkg, callback) {
     var map = {};
     for (var i = 0; i < rows.length; i++) {
       var r = rows[i];
+      if (r.package && r.package._publish_on_cnpm) {
+        // publish on cnpm, dont sync this version package
+        that.log('  [%s] publish on local cnpm, don\'t sync.', pkg.name);
+        ep.unbind();
+        callback(null, []);
+        return;
+      }
+
       if (r.version === 'next') {
         continue;
       }
@@ -148,17 +156,18 @@ SyncModuleWorker.prototype._sync = function (pkg, callback) {
     var times = pkg.time || {};
     var versions = [];
     for (var v in times) {
+      var exists = map[v] || {};
       var version = pkg.versions[v];
       if (!version || !version.dist) {
         continue;
       }
-      var exists = map[v] || {};
 
       version.publish_time = Date.parse(times[v]);
       if (!version.maintainers || !version.maintainers[0]) {
         version.maintainers = pkg.maintainers;
       }
       var sourceAuthor = version.maintainers && version.maintainers[0] && version.maintainers[0].name || exists.author;
+
       if (exists.package && exists.package.dist.shasum === version.dist.shasum && exists.author === sourceAuthor) {
         // * author make sure equal
         // * shasum make sure equal
