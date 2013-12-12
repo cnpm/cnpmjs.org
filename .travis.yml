@@ -2,3 +2,5 @@ language: node_js
 node_js:
   - '0.10'
 script: make test-coveralls
+before_install:
+  - 'npm install --registry=http://registry.cnpmjs.org --cache=${HOME}/.npm/.cache/cnpm'
