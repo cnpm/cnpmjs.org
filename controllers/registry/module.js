@@ -43,30 +43,27 @@ exports.show = function (req, res, next) {
   Module.listByName(name, ep.done('rows'));
 
   ep.all('tags', 'rows', function (tags, rows) {
-    debug('show module, user: %s, onlySync: %s, isAdmin: %s', req.session.name, req.session.onlySync, req.session.isAdmin);
-    if (rows.length === 0) {
-      return next();
-    }
-
+    debug('show module, user: %s, allowSync: %s, isAdmin: %s', req.session.name, req.session.allowSync, req.session.isAdmin);
     // if module not exist in this registry,
     // sync the module backend and return package info from official registry
     // TODO: Need to change this logic, it will cause unpublish sync again.
     // TODO: Hard to detect this show is on install flow or unpublish flow
-    // if (rows.length === 0) {
-    //   if (!req.session.allowSync) {
-    //     return next();
-    //   }
-    //   var username = (req.session && req.session.username) || 'anonymous';
-    //   return SyncModuleWorker.sync(name, username, function (err, result) {
-    //     if (err) {
-    //       return next(err);
-    //     }
-    //     if (!result.ok) {
-    //       return res.json(result.statusCode, result.pkg);
-    //     }
-    //     res.json(200, result.pkg);
-    //   });
-    // }
+    if (rows.length === 0) {
+      if (!req.session.allowSync) {
+        return next();
+      }
+      var username = (req.session && req.session.name) || 'anonymous';
+      SyncModuleWorker.sync(name, username, function (err, result) {
+        if (err) {
+          return next(err);
+        }
+        if (!result.ok) {
+          return res.json(result.statusCode, result.pkg);
+        }
+        res.json(200, result.pkg);
+      });
+      return;
+    }
 
     var nextMod = null;
     var latestMod = null;
