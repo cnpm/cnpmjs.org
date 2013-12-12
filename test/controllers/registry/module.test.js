@@ -453,7 +453,7 @@ describe('controllers/registry/module.test.js', function () {
     });
   });
 
-  describe('DELETE /:name/-/:filename/-rev/:rev', function () {
+  describe('DELETE /:name/download/:filename/-rev/:rev', function () {
     var lastRev;
     before(function (done) {
       request(app)
@@ -466,20 +466,20 @@ describe('controllers/registry/module.test.js', function () {
 
     it('should delete 401 when no auth', function (done) {
       request(app)
-      .del('/testputmodule/-/testputmodule-0.1.9.tgz/-rev/' + lastRev)
+      .del('/testputmodule/download/testputmodule-0.1.9.tgz/-rev/' + lastRev)
       .expect(401, done);
     });
 
     it('should delete 403 when auth error', function (done) {
       request(app)
-      .del('/testputmodule/-/testputmodule-0.1.9.tgz/-rev/' + lastRev)
+      .del('/testputmodule/download/testputmodule-0.1.9.tgz/-rev/' + lastRev)
       .set('authorization', baseauthOther)
       .expect(403, done);
     });
 
     it('should delete file ok', function (done) {
       request(app)
-      .del('/testputmodule/-/testputmodule-0.1.9.tgz/-rev/' + lastRev)
+      .del('/testputmodule/download/testputmodule-0.1.9.tgz/-rev/' + lastRev)
       .set('authorization', baseauth)
       .expect(200, done);
     });
