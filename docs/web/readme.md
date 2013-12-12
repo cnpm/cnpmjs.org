@@ -19,10 +19,13 @@
 * Our public registry: [registry.cnpmjs.org](http://registry.cnpmjs.org)
 * Current [cnpmjs.org](/) version: <span id="app-version"></span>
 
-Total Packages: <span id="total-packages"></span>
-
 <table class="downloads">
   <tbody>
+    <tr>
+      <td class="count" id="total-packages"></td><td>total packages</td>
+      <td class="count" id="total-versions"></td><td>total package versions</td>
+      <td class="count" id="total-deletes"></td><td>total delete packages</td>
+    </tr>
     <tr>
       <td class="count"></td><td> downloads today</td>
       <td class="count"></td><td> downloads in this week</td>
@@ -51,13 +54,16 @@ $(function () {
 
   $.getJSON('http://registry.cnpmjs.org/?callback=?', function (data) {
     $('#total-packages').html(humanize(data.doc_count));
+    $('#total-versions').html(humanize(data.doc_version_count));
+    $('#total-deletes').html(humanize(data.doc_del_count));
+
     var downloads = $('table.downloads');
-    downloads.find('td.count:eq(0)').html(humanize(data.download.today));
-    downloads.find('td.count:eq(1)').html(humanize(data.download.thisweek));
-    downloads.find('td.count:eq(2)').html(humanize(data.download.thismonth));
-    downloads.find('td.count:eq(3)').html(humanize(data.download.lastday));
-    downloads.find('td.count:eq(4)').html(humanize(data.download.lastweek));
-    downloads.find('td.count:eq(5)').html(humanize(data.download.lastmonth));
+    downloads.find('td.count:eq(3)').html(humanize(data.download.today));
+    downloads.find('td.count:eq(4)').html(humanize(data.download.thisweek));
+    downloads.find('td.count:eq(5)').html(humanize(data.download.thismonth));
+    downloads.find('td.count:eq(6)').html(humanize(data.download.lastday));
+    downloads.find('td.count:eq(7)').html(humanize(data.download.lastweek));
+    downloads.find('td.count:eq(8)').html(humanize(data.download.lastmonth));
 
     $('#node-version').html(data.node_version || 'v0.10.22');
     $('#app-version').html(data.app_version || '0.0.0');

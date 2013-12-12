@@ -1,10 +1,10 @@
 TESTS = $(shell ls -S `find test -type f -name "*.test.js" -print`)
 REPORTER = tap
-TIMEOUT = 20000
+TIMEOUT = 30000
 MOCHA_OPTS =
 
 install:
-	@npm install
+	@npm install --registry=http://registry.cnpmjs.org --cache=${HOME}/.npm/.cache/cnpm
 
 test: install
 	@NODE_ENV=test ./node_modules/mocha/bin/mocha \
