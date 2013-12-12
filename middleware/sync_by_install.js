@@ -19,6 +19,7 @@ var config = require('../config');
 /**
  * req.session.allowSync  -  allow sync triggle by cnpm install
  */
+
 module.exports = function (req, res, next) {
   if (!config.syncByInstall) {
     return next();

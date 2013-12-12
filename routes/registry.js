@@ -49,7 +49,7 @@ function routes(app) {
   // https://registry.npmjs.org/cnpmjs.org/-/cnpmjs.org-0.0.0.tgz/-rev/1-c85bc65e8d2470cc4d82b8f40da65b8e
   app.put('/:name/-/:filename/-rev/:rev', [login, publishable], mod.upload);
   // delete tarball
-  app.delete('/:name/-/:filename/-rev/:rev', [login, publishable], mod.removeTar);
+  app.delete('/:name/download/:filename/-rev/:rev', [login, publishable], mod.removeTar);
 
   // put package.json to module
   app.put('/:name/:version/-tag/latest', [login, publishable], mod.updateLatest);
