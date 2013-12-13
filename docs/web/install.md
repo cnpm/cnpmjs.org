@@ -10,7 +10,7 @@
 ## Clone
 
 ```bash
-$ git clone get://github.com/fengmk2/cnpmjs.org.git $HOME/cnpmjs.org
+$ git clone git://github.com/fengmk2/cnpmjs.org.git $HOME/cnpmjs.org
 $ cd $HOME/cnpmjs.org
 ```
 
