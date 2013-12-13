@@ -82,7 +82,14 @@ exports.update = function (mod, callback) {
 };
 
 function parseRow(row) {
-  row.package = JSON.parse(row.package);
+  if (row && row.package) {
+    try {
+      row.package = JSON.parse(row.package);
+    } catch (e) {
+      row.package = {};
+      console.warn('parse package error: %s, id: %s version: %s, error: %s', row.name, row.id, row.version, e);
+    }
+  }
 }
 
 var SELECT_MODULE_BY_ID_SQL = 'SELECT ' + MODULE_COLUMNS + ' FROM module WHERE id=?;';
