@@ -89,24 +89,18 @@ Or you can just use our `cnpm` cli:
 $ npm install cnpm -g
 ```
 
-### adduser
-
-```bash
-$ cnpm adduser
-```
-
 ### sync
 
 Only `cnpm` cli has this command:
 
 ```bash
-$ cnpm sync mocha
+$ cnpm sync connect
 ```
 
-(TODO) sync package web page
+sync package on web: [cnpmjs.org/sync/connect](http://cnpmjs.org/sync/connect)
 
 ```bash
-$ open http://cnpmjs.org/sync
+$ open http://cnpmjs.org/sync/connect
 ```
 
 ### publish
