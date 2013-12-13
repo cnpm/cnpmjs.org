@@ -6,3 +6,5 @@ Makefile
 logo.png
 .tmp/
 public/dist/
+backup/*.json
+backup/*.gz

@@ -68,7 +68,8 @@ var config = {
     dead_horse: true,
     cnpmjstest10: true,
   },
-  syncByInstall: true
+  syncByInstall: true,
+  backupFilePrefix: '/cnpm/backup/', // backup filepath prefix
 };
 
 // load config/config.js, everything in config.js will cover the same key in index.js
