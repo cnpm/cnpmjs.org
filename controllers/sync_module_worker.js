@@ -117,6 +117,11 @@ SyncModuleWorker.prototype._sync = function (pkg, callback) {
     var map = {};
     for (var i = 0; i < rows.length; i++) {
       var r = rows[i];
+      if (!r.package || !r.package.dist) {
+        // package json parse error
+        continue;
+      }
+
       if (r.package && r.package._publish_on_cnpm) {
         // publish on cnpm, dont sync this version package
         that.log('  [%s] publish on local cnpm, don\'t sync.', pkg.name);
