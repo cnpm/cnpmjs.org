@@ -17,7 +17,6 @@ $ cd $HOME/cnpmjs.org
 ## Create your `config.js`
 
 ```bash
-$ touch config/config.js
 $ vim config/config.js
 ```
 
@@ -85,4 +84,25 @@ Start nodejs success. PID=27175
 $ open http://localhost:7001
 # web
 $ open http://localhost:7002
+```
+
+## use cnpm cli with your own registry  
+You do not need to write another command line tool with your own registry, 
+just alias [cnpm](http://github.com/fengmk2/cnpm), then you can get a npm client for you own registry.
+
+```
+# install cnpm first
+npm install -g cnpm 
+
+# then alias lnpm to cnpm, but change config to your own registry
+alias lnpm='cnpm --registry=http://localhost:7001\
+ --registryweb=http://localhost:7002\
+ --cache=$HOME/.npm/.cache/lnpm\
+ --userconfig=$HOME/.lnpmrc'
+
+ #or put this in .zshrc or .bashrc
+ echo "#lnpm alias\nalias lnpm='cnpm --registry=http://localhost:7001\
+ --registryweb=http://localhost:7002\
+ --cache=$HOME/.npm/.cache/lnpm\
+ --userconfig=$HOME/.lnpmrc'" >> $HOME/.zshrc && source $HOME/.zshrc
 ```
