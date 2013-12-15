@@ -35,9 +35,18 @@ function SyncModuleWorker(options) {
   EventEmitter.call(this);
   this._logId = options.logId;
   this.startName = options.name;
-  this.names = [options.name];
+  if (!Array.isArray(options.name)) {
+    options.name = [options.name];
+  }
+
+  this.names = options.name;
   this.username = options.username;
   this.nameMap = {};
+  this.names.forEach(function (name) {
+    this.nameMap[name] = true;
+  }.bind(this));
+  this.noDep = options.noDep; //do not sync dependences
+
   this.successes = [];
   this.fails = [];
 }
@@ -57,7 +66,7 @@ SyncModuleWorker.prototype.finish = function () {
 SyncModuleWorker.prototype.log = function (format, arg1, arg2) {
   var str = '[' + utility.YYYYMMDDHHmmss() + '] ' + util.format.apply(util, arguments);
   debug(str);
-  Log.append(this._logId, str, utility.noop);
+  this._logId && Log.append(this._logId, str, utility.noop);
 };
 
 SyncModuleWorker.prototype.start = function () {
@@ -300,13 +309,14 @@ SyncModuleWorker.prototype._syncOneVersion = function (versionIndex, sourcePacka
 
   that.log('    [%s:%d] syncing, version: %s, dist: %j',
     sourcePackage.name, versionIndex, sourcePackage.version, sourcePackage.dist);
+  if (!that.noDep) {
+    for (var k in sourcePackage.dependencies) {
+      that.add(k);
+    }
 
-  for (var k in sourcePackage.dependencies) {
-    that.add(k);
-  }
-
-  for (var k in sourcePackage.devDependencies) {
-    that.add(k);
+    for (var k in sourcePackage.devDependencies) {
+      that.add(k);
+    }
   }
 
   var shasum = crypto.createHash('sha1');

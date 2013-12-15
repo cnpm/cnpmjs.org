@@ -34,11 +34,31 @@ describe('proxy/sync_module_worker.test.js', function () {
       });
 
       worker.start();
-      worker.on('end', function () {
-        // sync end
-        done();
-      });
+      worker.on('end', done);
     });
   });
-});
 
+  it('should start a sync worker with names and noDep', function (done) {
+    var worker = new SyncModuleWorker({
+      name: ['cnpmjs.org', 'cutter'],
+      noDep: true,
+      username: 'fengmk2'
+    });
+
+    worker.start();
+    worker.on('end', function () {
+      worker.successes.concat(worker.fails).should.eql(['cnpmjs.org', 'cutter']);
+      done();
+    });
+  });
+
+  it('should start a sync worker with names', function (done) {
+    var worker = new SyncModuleWorker({
+      name: ['cnpmjs.org', 'cutter'],
+      username: 'fengmk2'
+    });
+
+    worker.start();
+    worker.on('end', done);
+  });
+});
