@@ -43,7 +43,7 @@ describe('controllers/web/user.test.js', function () {
 
     it('should get not eixst user but have modules 200', function (done) {
       request(app)
-      .get('/~jdalton')
+      .get('/~tjholowaychuk')
       .expect(200)
       .expect(/<div id="profile">/)
       .expect(/Packages by/, done);
