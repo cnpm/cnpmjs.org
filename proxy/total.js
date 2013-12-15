@@ -79,3 +79,7 @@ var PLUS_DELETE_MODULE_SQL = 'UPDATE total SET module_delete=module_delete+1 WHE
 exports.plusDeleteModule = function (callback) {
   mysql.query(PLUS_DELETE_MODULE_SQL, callback);
 };
+
+exports.getTotalInfo = function (callback) {
+  mysql.query(TOTAL_INFO_SQL, callback);
+};

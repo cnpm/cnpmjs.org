@@ -1,11 +1,12 @@
 /**!
- * cnpmjs.org - controllers/sync_module_worker.js
+ * cnpmjs.org - proxy/sync_module_worker.js
  *
  * Copyright(c) cnpmjs.org and other contributors.
  * MIT Licensed
  *
  * Authors:
  *  fengmk2 <fengmk2@gmail.com> (http://fengmk2.github.com)
+ *  dead_horse <dead_horse@qq.com> (http://deadhorse.me)
  */
 
 'use strict';
@@ -14,7 +15,7 @@
  * Module dependencies.
  */
 
-var debug = require('debug')('cnpmjs.org:controllers:registry:sync_module_worker');
+var debug = require('debug')('cnpmjs.org:proxy:sync_module_worker');
 var EventEmitter = require('events').EventEmitter;
 var util = require('util');
 var fs = require('fs');
@@ -24,10 +25,10 @@ var eventproxy = require('eventproxy');
 var urllib = require('urllib');
 var utility = require('utility');
 var nfs = require('../common/nfs');
-var npm = require('../proxy/npm');
-var common = require('./common');
-var Module = require('../proxy/module');
-var Log = require('../proxy/module_log');
+var npm = require('./npm');
+var common = require('../lib/common');
+var Module = require('./module');
+var Log = require('./module_log');
 var ms = require('ms');
 
 function SyncModuleWorker(options) {

@@ -17,9 +17,9 @@
 var urllib = require('urllib');
 var config = require('../config');
 
-function request(url, callback) {
+function request(url, callback, options) {
   url = config.sourceNpmRegistry + url;
-  var options = {
+  options = options || {
     dataType: 'json',
     timeout: 10000
   };
@@ -36,5 +36,19 @@ exports.get = function (name, callback) {
       data = null;
     }
     callback(null, data, res);
+  });
+};
+
+exports.getAllSince = function (startkey, callback) {
+  request('/-/all/since?stale=update_after&startkey=' + startkey, callback, {
+    dataType: 'json',
+    timeout: 300000
+  });
+};
+
+exports.getShort = function (callback) {
+  request('/-/short', callback, {
+    dataType: 'json',
+    timeout: 300000
   });
 };

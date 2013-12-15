@@ -14,7 +14,7 @@
  * Module dependencies.
  */
 var Log = require('../proxy/module_log');
-var SyncModuleWorker = require('./sync_module_worker');
+var SyncModuleWorker = require('../proxy/sync_module_worker');
 
 exports.sync = function (req, res, next) {
   var username = req.session.name || 'anonymous';

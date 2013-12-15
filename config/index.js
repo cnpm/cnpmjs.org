@@ -70,6 +70,7 @@ var config = {
   },
   syncByInstall: true,
   backupFilePrefix: '/cnpm/backup/', // backup filepath prefix
+  syncModel: 'all' // null, all, hot
 };
 
 // load config/config.js, everything in config.js will cover the same key in index.js
