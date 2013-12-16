@@ -43,7 +43,7 @@
   <h3>Sync Status</h3>
   <p id="sync-model"></p>
   <p>Last sync time is <span id="last-sync-time"></span>. </p>
-  <p style="display:none;" class="syncing alert alert-info">The sync worker is working in the backend now. </p>
+  <p class="syncing alert alert-info">The sync worker is working in the backend now. </p>
   <table class="sync-status">
     <tbody>
       <tr>
@@ -92,11 +92,9 @@ $(function () {
     if (data.sync_model === 'all') {
       $('#sync-model').html('This registry will sync all packages from official registry.');
       $('#last-sync-time').html(new Date(data.last_sync_time));
-      $('.sync').show();
     } else if (data.sync_model === 'exist') {
       $('#sync-model').html('This registry will only update exist packages from official registry.');
       $('#last-sync-time').html(new Date(data.last_exist_sync_time));
-      $('.sync').show();
     }
 
     $('#need-sync').html(data.need_sync_num);
@@ -110,6 +108,8 @@ $(function () {
     if (!data.sync_status) {
       $('.syncing').html('');
     }
+
+    $('.sync').show();
   });
 });
 </script>
