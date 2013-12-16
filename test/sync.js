@@ -14,20 +14,22 @@
  * Module dependencies.
  */
 
-var SyncModuleWorker = require('../controllers/sync_module_worker');
+var SyncModuleWorker = require('../proxy/sync_module_worker');
 var mysql = require('../common/mysql');
 var Log = require('../proxy/module_log');
 
-var name = process.argv[2] || 'address';
+var name = process.argv[2] || 'address,pedding';
+var names = name.split(',');
 
 Log.create({
-  name: name,
+  name: names[0],
   username: 'fengmk2',
 }, function (err, result) {
   var worker = new SyncModuleWorker({
     logId: result.id,
-    name: name,
-    username: 'fengmk2'
+    name: names,
+    username: 'fengmk2',
+    concurrency: names.length,
   });
 
   worker.start();

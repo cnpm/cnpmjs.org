@@ -68,7 +68,8 @@ module.exports = function sync(callback) {
     var worker = new SyncModuleWorker({
       username: 'admin',
       name: packages,
-      noDep: true
+      noDep: true,
+      concurrency: config.syncConcurrency,
     });
     Status.init({
       worker: worker,

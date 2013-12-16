@@ -87,7 +87,8 @@ module.exports = function sync(callback) {
     debug('Total %d packages to sync', packages.length);
     var worker = new SyncModuleWorker({
       username: 'admin',
-      name: packages
+      name: packages,
+      concurrency: config.syncConcurrency,
     });
     Status.init({
       worker: worker,

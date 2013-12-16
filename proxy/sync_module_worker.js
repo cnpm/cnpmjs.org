@@ -41,6 +41,8 @@ function SyncModuleWorker(options) {
 
   this.names = options.name;
   this.username = options.username;
+  this.concurrency = options.concurrency || 1;
+  this.syncingNames = {};
   this.nameMap = {};
   this.names.forEach(function (name) {
     this.nameMap[name] = true;
@@ -56,11 +58,16 @@ util.inherits(SyncModuleWorker, EventEmitter);
 module.exports = SyncModuleWorker;
 
 SyncModuleWorker.prototype.finish = function () {
+  debug('syncingNames: %j', this.syncingNames);
+  if (this._finished || Object.keys(this.syncingNames).length > 0) {
+    return;
+  }
   this.log('[done] Sync %s module finished, %d success, %d fail\nSuccess: [ %s ]\nFail: [ %s ]',
     this.startName,
     this.successes.length, this.fails.length,
     this.successes.join(', '), this.fails.join(', '));
   this.emit('end');
+  this._finished = true;
 };
 
 SyncModuleWorker.prototype.log = function (format, arg1, arg2) {
@@ -70,8 +77,10 @@ SyncModuleWorker.prototype.log = function (format, arg1, arg2) {
 };
 
 SyncModuleWorker.prototype.start = function () {
-  this.log('user: %s, sync %s worker start.', this.username, this.names[0]);
-  this.next();
+  this.log('user: %s, sync %s worker start, %d concurrency.', this.username, this.names[0], this.concurrency);
+  for (var i = 0; i < this.concurrency; i++) {
+    this.next(i);
+  }
 };
 
 SyncModuleWorker.prototype.add = function (name) {
@@ -83,13 +92,14 @@ SyncModuleWorker.prototype.add = function (name) {
   this.log('    add dependencies: %s', name);
 };
 
-SyncModuleWorker.prototype.next = function () {
+SyncModuleWorker.prototype.next = function (concurrencyId) {
   var name = this.names.shift();
   if (!name) {
-    return this.finish();
+    return process.nextTick(this.finish.bind(this));
   }
 
   var that = this;
+  that.syncingNames[name] = true;
   npm.get(name, function (err, pkg, response) {
     if (!err && !pkg) {
       err = new Error('Module ' + name + ' not exists, http status ' + response.statusCode);
@@ -98,21 +108,23 @@ SyncModuleWorker.prototype.next = function () {
     if (err) {
       that.fails.push(name);
       that.log('[error] [%s] get package error: %s', name, err.stack);
-      return that.next();
+      delete that.syncingNames[name];
+      return that.next(concurrencyId);
     }
 
-    that.log('[%s] start...', pkg.name);
+    that.log('[c#%d] [%s] start...', concurrencyId, pkg.name);
     that._sync(pkg, function (err, versions) {
+      delete that.syncingNames[name];
       if (err) {
         that.fails.push(pkg.name);
         that.log('[error] [%s] sync error: %s', name, err.stack);
-        return that.next();
+        return that.next(concurrencyId);
       }
       that.log('[%s] synced success, %d versions: %s',
         name, versions.length, versions.join(', '));
       that.successes.push(name);
       that.emit('success', name);
-      that.next();
+      that.next(concurrencyId);
     });
   });
 };
