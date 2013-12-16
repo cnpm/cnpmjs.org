@@ -51,6 +51,10 @@ exports.queryOne = function (sql, values, cb) {
   });
 };
 
+exports.escape = function (val) {
+  return pool.escape(val);
+};
+
 ready(exports);
 
 function init() {
