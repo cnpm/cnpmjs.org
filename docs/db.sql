@@ -74,7 +74,7 @@ CREATE TABLE `total` (
  `success_sync_num` int unsigned NOT NULL DEFAULT '0' COMMENT 'how many packages sync success at this time',
  `fail_sync_num` int unsigned NOT NULL DEFAULT '0' COMMENT 'how many packages sync fail at this time',
  `left_sync_num` int unsigned NOT NULL DEFAULT '0' COMMENT 'how many packages left to be sync',
- `last_sync_module` varchar(100) NOT NULL COMMENT 'last sync success module name',
+ `last_sync_module` varchar(100) COMMENT 'last sync success module name',
  PRIMARY KEY (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='total info';
 INSERT INTO total(name, gmt_modified, module_delete) VALUES('total', now(), 0, 0);
