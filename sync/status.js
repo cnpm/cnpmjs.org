@@ -14,12 +14,14 @@
  * Module dependencies.
  */
 
-var Total = require('../proxy/total');
+var debug = require('debug')('cnpmjs.org:sync:status');
 var utility = require('utility');
+var Total = require('../proxy/total');
 
 function Status(options) {
   this.worker = options.worker;
   this.need = options.need;
+  this.lastSyncModule = '';
 }
 
 Status.prototype.log = function (syncDone) {
@@ -28,7 +30,8 @@ Status.prototype.log = function (syncDone) {
     need: this.need,
     success: this.worker.successes.length,
     fail: this.worker.fails.length,
-    left: this.worker.names.length
+    left: this.worker.names.length,
+    lastSyncModule: this.lastSyncModule,
   };
   Total.updateSyncNum(params, utility.noop);
 };
@@ -40,6 +43,10 @@ Status.prototype.start = function () {
   this.started = true;
   //every 30s log it into mysql
   this.timer = setInterval(this.log.bind(this), 30000);
+  this.worker.on('success', function (moduleName) {
+    debug('sync [%s] success', moduleName);
+    this.lastSyncModule = moduleName;
+  }.bind(this));
   this.worker.on('end', function () {
     this.started = false;
     this.log(true);

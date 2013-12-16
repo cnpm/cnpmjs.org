@@ -36,20 +36,17 @@ case 'exist':
 //set sync_status = 0 at first
 Total.updateSyncStatus(0, utility.noop);
 
-if (sync) {
-  handleSync();
-  var timer = setInterval(handleSync, ms('1h'));
-}
-
 // the same time only sync once
 var syncing = false;
 
 function handleSync() {
   var now = new Date();
   var hour = now.getHours();
+  debug('hour: %s, syncing: %s', hour, syncing);
   // start sync at 2 a.m every day
   if (hour === 2 && !syncing) {
     syncing = true;
+    debug('start syncing');
     sync(function (err, data) {
       if (config.debug) {
         console.log(err, data);
@@ -61,33 +58,38 @@ function handleSync() {
   }
 }
 
+if (sync) {
+  handleSync();
+  setInterval(handleSync, ms('1h'));
+}
+
 function sendMailToAdmin(err, result, syncTime) {
   result = result || {};
   var to = [];
   for (var name in config.admins) {
     to.push(config.admins[name]);
   }
-  debug('Send email to all admins: %j, with err message: %s, result: %j, start sync time: %s.', 
-    to, err ? err.message : '', result, syncTime);  
+  debug('Send email to all admins: %j, with err message: %s, result: %j, start sync time: %s.',
+    to, err ? err.message : '', result, syncTime);
   var subject;
   var type;
   var html;
   if (err) {
     subject = 'Sync Error';
     type = 'error';
-    html = util.format('Sync packages from official registry failed.\n' + 
+    html = util.format('Sync packages from official registry failed.\n' +
       'Start sync time is %s.\nError message is %s.', syncTime, err.message);
   } else if (result.fails && result.fails.length) {
     subject = 'Sync Finished But Some Packages Failed';
     type = 'warn';
-    html = util.format('Sync packages from official registry finished, but some packages sync failed.\n' + 
+    html = util.format('Sync packages from official registry finished, but some packages sync failed.\n' +
       'Start sync time is %s.\n %d packges sync failed: %j ...\n %d packages sync successes :%j ...',
-      syncTime, result.fails.length, result.fails.slice(0, 10), 
+      syncTime, result.fails.length, result.fails.slice(0, 10),
       result.successes.length, result.successes.slice(0, 10));
   } else {
     subject = 'Sync Finished';
     type = 'log';
-    html = util.format('Sync packages from official registry finished.\n' + 
+    html = util.format('Sync packages from official registry finished.\n' +
       'Start sync time is %s.\n %d packages sync successes :%j ...',
       syncTime, result.successes.length, result.successes.slice(0, 10));
   }

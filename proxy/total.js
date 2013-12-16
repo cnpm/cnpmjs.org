@@ -64,7 +64,8 @@ exports.get = function (callback) {
       fail_sync_num: info.fail_sync_num || 0,
       left_sync_num: info.left_sync_num || 0,
       last_sync_time: info.last_sync_time || 0,
-      last_exist_sync_time: info.last_exist_sync_time || 0
+      last_exist_sync_time: info.last_exist_sync_time || 0,
+      last_sync_module: info.last_sync_module || '',
     };
 
     for (var i = 0; i < sizes.length; i++) {
@@ -101,19 +102,19 @@ exports.setLastExistSyncTime = function (time, callback) {
   mysql.query(SET_LAST_EXIST_SYNC_TIME_SQL, Number(time), callback);
 };
 
-var UPDATE_SYNC_STATUS_SQL = 'UPDATE total SET sync_status = ?';
+var UPDATE_SYNC_STATUS_SQL = 'UPDATE total SET sync_status = ? WHERE name="total";';
 exports.updateSyncStatus = function (status, callback) {
   mysql.query(UPDATE_SYNC_STATUS_SQL, [status], callback);
 };
 
-var UPDATE_SYNC_NUM_SQL = 'UPDATE total SET\
-  sync_status = ?,\
-  need_sync_num = ?,\
-  success_sync_num = ?,\
-  fail_sync_num = ?,\
-  left_sync_num = ?';
+var UPDATE_SYNC_NUM_SQL = 'UPDATE total SET sync_status = ?, need_sync_num = ?, \
+  success_sync_num = ?, fail_sync_num = ?, left_sync_num = ?, last_sync_module=? \
+  WHERE name="total";';
 exports.updateSyncNum = function (params, callback) {
-  var query = [params.syncStatus, params.need || 0, 
-  params.success || 0, params.fail || 0, params.left || 0];
+  var query = [
+    params.syncStatus, params.need || 0,
+    params.success || 0, params.fail || 0, params.left || 0,
+    params.lastSyncModule,
+  ];
   mysql.query(UPDATE_SYNC_NUM_SQL, query, callback);
 };
