@@ -58,6 +58,13 @@ exports.get = function (callback) {
       doc_version_count: vc.count,
       user_count: uc.count,
       store_engine: 'mysql',
+      sync_status: info.sync_status,
+      need_sync_num: info.need_sync_num,
+      success_sync_num: info.success_sync_num,
+      fail_sync_num: info.fail_sync_num,
+      left_sync_num: info.left_sync_num,
+      last_sync_time: info.last_sync_time,
+      last_exist_sync_time: info.last_exist_sync_time
     };
 
     for (var i = 0; i < sizes.length; i++) {

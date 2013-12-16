@@ -39,6 +39,25 @@
   </tbody>
 </table>
 
+<div class="sync" style="display:none;">
+  <h3>Sync Status</h3>
+  <p id="sync-model"></p>
+  <p>Last sync time is <span id="last-sync-time"></span>. </p>
+  <p style="display:none;" class="syncing alert alert-info">The sync worker is working in the backend now. </p>
+  <table class="sync-status">
+    <tbody>
+      <tr>
+        <td><span id="need-sync"></span> packages need to be sync</td>
+        <td><span id="success-sync"></span> packages and dependencies sync successed</td>
+      </tr>
+      <tr>
+        <td><span id="fail-sync"></span> packages and dependencies sync failed</td>
+        <td style="display: none;" class="syncing"><span id="left-sync"></span> packages and dependencies waiting for sync</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
 Running on [Node.js](http://nodejs.org), version <span id="node-version"></span>.
 
 <script>
@@ -52,7 +71,7 @@ $(function () {
     return n.join(s);
   }
 
-  $.getJSON('http://registry.cnpmjs.org/?callback=?', function (data) {
+  $.getJSON('/total', function (data) {
     $('#total-packages').html(humanize(data.doc_count));
     $('#total-versions').html(humanize(data.doc_version_count));
     $('#total-deletes').html(humanize(data.doc_del_count));
@@ -67,6 +86,22 @@ $(function () {
 
     $('#node-version').html(data.node_version || 'v0.10.22');
     $('#app-version').html(data.app_version || '0.0.0');
+
+    if (data.sync_model === 'all') {
+      $('#sync-model').html('This registry will sync all packages from official registry.');
+      $('#last-sync-time').html(data.last_sync_time);
+      $('.sync').show();
+    } else if (data.sync_model === 'exist') {
+      $('#sync-model').html('This registry will only update exist packages from official registry.');
+      $('#last-sync-time').html(data.last_exist_sync_time);
+      $('.sync').show();
+    }
+    data.sync_status && $('.syncing').show();
+
+    $('#need-sync').html(data.need_sync_num);
+    $('#success-sync').html(data.success_sync_num);
+    $('#fail-sync').html(data.fail_sync_num);
+    $('#left-sync').html(data.left_sync_num);
   });
 });
 </script>
