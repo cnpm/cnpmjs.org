@@ -40,18 +40,16 @@ Total.updateSyncStatus(0, utility.noop);
 var syncing = false;
 
 function handleSync() {
-  var now = new Date();
-  var hour = now.getHours();
-  debug('hour: %s, syncing: %s', hour, syncing);
-  // start sync at 2 a.m every day
-  if (hour === 2 && !syncing) {
+  debug('mode: %s, syncing: %s', config.syncModel, syncing);
+  // check sync every one 30 minutes
+  if (!syncing) {
     syncing = true;
     debug('start syncing');
     sync(function (err, data) {
       if (config.debug) {
         console.log(err, data);
       } else {
-        sendMailToAdmin(err, data, now);
+        sendMailToAdmin(err, data, new Date());
       }
       syncing = false;
     });
@@ -60,7 +58,7 @@ function handleSync() {
 
 if (sync) {
   handleSync();
-  setInterval(handleSync, ms('1h'));
+  setInterval(handleSync, ms('30m'));
 }
 
 function sendMailToAdmin(err, result, syncTime) {

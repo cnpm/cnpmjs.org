@@ -81,7 +81,7 @@ var config = {
   },
   syncByInstall: true,
   backupFilePrefix: '/cnpm/backup/', // backup filepath prefix
-  syncModel: 'all', // null, 'all', 'exist'
+  syncModel: 'none', // 'none', 'all', 'exist'
   syncConcurrency: 1,
 };
 
