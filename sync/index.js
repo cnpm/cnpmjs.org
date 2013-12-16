@@ -20,6 +20,7 @@ var mail = require('../common/mail');
 var util = require('util');
 var utility = require('utility');
 var debug = require('debug')('cnpmjs.org:sync:index');
+var Total = require('../proxy/total');
 
 var sync;
 
@@ -32,26 +33,31 @@ case 'exist':
   break;
 }
 
+if (sync) {
+  handleSync();
+  var timer = setInterval(handleSync, ms('1h'));
+}
+
 // the same time only sync once
 var syncing = false;
 
-if (sync) {
-  var timer = setInterval(function () {
-    var now = new Date();
-    var hour = now.getHours();
-    // start sync at 2 a.m every day
-    if (hour === 2 && !syncing) {
-      syncing = true;
-      sync(function (err, data) {
-        if (config.debug) {
-          console.log(err, data);
-        } else {
-          sendMailToAdmin(err, data, now);
-        }
-        syncing = false;
-      });
-    }
-  }, ms('1h'));
+function handleSync() {
+  var now = new Date();
+  var hour = now.getHours();
+  // start sync at 2 a.m every day
+  if (hour === 2 && !syncing) {
+    syncing = true;
+    sync(function (err, data) {
+      if (config.debug) {
+        console.log(err, data);
+      } else {
+        sendMailToAdmin(err, data, now);
+      }
+      syncing = false;
+    });
+  } else {
+    Total.updateSyncStatus(0, utility.noop);
+  }
 }
 
 function sendMailToAdmin(err, result, syncTime) {

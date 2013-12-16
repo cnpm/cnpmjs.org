@@ -21,6 +21,7 @@ var eventproxy = require('eventproxy');
 var SyncModuleWorker = require('../proxy/sync_module_worker');
 var debug = require('debug')('cnpmjs.org:sync:sync_all');
 var utility = require('utility');
+var Status = require('./status');
 
 module.exports = function sync(callback) {
   var ep = eventproxy.create();
@@ -58,6 +59,10 @@ module.exports = function sync(callback) {
       name: packages,
       noDep: true
     });
+    Status.init({
+      worker: worker,
+      need: packages.length
+    }).start();
     worker.start();
     worker.once('end', function () {
       debug('All packages sync done, successes %d, fails %d', 

@@ -93,3 +93,20 @@ var SET_LAST_EXIST_SYNC_TIME_SQL = 'UPDATE total SET last_exist_sync_time=? WHER
 exports.setLastExistSyncTime = function (time, callback) {
   mysql.query(SET_LAST_EXIST_SYNC_TIME_SQL, Number(time), callback);
 };
+
+var UPDATE_SYNC_STATUS_SQL = 'UPDATE total SET sync_status = ?';
+exports.updateSyncStatus = function (status, callback) {
+  mysql.query(UPDATE_SYNC_STATUS_SQL, [status], callback);
+};
+
+var UPDATE_SYNC_NUM_SQL = 'UPDATE total SET\
+  sync_status = ?,\
+  need_sync_num = ?,\
+  success_sync_num = ?,\
+  fail_sync_num = ?,\
+  left_sync_num = ?';
+exports.updateSyncNum = function (params, callback) {
+  var query = [params.syncStatus, params.need || 0, 
+  params.success || 0, params.fail || 0, params.left || 0];
+  mysql.query(UPDATE_SYNC_NUM_SQL, query, callback);
+};
