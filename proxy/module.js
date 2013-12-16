@@ -34,7 +34,7 @@ var INSERT_MODULE_SQL = 'INSERT INTO module(gmt_create, gmt_modified, \
 exports.add = function (mod, callback) {
   var pkg;
   try {
-    pkg = JSON.stringify(mod.package);
+    pkg = stringifyPackage(mod.package);
   } catch (e) {
     return callback(e);
   }
@@ -67,7 +67,7 @@ var UPDATE_DIST_SQL = 'UPDATE module SET version=?, package=?, dist_tarball=?, d
 exports.update = function (mod, callback) {
   var pkg;
   try {
-    pkg = JSON.stringify(mod.package);
+    pkg = stringifyPackage(mod.package);
   } catch (e) {
     return callback(e);
   }
@@ -84,12 +84,19 @@ exports.update = function (mod, callback) {
 function parseRow(row) {
   if (row && row.package) {
     try {
+      if (row.package.indexOf('%7B%22') === 0) {
+        // now store package will encodeURIComponent() after JSON.stringify
+        row.package = decodeURIComponent(row.package);
+      }
       row.package = JSON.parse(row.package);
     } catch (e) {
-      row.package = {};
       console.warn('parse package error: %s, id: %s version: %s, error: %s', row.name, row.id, row.version, e);
     }
   }
+}
+
+function stringifyPackage(pkg) {
+  return encodeURIComponent(JSON.stringify(pkg));
 }
 
 var SELECT_MODULE_BY_ID_SQL = 'SELECT ' + MODULE_COLUMNS + ' FROM module WHERE id=?;';

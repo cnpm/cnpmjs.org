@@ -35,7 +35,7 @@ var config = {
   // mysql config
   mysqlServers: [
     {
-      host: 'keydiary.mysql.rds.aliyuncs.com',
+      host: 'keydiary.mysql.rds.aliyuncs.com', // 'db4free.net'
       port: 3306,
       user: 'cnpmjs',
       password: 'cnpmjs123'
