@@ -67,7 +67,7 @@ var UPDATE_DIST_SQL = 'UPDATE module SET version=?, package=?, dist_tarball=?, d
 exports.update = function (mod, callback) {
   var pkg;
   try {
-    pkg = JSON.stringify(mod.package);
+    pkg = stringifyPackage(mod.package);
   } catch (e) {
     return callback(e);
   }
