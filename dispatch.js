@@ -21,6 +21,8 @@ var fs = require('fs');
 var cluster = require('cluster');
 var config = require('./config');
 var workerPath = path.join(__dirname, 'worker.js');
+var childProcess = require('child_process');
+var syncPath = path.join(__dirname, 'sync');
 
 if (config.enableCluster) {
   cluster.setupMaster({
@@ -50,6 +52,8 @@ if (config.enableCluster) {
     cluster.fork();
   }
 
+  childProcess.fork(syncPath);
 } else {
   require(workerPath);
+  require(syncPath);
 }

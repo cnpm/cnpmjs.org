@@ -60,16 +60,28 @@ var config = {
     domain: "http://qtestbucket.qiniudn.com"
   },
 
+  mail: {
+    appname: 'cnpmjs.org',
+    sender: 'cnpmjs.org mail sender <adderss@gmail.com>',
+    host: 'smtp.gmail.com',
+    port: 465,
+    user: 'address@gmail.com',
+    pass: 'your password',
+    ssl: true,
+    debug: true
+  },
+
   sourceNpmRegistry: 'http://registry.npmjs.org',
   enablePrivate: true, // enable private mode, only admin can publish, other use just can sync package from source npm
   admins: {
-    admin: true,
-    fengmk2: true,
-    dead_horse: true,
-    cnpmjstest10: true,
+    admin: 'admin@cnpmjs.org',
+    fengmk2: 'fengmk2@gmail.com',
+    dead_horse: 'dead_horse@qq.com',
+    cnpmjstest10: 'cnpmjstest10@cnpmjs.org',
   },
   syncByInstall: true,
   backupFilePrefix: '/cnpm/backup/', // backup filepath prefix
+  syncModel: 'all' // null, 'all', 'exist'
 };
 
 // load config/config.js, everything in config.js will cover the same key in index.js

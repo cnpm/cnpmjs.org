@@ -18,13 +18,13 @@
 var login = require('../middleware/login');
 var publishable = require('../middleware/publishable');
 var syncByInstall = require('../middleware/sync_by_install');
-var home = require('../controllers/registry/home');
+var total = require('../controllers/total');
 var mod = require('../controllers/registry/module');
 var user = require('../controllers/registry/user');
 var sync = require('../controllers/sync');
 
 function routes(app) {
-  app.get('/', home.show);
+  app.get('/', total.show);
 
   //before /:name/:version
   //get all modules, for npm search

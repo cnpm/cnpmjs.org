@@ -18,8 +18,10 @@
 var pkg = require('../controllers/web/package');
 var user = require('../controllers/web/user');
 var sync = require('../controllers/sync');
+var total = require('../controllers/total');
 
 function routes(app) {
+  app.get('/total', total.show);
   app.get('/package/:name', pkg.display);
   app.get('/package/:name/:version', pkg.display);
   app.get('/browse/keyword/:word', pkg.search);

@@ -27,10 +27,10 @@ var config = require('../../config');
 var Module = require('../../proxy/module');
 var Total = require('../../proxy/total');
 var nfs = require('../../common/nfs');
-var common = require('../common');
+var common = require('../../lib/common');
 var Log = require('../../proxy/module_log');
 var DownloadTotal = require('../../proxy/download');
-var SyncModuleWorker = require('../sync_module_worker');
+var SyncModuleWorker = require('../../proxy/sync_module_worker');
 var logger = require('../../common/logger');
 var semver = require('semver');
 

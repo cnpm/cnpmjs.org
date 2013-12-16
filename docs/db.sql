@@ -67,9 +67,23 @@ CREATE TABLE `total` (
  `name` varchar(100) NOT NULL COMMENT 'total name',
  `gmt_modified` datetime NOT NULL COMMENT 'modified time',
  `module_delete` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT 'module delete count',
+ `last_sync_time` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT 'last timestamp sync from official registry',
+ `last_exist_sync_time` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT 'last timestamp sync exist packages from official registry'
+ `sync_status` tinyint unsigned NOT NULL DEFAULT '0' COMMENT 'system sync from official registry status'
+ `need_sync_num` int unsigned NOT NULL DEFAULT '0' COMMENT 'how many packages need to be sync'
+ `success_sync_num` int unsigned NOT NULL DEFAULT '0' COMMENT 'how many packages sync success at this time'
+ `fail_sync_num` int unsigned NOT NULL DEFAULT '0' COMMENT 'how many packages sync fail at this time'
+ `left_sync_num` int unsigned NOT NULL DEFAULT '0' COMMENT 'how many packages left to be sync'
  PRIMARY KEY (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='total info';
-INSERT INTO total(name, gmt_modified, module_delete) VALUES('total', now(), 0);
+INSERT INTO total(name, gmt_modified, module_delete) VALUES('total', now(), 0, 0);
+-- ALTER TABLE `total` ADD `last_sync_time` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT 'last timestamp sync from official registry'
+-- ALTER TABLE `total` ADD `last_exist_sync_time` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT 'last timestamp sync exist packages from official registry'
+-- ALTER TABLE `total` ADD `sync_status` tinyint unsigned NOT NULL DEFAULT '0' COMMENT 'system sync from official registry status'
+-- ALTER TABLE `total` ADD `need_sync_num` int unsigned NOT NULL DEFAULT '0' COMMENT 'how many packages need to be sync'
+-- ALTER TABLE `total` ADD `success_sync_num` int unsigned NOT NULL DEFAULT '0' COMMENT 'how many packages sync success at this time'
+-- ALTER TABLE `total` ADD `fail_sync_num` int unsigned NOT NULL DEFAULT '0' COMMENT 'how many packages sync fail at this time'
+-- ALTER TABLE `total` ADD `left_sync_num` int unsigned NOT NULL DEFAULT '0' COMMENT 'how many packages left to be sync'
 
 CREATE TABLE `download_total` (
  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'primary key',

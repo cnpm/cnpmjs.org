@@ -1,11 +1,12 @@
 /**!
- * cnpmjs.org - controllers/sync_module_worker.js
+ * cnpmjs.org - proxy/sync_module_worker.js
  *
  * Copyright(c) cnpmjs.org and other contributors.
  * MIT Licensed
  *
  * Authors:
  *  fengmk2 <fengmk2@gmail.com> (http://fengmk2.github.com)
+ *  dead_horse <dead_horse@qq.com> (http://deadhorse.me)
  */
 
 'use strict';
@@ -14,7 +15,7 @@
  * Module dependencies.
  */
 
-var debug = require('debug')('cnpmjs.org:controllers:registry:sync_module_worker');
+var debug = require('debug')('cnpmjs.org:proxy:sync_module_worker');
 var EventEmitter = require('events').EventEmitter;
 var util = require('util');
 var fs = require('fs');
@@ -24,19 +25,28 @@ var eventproxy = require('eventproxy');
 var urllib = require('urllib');
 var utility = require('utility');
 var nfs = require('../common/nfs');
-var npm = require('../proxy/npm');
-var common = require('./common');
-var Module = require('../proxy/module');
-var Log = require('../proxy/module_log');
+var npm = require('./npm');
+var common = require('../lib/common');
+var Module = require('./module');
+var Log = require('./module_log');
 var ms = require('ms');
 
 function SyncModuleWorker(options) {
   EventEmitter.call(this);
   this._logId = options.logId;
   this.startName = options.name;
-  this.names = [options.name];
+  if (!Array.isArray(options.name)) {
+    options.name = [options.name];
+  }
+
+  this.names = options.name;
   this.username = options.username;
   this.nameMap = {};
+  this.names.forEach(function (name) {
+    this.nameMap[name] = true;
+  }.bind(this));
+  this.noDep = options.noDep; //do not sync dependences
+
   this.successes = [];
   this.fails = [];
 }
@@ -56,7 +66,7 @@ SyncModuleWorker.prototype.finish = function () {
 SyncModuleWorker.prototype.log = function (format, arg1, arg2) {
   var str = '[' + utility.YYYYMMDDHHmmss() + '] ' + util.format.apply(util, arguments);
   debug(str);
-  Log.append(this._logId, str, utility.noop);
+  this._logId && Log.append(this._logId, str, utility.noop);
 };
 
 SyncModuleWorker.prototype.start = function () {
@@ -299,13 +309,14 @@ SyncModuleWorker.prototype._syncOneVersion = function (versionIndex, sourcePacka
 
   that.log('    [%s:%d] syncing, version: %s, dist: %j',
     sourcePackage.name, versionIndex, sourcePackage.version, sourcePackage.dist);
+  if (!that.noDep) {
+    for (var k in sourcePackage.dependencies) {
+      that.add(k);
+    }
 
-  for (var k in sourcePackage.dependencies) {
-    that.add(k);
-  }
-
-  for (var k in sourcePackage.devDependencies) {
-    that.add(k);
+    for (var k in sourcePackage.devDependencies) {
+      that.add(k);
+    }
   }
 
   var shasum = crypto.createHash('sha1');
