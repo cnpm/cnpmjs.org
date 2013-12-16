@@ -48,11 +48,13 @@
     <tbody>
       <tr>
         <td><span id="need-sync"></span> packages need to be sync</td>
-        <td><span id="success-sync"></span> packages and dependencies sync successed</td>
+        <td class="syncing"><span id="left-sync"></span> packages and dependencies waiting for sync</td>
+        <td><span id="percent-sync"></span>% progress</td>
       </tr>
       <tr>
+        <td><span id="success-sync"></span> packages and dependencies sync successed</td>
         <td><span id="fail-sync"></span> packages and dependencies sync failed</td>
-        <td style="display: none;" class="syncing"><span id="left-sync"></span> packages and dependencies waiting for sync</td>
+        <td>last success: <span id="last-success-name"></span></td>
       </tr>
     </tbody>
   </table>
@@ -96,12 +98,18 @@ $(function () {
       $('#last-sync-time').html(new Date(data.last_exist_sync_time));
       $('.sync').show();
     }
-    data.sync_status && $('.syncing').show();
 
     $('#need-sync').html(data.need_sync_num);
     $('#success-sync').html(data.success_sync_num);
     $('#fail-sync').html(data.fail_sync_num);
     $('#left-sync').html(data.left_sync_num);
+    $('#percent-sync').html(Math.floor(data.success_sync_num / data.need_sync_num * 100));
+    $('#last-success-name').html('<a target="_blank" href="/package/' + data.last_sync_module + '">' +
+      data.last_sync_module + '</a>');
+
+    if (!data.sync_status) {
+      $('.syncing').html('');
+    }
   });
 });
 </script>

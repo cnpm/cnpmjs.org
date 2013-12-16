@@ -29,7 +29,12 @@ describe('sync/sync_all.js', function () {
       sync(function (err, data) {
         should.not.exist(err);
         data.successes.should.eql(['cnpmjs.org', 'cutter']);
-        done();
+        mm.restore();
+        Total.getTotalInfo(function (err, result) {
+          should.not.exist(err);
+          result.last_sync_module.should.equal('cutter');
+          done();
+        });
       });
     });
 
@@ -44,7 +49,7 @@ describe('sync/sync_all.js', function () {
         should.not.exist(err);
         data.successes.should.eql(['cnpmjs.org', 'cutter']);
         done();
-      });      
+      });
     });
   });
 });

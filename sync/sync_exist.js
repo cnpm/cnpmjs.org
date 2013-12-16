@@ -57,7 +57,17 @@ module.exports = function sync(callback) {
     }
     if (!info.last_exist_sync_time) {
       debug('First time sync all packages from official registry');
-      return Npm.getShort(ep.done('allPackages'));
+      return Npm.getShort(ep.done(function (pkgs) {
+        if (!info.last_sync_module) {
+          return ep.emit('allPackages', pkgs);
+        }
+        // start from last success
+        var lastIndex = pkgs.indexOf(info.last_sync_module);
+        if (lastIndex > 0) {
+          pkgs = pkgs.slice(lastIndex);
+        }
+        ep.emit('allPackages', pkgs);
+      }));
     }
     Npm.getAllSince(info.last_exist_sync_time, ep.done(function (data) {
       if (!data) {
@@ -85,7 +95,7 @@ module.exports = function sync(callback) {
     }).start();
     worker.start();
     worker.once('end', function () {
-      debug('All packages sync done, successes %d, fails %d', 
+      debug('All packages sync done, successes %d, fails %d',
         worker.successes.length, worker.fails.length);
       Total.setLastExistSyncTime(syncTime, utility.noop);
       callback(null, {

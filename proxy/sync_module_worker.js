@@ -111,6 +111,7 @@ SyncModuleWorker.prototype.next = function () {
       that.log('[%s] synced success, %d versions: %s',
         name, versions.length, versions.join(', '));
       that.successes.push(name);
+      that.emit('success', name);
       that.next();
     });
   });
