@@ -32,18 +32,23 @@ case 'exist':
   break;
 }
 
+// the same time only sync once
+var syncing = false;
+
 if (sync) {
   var timer = setInterval(function () {
     var now = new Date();
     var hour = now.getHours();
     // start sync at 2 a.m every day
-    if (hour === 2) {
+    if (hour === 2 && !syncing) {
+      syncing = true;
       sync(function (err, data) {
         if (config.debug) {
           console.log(err, data);
         } else {
           sendMailToAdmin(err, data, now);
         }
+        syncing = false;
       });
     }
   }, ms('1h'));

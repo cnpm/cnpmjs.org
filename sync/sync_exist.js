@@ -51,6 +51,9 @@ module.exports = function sync(callback) {
   Total.getTotalInfo(ep.doneLater('totalInfo'));
 
   ep.once('totalInfo', function (info) {
+    if (!info) {
+      return callback(new Error('can not found total info'));
+    }
     if (!info.last_exist_sync_time) {
       debug('First time sync all packages from official registry');
       return Npm.getShort(ep.done('allPackages'));

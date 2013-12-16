@@ -81,7 +81,7 @@ exports.plusDeleteModule = function (callback) {
 };
 
 exports.getTotalInfo = function (callback) {
-  mysql.query(TOTAL_INFO_SQL, callback);
+  mysql.queryOne(TOTAL_INFO_SQL, callback);
 };
 
 var SET_LAST_SYNC_TIME_SQL = 'UPDATE total SET last_sync_time=? WHERE name="total";';

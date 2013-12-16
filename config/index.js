@@ -75,9 +75,9 @@ var config = {
   enablePrivate: true, // enable private mode, only admin can publish, other use just can sync package from source npm
   admins: {
     admin: 'admin@cnpmjs.org',
-    // fengmk2: 'fengmk2@gmail.com',
+    fengmk2: 'fengmk2@gmail.com',
     dead_horse: 'dead_horse@qq.com',
-    // cnpmjstest10: 'cnpmjstest10@cnpmjs.org',
+    cnpmjstest10: 'cnpmjstest10@cnpmjs.org',
   },
   syncByInstall: true,
   backupFilePrefix: '/cnpm/backup/', // backup filepath prefix
