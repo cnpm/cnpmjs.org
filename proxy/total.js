@@ -59,12 +59,12 @@ exports.get = function (callback) {
       user_count: uc.count,
       store_engine: 'mysql',
       sync_status: info.sync_status,
-      need_sync_num: info.need_sync_num,
-      success_sync_num: info.success_sync_num,
-      fail_sync_num: info.fail_sync_num,
-      left_sync_num: info.left_sync_num,
-      last_sync_time: info.last_sync_time,
-      last_exist_sync_time: info.last_exist_sync_time
+      need_sync_num: info.need_sync_num || 0,
+      success_sync_num: info.success_sync_num || 0,
+      fail_sync_num: info.fail_sync_num || 0,
+      left_sync_num: info.left_sync_num || 0,
+      last_sync_time: info.last_sync_time || 0,
+      last_exist_sync_time: info.last_exist_sync_time || 0
     };
 
     for (var i = 0; i < sizes.length; i++) {

@@ -89,11 +89,11 @@ $(function () {
 
     if (data.sync_model === 'all') {
       $('#sync-model').html('This registry will sync all packages from official registry.');
-      $('#last-sync-time').html(data.last_sync_time);
+      $('#last-sync-time').html(new Date(data.last_sync_time));
       $('.sync').show();
     } else if (data.sync_model === 'exist') {
       $('#sync-model').html('This registry will only update exist packages from official registry.');
-      $('#last-sync-time').html(data.last_exist_sync_time);
+      $('#last-sync-time').html(new Date(data.last_exist_sync_time));
       $('.sync').show();
     }
     data.sync_status && $('.syncing').show();

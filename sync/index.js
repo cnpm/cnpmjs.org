@@ -33,6 +33,9 @@ case 'exist':
   break;
 }
 
+//set sync_status = 0 at first
+Total.updateSyncStatus(0, utility.noop);
+
 if (sync) {
   handleSync();
   var timer = setInterval(handleSync, ms('1h'));
@@ -55,8 +58,6 @@ function handleSync() {
       }
       syncing = false;
     });
-  } else {
-    Total.updateSyncStatus(0, utility.noop);
   }
 }
 

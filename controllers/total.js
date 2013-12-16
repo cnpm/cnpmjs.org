@@ -21,7 +21,6 @@ var Total = require('../proxy/total');
 var down = require('./download');
 var version = require('../package.json').version;
 var config = require('../config');
-var moment = require('moment');
 
 var startTime = '' + microtime.now();
 
@@ -39,8 +38,8 @@ exports.show = function (req, res, next) {
     total.app_version = version;
     total.donate = 'https://me.alipay.com/imk2';
     total.sync_model = config.syncModel;
-    total.last_sync_time = moment(total.last_sync_time).format('YYYYMMDD HH:mm:ss');
-    total.last_exist_sync_time = moment(total.last_exist_sync_time).format('YYYY-MM-DD HH:mm:ss');
+    total.last_sync_time = total.last_sync_time;
+    total.last_exist_sync_time = total.last_exist_sync_time;
     res.json(total);
   });
 };
