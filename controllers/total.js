@@ -38,6 +38,9 @@ exports.show = function (req, res, next) {
     total.app_version = version;
     total.donate = 'https://me.alipay.com/imk2';
     total.sync_model = config.syncModel;
+    if (req.query.callback) {
+      return res.jsonp(total, req.query.callback);
+    }
     res.json(total);
   });
 };

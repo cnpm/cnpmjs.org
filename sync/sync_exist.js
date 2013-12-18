@@ -29,12 +29,12 @@ function intersection(arrOne, arrTwo) {
   arrTwo = arrTwo || [];
   var map = {};
   var results = [];
-  for (var i = 0; i < arrOne.length; i++) {
-    map[arrOne[i]] = true;
-  }
-  for (var j = 0; j < arrTwo.length; j++) {
-    map[arrTwo[j]] && results.push(arrTwo[j]);
-  }
+  arrOne.map(function (name) {
+    map[name] = true;
+  });
+  arrTwo.map(function (name) {
+    map[name] && results.push(name);
+  });
   return results;
 }
 

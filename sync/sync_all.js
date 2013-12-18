@@ -22,6 +22,84 @@ var SyncModuleWorker = require('../proxy/sync_module_worker');
 var debug = require('debug')('cnpmjs.org:sync:sync_all');
 var utility = require('utility');
 var Status = require('./status');
+var Module = require('../proxy/module');
+
+function subtract(subtracter, minuend) {
+  subtracter = subtracter || [];
+  minuend = minuend || [];
+  var map = {};
+  var results = [];
+  minuend.map(function (name) {
+    map[name] = true;
+  });
+  subtracter.map(function (name) {
+    !map[name] && results.push(name);
+  });
+  return results;
+}
+
+function union(arrOne, arrTwo) {
+  arrOne = arrOne || [];
+  arrTwo = arrTwo || [];
+  var map = {};
+  arrOne.concat(arrTwo).map(function (name) {
+    map[name] = true;
+  });
+  return Object.keys(map);
+}
+
+/**
+ * when sync from official at the first time
+ * get all packages by short and restart from last synced module
+ * @param {String} lastSyncModule 
+ * @param {Function} callback
+ */
+function getFirstSyncPackages(lastSyncModule, callback) {
+  Npm.getShort(function (err, pkgs) {
+    if (err || !lastSyncModule) {
+      return callback(err, pkgs);
+    }
+    // start from last success
+    var lastIndex = pkgs.indexOf(lastSyncModule);
+    if (lastIndex > 0) {
+      pkgs = pkgs.slice(lastIndex);
+    }
+    return callback(null, pkgs);
+  });
+}
+
+/**
+ * when is not sync from official at the first time,
+ * get all the missing packages and all the newest packages
+ * @param {Number} lastSyncTime 
+ * @param {Function} callback 
+ */
+function getCommonSyncPackages(lastSyncTime, callback) {
+  var ep = eventproxy.create();
+  ep.fail(callback);
+  Npm.getShort(ep.doneLater('allPackages'));
+  var updated;
+  Module.listShort(ep.doneLater(function (rows) {
+    var existPackages = rows.map(function (row) {
+      return row.name;
+    });
+    ep.emit('existPackages', existPackages);
+  }));
+  ep.all('allPackages', 'existPackages', function (allPackages, existPackages) {
+    ep.emit('missPackages', subtract(allPackages, existPackages));
+  });
+  Npm.getAllSince(lastSyncTime, ep.done(function (data) {
+    if (!data) {
+      return ep.emit('newestPackages', []);
+    }
+    delete data._updated;
+    return ep.emit('newestPackages', Object.keys(data));
+  }));
+
+  ep.all('missPackages', 'newestPackages', function (missPackages, newestPackages) {
+    callback(null, union(missPackages, newestPackages));
+  });
+}
 
 module.exports = function sync(callback) {
   var ep = eventproxy.create();
@@ -37,32 +115,12 @@ module.exports = function sync(callback) {
     // TODO: 记录上次同步的最后一个模块名称
     if (!info.last_sync_time) {
       debug('First time sync all packages from official registry');
-      return Npm.getShort(ep.done(function (pkgs) {
-        if (!info.last_sync_module) {
-          return ep.emit('allPackages', pkgs);
-        }
-        // start from last success
-        var lastIndex = pkgs.indexOf(info.last_sync_module);
-        if (lastIndex > 0) {
-          pkgs = pkgs.slice(lastIndex);
-        }
-        ep.emit('allPackages', pkgs);
-      }));
+      return getFirstSyncPackages(info.last_sync_module, ep.done('syncPackages'));
     }
-    Npm.getAllSince(info.last_sync_time, ep.done(function (data) {
-      if (!data) {
-        return ep.emit('allPackages', []);
-      }
-      if (data._updated) {
-        syncTime = data._updated;
-        delete data._updated;
-      }
-
-      return ep.emit('allPackages', Object.keys(data));
-    }));
+    getCommonSyncPackages(info.last_sync_time, ep.done('syncPackages'));
   });
 
-  ep.once('allPackages', function (packages) {
+  ep.once('syncPackages', function (packages) {
     packages = packages || [];
     debug('Total %d packages to sync', packages.length);
     var worker = new SyncModuleWorker({
