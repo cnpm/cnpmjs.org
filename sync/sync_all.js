@@ -70,16 +70,28 @@ function getFirstSyncPackages(lastSyncModule, callback) {
 }
 
 /**
- * when is not sync from official at the first time,
- * get all the missing packages and all the newest packages
+ * get all the packages that update time > lastSyncTime
  * @param {Number} lastSyncTime 
  * @param {Function} callback 
  */
 function getCommonSyncPackages(lastSyncTime, callback) {
+  Npm.getAllSince(lastSyncTime, function (err, data) {
+    if (err || !data) {
+      return callback(err, []);
+    }
+    delete data._updated;
+    return callback(null, Object.keys(data));
+  });
+}
+
+/**
+ * get all the missing packages
+ * @param {Function} callback
+ */
+function getMissPackages(callback) {
   var ep = eventproxy.create();
   ep.fail(callback);
   Npm.getShort(ep.doneLater('allPackages'));
-  var updated;
   Module.listShort(ep.doneLater(function (rows) {
     var existPackages = rows.map(function (row) {
       return row.name;
@@ -87,21 +99,12 @@ function getCommonSyncPackages(lastSyncTime, callback) {
     ep.emit('existPackages', existPackages);
   }));
   ep.all('allPackages', 'existPackages', function (allPackages, existPackages) {
-    ep.emit('missPackages', subtract(allPackages, existPackages));
-  });
-  Npm.getAllSince(lastSyncTime, ep.done(function (data) {
-    if (!data) {
-      return ep.emit('newestPackages', []);
-    }
-    delete data._updated;
-    return ep.emit('newestPackages', Object.keys(data));
-  }));
-
-  ep.all('missPackages', 'newestPackages', function (missPackages, newestPackages) {
-    callback(null, union(missPackages, newestPackages));
+    callback(null, subtract(allPackages, existPackages));
   });
 }
 
+//only sync not exist once
+var syncNotExist = true;
 module.exports = function sync(callback) {
   var ep = eventproxy.create();
   ep.fail(callback);
@@ -118,7 +121,16 @@ module.exports = function sync(callback) {
       debug('First time sync all packages from official registry');
       return getFirstSyncPackages(info.last_sync_module, ep.done('syncPackages'));
     }
-    getCommonSyncPackages(info.last_sync_time - ms('10m'), ep.done('syncPackages'));
+    if (syncNotExist) {
+      getMissPackages(ep.done('missPackages'));
+      syncNotExist = false;
+    } else {
+      ep.emitLater('missPackages', []);
+    }
+    getCommonSyncPackages(info.last_sync_time - ms('10m'), ep.doneLater('newestPackages'));
+    ep.all('missPackages', 'newestPackages', function (missPackages, newestPackages) {
+      ep.emit('syncPackages', union(missPackages, newestPackages));
+    });
   });
 
   ep.once('syncPackages', function (packages) {
@@ -138,7 +150,8 @@ module.exports = function sync(callback) {
     worker.once('end', function () {
       debug('All packages sync done, successes %d, fails %d',
         worker.successes.length, worker.fails.length);
-      Total.setLastSyncTime(syncTime, utility.noop);
+      //only when all succss, set last sync time
+      !worker.fails.length && Total.setLastSyncTime(syncTime, utility.noop);
       callback(null, {
         successes: worker.successes,
         fails: worker.fails
