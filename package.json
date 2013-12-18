@@ -29,7 +29,7 @@
     "connect-rt": "0.0.2",
     "connect-redis": "1.4.6",
     "connect-render": "0.3.2",
-    "urlrouter": "0.5.3",
+    "urlrouter": "0.5.4",
     "graceful": "0.0.5",
     "moment": "2.4.0",
     "logfilestream": "0.1.0",
@@ -41,7 +41,7 @@
     "bagpipe": "0.3.5",
     "semver": "2.2.1",
     "marked": "0.2.10",
-    "nodemailer": "0.5.14",
+    "nodemailer": "0.5.15",
     "eventproxy": "0.2.6"
   },
   "devDependencies": {

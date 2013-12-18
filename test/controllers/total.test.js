@@ -44,6 +44,12 @@ describe('controllers/total.test.js', function () {
         done();
       });
     });
+    it('should return total info by jsonp', function (done) {
+      request(registryApp)
+      .get('?callback=totalCallback')
+      .expect(200)
+      .expect(/totalCallback\({.*}\)/, done);
+    });
   });
   describe('GET /total in web', function () {
     it('should return total info', function (done) {

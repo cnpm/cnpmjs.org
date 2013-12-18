@@ -18,6 +18,7 @@ var mm = require('mm');
 var Npm = require('../../proxy/npm');
 var Total = require('../../proxy/total');
 var should = require('should');
+var Module = require('../../proxy/module');
 
 describe('sync/sync_all.js', function () {
   describe('sync()', function () {
@@ -44,10 +45,12 @@ describe('sync/sync_all.js', function () {
         'cnpmjs.org': {},
         cutter: {}
       });
+      mm.data(Npm, 'getShort', ['cnpmjs.org', 'cutter', 'cnpm']);
       mm.data(Total, 'getTotalInfo', {last_sync_time: Date.now()});
+      mm.data(Module, 'listShort', [{name: 'cnpmjs.org'}, {name: 'cutter'}]);
       sync(function (err, data) {
         should.not.exist(err);
-        data.successes.should.eql(['cnpmjs.org', 'cutter']);
+        data.successes.should.eql(['cnpm', 'cnpmjs.org', 'cutter']);
         done();
       });
     });
