@@ -23,16 +23,17 @@ var debug = require('debug')('cnpmjs.org:sync:sync_all');
 var utility = require('utility');
 var Status = require('./status');
 var Module = require('../proxy/module');
+var ms = require('ms');
 
 function subtract(subtracter, minuend) {
   subtracter = subtracter || [];
   minuend = minuend || [];
   var map = {};
   var results = [];
-  minuend.map(function (name) {
+  minuend.forEach(function (name) {
     map[name] = true;
   });
-  subtracter.map(function (name) {
+  subtracter.forEach(function (name) {
     !map[name] && results.push(name);
   });
   return results;
@@ -42,7 +43,7 @@ function union(arrOne, arrTwo) {
   arrOne = arrOne || [];
   arrTwo = arrTwo || [];
   var map = {};
-  arrOne.concat(arrTwo).map(function (name) {
+  arrOne.concat(arrTwo).forEach(function (name) {
     map[name] = true;
   });
   return Object.keys(map);
@@ -117,7 +118,7 @@ module.exports = function sync(callback) {
       debug('First time sync all packages from official registry');
       return getFirstSyncPackages(info.last_sync_module, ep.done('syncPackages'));
     }
-    getCommonSyncPackages(info.last_sync_time, ep.done('syncPackages'));
+    getCommonSyncPackages(info.last_sync_time - ms('10m'), ep.done('syncPackages'));
   });
 
   ep.once('syncPackages', function (packages) {

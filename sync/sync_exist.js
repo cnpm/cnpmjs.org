@@ -23,16 +23,17 @@ var SyncModuleWorker = require('../proxy/sync_module_worker');
 var debug = require('debug')('cnpmjs.org:sync:sync_hot');
 var utility = require('utility');
 var Status = require('./status');
+var ms = require('ms');
 
 function intersection(arrOne, arrTwo) {
   arrOne = arrOne || [];
   arrTwo = arrTwo || [];
   var map = {};
   var results = [];
-  arrOne.map(function (name) {
+  arrOne.forEach(function (name) {
     map[name] = true;
   });
-  arrTwo.map(function (name) {
+  arrTwo.forEach(function (name) {
     map[name] && results.push(name);
   });
   return results;
@@ -69,7 +70,7 @@ module.exports = function sync(callback) {
         ep.emit('allPackages', pkgs);
       }));
     }
-    Npm.getAllSince(info.last_exist_sync_time, ep.done(function (data) {
+    Npm.getAllSince(info.last_exist_sync_time - ms('10m'), ep.done(function (data) {
       if (!data) {
         return ep.emit('allPackages', []);
       }
