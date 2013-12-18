@@ -273,9 +273,26 @@ exports.listByAuthor = function (author, callback) {
   });
 };
 
-var SEARCH_SQL = 'SELECT name, description FROM module WHERE id IN\
-  (SELECT module_id FROM tag WHERE name LIKE ? AND  tag="latest")\
-  ORDER BY name LIMIT 20';
+var LIST_BY_NAME_FROM_TAG_SQL = 'SELECT module_id FROM tag\
+  WHERE name LIKE ? AND  tag="latest" ORDER BY name LIMIT 20;';
+var LIST_DETAIL_FROM_MODULE_SQL = 'SELECT name, description FROM module\
+  WHERE id IN (?) ORDER BY name;';
 exports.search = function (word, callback) {
-  mysql.query(SEARCH_SQL, [word + '%'], callback);
+  word = word.replace(/^%/, '') + '%'; //ignore prefix %
+  var ep = eventproxy.create();
+  ep.fail(callback);
+  mysql.query(LIST_BY_NAME_FROM_TAG_SQL, [word], ep.done(function (rows) {
+    if (!rows || !rows.length) {
+      return callback(null, []);
+    }
+    ep.emit('ids', rows.map(function (r) {
+      return r.module_id;
+    }));
+  }));
+
+  ep.on('ids', function (ids) {
+    mysql.query(LIST_DETAIL_FROM_MODULE_SQL, [ids], ep.done(function (modules) {
+      callback(null, modules);
+    }));
+  });
 };
