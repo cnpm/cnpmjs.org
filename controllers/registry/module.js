@@ -570,9 +570,9 @@ exports.removeAll = function (req, res, next) {
   });
 };
 
-function parseModsForList(mods, req) {
+function parseModsForList(updated, mods, req) {
   var results = {
-    _updated: Date.now()
+    _updated: updated
   };
 
   for (var i = 0; i < mods.length; i++) {
@@ -594,11 +594,12 @@ function parseModsForList(mods, req) {
 }
 
 exports.listAllModules = function (req, res, next) {
-  Module.listSince(new Date(0), function (err, mods) {
+  var updated = Date.now();
+  Module.listSince(0, function (err, mods) {
     if (err) {
       return next(err);
     }
-    return res.json(parseModsForList(mods, req));
+    return res.json(parseModsForList(updated, mods, req));
   });
 };
 
@@ -612,11 +613,12 @@ exports.listAllModulesSince = function (req, res, next) {
   }
   debug('list all modules from %s', req.startkey);
   var startkey = Number(query.startkey) || 0;
-  Module.listSince(new Date(startkey), function (err, mods) {
+  var updated = Date.now();
+  Module.listSince(startkey, function (err, mods) {
     if (err) {
       return next(err);
     }
-    res.json(parseModsForList(mods, req));
+    res.json(parseModsForList(updated, mods, req));
   });
 };
 

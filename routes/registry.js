@@ -28,10 +28,10 @@ function routes(app) {
 
   //before /:name/:version
   //get all modules, for npm search
-  // app.get('/-/all', mod.listAllModules);
-  // app.get('/-/all/since', mod.listAllModulesSince);
+  app.get('/-/all', mod.listAllModules);
+  app.get('/-/all/since', mod.listAllModulesSince);
   //get all module names, for auto completion
-  // app.get('/-/short', mod.listAllModuleNames);
+  app.get('/-/short', mod.listAllModuleNames);
 
   // module
   app.get('/:name', [syncByInstall], mod.show);

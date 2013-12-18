@@ -348,7 +348,7 @@ describe('controllers/registry/module.test.js', function () {
     });
   });
 
-  describe.skip('GET /-/all', function () {
+  describe('GET /-/all', function () {
     it('should get 200', function (done) {
       request(app)
       .get('/-/all')
@@ -361,7 +361,7 @@ describe('controllers/registry/module.test.js', function () {
     });
   });
 
-  describe.skip('GET /-/all/since', function () {
+  describe('GET /-/all/since', function () {
     it('should get 200', function (done) {
       request(app)
       .get('/-/all/since?stale=update_after&startkey=0')
@@ -389,7 +389,7 @@ describe('controllers/registry/module.test.js', function () {
     });
   });
 
-  describe.skip('GET /-/short', function () {
+  describe('GET /-/short', function () {
     it('should get 200', function (done) {
       request(app)
       .get('/-/short')
