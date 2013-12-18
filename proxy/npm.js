@@ -25,11 +25,9 @@ function request(url, options, callback) {
       timeout: 10000
     };
   }
-  options = options || {
-    dataType: 'json',
-    timeout: 10000
-  };
-  url = config.sourceNpmRegistry + url;  
+  options.dataType = options.dataType || 'json';
+  options.timeout = options.timeout || 120000;
+  url = config.sourceNpmRegistry + url;
   urllib.request(url, options, callback);
 }
 

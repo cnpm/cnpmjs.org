@@ -21,6 +21,7 @@ var util = require('util');
 var utility = require('utility');
 var debug = require('debug')('cnpmjs.org:sync:index');
 var Total = require('../proxy/total');
+var logger = require('../common/logger');
 
 var sync;
 
@@ -76,7 +77,7 @@ function sendMailToAdmin(err, result, syncTime) {
     subject = 'Sync Error';
     type = 'error';
     html = util.format('Sync packages from official registry failed.\n' +
-      'Start sync time is %s.\nError message is %s.', syncTime, err.message);
+      'Start sync time is %s.\nError message is %s.', syncTime, err.stack);
   } else if (result.fails && result.fails.length) {
     subject = 'Sync Finished But Some Packages Failed';
     type = 'warn';
@@ -92,5 +93,12 @@ function sendMailToAdmin(err, result, syncTime) {
       syncTime, result.successes.length, result.successes.slice(0, 10));
   }
   debug('send email with type: %s, subject: %s, html: %s', type, subject, html);
-  mail[type](to, subject, html, utility.noop);
+  if (type !== 'log') {
+    mail[type](to, subject, html, function (err) {
+      if (err) {
+        logger.info('send email with type: %s, subject: %s, html: %s', type, subject, html);
+        logger.error(err);
+      }
+    });
+  }
 }
