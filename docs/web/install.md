@@ -46,10 +46,12 @@ module.exports = {
     bucket: "foobucket",
     domain: "http://foobucket.u.qiniudn.com"
   },
+  nfs: null, // you can set a nfs to replace qiniu cdn
   enablePrivate: true, // enable private mode, only admin can publish, other use just can sync package from source npm
   admins: {
-    admin: true,
+    admin: 'admin@cnpmjs.org',
   },
+  syncModel: 'exist', //`all` sync all packages, `exist` only update  exist packages, `none` do nothing
 };
 ```
 
@@ -61,6 +63,9 @@ $ mysql -u yourname -p
 mysql> use cnpmjs;
 mysql> source docs/db.sql
 ```
+
+## Use your own CDN
+If you wan to use your own CDN instead of qiniu. Just look at `common/qnfs.js` and implement the interface like it, then pass it by set `config.nfs`.
 
 ## npm install
 

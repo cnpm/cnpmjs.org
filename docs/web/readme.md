@@ -119,11 +119,14 @@ $(function () {
 alias it:
 
 ```bash
-alias cnpm="npm --registry=http://registry.cnpmjs.org --cache=$HOME/.npm/.cache/cnpm"
+alias cnpm="npm --registry=http://registry.cnpmjs.org \
+--cache=$HOME/.npm/.cache/cnpm \
+--userconfig=$HOME/.cnpmrc"
 
 #Or alias it in .bashrc or .zshrc
 $ echo '\n#alias for cnpm\nalias cnpm="npm --registry=http://registry.cnpmjs.org \
-  --cache=$HOME/.npm/.cache/cnpm"' >> ~/.zshrc && source ~/.zshrc
+  --cache=$HOME/.npm/.cache/cnpm \
+  --userconfig=$HOME/.cnpmrc"' >> ~/.zshrc && source ~/.zshrc
 ```
 
 Or you can just use our `cnpm` cli:
