@@ -47,7 +47,7 @@ describe('sync/sync_all.js', function () {
       });
       mm.data(Npm, 'getShort', ['cnpmjs.org', 'cutter', 'cnpm']);
       mm.data(Total, 'getTotalInfo', {last_sync_time: Date.now()});
-      mm.data(Module, 'listShort', [{name: 'cnpmjs.org'}, {name: 'cutter'}]);
+      mm.data(Module, 'listAllModuleNames', [{name: 'cnpmjs.org'}, {name: 'cutter'}]);
       sync(function (err, data) {
         should.not.exist(err);
         data.successes.should.eql(['cnpm', 'cnpmjs.org', 'cutter']);
