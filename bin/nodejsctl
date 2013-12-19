@@ -77,6 +77,7 @@ status()
   else
     echo "$PROJECT_NAME is not running"
   fi
+  exit 0;
 }
 
 case "$ACTION" in
