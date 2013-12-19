@@ -5,10 +5,9 @@
   "main": "dispatch.js",
   "scripts": {
     "test": "make test-all",
-    "start": "./bin/nodejsctl start && npm run status",
+    "start": "./bin/nodejsctl start",
     "status": "./bin/nodejsctl status",
-    "stop": "./bin/nodejsctl stop && npm run status",
-    "restart": "./bin/nodejsctl restart && npm run status",
+    "stop": "./bin/nodejsctl stop",
     "blanket": {
       "pattern": "//^((?!(node_modules|test|common)).)*$/",
       "data-cover-flags": {
