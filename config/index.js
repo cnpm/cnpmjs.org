@@ -68,7 +68,7 @@ var config = {
     user: 'address@gmail.com',
     pass: 'your password',
     ssl: true,
-    debug: true
+    debug: false 
   },
 
   sourceNpmRegistry: 'http://registry.npmjs.org',
