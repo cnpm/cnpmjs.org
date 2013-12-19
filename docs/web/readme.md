@@ -1,6 +1,6 @@
 # cnpmjs.org: Private npm registry and web for Enterprise
 
-[![Build Status](https://secure.travis-ci.org/fengmk2/cnpmjs.org.png)](http://travis-ci.org/fengmk2/cnpmjs.org) [![Coverage Status](https://coveralls.io/repos/fengmk2/cnpmjs.org/badge.png)](https://coveralls.io/r/fengmk2/cnpmjs.org)[![Dependency Status](https://gemnasium.com/fengmk2/cnpmjs.org.png)](https://gemnasium.com/fengmk2/cnpmjs.org)
+[![Build Status](https://secure.travis-ci.org/fengmk2/cnpmjs.org.png)](http://travis-ci.org/fengmk2/cnpmjs.org) [![Coverage Status](https://coveralls.io/repos/fengmk2/cnpmjs.org/badge.png)](https://coveralls.io/r/fengmk2/cnpmjs.org) [![Dependency Status](https://gemnasium.com/fengmk2/cnpmjs.org.png)](https://gemnasium.com/fengmk2/cnpmjs.org)
 
 [![NPM](https://nodei.co/npm/cnpmjs.org.png?downloads=true&stars=true)](https://nodei.co/npm/cnpmjs.org/)
 
@@ -135,9 +135,17 @@ Or you can just use our `cnpm` cli:
 $ npm install cnpm -g
 ```
 
+### install  
+
+Install package from [registry.cnpmjs.org](http://registry.cnpmjs.org). When isntall a  package or version not exist, it will try to install from official registry([registry.npmjs.org](http://registry.npmjs.org)), and sync this package to cnpm in the backend.
+
+```
+$ cnpm install [name]
+```
+
 ### sync
 
-Only `cnpm` cli has this command:
+Only `cnpm` cli has this command. Meaning sync package from source npm.
 
 ```bash
 $ cnpm sync connect
@@ -149,15 +157,17 @@ sync package on web: [cnpmjs.org/sync/connect](http://cnpmjs.org/sync/connect)
 $ open http://cnpmjs.org/sync/connect
 ```
 
-### publish
+### publish / unpublish
 
-Meaning sync package from source npm.
-
-Only `admin` user can publish package to private registry.
+Only `admin` user can publish / unpublish package to private registry.
 
 ```bash
 $ cnpm publish [name]
+$ cnpm unpublish [name]
 ```
+
+### Orther command  
+Support all the other npm command.
 
 ## TODO list
 
