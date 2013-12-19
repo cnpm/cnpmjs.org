@@ -226,15 +226,40 @@ exports.listByName = function (name, callback) {
   });
 };
 
-var LIST_SINCE_SQL = 'SELECT name, package FROM module WHERE id IN\
-                      (SELECT module_id FROM tag WHERE tag="latest" AND name IN\
-                      (SELECT distinct(name) FROM module WHERE gmt_modified > ?))\
-                      ORDER BY name';
+var LIST_SINCE_SQLS = [
+  'SELECT distinct(name) AS name FROM module WHERE publish_time > ?;',
+  'SELECT module_id FROM tag WHERE tag="latest" AND name IN (?);',
+  'SELECT name, package FROM module WHERE id IN (?);'
+];
 exports.listSince = function (start, callback) {
-  mysql.query(LIST_SINCE_SQL, [start], callback);
+  var ep = eventproxy.create();
+  ep.fail(callback);
+  mysql.query(LIST_SINCE_SQLS[0], [start], ep.done(function (rows) {
+    if (!rows || rows.length === 0) {
+      return callback(null, []);
+    }
+    ep.emit('names', rows.map(function (r) {
+      return r.name;
+    }));
+  }));
+
+  ep.once('names', function (names) {
+    mysql.query(LIST_SINCE_SQLS[1], [names], ep.done(function (rows) {
+      if (!rows || rows.length === 0) {
+        return callback(null, []);
+      }      
+      ep.emit('ids', rows.map(function (r) {
+        return r.module_id;
+      }));
+    }));
+  });
+
+  ep.once('ids', function (ids) {
+    mysql.query(LIST_SINCE_SQLS[2], [ids], callback);
+  });
 };
 
-var LIST_SHORT_SQL = 'SELECT distinct(name) FROM module ORDER BY name';
+var LIST_SHORT_SQL = 'SELECT distinct(name) FROM tag ORDER BY name';
 exports.listShort = function (callback) {
   mysql.query(LIST_SHORT_SQL, callback);
 };
@@ -249,15 +274,15 @@ exports.removeByNameAndVersions = function (name, versions, callback) {
   mysql.query(DELETE_MODULE_BY_NAME_AND_VERSIONS_SQL, [name, versions], callback);
 };
 
-var LIST_RECENTLY_NAMES_SQL = 'SELECT distinct(name) AS name FROM module WHERE author = ? ORDER BY publish_time DESC LIMIT 100;';
-var LIST_BY_NAMES_SQL = 'SELECT name, description FROM module WHERE id IN \
-  ( \
-    SELECT module_id FROM tag WHERE tag="latest" AND name IN (?) \
-  ) ORDER BY publish_time DESC;';
+var LIST_BY_AUTH_SQLS = [
+  'SELECT distinct(name) AS name FROM module WHERE author = ? ORDER BY publish_time DESC LIMIT 100;',
+  'SELECT module_id FROM tag WHERE tag="latest" AND name IN (?)',
+  'SELECT name, description FROM module WHERE id IN (?) ORDER BY publish_time DESC'
+];
 exports.listByAuthor = function (author, callback) {
   var ep = eventproxy.create();
   ep.fail(callback);
-  mysql.query(LIST_RECENTLY_NAMES_SQL, [author], ep.done(function (rows) {
+  mysql.query(LIST_BY_AUTH_SQLS[0], [author], ep.done(function (rows) {
     if (!rows || rows.length === 0) {
       return callback(null, []);
     }
@@ -266,23 +291,30 @@ exports.listByAuthor = function (author, callback) {
     }));
   }));
   ep.on('names', function (names) {
-    mysql.query(LIST_BY_NAMES_SQL, [names], ep.done('modules'));
+    mysql.query(LIST_BY_AUTH_SQLS[1], [names], ep.done(function (rows) {
+      if (!rows || rows.length === 0) {
+        return callback(null, []);
+      }      
+      ep.emit('ids', rows.map(function (r) {
+        return r.module_id;
+      }));
+    }));
   });
-  ep.on('modules', function (modules) {
-    callback(null, modules);
+  ep.on('ids', function (ids) {
+    mysql.query(LIST_BY_AUTH_SQLS[2], [ids], callback);
   });
 };
 
-var LIST_BY_NAME_FROM_TAG_SQL = 'SELECT module_id FROM tag\
-  WHERE name LIKE ? AND  tag="latest" ORDER BY name LIMIT 20;';
-var LIST_DETAIL_FROM_MODULE_SQL = 'SELECT name, description FROM module\
-  WHERE id IN (?) ORDER BY name;';
+var SEARCH_SQLS = [
+  'SELECT module_id FROM tag WHERE name LIKE ? AND  tag="latest" ORDER BY name LIMIT 100;',
+  'SELECT name, description FROM module WHERE id IN (?) ORDER BY name;'
+];
 exports.search = function (word, callback) {
   word = word.replace(/^%/, '') + '%'; //ignore prefix %
   var ep = eventproxy.create();
   ep.fail(callback);
-  mysql.query(LIST_BY_NAME_FROM_TAG_SQL, [word], ep.done(function (rows) {
-    if (!rows || !rows.length) {
+  mysql.query(SEARCH_SQLS[0], [word], ep.done(function (rows) {
+    if (!rows || rows.length === 0) {
       return callback(null, []);
     }
     ep.emit('ids', rows.map(function (r) {
@@ -291,7 +323,7 @@ exports.search = function (word, callback) {
   }));
 
   ep.on('ids', function (ids) {
-    mysql.query(LIST_DETAIL_FROM_MODULE_SQL, [ids], ep.done(function (modules) {
+    mysql.query(SEARCH_SQLS[1], [ids], ep.done(function (modules) {
       callback(null, modules);
     }));
   });
