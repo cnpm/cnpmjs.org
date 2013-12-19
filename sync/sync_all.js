@@ -92,7 +92,7 @@ function getMissPackages(callback) {
   var ep = eventproxy.create();
   ep.fail(callback);
   Npm.getShort(ep.doneLater('allPackages'));
-  Module.listShort(ep.doneLater(function (rows) {
+  Module.listAllModuleNames(ep.doneLater(function (rows) {
     var existPackages = rows.map(function (row) {
       return row.name;
     });

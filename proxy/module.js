@@ -264,6 +264,11 @@ exports.listShort = function (callback) {
   mysql.query(LIST_SHORT_SQL, callback);
 };
 
+var LIST_ALL_MODULE_NAMES_SQL = 'SELECT distinct(name) FROM module ORDER BY name';
+exports.listAllModuleNames = function (callback) {
+  mysql.query(LIST_SHORT_SQL, callback);
+};
+
 var DELETE_MODULE_BY_NAME_SQL = 'DELETE FROM module WHERE name=?;';
 exports.removeByName = function (name, callback) {
   mysql.query(DELETE_MODULE_BY_NAME_SQL, [name], callback);
