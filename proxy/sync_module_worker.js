@@ -182,9 +182,13 @@ SyncModuleWorker.prototype._sync = function (pkg, callback) {
   var missingDescriptions = [];
   ep.all('existsMap', 'existsTags', function (map, tags) {
     var times = pkg.time || {};
+    pkg.versions = pkg.versions || {};
     var versionNames = Object.keys(times);
     if (versionNames.length === 0) {
       versionNames = Object.keys(pkg.versions);
+    }
+    if (versionNames.length === 0) {
+      that.log('  [%s] no times and no versions', pkg.name);
     }
     var versions = [];
     for (var i = 0; i < versionNames.length; i++) {
