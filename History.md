@@ -1,4 +1,18 @@
 
+0.1.2 / 2013-12-19 
+==================
+
+  * fix times not exists canot sync bug. fixed #101
+  * support npm run command
+  * remove before_install and install in travis, fixed #102
+  * split all sub queries, fixed #104
+  * fix doc, fixed #103
+  * fix search too slow.
+  * dont email sync log level info
+  * only sync missing packages at first time
+  * update dependencies
+  * sync all will sync all the missing packages, fixed #97
+
 0.1.0 / 2013-12-12
 ==================
 

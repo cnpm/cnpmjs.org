@@ -169,18 +169,18 @@ $ cnpm publish [name]
 $ git summary
 
  project  : cnpmjs.org
- repo age : 9 days
- active   : 49 days
- commits  : 126
- files    : 70
+ repo age : 2 weeks
+ active   : 73 days
+ commits  : 186
+ files    : 83
  authors  :
-    73  fengmk2                 57.9%
-    53  dead_horse              42.1%
+   109  fengmk2                 58.6%
+    77  dead_horse              41.4%
 ```
 
 ## npm and cnpm relation
 
-![npm&cnpm](https://docs.google.com/drawings/d/12QeQfGalqjsB77mRnf5Iq5oSXHCIUTvZTwECMonqCmw/pub?w=960&h=720)
+![npm&cnpm](https://docs.google.com/drawings/d/12QeQfGalqjsB77mRnf5Iq5oSXHCIUTvZTwECMonqCmw/pub?w=383&h=284)
 
 ## 捐赠 Donate
 如果您觉得 [cnpmjs.org] 对您有帮助，欢迎请作者一杯咖啡.

@@ -27,6 +27,21 @@ $ npm install
 $ node dispatch.js
 ```
 
+## Authors
+
+```bash
+$ git summary
+
+ project  : cnpmjs.org
+ repo age : 2 weeks
+ active   : 73 days
+ commits  : 186
+ files    : 83
+ authors  :
+   109  fengmk2                 58.6%
+    77  dead_horse              41.4%
+```
+
 ## License
 
 (The MIT License)
