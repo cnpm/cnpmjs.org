@@ -182,15 +182,21 @@ SyncModuleWorker.prototype._sync = function (pkg, callback) {
   var missingDescriptions = [];
   ep.all('existsMap', 'existsTags', function (map, tags) {
     var times = pkg.time || {};
+    var versionNames = Object.keys(times);
+    if (versionNames.length === 0) {
+      versionNames = Object.keys(pkg.versions);
+    }
     var versions = [];
-    for (var v in times) {
+    for (var i = 0; i < versionNames.length; i++) {
+      var v = versionNames[i];
       var exists = map[v] || {};
       var version = pkg.versions[v];
       if (!version || !version.dist) {
         continue;
       }
 
-      version.publish_time = Date.parse(times[v]);
+      var publish_time = times[v];
+      version.publish_time = publish_time ? Date.parse(publish_time) : null;
       if (!version.maintainers || !version.maintainers[0]) {
         version.maintainers = pkg.maintainers;
       }
@@ -199,7 +205,9 @@ SyncModuleWorker.prototype._sync = function (pkg, callback) {
       if (exists.package && exists.package.dist.shasum === version.dist.shasum && exists.author === sourceAuthor) {
         // * author make sure equal
         // * shasum make sure equal
-        if (version.publish_time === exists.publish_time) {
+        if ((version.publish_time === exists.publish_time) || (!version.publish_time && exists.publish_time)) {
+          debug('  [%s] %s publish_time equal: %s, %s',
+            pkg.name, version.version, version.publish_time, exists.publish_time);
           // * publish_time make sure equal
           if (exists.description === null && version.description) {
             // * make sure description exists
