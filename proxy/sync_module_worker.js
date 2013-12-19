@@ -136,7 +136,9 @@ SyncModuleWorker.prototype._sync = function (pkg, callback) {
   var ep = eventproxy.create();
   ep.fail(callback);
 
+  var hasModules = false;
   Module.listByName(name, ep.done(function (rows) {
+    hasModules = rows.length > 0;
     var map = {};
     for (var i = 0; i < rows.length; i++) {
       var r = rows[i];
@@ -188,7 +190,34 @@ SyncModuleWorker.prototype._sync = function (pkg, callback) {
       versionNames = Object.keys(pkg.versions);
     }
     if (versionNames.length === 0) {
-      that.log('  [%s] no times and no versions', pkg.name);
+      that.log('  [%s] no times and no versions, hasModules: %s', pkg.name, hasModules);
+      if (!hasModules) {
+        // save a next module
+        var maintainer = pkg.maintainers && pkg.maintainers[0];
+        if (maintainer && maintainer.name) {
+          maintainer = maintainer.name;
+        }
+        if (!maintainer) {
+          maintainer = '-';
+        }
+        var nextMod = {
+          name: pkg.name,
+          version: 'next',
+          author: maintainer,
+          package: {
+            name: pkg.name,
+            version: 'next',
+            description: pkg.description || '',
+            readme: pkg.readme || '',
+            maintainers: pkg.maintainers || {
+              name: maintainer
+            },
+          },
+        };
+        Module.add(nextMod, function (err, result) {
+          that.log('  [%s] save next module, %j, error: %s', pkg.name, result, err);
+        });
+      }
     }
     var versions = [];
     for (var i = 0; i < versionNames.length; i++) {
