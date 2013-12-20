@@ -40,6 +40,11 @@ function SyncModuleWorker(options) {
   }
 
   this.names = options.name;
+  for (var i = 0; i < this.names.length; i++) {
+    // ensure package name is lower case
+    this.names[i] = this.names[i].toLowerCase();
+  }
+
   this.username = options.username;
   this.concurrency = options.concurrency || 1;
   this.syncingNames = {};

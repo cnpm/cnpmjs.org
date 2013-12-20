@@ -21,9 +21,6 @@ var mysql = require('../common/mysql');
 
 var MODULE_COLUMNS = 'id, publish_time, gmt_create, gmt_modified, author, name, version, description, package, dist_tarball, dist_shasum, dist_size';
 
-// var INSERT_MODULE_SQL = 'INSERT INTO module(gmt_create, gmt_modified, author, name, version, package, dist_tarball, dist_shasum, dist_size) \
-//   VALUES(now(), now(), ?, ?, ?, ?, ?, ?, ?);';
-
 var INSERT_MODULE_SQL = 'INSERT INTO module(gmt_create, gmt_modified, \
   publish_time, author, name, version, package, dist_tarball, dist_shasum, dist_size, description) \
   VALUES(now(), now(), ?, ?, ?, ?, ?, ?, ?, ?, ?) \
@@ -254,7 +251,7 @@ exports.listShort = function (callback) {
 
 var LIST_ALL_MODULE_NAMES_SQL = 'SELECT distinct(name) FROM module ORDER BY name';
 exports.listAllModuleNames = function (callback) {
-  mysql.query(LIST_SHORT_SQL, callback);
+  mysql.query(LIST_ALL_MODULE_NAMES_SQL, callback);
 };
 
 var DELETE_MODULE_BY_NAME_SQL = 'DELETE FROM module WHERE name=?;';
@@ -287,7 +284,7 @@ exports.listByAuthor = function (author, callback) {
     mysql.query(LIST_BY_AUTH_SQLS[1], [names], ep.done(function (rows) {
       if (!rows || rows.length === 0) {
         return callback(null, []);
-      }      
+      }
       ep.emit('ids', rows.map(function (r) {
         return r.module_id;
       }));
