@@ -166,8 +166,13 @@ $ cnpm publish [name]
 $ cnpm unpublish [name]
 ```
 
-### Orther command
-Support all the other npm command.
+### Other commands
+
+Support all the other npm commands. e.g.:
+
+```bash
+$ cnpm info cnpm
+```
 
 ## TODO list
 
