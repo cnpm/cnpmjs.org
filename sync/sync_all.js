@@ -14,16 +14,16 @@
  * Module dependencies.
  */
 
+var debug = require('debug')('cnpmjs.org:sync:sync_all');
+var eventproxy = require('eventproxy');
+var ms = require('ms');
+var utility = require('utility');
 var config = require('../config');
+var Status = require('./status');
 var Npm = require('../proxy/npm');
 var Total = require('../proxy/total');
-var eventproxy = require('eventproxy');
 var SyncModuleWorker = require('../proxy/sync_module_worker');
-var debug = require('debug')('cnpmjs.org:sync:sync_all');
-var utility = require('utility');
-var Status = require('./status');
 var Module = require('../proxy/module');
-var ms = require('ms');
 
 function subtract(subtracter, minuend) {
   subtracter = subtracter || [];
@@ -31,10 +31,14 @@ function subtract(subtracter, minuend) {
   var map = {};
   var results = [];
   minuend.forEach(function (name) {
-    map[name] = true;
+    map[name.toLowerCase()] = true;
   });
   subtracter.forEach(function (name) {
-    !map[name] && results.push(name);
+    var lowerName = name.toLowerCase();
+    if (!map[lowerName] && !/[A-Z]/.test(name)) {
+      // ensure package name is lower case
+      results.push(lowerName);
+    }
   });
   return results;
 }
@@ -52,7 +56,7 @@ function union(arrOne, arrTwo) {
 /**
  * when sync from official at the first time
  * get all packages by short and restart from last synced module
- * @param {String} lastSyncModule 
+ * @param {String} lastSyncModule
  * @param {Function} callback
  */
 function getFirstSyncPackages(lastSyncModule, callback) {
@@ -71,8 +75,8 @@ function getFirstSyncPackages(lastSyncModule, callback) {
 
 /**
  * get all the packages that update time > lastSyncTime
- * @param {Number} lastSyncTime 
- * @param {Function} callback 
+ * @param {Number} lastSyncTime
+ * @param {Function} callback
  */
 function getCommonSyncPackages(lastSyncTime, callback) {
   Npm.getAllSince(lastSyncTime, function (err, data) {
