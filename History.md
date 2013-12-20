@@ -1,5 +1,19 @@
 
-0.1.2 / 2013-12-19 
+0.1.3 / 2013-12-20
+==================
+
+  * add favicon
+  * Fix auth middleware bug (@alsotang)
+  * make sure all packages name are lower case
+  * select ids from tag
+  * fix nodejsctl
+  * fix #112 missing versions and time no sync
+  * remove restart command
+  * fix sync missing packages error
+  * fix web/readme.md, add install
+  * fix #109 pkg no times and no versions bug.
+
+0.1.2 / 2013-12-19
 ==================
 
   * fix times not exists canot sync bug. fixed #101

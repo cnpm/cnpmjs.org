@@ -1,11 +1,11 @@
 {
   "name": "cnpmjs.org",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Private npm registry and web",
   "main": "dispatch.js",
   "scripts": {
     "test": "make test-all",
-    "start": "./bin/nodejsctl start",
+    "start": "./bin/nodejsctl start && cp History.md docs/web/history.md",
     "status": "./bin/nodejsctl status",
     "stop": "./bin/nodejsctl stop",
     "blanket": {

@@ -48,9 +48,9 @@ stop()
 {
   get_pid
   if [ ! -z "$PID" ]; then
-    echo "Waiting $PROJECT_NAME stop for 5s ..."
+    echo "Waiting $PROJECT_NAME stop for 2s ..."
     kill -15 $PID
-    sleep 5
+    sleep 2
 
     node_num=`ps -ef |grep node|grep ${PROJECT_NAME}|grep -v grep|wc -l`
     if [ $node_num != 0 ]; then

@@ -18,3 +18,4 @@ public/dist/
 config/config.js
 backup/*.json
 backup/*.gz
+docs/web/history.md

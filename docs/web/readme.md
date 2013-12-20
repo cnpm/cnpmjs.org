@@ -135,7 +135,7 @@ Or you can just use our `cnpm` cli:
 $ npm install cnpm -g
 ```
 
-### install  
+### install
 
 Install package from [registry.cnpmjs.org](http://registry.cnpmjs.org). When isntall a  package or version not exist, it will try to install from official registry([registry.npmjs.org](http://registry.npmjs.org)), and sync this package to cnpm in the backend.
 
@@ -166,7 +166,7 @@ $ cnpm publish [name]
 $ cnpm unpublish [name]
 ```
 
-### Orther command  
+### Orther command
 Support all the other npm command.
 
 ## TODO list
@@ -175,17 +175,20 @@ Support all the other npm command.
 
 ## Authors
 
+Release [History](/history).
+
 ```bash
 $ git summary
 
  project  : cnpmjs.org
  repo age : 2 weeks
- active   : 73 days
- commits  : 186
+ active   : 81 days
+ commits  : 205
  files    : 83
  authors  :
-   109  fengmk2                 58.6%
-    77  dead_horse              41.4%
+   120  fengmk2                 58.5%
+    84  dead_horse              41.0%
+     1  Alsotang                0.5%
 ```
 
 ## npm and cnpm relation
