@@ -21,12 +21,15 @@ var connect = require('connect');
 var rt = require('connect-rt');
 var responseCookie = require('response-cookie');
 var urlrouter = require('urlrouter');
+var forward = require('forward');
+var path = require('path');
 var routes = require('../routes/registry');
 var logger = require('../common/logger');
 var config = require('../config');
 var session = require('../common/session');
 var auth = require('../middleware/auth');
 
+var rootdir = path.dirname(__dirname);
 var app = connect();
 
 app.use(rt({headerName: 'X-ReadTime'}));
@@ -34,6 +37,8 @@ app.use(function (req, res, next) {
   res.req = req;
   next();
 });
+
+app.use('/favicon.ico', forward(path.join(rootdir, 'public', 'favicon.png')));
 
 app.use('/dist', connect.static(config.uploadDir));
 
