@@ -52,7 +52,7 @@ module.exports = function (options) {
       }
 
       req.session.name = row.name;
-      if (config.admins[req.session.name]) {
+      if (config.admins.hasOwnProperty(req.session.name)) {
         req.session.isAdmin = true;
       }
       debug('auth pass user: %j, onlySync: %s, isAdmin: %s, headers: %j',
