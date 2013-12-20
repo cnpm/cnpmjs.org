@@ -227,35 +227,23 @@ exports.listByName = function (name, callback) {
 };
 
 var LIST_SINCE_SQLS = [
-  'SELECT distinct(name) AS name FROM module WHERE publish_time > ?;',
-  'SELECT module_id FROM tag WHERE tag="latest" AND name IN (?);',
+  'SELECT module_id FROM tag WHERE tag="latest" AND gmt_modified>?',
   'SELECT name, package FROM module WHERE id IN (?);'
 ];
 exports.listSince = function (start, callback) {
   var ep = eventproxy.create();
   ep.fail(callback);
-  mysql.query(LIST_SINCE_SQLS[0], [start], ep.done(function (rows) {
+  mysql.query(LIST_SINCE_SQLS[0], [new Date(start)], ep.done(function (rows) {
     if (!rows || rows.length === 0) {
       return callback(null, []);
     }
-    ep.emit('names', rows.map(function (r) {
-      return r.name;
+    ep.emit('ids', rows.map(function (r) {
+      return r.module_id;
     }));
   }));
 
-  ep.once('names', function (names) {
-    mysql.query(LIST_SINCE_SQLS[1], [names], ep.done(function (rows) {
-      if (!rows || rows.length === 0) {
-        return callback(null, []);
-      }      
-      ep.emit('ids', rows.map(function (r) {
-        return r.module_id;
-      }));
-    }));
-  });
-
   ep.once('ids', function (ids) {
-    mysql.query(LIST_SINCE_SQLS[2], [ids], callback);
+    mysql.query(LIST_SINCE_SQLS[1], [ids], callback);
   });
 };
 
