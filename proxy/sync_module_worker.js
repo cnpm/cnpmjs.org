@@ -111,7 +111,11 @@ SyncModuleWorker.prototype.next = function (concurrencyId) {
       err.name = 'NpmModuleNotExsitsError';
     }
     if (err) {
-      that.fails.push(name);
+      if (response.statusCode === 404) {
+        that.successes.push(name);
+      } else {
+        that.fails.push(name);
+      }
       that.log('[error] [%s] get package error: %s', name, err.stack);
       delete that.syncingNames[name];
       return that.next(concurrencyId);
