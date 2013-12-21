@@ -77,7 +77,7 @@ CREATE TABLE `total` (
  `last_sync_module` varchar(100) COMMENT 'last sync success module name',
  PRIMARY KEY (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='total info';
-INSERT INTO total(name, gmt_modified, module_delete) VALUES('total', now(), 0, 0);
+INSERT INTO total(name, gmt_modified) VALUES('total', now());
 -- ALTER TABLE `total` ADD `last_sync_time` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT 'last timestamp sync from official registry'
 -- ALTER TABLE `total` ADD `last_exist_sync_time` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT 'last timestamp sync exist packages from official registry'
 -- ALTER TABLE `total` ADD `sync_status` tinyint unsigned NOT NULL DEFAULT '0' COMMENT 'system sync from official registry status'
