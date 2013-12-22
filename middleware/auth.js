@@ -22,7 +22,7 @@ module.exports = function (options) {
   return function auth(req, res, next) {
     req.session.onlySync = config.enablePrivate ? true : false;
     if (req.session.name) {
-      if (config.admins[req.session.name]) {
+      if (config.admins.hasOwnProperty[req.session.name]) {
         req.session.isAdmin = true;
       }
       debug('auth exists user: %s, onlySync: %s, isAdmin: %s, headers: %j',
