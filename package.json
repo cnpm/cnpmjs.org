@@ -7,7 +7,9 @@
     "test": "make test-all",
     "start": "./bin/nodejsctl start && cp History.md docs/web/history.md",
     "status": "./bin/nodejsctl status",
-    "stop": "./bin/nodejsctl stop",
+    "stop": "./bin/nodejsctl stop"
+  },
+  "config": {
     "blanket": {
       "pattern": "//^((?!(node_modules|test|common)).)*$/",
       "data-cover-flags": {
