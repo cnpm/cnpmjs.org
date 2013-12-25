@@ -106,12 +106,13 @@ SyncModuleWorker.prototype.next = function (concurrencyId) {
   var that = this;
   that.syncingNames[name] = true;
   npm.get(name, function (err, pkg, response) {
+    var statusCode = response && response.statusCode || -1;
     if (!err && !pkg) {
-      err = new Error('Module ' + name + ' not exists, http status ' + response.statusCode);
+      err = new Error('Module ' + name + ' not exists, http status ' + statusCode);
       err.name = 'NpmModuleNotExsitsError';
     }
     if (err) {
-      if (response.statusCode === 404) {
+      if (statusCode === 404) {
         that.successes.push(name);
       } else {
         that.fails.push(name);
