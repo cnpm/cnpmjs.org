@@ -62,6 +62,15 @@ exports.display = function (req, res, next) {
       }
     }
 
+    if (pkg.contributors) {
+      for (var i = 0; i < pkg.contributors.length; i++) {
+        var contributor = pkg.contributors[i];
+        if (contributor.email) {
+          contributor.gravatar = gravatar.url(contributor.email, {s: '50', d: 'retro'}, false);
+        }
+      }
+    }
+
     setLicense(pkg);
 
     for (var k in download) {
