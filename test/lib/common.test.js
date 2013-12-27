@@ -22,6 +22,8 @@ describe('lib/common.test.js', function () {
     it('should admin is admin', function () {
       common.isAdmin('admin').should.equal(true);
       common.isAdmin('fengmk2').should.equal(true);
+      common.isAdmin('constructor').should.equal(false);
+      common.isAdmin('toString').should.equal(false);
     });
   });
 });
