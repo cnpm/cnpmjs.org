@@ -35,14 +35,14 @@
         <th>Maintainers</th>
         <td>
         <% package.maintainers.forEach(function (m) { %>
-          <div class="user">
+          <span class="user">
             <a class="username" href="/~<%= m.name %>">
               <% if (m.gravatar) { %>
               <img src="<%- m.gravatar %>" class="avatar">
               <% } %>
               <%= m.name %>
             </a>
-          </div>
+          </span>
         <% }) %>
         </td>
       </tr>
@@ -165,6 +165,24 @@
             <%= (l-max) %> more</a><%
           }
           %>
+        </td>
+      </tr>
+      <% } %>
+
+      <% if (package.contributors) { %>
+      <tr>
+        <th>Contributors</th>
+        <td>
+        <% package.contributors.forEach(function (m) { %>
+          <span class="user">
+            <a class="username" href="/~<%= m.name %>">
+              <% if (m.gravatar) { %>
+              <img src="<%- m.gravatar %>" class="avatar">
+              <% } %>
+              <%= m.name %>
+            </a>
+          </span>
+        <% }) %>
         </td>
       </tr>
       <% } %>
