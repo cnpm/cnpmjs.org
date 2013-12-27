@@ -19,7 +19,7 @@ CREATE TABLE `module` (
  `gmt_create` datetime NOT NULL COMMENT 'create time',
  `gmt_modified` datetime NOT NULL COMMENT 'modified time',
  `author` varchar(100) NOT NULL,
- `name` varchar(100) NOT NULL COMMENT 'module name',
+ `name` varchar(100) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL COMMENT 'module name',
  `version` varchar(30) NOT NULL COMMENT 'module version',
  `description` longtext,
  `package` longtext CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'package.json',
@@ -38,23 +38,25 @@ CREATE TABLE `module` (
 -- ALTER TABLE `module` CHANGE `package` `package` LONGTEXT CHARACTER SET utf8 COLLATE utf8_general_ci;
 -- ALTER TABLE `module` CHANGE `description` `description` LONGTEXT CHARACTER SET utf8 COLLATE utf8_general_ci;
 -- show create table module\G
+-- ALTER TABLE  `module` CHANGE  `name`  `name` VARCHAR( 100 ) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL COMMENT  'module name';
 
 CREATE TABLE `module_log` (
  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'primary key',
  `gmt_create` datetime NOT NULL COMMENT 'create time',
  `gmt_modified` datetime NOT NULL COMMENT 'modified time',
  `username` varchar(100) NOT NULL,
- `name` varchar(100) NOT NULL COMMENT 'module name',
+ `name` varchar(100) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL COMMENT 'module name',
  `log` longtext,
  PRIMARY KEY (`id`),
  KEY `name` (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='module sync log';
+-- ALTER TABLE  `module_log` CHANGE  `name`  `name` VARCHAR( 100 ) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL COMMENT  'module name';
 
 CREATE TABLE `tag` (
  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'primary key',
  `gmt_create` datetime NOT NULL COMMENT 'create time',
  `gmt_modified` datetime NOT NULL COMMENT 'modified time',
- `name` varchar(100) NOT NULL COMMENT 'module name',
+ `name` varchar(100) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL COMMENT 'module name',
  `tag` varchar(30) NOT NULL COMMENT 'tag name',
  `version` varchar(30) NOT NULL COMMENT 'module version',
  `module_id` bigint(20) unsigned NOT NULL COMMENT 'module id',
@@ -62,6 +64,7 @@ CREATE TABLE `tag` (
  UNIQUE KEY `name` (`name`, `tag`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='module tag';
 -- ALTER TABLE  `tag` ADD  `module_id` BIGINT( 20 ) UNSIGNED NOT NULL;
+-- ALTER TABLE  `tag` CHANGE  `name`  `name` VARCHAR( 100 ) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL COMMENT  'module name';
 
 CREATE TABLE `total` (
  `name` varchar(100) NOT NULL COMMENT 'total name',
@@ -92,8 +95,9 @@ CREATE TABLE `download_total` (
  `gmt_create` datetime NOT NULL COMMENT 'create time',
  `gmt_modified` datetime NOT NULL COMMENT 'modified time',
  `date` varchar(10) NOT NULL COMMENT 'YYYY-MM-DD format',
- `name` varchar(100) NOT NULL COMMENT 'module name',
+ `name` varchar(100) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL COMMENT 'module name',
  `count` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT 'download count',
  PRIMARY KEY (`id`),
  UNIQUE KEY `date_name` (`date`, `name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='module download total info';
+-- ALTER TABLE  `download_total` CHANGE  `name`  `name` VARCHAR( 100 ) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL COMMENT  'module name';
