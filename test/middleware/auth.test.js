@@ -29,8 +29,9 @@ describe('middleware/auth.test.js', function () {
     app.close(done);
   });
 
+  afterEach(mm.restore);
+
   describe('auth()', function () {
-    afterEach(mm.restore);
     it('should pass if no authorization', function (done) {
       request(app)
       .get('/-/user/org.couchdb.user:cnpmjstest1')

@@ -17,14 +17,13 @@
 var debug = require('debug')('cnpmjs.org:middleware:auth');
 var User = require('../proxy/user');
 var config = require('../config');
+var common = require('../lib/common');
 
 module.exports = function (options) {
   return function auth(req, res, next) {
     req.session.onlySync = config.enablePrivate ? true : false;
     if (req.session.name) {
-      if (config.admins.hasOwnProperty[req.session.name]) {
-        req.session.isAdmin = true;
-      }
+      req.session.isAdmin = common.isAdmin(req.session.name);
       debug('auth exists user: %s, onlySync: %s, isAdmin: %s, headers: %j',
         req.session.name, req.session.onlySync, req.session.isAdmin, req.headers);
       return next();
@@ -52,9 +51,7 @@ module.exports = function (options) {
       }
 
       req.session.name = row.name;
-      if (config.admins.hasOwnProperty(req.session.name)) {
-        req.session.isAdmin = true;
-      }
+      req.session.isAdmin = common.isAdmin(req.session.name);
       debug('auth pass user: %j, onlySync: %s, isAdmin: %s, headers: %j',
         row, req.session.onlySync, req.session.isAdmin, req.headers);
       next();
