@@ -36,6 +36,12 @@ exports.upload = function (filepath, options, callback) {
   });
 };
 
+exports.uploadBuffer = function (buf, options, callback) {
+  client.delete(options.key, function (err, data) {
+    client.upload(buf, {key: options.key}, callback);
+  });
+};
+
 exports.url = function (key) {
   return client.resourceURL(key);
 };

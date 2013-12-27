@@ -14,6 +14,7 @@
  * Module dependencies.
  */
 
+var debug = require('debug')('cnpmjs.org:middleware:sync_by_install');
 var config = require('../config');
 
 /**
@@ -36,5 +37,9 @@ module.exports = function (req, res, next) {
     req.session.allowSync = false;
   }
 
+  // TODO: allow sync will let publish sync package...
+  req.session.allowSync = false;
+
+  debug('%s allowSync: %s', req.session.name, req.session.allowSync);
   next();
 };

@@ -355,6 +355,7 @@ exports.updateLatest = function (req, res, next) {
     // change latest to version
     Module.update(nextMod, function (err) {
       if (err) {
+        debug('update nextMod %s error: %s', name, err);
         return next(err);
       }
       // set latest tag
@@ -375,19 +376,132 @@ exports.updateLatest = function (req, res, next) {
   });
 };
 
+exports.addPackageAndDist = function (req, res, next) {
+  // 'dist-tags': { latest: '0.0.2' },
+  //  _attachments:
+  // { 'nae-sandbox-0.0.2.tgz':
+  //    { content_type: 'application/octet-stream',
+  //      data: 'H4sIAAAAA
+  //      length: 9883
+  var pkg = req.body;
+  var username = req.session.name;
+  var name = req.params.name;
+  var filename = Object.keys(pkg._attachments)[0];
+  var attachment = pkg._attachments[filename];
+  var version = filename.match(/\-([\.\d\w\_]+?)\.tgz$/);
+  if (!version) {
+    return res.json(403, {
+      error: 'version_error',
+      reason: filename + ' version not found',
+    });
+  }
+  version = version[1];
+  var versionPackage = pkg.versions[version];
+  var distTags = pkg['dist-tags'] || {};
+  var tags = []; // tag, version
+  for (var t in distTags) {
+    tags.push([t, distTags[t]]);
+  }
+
+  debug('addPackageAndDist %s:%s, attachment size: %s', name, version, attachment.length);
+
+  var ep = eventproxy.create();
+  ep.fail(next);
+  Module.get(name, version, ep.done('exists'));
+
+  var shasum;
+  ep.on('exists', function (exists) {
+    if (exists) {
+      return res.json(409, {
+        error: 'conflict',
+        reason: 'Document update conflict.'
+      });
+    }
+
+    // upload attachment
+    var tarballBuffer;
+    try {
+      tarballBuffer = new Buffer(attachment.data, 'base64');
+    } catch (e) {
+      return next(e);
+    }
+
+    if (tarballBuffer.length !== attachment.length) {
+      return res.json(403, {
+        error: 'size_wrong',
+        reason: 'Attachment size ' + attachment.length + ' not match download size ' + tarballBuffer.length,
+      });
+    }
+
+    shasum = crypto.createHash('sha1');
+    shasum.update(tarballBuffer);
+    shasum = shasum.digest('hex');
+    var key = common.getCDNKey(name, filename);
+    nfs.uploadBuffer(tarballBuffer, {key: key}, ep.done('upload'));
+  });
+
+  ep.on('upload', function (result) {
+    debug('upload %j', result);
+
+    var dist = {
+      tarball: result.url,
+      shasum: shasum,
+      size: attachment.length
+    };
+    var mod = {
+      name: name,
+      version: version,
+      author: username,
+      package: versionPackage
+    };
+
+    mod.package.dist = dist;
+
+    Module.add(mod, ep.done(function (r) {
+      debug('%s module: save file to %s, size: %d, sha1: %s, dist: %j, version: %s',
+        r.id, dist.tarball, dist.size, shasum, dist, version);
+      ep.emit('saveModule', r.id);
+    }));
+  });
+
+  ep.on('saveModule', function () {
+    if (tags.length === 0) {
+      return ep.emit('saveTags');
+    }
+
+    tags.forEach(function (item) {
+      Module.addTag(name, item[0], item[1], ep.done('saveTag'));
+    });
+    ep.after('saveTag', tags.length, function () {
+      ep.emit('saveTags');
+    });
+  });
+
+  ep.all('saveModule', 'saveTags', function (moduleId) {
+    res.json(201, {ok: true, rev: String(moduleId)});
+  });
+};
+
 exports.add = function (req, res, next) {
   var username = req.session.name;
   var name = req.params.name;
-  var pkg = req.body;
+  var pkg = req.body || {};
   var maintainers = pkg.maintainers || [];
   var match = maintainers.filter(function (item) {
     return item.name === username;
   });
+
+  debug('add module %s maintainers match: %j, current user: %s', name, match, username);
+
   if (match.length === 0) {
     return res.json(403, {
       error: 'no_perms',
       reason: 'Current user can not publish this module'
     });
+  }
+
+  if (pkg._attachments && Object.keys(pkg._attachments).length > 0) {
+    return exports.addPackageAndDist(req, res, next);
   }
 
   var ep = eventproxy.create();
@@ -413,6 +527,7 @@ exports.add = function (req, res, next) {
         maintainers: pkg.maintainers,
       },
     };
+    debug('add next module: %s', name);
     Module.add(nextMod, ep.done(function (result) {
       nextMod.id = result.id;
       ep.emit('next', nextMod);
@@ -420,7 +535,8 @@ exports.add = function (req, res, next) {
   }));
 
   ep.all('latest', 'next', function (latestMod, nextMod) {
-    var maintainers = latestMod ? latestMod.package.maintainers : nextMod.package.maintainers;
+    var maintainers = latestMod && latestMod.package.maintainers.length > 0 ?
+      latestMod.package.maintainers : nextMod.package.maintainers;
     var match = maintainers.filter(function (item) {
       return item.name === username;
     });
@@ -432,7 +548,9 @@ exports.add = function (req, res, next) {
       });
     }
 
-    if (latestMod || nextMod.exists) {
+    debug('add %s rev: %s, version: %s', name, nextMod.id, nextMod.version);
+
+    if (latestMod || nextMod.version !== 'next') {
       return res.json(409, {
         error: 'conflict',
         reason: 'Document update conflict.'
@@ -532,6 +650,7 @@ exports.removeAll = function (req, res, next) {
 
   Module.listByName(name, ep.doneLater('list'));
   ep.once('list', function (mods) {
+    debug('removeAll module %s: %d', name, mods.length);
     var mod = mods[0];
     if (!mod) {
       return next();
@@ -540,6 +659,10 @@ exports.removeAll = function (req, res, next) {
     var match = mod.package.maintainers.filter(function (item) {
       return item.name === username;
     });
+    if (req.session.isAdmin) {
+      match.push({name: username});
+    }
+
     if (!match.length || mod.name !== name) {
       return res.json(403, {
         error: 'no_perms',
