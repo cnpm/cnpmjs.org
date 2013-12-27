@@ -1,4 +1,18 @@
 
+0.2.0 / 2013-12-27 
+==================
+
+  * remove to lower case
+  * fix #127 execSync and execsync.
+  * add contributors list on package page
+  * mv blanket to config
+  * sync typeerror fix #statusCode
+  * add disturl
+  * fix #122 admin security bug
+  * fixed #121, let pkg 404 as success
+  * fix sql insert error
+  * fix typos
+
 0.1.3 / 2013-12-20
 ==================
 
