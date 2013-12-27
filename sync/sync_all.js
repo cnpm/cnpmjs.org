@@ -31,13 +31,11 @@ function subtract(subtracter, minuend) {
   var map = {};
   var results = [];
   minuend.forEach(function (name) {
-    map[name.toLowerCase()] = true;
+    map[name] = true;
   });
   subtracter.forEach(function (name) {
-    var lowerName = name.toLowerCase();
-    if (!map[lowerName] && !/[A-Z]/.test(name)) {
-      // ensure package name is lower case
-      results.push(lowerName);
+    if (!map[name]) {
+      results.push(name);
     }
   });
   return results;
