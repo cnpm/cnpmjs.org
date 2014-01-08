@@ -63,6 +63,10 @@ exports.display = function (req, res, next) {
     }
 
     if (pkg.contributors) {
+      // registry.cnpmjs.org/compressible
+      if (!Array.isArray(pkg.contributors)) {
+        pkg.contributors = [pkg.contributors];
+      }
       for (var i = 0; i < pkg.contributors.length; i++) {
         var contributor = pkg.contributors[i];
         if (contributor.email) {
