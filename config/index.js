@@ -68,7 +68,7 @@ var config = {
     user: 'address@gmail.com',
     pass: 'your password',
     ssl: true,
-    debug: false 
+    debug: false
   },
 
   sourceNpmRegistry: 'http://registry.npmjs.org',
@@ -98,3 +98,12 @@ mkdirp.sync(config.logdir);
 mkdirp.sync(config.uploadDir);
 
 module.exports = config;
+
+config.loadConfig = function (customConfig) {
+  if (!customConfig) {
+    return;
+  }
+  for (var key in customConfig) {
+    config[key] = customConfig[key];
+  }
+};
