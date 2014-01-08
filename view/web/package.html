@@ -30,7 +30,7 @@
     </table>
 
     <table class="metadata">
-      <% if (package.maintainers) { %>
+      <% if (Array.isArray(package.maintainers) && package.maintainers.length > 0) { %>
       <tr>
         <th>Maintainers</th>
         <td>
@@ -169,7 +169,7 @@
       </tr>
       <% } %>
 
-      <% if (package.contributors) { %>
+      <% if (Array.isArray(package.contributors) && package.contributors.length > 0) { %>
       <tr>
         <th>Contributors</th>
         <td>
