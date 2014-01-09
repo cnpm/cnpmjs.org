@@ -171,11 +171,59 @@ var _downloads = {};
 exports.download = function (req, res, next) {
   var name = req.params.name;
   var filename = req.params.filename;
-  var cdnurl = nfs.url(common.getCDNKey(name, filename));
-  res.statusCode = 302;
-  res.setHeader('Location', cdnurl);
-  res.end();
-  _downloads[name] = (_downloads[name] || 0) + 1;
+  var version = filename.slice(name.length + 1, -4);
+  var ep = eventproxy.create();
+  ep.fail(next);
+
+  Module.get(name, version, ep.doneLater('moduleInfo'));
+  ep.once('moduleInfo', function (row) {
+    if (!row || !row.package || !row.package.dist) {
+      return ep.emit('nodist');
+    }
+    var dist = row.package.dist;
+    if (dist.url) {
+      return ep.emit('url', dist.url);
+    }
+    if (dist.key) {
+      return ep.emit('key', dist.key);
+    }
+    ep.emit('nodist');
+  });
+
+  ep.once('nodist', function () {
+    if (!nfs.url) {
+      return next();
+    }
+    ep.emit('url', nfs.url(common.getCDNKey(name, filename)));
+  });
+
+  ep.once('url', function (url) {
+    res.statusCode = 302;
+    res.setHeader('Location', url);
+    res.end();
+    _downloads[name] = (_downloads[name] || 0) + 1;
+  });
+
+  ep.once('key', function (key) {
+    if (!nfs.download) {
+      return next();
+    }
+    var tmpPath = path.join(config.uploadDir, key);
+    function cleanup() {
+      fs.unlink(tmpPath, utility.noop);
+    }
+
+    nfs.download(key, tmpPath, function (err, res) {
+      if (err) {
+        cleanup();
+        return next(err);
+      }
+      var tarball = fs.createReadStream(tmpPath);
+      tarball.on('error', cleanup);
+      tarball.on('end', cleanup);
+      tarball.pipe(res);
+    });
+  });
 };
 
 setInterval(function () {
@@ -285,10 +333,18 @@ exports.upload = function (req, res, next) {
         }
 
         var dist = {
-          tarball: result.url,
           shasum: shasum,
           size: length
         };
+
+        // if nfs upload return a key, record it
+        if (result.key) {
+          dist.key = result.key;
+        }
+        if (result.url) {
+          dist.tarball = result.url;
+        }
+
         mod.package.dist = dist;
         mod.package.version = version;
         debug('%s module: save file to %s, size: %d, sha1: %s, dist: %j, version: %s',
@@ -444,10 +500,18 @@ exports.addPackageAndDist = function (req, res, next) {
     debug('upload %j', result);
 
     var dist = {
-      tarball: result.url,
       shasum: shasum,
       size: attachment.length
     };
+
+    // if nfs upload return a key, record it
+    if (result.key) {
+      dist.key = result.key;
+    }
+    if (result.url) {
+      dist.tarball = result.url;
+    }
+
     var mod = {
       name: name,
       version: version,
@@ -631,8 +695,9 @@ exports.removeTar = function (req, res, next) {
         reason: 'Current user can not delete this tarball'
       });
     }
+    var key = mod.package.dist && mod.package.dist.key;
+    key = key || common.getCDNKey(mod.name, filename);
 
-    var key = common.getCDNKey(mod.name, filename);
     nfs.remove(key, ep.done(function () {
       res.json(200, {ok: true});
     }));
