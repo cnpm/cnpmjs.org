@@ -180,11 +180,10 @@ exports.download = function (req, res, next) {
       return ep.emit('nodist');
     }
     var dist = row.package.dist;
-    if (dist.url) {
-      return ep.emit('url', dist.url);
-    }
     if (dist.key) {
       return ep.emit('key', dist.key);
+    } else {
+      return ep.emit('url', dist.tarball);
     }
     ep.emit('nodist');
   });
@@ -339,6 +338,7 @@ exports.upload = function (req, res, next) {
         // if nfs upload return a key, record it
         if (result.key) {
           dist.key = result.key;
+          dist.tarball = result.key;
         }
         if (result.url) {
           dist.tarball = result.url;
@@ -508,6 +508,7 @@ exports.addPackageAndDist = function (req, res, next) {
     // if nfs upload return a key, record it
     if (result.key) {
       dist.key = result.key;
+      dist.tarball = result.key;
     }
     if (result.url) {
       dist.tarball = result.url;
@@ -748,7 +749,7 @@ exports.removeAll = function (req, res, next) {
     }
     var queue = new Bagpipe(5);
     keys.forEach(function (key) {
-      queue.push(nfs.remove, key, function () {
+      queue.push(nfs.remove.bind(nfs), key, function () {
         //ignore err here
         ep.emit('removeTar');
       });
