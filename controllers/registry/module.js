@@ -453,6 +453,7 @@ exports.addPackageAndDist = function (req, res, next) {
   }
   version = version[1];
   var versionPackage = pkg.versions[version];
+  versionPackage._publish_on_cnpm = true;
   var distTags = pkg['dist-tags'] || {};
   var tags = []; // tag, version
   for (var t in distTags) {
