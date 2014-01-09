@@ -443,11 +443,18 @@ SyncModuleWorker.prototype._syncOneVersion = function (versionIndex, sourcePacka
       publish_time: sourcePackage.publish_time,
     };
     var dist = {
-      tarball: result.url,
       shasum: shasum,
       size: dataSize,
       noattachment: dataSize === 0,
     };
+
+    if (result.url) {
+      dist.tarball = result.url;
+    }
+    if (result.key) {
+      dist.key = result.key;
+    }
+
     mod.package.dist = dist;
     Module.add(mod, ep.done(function (result) {
       that.log('    [%s:%s] done, insertId: %s, author: %s, version: %s, size: %d, publish_time: %j',

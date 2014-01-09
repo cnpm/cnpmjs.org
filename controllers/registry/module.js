@@ -83,7 +83,7 @@ exports.show = function (req, res, next) {
         continue;
       }
       var pkg = row.package;
-      common.downloadURL(pkg, req);
+      common.setDownloadURL(pkg, req);
       versions[pkg.version] = pkg;
       times[pkg.version] = row.publish_time ? new Date(row.publish_time) : row.gmt_modified;
       if ((!distTags.latest && !latestMod) || distTags.latest === row.version) {
@@ -129,7 +129,6 @@ exports.get = function (req, res, next) {
   var name = req.params.name;
   var tag = req.params.version;
   var version = semver.valid(tag);
-
   var ep = eventproxy.create();
   ep.fail(next);
 
@@ -138,7 +137,7 @@ exports.get = function (req, res, next) {
 
   Module[method](name, queryLabel, ep.done(function (mod) {
     if (mod) {
-      common.downloadURL(mod.package, req);
+      common.setDownloadURL(mod.package, req);
       return res.json(mod.package);
     }
     ep.emit('notFound');
@@ -213,7 +212,7 @@ exports.download = function (req, res, next) {
       fs.unlink(tmpPath, utility.noop);
     }
 
-    nfs.download(key, tmpPath, function (err, res) {
+    nfs.download(key, tmpPath, function (err) {
       if (err) {
         cleanup();
         return next(err);
@@ -494,6 +493,7 @@ exports.addPackageAndDist = function (req, res, next) {
     shasum.update(tarballBuffer);
     shasum = shasum.digest('hex');
     var key = common.getCDNKey(name, filename);
+
     nfs.uploadBuffer(tarballBuffer, {key: key}, ep.done('upload'));
   });
 
@@ -776,7 +776,7 @@ function parseModsForList(updated, mods, req) {
     pkg['dist-tags'] = {
       latest: pkg.version
     };
-    common.downloadURL(pkg, req);
+    common.setDownloadURL(pkg, req);
     results[mod.name] = pkg;
   }
   return results;
