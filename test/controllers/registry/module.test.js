@@ -172,14 +172,7 @@ describe('controllers/registry/module.test.js', function () {
       .put('/' + pkg.name)
       .set('authorization', baseauth)
       .send(pkg)
-      .expect(409, function (err, res) {
-        should.not.exist(err);
-        res.body.should.eql({
-          error: 'conflict',
-          reason: 'Document update conflict.'
-        });
-        done();
-      });
+      .expect(201, done);
     });
 
     it('should try to add return 403 when not module user and only next module exists',
