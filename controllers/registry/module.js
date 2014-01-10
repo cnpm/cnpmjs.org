@@ -23,6 +23,8 @@ var utility = require('utility');
 var eventproxy = require('eventproxy');
 var Bagpipe = require('bagpipe');
 var urlparse = require('url').parse;
+var mime = require('mime');
+var semver = require('semver');
 var config = require('../../config');
 var Module = require('../../proxy/module');
 var Total = require('../../proxy/total');
@@ -32,7 +34,6 @@ var Log = require('../../proxy/module_log');
 var DownloadTotal = require('../../proxy/download');
 var SyncModuleWorker = require('../../proxy/sync_module_worker');
 var logger = require('../../common/logger');
-var semver = require('semver');
 
 exports.show = function (req, res, next) {
   var name = req.params.name;
@@ -181,9 +182,9 @@ exports.download = function (req, res, next) {
     }
     var dist = row.package.dist;
     if (dist.key) {
-      return ep.emit('key', dist.key);
+      return ep.emit('key', dist);
     } else {
-      return ep.emit('url', dist.tarball);
+      return ep.emit('url', dist);
     }
     ep.emit('nodist');
   });
@@ -195,31 +196,30 @@ exports.download = function (req, res, next) {
     ep.emit('url', nfs.url(common.getCDNKey(name, filename)));
   });
 
-  ep.once('url', function (url) {
+  ep.once('url', function (dist) {
     res.statusCode = 302;
-    res.setHeader('Location', url);
+    res.setHeader('Location', dist.tarball);
     res.end();
     _downloads[name] = (_downloads[name] || 0) + 1;
   });
 
-  ep.once('key', function (key) {
+  ep.once('key', function (dist) {
     if (!nfs.download) {
       return next();
     }
-    var tmpPath = path.join(config.uploadDir, utility.randomString() + key);
-    function cleanup() {
-      fs.unlink(tmpPath, utility.noop);
-    }
 
-    nfs.download(key, tmpPath, function (err) {
+    if (typeof dist.size === 'number') {
+      res.setHeader('Content-Length', dist.size);
+    }
+    res.setHeader('Content-Type', mime.lookup(dist.key));
+    res.setHeader('Content-Disposition: inline; filename="' + filename + '"');
+    res.setHeader('ETag', dist.shasum);
+
+    nfs.download(dist.key, res, function (err) {
       if (err) {
-        cleanup();
+        // TODO: just end or send error response?
         return next(err);
       }
-      var tarball = fs.createReadStream(tmpPath);
-      tarball.on('error', cleanup);
-      tarball.on('end', cleanup);
-      tarball.pipe(res);
       _downloads[name] = (_downloads[name] || 0) + 1;
     });
   });
