@@ -1,7 +1,13 @@
   <div id="package">
     <h1>
       <%= package.name %>
-      <small>(<a href="/sync/<%= package.name %>" target="_blank">SYNC</a> missed versions from official npm registry)</small>
+      <small>
+      <% if (package._publish_on_cnpm) { %>
+      (Private package)
+      <% } else { %>
+      (<a href="/sync/<%= package.name %>" target="_blank">SYNC</a> missed versions from official npm registry)
+      <% } %>
+      </small>
     </h1>
 
     <% if (package.deprecated) { %>
