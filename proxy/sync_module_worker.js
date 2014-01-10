@@ -450,9 +450,9 @@ SyncModuleWorker.prototype._syncOneVersion = function (versionIndex, sourcePacka
 
     if (result.url) {
       dist.tarball = result.url;
-    }
-    if (result.key) {
+    } else if (result.key) {
       dist.key = result.key;
+      dist.tarball = result.key;
     }
 
     mod.package.dist = dist;

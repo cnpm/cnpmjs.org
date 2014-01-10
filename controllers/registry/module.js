@@ -206,7 +206,7 @@ exports.download = function (req, res, next) {
     if (!nfs.download) {
       return next();
     }
-    var tmpPath = path.join(config.uploadDir, key);
+    var tmpPath = path.join(config.uploadDir, utility.randomString() + key);
     function cleanup() {
       fs.unlink(tmpPath, utility.noop);
     }
@@ -220,6 +220,7 @@ exports.download = function (req, res, next) {
       tarball.on('error', cleanup);
       tarball.on('end', cleanup);
       tarball.pipe(res);
+      _downloads[name] = (_downloads[name] || 0) + 1;
     });
   });
 };
@@ -336,12 +337,11 @@ exports.upload = function (req, res, next) {
         };
 
         // if nfs upload return a key, record it
-        if (result.key) {
-          dist.key = result.key;
-          dist.tarball = result.key;
-        }
         if (result.url) {
           dist.tarball = result.url;
+        } else if (result.key) {
+          dist.key = result.key;
+          dist.tarball = result.key;
         }
 
         mod.package.dist = dist;
@@ -506,12 +506,11 @@ exports.addPackageAndDist = function (req, res, next) {
     };
 
     // if nfs upload return a key, record it
-    if (result.key) {
-      dist.key = result.key;
-      dist.tarball = result.key;
-    }
     if (result.url) {
       dist.tarball = result.url;
+    } else if (result.key) {
+      dist.key = result.key;
+      dist.tarball = result.key;
     }
 
     var mod = {
