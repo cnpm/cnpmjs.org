@@ -47,6 +47,8 @@ function SyncModuleWorker(options) {
 
   this.username = options.username;
   this.concurrency = options.concurrency || 1;
+  this._publish = options.publish; // _publish_on_cnpm
+
   this.syncingNames = {};
   this.nameMap = {};
   this.names.forEach(function (name) {
@@ -82,7 +84,8 @@ SyncModuleWorker.prototype.log = function (format, arg1, arg2) {
 };
 
 SyncModuleWorker.prototype.start = function () {
-  this.log('user: %s, sync %s worker start, %d concurrency.', this.username, this.names[0], this.concurrency);
+  this.log('user: %s, sync %s worker start, %d concurrency, nodeps: %s, publish: %s',
+    this.username, this.names[0], this.concurrency, this.noDep, this._publish);
   for (var i = 0; i < this.concurrency; i++) {
     this.next(i);
   }
@@ -122,11 +125,11 @@ SyncModuleWorker.prototype.next = function (concurrencyId) {
       return that.next(concurrencyId);
     }
 
-    that.log('[c#%d] [%s] start...', concurrencyId, pkg.name);
-    that._sync(pkg, function (err, versions) {
+    that.log('[c#%d] [%s] start...', concurrencyId, name);
+    that._sync(name, pkg, function (err, versions) {
       delete that.syncingNames[name];
       if (err) {
-        that.fails.push(pkg.name);
+        that.fails.push(name);
         that.log('[error] [%s] sync error: %s', name, err.stack);
         return that.next(concurrencyId);
       }
@@ -139,9 +142,8 @@ SyncModuleWorker.prototype.next = function (concurrencyId) {
   });
 };
 
-SyncModuleWorker.prototype._sync = function (pkg, callback) {
-  var username = this.name;
-  var name = pkg.name;
+SyncModuleWorker.prototype._sync = function (name, pkg, callback) {
+  var username = this.username;
   var that = this;
   var ep = eventproxy.create();
   ep.fail(callback);
@@ -159,7 +161,7 @@ SyncModuleWorker.prototype._sync = function (pkg, callback) {
 
       if (r.package && r.package._publish_on_cnpm) {
         // publish on cnpm, dont sync this version package
-        that.log('  [%s] publish on local cnpm, don\'t sync.', pkg.name);
+        that.log('  [%s] publish on local cnpm, don\'t sync', name);
         ep.unbind();
         callback(null, []);
         return;
@@ -200,7 +202,7 @@ SyncModuleWorker.prototype._sync = function (pkg, callback) {
       versionNames = Object.keys(pkg.versions);
     }
     if (versionNames.length === 0) {
-      that.log('  [%s] no times and no versions, hasModules: %s', pkg.name, hasModules);
+      that.log('  [%s] no times and no versions, hasModules: %s', name, hasModules);
       if (!hasModules) {
         // save a next module
         var maintainer = pkg.maintainers && pkg.maintainers[0];
@@ -211,11 +213,11 @@ SyncModuleWorker.prototype._sync = function (pkg, callback) {
           maintainer = '-';
         }
         var nextMod = {
-          name: pkg.name,
+          name: name,
           version: 'next',
           author: maintainer,
           package: {
-            name: pkg.name,
+            name: name,
             version: 'next',
             description: pkg.description || '',
             readme: pkg.readme || '',
@@ -225,7 +227,7 @@ SyncModuleWorker.prototype._sync = function (pkg, callback) {
           },
         };
         Module.add(nextMod, function (err, result) {
-          that.log('  [%s] save next module, %j, error: %s', pkg.name, result, err);
+          that.log('  [%s] save next module, %j, error: %s', name, result, err);
         });
       }
     }
@@ -250,7 +252,7 @@ SyncModuleWorker.prototype._sync = function (pkg, callback) {
         // * shasum make sure equal
         if ((version.publish_time === exists.publish_time) || (!version.publish_time && exists.publish_time)) {
           debug('  [%s] %s publish_time equal: %s, %s',
-            pkg.name, version.version, version.publish_time, exists.publish_time);
+            name, version.version, version.publish_time, exists.publish_time);
           // * publish_time make sure equal
           if (exists.description === null && version.description) {
             // * make sure description exists
@@ -274,7 +276,7 @@ SyncModuleWorker.prototype._sync = function (pkg, callback) {
     }
 
     if (versions.length === 0) {
-      that.log('  [%s] all versions are exists', pkg.name);
+      that.log('  [%s] all versions are exists', name);
       return ep.emit('syncDone');
     }
 
@@ -282,7 +284,7 @@ SyncModuleWorker.prototype._sync = function (pkg, callback) {
       return a.publish_time - b.publish_time;
     });
     missingVersions = versions;
-    that.log('  [%s] %d versions', pkg.name, versions.length);
+    that.log('  [%s] %d versions', name, versions.length);
     ep.emit('syncModule', missingVersions.shift());
   });
 
@@ -311,7 +313,7 @@ SyncModuleWorker.prototype._sync = function (pkg, callback) {
       return ep.emit('descriptionDone');
     }
 
-    that.log('  [%s] saving %d descriptions', pkg.name, missingDescriptions.length);
+    that.log('  [%s] saving %d descriptions', name, missingDescriptions.length);
     missingDescriptions.forEach(function (item) {
       Module.updateDescription(item.id, item.description, function (err, result) {
         if (err) {
@@ -332,10 +334,10 @@ SyncModuleWorker.prototype._sync = function (pkg, callback) {
       return ep.emit('tagDone');
     }
 
-    that.log('  [%s] adding %d tags', pkg.name, missingTags.length);
+    that.log('  [%s] adding %d tags', name, missingTags.length);
     // sync tags
     missingTags.forEach(function (item) {
-      Module.addTag(pkg.name, item[0], item[1], ep.done(function (result) {
+      Module.addTag(name, item[0], item[1], ep.done(function (result) {
         that.log('    added tag %s:%s, module_id: %s', item[0], item[1], result && result.module_id);
         ep.emit('addTag');
       }));
@@ -371,8 +373,9 @@ SyncModuleWorker.prototype._syncOneVersion = function (versionIndex, sourcePacka
     callback(err);
   });
 
-  that.log('    [%s:%d] syncing, version: %s, dist: %j',
-    sourcePackage.name, versionIndex, sourcePackage.version, sourcePackage.dist);
+  that.log('    [%s:%d] syncing, version: %s, dist: %j, no deps: %s, publish on cnpm: %s',
+    sourcePackage.name, versionIndex, sourcePackage.version,
+    sourcePackage.dist, that.noDep, that._publish);
   if (!that.noDep) {
     for (var k in sourcePackage.dependencies) {
       that.add(k);
@@ -442,6 +445,12 @@ SyncModuleWorker.prototype._syncOneVersion = function (versionIndex, sourcePacka
       author: author,
       publish_time: sourcePackage.publish_time,
     };
+
+    if (that._publish) {
+      // sync as publish
+      mod.package._publish_on_cnpm = true;
+    }
+
     var dist = {
       shasum: shasum,
       size: dataSize,
@@ -457,16 +466,23 @@ SyncModuleWorker.prototype._syncOneVersion = function (versionIndex, sourcePacka
 
     mod.package.dist = dist;
     Module.add(mod, ep.done(function (result) {
-      that.log('    [%s:%s] done, insertId: %s, author: %s, version: %s, size: %d, publish_time: %j',
+      that.log('    [%s:%s] done, insertId: %s, author: %s, version: %s, size: %d, publish_time: %j, publish on cnpm: %s',
         sourcePackage.name, versionIndex,
         result.id,
-        author, mod.version, dataSize, new Date(mod.publish_time));
+        author, mod.version, dataSize,
+        new Date(mod.publish_time),
+        that._publish);
       callback(null, result);
     }));
   });
 };
 
-SyncModuleWorker.sync = function (name, username, callback) {
+SyncModuleWorker.sync = function (name, username, options, callback) {
+  if (typeof options === 'function') {
+    callback = options;
+    options = null;
+  }
+  options = options || {};
   npm.get(name, function (err, pkg, response) {
     if (err) {
       return callback(err);
@@ -486,6 +502,8 @@ SyncModuleWorker.sync = function (name, username, callback) {
         logId: result.id,
         name: name,
         username: username,
+        noDep: options.noDep,
+        publish: options.publish,
       });
       worker.start();
       callback(null, {

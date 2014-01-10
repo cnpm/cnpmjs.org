@@ -13,13 +13,27 @@
 /**
  * Module dependencies.
  */
+
 var Log = require('../proxy/module_log');
 var SyncModuleWorker = require('../proxy/sync_module_worker');
 
 exports.sync = function (req, res, next) {
   var username = req.session.name || 'anonymous';
   var name = req.params.name;
-  SyncModuleWorker.sync(name, username, function (err, result) {
+  var publish = req.query.publish === 'true';
+  var noDep = req.query.nodeps === 'true';
+  if (publish && !req.session.isAdmin) {
+    return res.json(403, {
+      error: 'no_perms',
+      reason: 'Only admin can publish'
+    });
+  }
+
+  var options = {
+    publish: publish,
+    noDep: noDep,
+  };
+  SyncModuleWorker.sync(name, username, options, function (err, result) {
     if (err) {
       return next(err);
     }

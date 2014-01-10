@@ -30,6 +30,8 @@ Log.create({
     name: names,
     username: 'fengmk2',
     concurrency: names.length,
+    noDep: true,
+    publish: true,
   });
 
   worker.start();
