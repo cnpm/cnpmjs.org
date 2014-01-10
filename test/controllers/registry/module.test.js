@@ -88,14 +88,14 @@ describe('controllers/registry/module.test.js', function () {
   describe('GET /:name/:(version|tag)', function () {
     it('should return module@version info', function (done) {
       request(app)
-      .get('/cnpmjs.org/0.0.0')
+      .get('/cnpmjs.org/0.2.1')
       .expect(200, function (err, res) {
         should.not.exist(err);
         var body = res.body;
         body.name.should.equal('cnpmjs.org');
-        body.version.should.equal('0.0.0');
-        body._id.should.equal('cnpmjs.org@0.0.0');
-        body.dist.tarball.should.include('cnpmjs.org-0.0.0.tgz');
+        body.version.should.equal('0.2.1');
+        body._id.should.equal('cnpmjs.org@0.2.1');
+        body.dist.tarball.should.include('cnpmjs.org-0.2.1.tgz');
         done();
       });
     });
@@ -114,14 +114,14 @@ describe('controllers/registry/module.test.js', function () {
       });
     });
 
-    it('should get cnpmjs.org@0.1.0 with _publish_on_cnpm=true', function (done) {
+    it('should get cnpmjs.org@0.2.1 with _publish_on_cnpm=true', function (done) {
       request(app)
-      .get('/cnpmjs.org/0.1.0')
+      .get('/cnpmjs.org/0.2.1')
       .expect(200, function (err, res) {
         should.not.exist(err);
         var body = res.body;
         body.name.should.equal('cnpmjs.org');
-        body.version.should.equal('0.1.0');
+        body.version.should.equal('0.2.1');
         body._publish_on_cnpm.should.equal(true);
         done();
       });
@@ -172,14 +172,7 @@ describe('controllers/registry/module.test.js', function () {
       .put('/' + pkg.name)
       .set('authorization', baseauth)
       .send(pkg)
-      .expect(409, function (err, res) {
-        should.not.exist(err);
-        res.body.should.eql({
-          error: 'conflict',
-          reason: 'Document update conflict.'
-        });
-        done();
-      });
+      .expect(201, done);
     });
 
     it('should try to add return 403 when not module user and only next module exists',

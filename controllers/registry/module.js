@@ -83,7 +83,7 @@ exports.show = function (req, res, next) {
         continue;
       }
       var pkg = row.package;
-      common.downloadURL(pkg, req);
+      common.setDownloadURL(pkg, req);
       versions[pkg.version] = pkg;
       times[pkg.version] = row.publish_time ? new Date(row.publish_time) : row.gmt_modified;
       if ((!distTags.latest && !latestMod) || distTags.latest === row.version) {
@@ -129,7 +129,6 @@ exports.get = function (req, res, next) {
   var name = req.params.name;
   var tag = req.params.version;
   var version = semver.valid(tag);
-
   var ep = eventproxy.create();
   ep.fail(next);
 
@@ -138,7 +137,7 @@ exports.get = function (req, res, next) {
 
   Module[method](name, queryLabel, ep.done(function (mod) {
     if (mod) {
-      common.downloadURL(mod.package, req);
+      common.setDownloadURL(mod.package, req);
       return res.json(mod.package);
     }
     ep.emit('notFound');
@@ -171,11 +170,59 @@ var _downloads = {};
 exports.download = function (req, res, next) {
   var name = req.params.name;
   var filename = req.params.filename;
-  var cdnurl = nfs.url(common.getCDNKey(name, filename));
-  res.statusCode = 302;
-  res.setHeader('Location', cdnurl);
-  res.end();
-  _downloads[name] = (_downloads[name] || 0) + 1;
+  var version = filename.slice(name.length + 1, -4);
+  var ep = eventproxy.create();
+  ep.fail(next);
+
+  Module.get(name, version, ep.doneLater('moduleInfo'));
+  ep.once('moduleInfo', function (row) {
+    if (!row || !row.package || !row.package.dist) {
+      return ep.emit('nodist');
+    }
+    var dist = row.package.dist;
+    if (dist.key) {
+      return ep.emit('key', dist.key);
+    } else {
+      return ep.emit('url', dist.tarball);
+    }
+    ep.emit('nodist');
+  });
+
+  ep.once('nodist', function () {
+    if (!nfs.url) {
+      return next();
+    }
+    ep.emit('url', nfs.url(common.getCDNKey(name, filename)));
+  });
+
+  ep.once('url', function (url) {
+    res.statusCode = 302;
+    res.setHeader('Location', url);
+    res.end();
+    _downloads[name] = (_downloads[name] || 0) + 1;
+  });
+
+  ep.once('key', function (key) {
+    if (!nfs.download) {
+      return next();
+    }
+    var tmpPath = path.join(config.uploadDir, utility.randomString() + key);
+    function cleanup() {
+      fs.unlink(tmpPath, utility.noop);
+    }
+
+    nfs.download(key, tmpPath, function (err) {
+      if (err) {
+        cleanup();
+        return next(err);
+      }
+      var tarball = fs.createReadStream(tmpPath);
+      tarball.on('error', cleanup);
+      tarball.on('end', cleanup);
+      tarball.pipe(res);
+      _downloads[name] = (_downloads[name] || 0) + 1;
+    });
+  });
 };
 
 setInterval(function () {
@@ -285,10 +332,18 @@ exports.upload = function (req, res, next) {
         }
 
         var dist = {
-          tarball: result.url,
           shasum: shasum,
           size: length
         };
+
+        // if nfs upload return a key, record it
+        if (result.url) {
+          dist.tarball = result.url;
+        } else if (result.key) {
+          dist.key = result.key;
+          dist.tarball = result.key;
+        }
+
         mod.package.dist = dist;
         mod.package.version = version;
         debug('%s module: save file to %s, size: %d, sha1: %s, dist: %j, version: %s',
@@ -397,6 +452,7 @@ exports.addPackageAndDist = function (req, res, next) {
   }
   version = version[1];
   var versionPackage = pkg.versions[version];
+  versionPackage._publish_on_cnpm = true;
   var distTags = pkg['dist-tags'] || {};
   var tags = []; // tag, version
   for (var t in distTags) {
@@ -437,6 +493,7 @@ exports.addPackageAndDist = function (req, res, next) {
     shasum.update(tarballBuffer);
     shasum = shasum.digest('hex');
     var key = common.getCDNKey(name, filename);
+
     nfs.uploadBuffer(tarballBuffer, {key: key}, ep.done('upload'));
   });
 
@@ -444,10 +501,18 @@ exports.addPackageAndDist = function (req, res, next) {
     debug('upload %j', result);
 
     var dist = {
-      tarball: result.url,
       shasum: shasum,
       size: attachment.length
     };
+
+    // if nfs upload return a key, record it
+    if (result.url) {
+      dist.tarball = result.url;
+    } else if (result.key) {
+      dist.key = result.key;
+      dist.tarball = result.key;
+    }
+
     var mod = {
       name: name,
       version: version,
@@ -631,8 +696,9 @@ exports.removeTar = function (req, res, next) {
         reason: 'Current user can not delete this tarball'
       });
     }
+    var key = mod.package.dist && mod.package.dist.key;
+    key = key || common.getCDNKey(mod.name, filename);
 
-    var key = common.getCDNKey(mod.name, filename);
     nfs.remove(key, ep.done(function () {
       res.json(200, {ok: true});
     }));
@@ -682,7 +748,7 @@ exports.removeAll = function (req, res, next) {
     }
     var queue = new Bagpipe(5);
     keys.forEach(function (key) {
-      queue.push(nfs.remove, key, function () {
+      queue.push(nfs.remove.bind(nfs), key, function () {
         //ignore err here
         ep.emit('removeTar');
       });
@@ -710,7 +776,7 @@ function parseModsForList(updated, mods, req) {
     pkg['dist-tags'] = {
       latest: pkg.version
     };
-    common.downloadURL(pkg, req);
+    common.setDownloadURL(pkg, req);
     results[mod.name] = pkg;
   }
   return results;
