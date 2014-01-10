@@ -1,4 +1,20 @@
 
+0.2.2 / 2014-01-10 
+==================
+
+  * keep compatibility
+  * qnfs upload only callback a url
+  * compat remove package
+  * set tarball url
+  * new npm publish in one request, add _publish_in_cnpm
+  * support unsure name ufs
+  * contributors maybe a object
+  * Object #<Object> has no method 'forEach' fixed #134
+  * support custom config as a module, fixed issue #132
+  * support npm new publish flow. fixed #129
+  * add toString and constructor to test admin
+  * fix #119 hasOwnProperty check admin bug.
+
 0.2.0 / 2013-12-27 
 ==================
 

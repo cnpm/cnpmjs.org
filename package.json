@@ -1,6 +1,6 @@
 {
   "name": "cnpmjs.org",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Private npm registry and web",
   "main": "dispatch.js",
   "scripts": {
@@ -39,8 +39,8 @@
     "mkdirp": "0.3.5",
     "moment": "2.5.0",
     "ms": "0.6.2",
-    "mysql": "2.0.0-rc2",
-    "nodemailer": "0.5.15",
+    "mysql": "2.0.0",
+    "nodemailer": "0.6.0",
     "qn": "0.2.0",
     "ready": "0.1.1",
     "response-cookie": "0.0.2",
@@ -48,28 +48,28 @@
     "semver": "2.2.1",
     "urllib": "0.5.5",
     "urlrouter": "0.5.4",
-    "utility": "0.1.9"
+    "utility": "0.1.10"
   },
   "devDependencies": {
     "blanket": "*",
     "contributors": "*",
     "coveralls": "*",
-    "mm": "0.1.7",
+    "mm": "0.1.8",
     "mocha": "*",
     "mocha-lcov-reporter": "*",
     "pedding": "0.0.3",
     "should": "2.1.1",
-    "supertest": "0.8.2",
+    "supertest": "0.8.3",
     "travis-cov": "*"
   },
-  "homepage": "https://github.com/fengmk2/cnpmjs.org",
+  "homepage": "https://github.com/cnpm/cnpmjs.org",
   "repository": {
     "type": "git",
-    "url": "git://github.com/fengmk2/cnpmjs.org.git",
-    "web": "https://github.com/fengmk2/cnpmjs.org"
+    "url": "git://github.com/cnpm/cnpmjs.org.git",
+    "web": "https://github.com/cnpm/cnpmjs.org"
   },
   "bugs": {
-    "url": "https://github.com/fengmk2/cnpmjs.org/issues",
+    "url": "https://github.com/cnpm/cnpmjs.org/issues",
     "email": "fengmk2@gmail.com"
   },
   "keywords": [

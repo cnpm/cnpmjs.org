@@ -1,11 +1,11 @@
 cnpmjs.org
 =======
 
-[![Build Status](https://secure.travis-ci.org/fengmk2/cnpmjs.org.png)](http://travis-ci.org/fengmk2/cnpmjs.org) [![Coverage Status](https://coveralls.io/repos/fengmk2/cnpmjs.org/badge.png)](https://coveralls.io/r/fengmk2/cnpmjs.org)[![Dependency Status](https://gemnasium.com/fengmk2/cnpmjs.org.png)](https://gemnasium.com/fengmk2/cnpmjs.org)
+[![Build Status](https://secure.travis-ci.org/cnpm/cnpmjs.org.png)](http://travis-ci.org/cnpm/cnpmjs.org) [![Coverage Status](https://coveralls.io/repos/cnpm/cnpmjs.org/badge.png)](https://coveralls.io/r/cnpm/cnpmjs.org)[![Dependency Status](https://gemnasium.com/cnpm/cnpmjs.org.png)](https://gemnasium.com/cnpm/cnpmjs.org)
 
 [![NPM](https://nodei.co/npm/cnpmjs.org.png?downloads=true&stars=true)](https://nodei.co/npm/cnpmjs.org/)
 
-![logo](https://raw.github.com/fengmk2/cnpmjs.org/master/logo.png)
+![logo](https://raw.github.com/cnpm/cnpmjs.org/master/logo.png)
 
 ## What is this?
 
@@ -33,14 +33,14 @@ $ node dispatch.js
 $ git summary
 
  project  : cnpmjs.org
- repo age : 2 weeks
- active   : 81 days
- commits  : 205
- files    : 83
+ repo age : 5 weeks
+ active   : 98 days
+ commits  : 239
+ files    : 85
  authors  :
-   120  fengmk2                 58.5%
-    84  dead_horse              41.0%
-     1  Alsotang                0.5%
+   140  fengmk2                 58.6%
+    98  dead_horse              41.0%
+     1  Alsotang                0.4%
 ```
 
 ## License
