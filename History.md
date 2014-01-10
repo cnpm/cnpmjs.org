@@ -1,4 +1,10 @@
 
+0.2.3 / 2014-01-10 
+==================
+
+  * Dont show sync button on private package
+  * Sync package as publish with no deps. fixed #138
+
 0.2.2 / 2014-01-10 
 ==================
 
