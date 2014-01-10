@@ -40,6 +40,53 @@ describe('controllers/sync.test.js', function () {
   describe('sync source npm package', function () {
     var logIdRegistry;
     var logIdWeb;
+
+    it('should sync as publish success', function (done) {
+      request(registryApp)
+      .del('/utility/-rev/123')
+      .set('authorization', baseauth)
+      // .expect(200)
+      // .expect({ok: true})
+      .end(function (err, res) {
+        should.not.exist(err);
+
+        mm.data(Npm, 'get', require(path.join(fixtures, 'utility.json')));
+        request(registryApp)
+        .put('/utility/sync?publish=true&nodeps=true')
+        .set('authorization', baseauth)
+        .end(function (err, res) {
+          should.not.exist(err);
+          res.body.should.have.keys('ok', 'logId');
+          logIdRegistry = res.body.logId;
+          setTimeout(function () {
+            request(registryApp)
+            .get('/utility')
+            .expect(200)
+            .end(function (err, res) {
+              should.not.exist(err);
+              Object.keys(res.body.versions).length.should.above(0);
+              for (var v in res.body.versions) {
+                var pkg = res.body.versions[v];
+                pkg.should.have.property('_publish_on_cnpm', true);
+              }
+              done();
+            });
+          }, 3000);
+        });
+      });
+    });
+
+    it('should sync as publish 403 when user not admin', function (done) {
+      mm.data(Npm, 'get', require(path.join(fixtures, 'utility.json')));
+      request(registryApp)
+      .put('/utility_unit_test/sync?publish=true&nodeps=true')
+      .expect(403)
+      .expect({
+        error: 'no_perms',
+        reason: 'Only admin can publish'
+      }, done);
+    });
+
     it('should sync success', function (done) {
       mm.data(Npm, 'get', require(path.join(fixtures, 'utility.json')));
       done = pedding(2, done);
