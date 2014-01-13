@@ -349,8 +349,13 @@ exports.upload = function (req, res, next) {
         });
       }
       shasum = shasum.digest('hex');
-      var key = common.getCDNKey(name, filename);
-      nfs.upload(filepath, {key: key, size: length}, function (err, result) {
+
+      var options = {
+        key: common.getCDNKey(name, filename),
+        size: length,
+        shasum: shasum
+      };
+      nfs.upload(filepath, options, function (err, result) {
         // remove tmp file whatever
         fs.unlink(filepath, utility.noop);
         if (err) {
@@ -518,9 +523,12 @@ exports.addPackageAndDist = function (req, res, next) {
     shasum = crypto.createHash('sha1');
     shasum.update(tarballBuffer);
     shasum = shasum.digest('hex');
-    var key = common.getCDNKey(name, filename);
 
-    nfs.uploadBuffer(tarballBuffer, {key: key}, ep.done('upload'));
+    var options = {
+      key: common.getCDNKey(name, filename),
+      shasum: shasum
+    };
+    nfs.uploadBuffer(tarballBuffer, options, ep.done('upload'));
   });
 
   ep.on('upload', function (result) {

@@ -422,8 +422,12 @@ SyncModuleWorker.prototype._syncOneVersion = function (versionIndex, sourcePacka
         return ep.emit('error', err);
       }
 
-      var key = common.getCDNKey(sourcePackage.name, filename);
-      nfs.upload(filepath, {key: key, size: dataSize}, ep.done('uploadResult'));
+      var options = {
+        key: common.getCDNKey(sourcePackage.name, filename),
+        size: dataSize,
+        shasum: shasum
+      };
+      nfs.upload(filepath, options, ep.done('uploadResult'));
     });
   }));
 
