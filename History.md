@@ -1,4 +1,9 @@
 
+0.2.7 / 2014-01-13 
+==================
+
+  * add shasum when nfs.upload and hfs.uploadBuffer, fixed #148
+
 0.2.6 / 2014-01-13 
 ==================
 
