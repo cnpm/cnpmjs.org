@@ -1,4 +1,11 @@
 
+0.2.5 / 2014-01-13 
+==================
+
+  * add download timeout and unit test
+  * use downloadStream() first
+  * nfs download to a writeable stream.
+
 0.2.4 / 2014-01-10 
 ==================
 
