@@ -204,9 +204,11 @@ exports.download = function (req, res, next) {
   });
 
   ep.once('key', function (dist) {
-    if (!nfs.download) {
+    if (!nfs.downloadStream && !nfs.download) {
       return next();
     }
+
+    _downloads[name] = (_downloads[name] || 0) + 1;
 
     if (typeof dist.size === 'number') {
       res.setHeader('Content-Length', dist.size);
@@ -215,12 +217,31 @@ exports.download = function (req, res, next) {
     res.setHeader('Content-Disposition: inline; filename="' + filename + '"');
     res.setHeader('ETag', dist.shasum);
 
-    nfs.download(dist.key, res, function (err) {
+    if (nfs.downloadStream) {
+      nfs.downloadStream(dist.key, res, function (err) {
+        if (err) {
+          // TODO: just end or send error response?
+          return next(err);
+        }
+      });
+      return;
+    }
+
+    // use download file api
+    var tmpPath = path.join(config.uploadDir, utility.randomString() + dist.key);
+    function cleanup() {
+      fs.unlink(tmpPath, utility.noop);
+    }
+
+    nfs.download(dist.key, tmpPath, function (err) {
       if (err) {
-        // TODO: just end or send error response?
+        cleanup();
         return next(err);
       }
-      _downloads[name] = (_downloads[name] || 0) + 1;
+      var tarball = fs.createReadStream(tmpPath);
+      tarball.on('error', cleanup);
+      tarball.on('end', cleanup);
+      tarball.pipe(res);
     });
   });
 };
