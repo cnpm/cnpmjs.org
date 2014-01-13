@@ -44,7 +44,7 @@ describe('sync/sync_exist.js', function () {
         should.not.exist(err);
         data.successes.should.eql(['cnpmjs.org', 'cutter']);
         done();
-      });      
+      });
     });
   });
 });

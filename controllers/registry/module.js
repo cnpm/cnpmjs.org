@@ -23,6 +23,9 @@ var utility = require('utility');
 var eventproxy = require('eventproxy');
 var Bagpipe = require('bagpipe');
 var urlparse = require('url').parse;
+var mime = require('mime');
+var semver = require('semver');
+var ms = require('ms');
 var config = require('../../config');
 var Module = require('../../proxy/module');
 var Total = require('../../proxy/total');
@@ -32,7 +35,6 @@ var Log = require('../../proxy/module_log');
 var DownloadTotal = require('../../proxy/download');
 var SyncModuleWorker = require('../../proxy/sync_module_worker');
 var logger = require('../../common/logger');
-var semver = require('semver');
 
 exports.show = function (req, res, next) {
   var name = req.params.name;
@@ -167,6 +169,8 @@ exports.get = function (req, res, next) {
 
 var _downloads = {};
 
+var DOWNLOAD_TIMEOUT = ms('10m');
+
 exports.download = function (req, res, next) {
   var name = req.params.name;
   var filename = req.params.filename;
@@ -181,9 +185,9 @@ exports.download = function (req, res, next) {
     }
     var dist = row.package.dist;
     if (dist.key) {
-      return ep.emit('key', dist.key);
+      return ep.emit('key', dist);
     } else {
-      return ep.emit('url', dist.tarball);
+      return ep.emit('url', dist);
     }
     ep.emit('nodist');
   });
@@ -195,23 +199,46 @@ exports.download = function (req, res, next) {
     ep.emit('url', nfs.url(common.getCDNKey(name, filename)));
   });
 
-  ep.once('url', function (url) {
+  ep.once('url', function (dist) {
     res.statusCode = 302;
-    res.setHeader('Location', url);
+    res.setHeader('Location', dist.tarball);
     res.end();
     _downloads[name] = (_downloads[name] || 0) + 1;
   });
 
-  ep.once('key', function (key) {
-    if (!nfs.download) {
+  ep.once('key', function (dist) {
+    if (!nfs.downloadStream && !nfs.download) {
       return next();
     }
-    var tmpPath = path.join(config.uploadDir, utility.randomString() + key);
+
+    _downloads[name] = (_downloads[name] || 0) + 1;
+
+    if (typeof dist.size === 'number') {
+      res.setHeader('Content-Length', dist.size);
+    }
+    res.setHeader('Content-Type', mime.lookup(dist.key));
+    res.setHeader('Content-Disposition: attachment; filename="' + filename + '"');
+    res.setHeader('ETag', dist.shasum);
+
+    if (nfs.downloadStream) {
+      nfs.downloadStream(dist.key, res, {timeout: DOWNLOAD_TIMEOUT},
+      function (err) {
+        if (err) {
+          // TODO: just end or send error response?
+          return next(err);
+        }
+      });
+      return;
+    }
+
+    // use download file api
+    var tmpPath = path.join(config.uploadDir, utility.randomString() + dist.key);
     function cleanup() {
       fs.unlink(tmpPath, utility.noop);
     }
 
-    nfs.download(key, tmpPath, function (err) {
+    nfs.download(dist.key, tmpPath, {timeout: DOWNLOAD_TIMEOUT},
+    function (err) {
       if (err) {
         cleanup();
         return next(err);
@@ -220,7 +247,6 @@ exports.download = function (req, res, next) {
       tarball.on('error', cleanup);
       tarball.on('end', cleanup);
       tarball.pipe(res);
-      _downloads[name] = (_downloads[name] || 0) + 1;
     });
   });
 };

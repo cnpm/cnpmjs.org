@@ -36,6 +36,7 @@
     "logfilestream": "0.1.0",
     "marked": "0.3.0",
     "microtime": "0.5.1",
+    "mime": "1.2.11",
     "mkdirp": "0.3.5",
     "moment": "2.5.0",
     "ms": "0.6.2",
