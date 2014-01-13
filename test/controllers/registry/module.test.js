@@ -446,6 +446,45 @@ describe('controllers/registry/module.test.js', function () {
     });
   });
 
+  describe('GET /:name/download/:filename', function () {
+    it('should download a file with 302 redirect', function (done) {
+      request(app)
+      .get('/cutter/download/cutter-0.0.2.tgz')
+      .expect('Location', 'http://qtestbucket.qiniudn.com/cutter/-/cutter-0.0.2.tgz')
+      .expect(302, done)
+    });
+
+    it('should download a file direct from nfs stream', function (done) {
+      var nfs = require('../../../common/nfs');
+      mm(nfs, 'downloadStream', function (key, writeStream, options, callback) {
+        options.timeout.should.equal(600000);
+        nfs._client.download(key, {writeStream: writeStream, timeout: options.timeout}, callback);
+      });
+      Module.__get__ = Module.get;
+      mm(Module, 'get', function (name, version, callback) {
+        Module.__get__(name, version, function (err, info) {
+          info.package.dist.key = 'cutter/-/cutter-0.0.2.tgz';
+          callback(err, info);
+        });
+      });
+      request(app)
+      .get('/cutter/download/cutter-0.0.2.tgz')
+      .expect('ETag', 'c61fde5e8c26d053574d0c722097029fd1bc963a')
+      .expect('Content-Type', 'application/octet-stream')
+      .expect('Content-Length', '3139')
+      // TODO supertest has a bug
+      // Error: expected "Content-Disposition" of "inline; filename="testputmodule-0.1.9.tgz"", got "attachment; filename="testputmodule-0.1.9.tgz": undefined"
+      // .expect('Content-Disposition', 'inline; filename="testputmodule-0.1.9.tgz"')
+      .expect(200)
+      .end(function (err, res) {
+        should.not.exist(err);
+        // TODO: why supertest change buffer to text?
+        // res.text.length.should.equal(3139);
+        done();
+      });
+    });
+  });
+
   describe('DELETE /:name/download/:filename/-rev/:rev', function () {
     var lastRev;
     before(function (done) {

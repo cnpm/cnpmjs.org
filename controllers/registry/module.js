@@ -25,6 +25,7 @@ var Bagpipe = require('bagpipe');
 var urlparse = require('url').parse;
 var mime = require('mime');
 var semver = require('semver');
+var ms = require('ms');
 var config = require('../../config');
 var Module = require('../../proxy/module');
 var Total = require('../../proxy/total');
@@ -168,6 +169,8 @@ exports.get = function (req, res, next) {
 
 var _downloads = {};
 
+var DOWNLOAD_TIMEOUT = ms('10m');
+
 exports.download = function (req, res, next) {
   var name = req.params.name;
   var filename = req.params.filename;
@@ -214,11 +217,12 @@ exports.download = function (req, res, next) {
       res.setHeader('Content-Length', dist.size);
     }
     res.setHeader('Content-Type', mime.lookup(dist.key));
-    res.setHeader('Content-Disposition: inline; filename="' + filename + '"');
+    res.setHeader('Content-Disposition: attachment; filename="' + filename + '"');
     res.setHeader('ETag', dist.shasum);
 
     if (nfs.downloadStream) {
-      nfs.downloadStream(dist.key, res, function (err) {
+      nfs.downloadStream(dist.key, res, {timeout: DOWNLOAD_TIMEOUT},
+      function (err) {
         if (err) {
           // TODO: just end or send error response?
           return next(err);
@@ -233,7 +237,8 @@ exports.download = function (req, res, next) {
       fs.unlink(tmpPath, utility.noop);
     }
 
-    nfs.download(dist.key, tmpPath, function (err) {
+    nfs.download(dist.key, tmpPath, {timeout: DOWNLOAD_TIMEOUT},
+    function (err) {
       if (err) {
         cleanup();
         return next(err);

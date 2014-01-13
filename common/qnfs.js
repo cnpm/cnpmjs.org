@@ -19,6 +19,8 @@ var config = require('../config');
 
 var client = qn.create(config.qn);
 
+exports._client = client;
+
 /**
  * Upload file
  *
