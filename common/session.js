@@ -33,7 +33,7 @@ if (config.debug) {
   session = connect.session({
     key: key,
     secret: config.sessionSecret,
-    store: new RedisStore(config.redis),
+    store: config.sessionStore || new RedisStore(config.redis),
     cookie: cookie,
   });
 }
