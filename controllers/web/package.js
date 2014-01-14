@@ -109,6 +109,39 @@ exports.search = function (req, res, next) {
   });
 };
 
+exports.rangeSearch = function (req, res, next) {
+  var startKey = req.query.startkey || '';
+  if (startKey[0] === '"') {
+    startKey = startKey.substring(1);
+  }
+  if (startKey[startKey.length - 1] === '"') {
+    startKey = startKey.substring(0, startKey.length - 1);
+  }
+  var limit = Number(req.query.limit) || 20;
+  Module.search(startKey, {limit: limit}, function (err, packages) {
+    if (err) {
+      return next(err);
+    }
+
+    var rows = [];
+    for (var i = 0; i < packages.length; i++) {
+      var p = packages[i];
+      var row = {
+        key: p.name,
+        count: 1,
+        value: {
+          name: p.name,
+          description: p.description,
+        }
+      };
+      rows.push(row);
+    }
+    res.json({
+      rows: rows
+    });
+  });
+};
+
 exports.displaySync = function (req, res, next) {
   var name = req.params.name || req.query.name;
   res.render('sync', {

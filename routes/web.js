@@ -32,6 +32,8 @@ function routes(app) {
   app.put('/sync/:name', sync.sync);
   app.get('/sync/:name/log/:id', sync.getSyncLog);
   app.get('/sync', pkg.displaySync);
+
+  app.get('/_list/search/search', pkg.rangeSearch);
 }
 
 module.exports = routes;
