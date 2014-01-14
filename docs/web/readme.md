@@ -6,7 +6,7 @@
 
 ## What is this?
 
-> Private npm registry and web for Enterprise, base on MySQL and Simple File Store.
+> Private npm registry and web for Enterprise, base on MySQL and [Simple Store Service](https://github.com/cnpm/cnpmjs.org/wiki/NFS-Guide).
 
 @[JacksonTian](https://github.com/JacksonTian/) had a talk about [private npm](https://speakerdeck.com/jacksontian/qi-ye-ji-node-dot-jskai-fa).
 
@@ -16,7 +16,7 @@
 
 ## Registry
 
-* Our public registry: [registry.cnpmjs.org](http://registry.cnpmjs.org)
+* Our public registry: [r.cnpmjs.org](http://r.cnpmjs.org), syncing from [registry.npmjs.org](http://registry.npmjs.org)
 * Current [cnpmjs.org](/) version: <span id="app-version"></span>
 
 <table class="downloads">
@@ -119,13 +119,13 @@ $(function () {
 alias it:
 
 ```bash
-alias cnpm="npm --registry=http://registry.cnpmjs.org \
+alias cnpm="npm --registry=http://r.cnpmjs.org \
 --cache=$HOME/.npm/.cache/cnpm \
 --disturl=http://dist.u.qiniudn.com \
 --userconfig=$HOME/.cnpmrc"
 
 #Or alias it in .bashrc or .zshrc
-$ echo '\n#alias for cnpm\nalias cnpm="npm --registry=http://registry.cnpmjs.org \
+$ echo '\n#alias for cnpm\nalias cnpm="npm --registry=http://r.cnpmjs.org \
   --cache=$HOME/.npm/.cache/cnpm \
   --disturl=http://dist.u.qiniudn.com \
   --userconfig=$HOME/.cnpmrc"' >> ~/.zshrc && source ~/.zshrc
@@ -139,7 +139,7 @@ $ npm install cnpm -g
 
 ### install
 
-Install package from [registry.cnpmjs.org](http://registry.cnpmjs.org). When isntall a  package or version not exist, it will try to install from official registry([registry.npmjs.org](http://registry.npmjs.org)), and sync this package to cnpm in the backend.
+Install package from [r.cnpmjs.org](http://r.cnpmjs.org). When isntall a  package or version not exist, it will try to install from official registry([registry.npmjs.org](http://registry.npmjs.org)), and sync this package to cnpm in the backend.
 
 ```
 $ cnpm install [name]
