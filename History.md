@@ -1,4 +1,10 @@
 
+0.2.8 / 2014-01-14 
+==================
+
+  * dont show err stack on test env
+  * add download link for package page
+
 0.2.7 / 2014-01-13 
 ==================
 
