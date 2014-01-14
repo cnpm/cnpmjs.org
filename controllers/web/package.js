@@ -20,10 +20,12 @@ var semver = require('semver');
 var marked = require('marked');
 var gravatar = require('gravatar');
 var humanize = require('humanize-number');
+var config = require('../../config');
 var Module = require('../../proxy/module');
 var down = require('../download');
 var sync = require('../sync');
 var Log = require('../../proxy/module_log');
+var setDownloadURL = require('../../lib/common').setDownloadURL;
 
 exports.display = function (req, res, next) {
   var params = req.params;
@@ -80,6 +82,8 @@ exports.display = function (req, res, next) {
     for (var k in download) {
       download[k] = humanize(download[k]);
     }
+
+    setDownloadURL(pkg, req, config.registryHost);
 
     res.render('package', {
       title: 'Package - ' + pkg.name,

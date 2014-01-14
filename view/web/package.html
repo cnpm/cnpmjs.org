@@ -192,6 +192,17 @@
         </td>
       </tr>
       <% } %>
+
+      <% if (package.dist && package.dist.tarball) { %>
+      <tr>
+        <th>Download</th>
+        <td>
+          <a class="downloadlink" target="_blank" href="<%= package.dist.tarball %>">
+            <%= package.dist.tarball %>
+          </a>
+        </td>
+      </tr>
+      <% } %>
     </table>
 
     <div class="details">

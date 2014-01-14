@@ -71,6 +71,7 @@ var config = {
     debug: false
   },
 
+  registryHost: 'r.cnpmjs.org',
   sourceNpmRegistry: 'http://registry.npmjs.org',
   enablePrivate: true, // enable private mode, only admin can publish, other use just can sync package from source npm
   admins: {
