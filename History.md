@@ -1,4 +1,12 @@
 
+0.2.9 / 2014-01-14 
+==================
+
+  * support startkey=c and startkey="c"
+  * support couch db search api. fixed #153
+  * fix fork me image link
+  * support sync by query.name
+
 0.2.8 / 2014-01-14 
 ==================
 
