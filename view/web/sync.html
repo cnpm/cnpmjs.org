@@ -11,6 +11,7 @@
   var $notify = $('#sync-notify');
   var timer;
   var name = '<%= name %>';
+  var resourceURL = '/sync/' + name;
   $(function() {
     var checkLogId = location.hash.match(/logid=(\d+)/);
     var logid = checkLogId ? checkLogId[1] : '';
@@ -18,7 +19,7 @@
       return getSyncLog(logid);
     }
     $.ajax({
-      url: location.pathname,
+      url: resourceURL,
       type: 'PUT',
       dataType: 'json',
       success: handleSyncSucess,
@@ -53,7 +54,7 @@
   var hasFail = false;
   function getSyncLog(id) {
     $.ajax({
-      url: location.pathname + '/log/' + id + '?offset=' + offset,
+      url: resourceURL + '/log/' + id + '?offset=' + offset,
       type: 'GET',
       dataType: 'json',
       success: function (data) {

@@ -110,7 +110,7 @@ exports.search = function (req, res, next) {
 };
 
 exports.displaySync = function (req, res, next) {
-  var name = req.params.name;
+  var name = req.params.name || req.query.name;
   res.render('sync', {
     name: name,
     title: 'Sync - ' + name
