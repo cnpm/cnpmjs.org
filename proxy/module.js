@@ -296,14 +296,20 @@ exports.listByAuthor = function (author, callback) {
 };
 
 var SEARCH_SQLS = [
-  'SELECT module_id FROM tag WHERE name LIKE ? AND  tag="latest" ORDER BY name LIMIT 100;',
+  'SELECT module_id FROM tag WHERE name LIKE ? AND  tag="latest" ORDER BY name LIMIT ?;',
   'SELECT name, description FROM module WHERE id IN (?) ORDER BY name;'
 ];
-exports.search = function (word, callback) {
+exports.search = function (word, options, callback) {
+  if (typeof options === 'function') {
+    callback = options;
+    options = null;
+  }
+  options = options || {};
+  var limit = options.limit || 100;
   word = word.replace(/^%/, '') + '%'; //ignore prefix %
   var ep = eventproxy.create();
   ep.fail(callback);
-  mysql.query(SEARCH_SQLS[0], [word], ep.done(function (rows) {
+  mysql.query(SEARCH_SQLS[0], [word, limit], ep.done(function (rows) {
     if (!rows || rows.length === 0) {
       return callback(null, []);
     }

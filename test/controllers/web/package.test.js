@@ -31,6 +31,48 @@ describe('controllers/web/package.test.js', function () {
 
   afterEach(mm.restore);
 
+  describe('GET /_list/search/search', function () {
+    it('should search with "c"', function (done) {
+      request(app)
+      .get('/_list/search/search?startkey="c"&limit=2')
+      .expect(200, function (err, res) {
+        should.not.exist(err);
+        res.body.should.have.keys('rows');
+        res.body.rows.should.eql([
+          { key: 'c', count: 1, value: { name: 'c', description: 'Give folders or directories comments and view them easy.' } },
+          { key: 'charset', count: 1,
+            value: { name: 'charset', description: 'Get the content charset from header and html content-type.' } }
+        ]);
+        done();
+      });
+    });
+
+    it('should search with c', function (done) {
+      request(app)
+      .get('/_list/search/search?startkey=c&limit=2')
+      .expect(200, function (err, res) {
+        should.not.exist(err);
+        res.body.should.have.keys('rows');
+        res.body.rows.should.eql([
+          { key: 'c', count: 1, value: { name: 'c', description: 'Give folders or directories comments and view them easy.' } },
+          { key: 'charset', count: 1,
+            value: { name: 'charset', description: 'Get the content charset from header and html content-type.' } }
+        ]);
+        done();
+      });
+    });
+
+    it('should search return empty', function (done) {
+      request(app)
+      .get('/_list/search/search?startkey="cddddsdasdaasds"&limit=2')
+      .expect(200, function (err, res) {
+        should.not.exist(err);
+        res.body.should.eql({rows: []});
+        done();
+      });
+    });
+  });
+
   describe('GET /package/:name', function (done) {
     it('should get 200', function (done) {
       request(app)
