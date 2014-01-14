@@ -20,11 +20,9 @@ var config = require('../config');
 function request(url, options, callback) {
   if (typeof options === 'function') {
     callback = options;
-    options = {
-      dataType: 'json',
-      timeout: 10000
-    };
+    options = null;
   }
+  options = options || {};
   options.dataType = options.dataType || 'json';
   options.timeout = options.timeout || 120000;
   url = config.sourceNpmRegistry + url;

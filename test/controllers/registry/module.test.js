@@ -472,9 +472,7 @@ describe('controllers/registry/module.test.js', function () {
       .expect('ETag', 'c61fde5e8c26d053574d0c722097029fd1bc963a')
       .expect('Content-Type', 'application/octet-stream')
       .expect('Content-Length', '3139')
-      // TODO supertest has a bug
-      // Error: expected "Content-Disposition" of "inline; filename="testputmodule-0.1.9.tgz"", got "attachment; filename="testputmodule-0.1.9.tgz": undefined"
-      // .expect('Content-Disposition', 'inline; filename="testputmodule-0.1.9.tgz"')
+      .expect('Content-Disposition', 'attachment; filename="cutter-0.0.2.tgz"')
       .expect(200)
       .end(function (err, res) {
         should.not.exist(err);

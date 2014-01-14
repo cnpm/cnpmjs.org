@@ -217,7 +217,7 @@ exports.download = function (req, res, next) {
       res.setHeader('Content-Length', dist.size);
     }
     res.setHeader('Content-Type', mime.lookup(dist.key));
-    res.setHeader('Content-Disposition: attachment; filename="' + filename + '"');
+    res.setHeader('Content-Disposition', 'attachment; filename="' + filename + '"');
     res.setHeader('ETag', dist.shasum);
 
     if (nfs.downloadStream) {
