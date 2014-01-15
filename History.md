@@ -1,4 +1,9 @@
 
+0.2.13 / 2014-01-15 
+==================
+
+  * markdown tmpl not support footer, need to wrap on app start
+
 0.2.12 / 2014-01-15 
 ==================
 
