@@ -181,7 +181,7 @@
         <td>
         <% package.contributors.forEach(function (m) { %>
           <span class="user">
-            <a class="username" href="/~<%= m.name %>">
+            <a class="username" target="_blank" href="<%= m.url %>">
               <% if (m.gravatar) { %>
               <img src="<%- m.gravatar %>" class="avatar">
               <% } %>

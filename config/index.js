@@ -72,6 +72,7 @@ var config = {
   },
 
   registryHost: 'r.cnpmjs.org',
+  packagePageContributorSearch: true, // package page contributor link to search, default is true
   sourceNpmRegistry: 'http://registry.npmjs.org',
   enablePrivate: true, // enable private mode, only admin can publish, other use just can sync package from source npm
   admins: {

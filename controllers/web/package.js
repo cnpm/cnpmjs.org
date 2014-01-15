@@ -74,6 +74,9 @@ exports.display = function (req, res, next) {
         if (contributor.email) {
           contributor.gravatar = gravatar.url(contributor.email, {s: '50', d: 'retro'}, false);
         }
+        if (config.packagePageContributorSearch || !contributor.url) {
+          contributor.url = '/~' + encodeURIComponent(contributor.name);
+        }
       }
     }
 
