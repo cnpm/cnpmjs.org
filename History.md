@@ -1,4 +1,9 @@
 
+0.2.11 / 2014-01-15 
+==================
+
+  * package page contributor link to search, default is true
+
 0.2.10 / 2014-01-14 
 ==================
 
