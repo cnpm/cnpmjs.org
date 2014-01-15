@@ -18,7 +18,7 @@
       <p class="description"><%= package.description %></p>
     <% } %>
 
-    <pre class="sh"><code>$ cnpm install <%= package.name %></code></pre>
+    <pre class="sh"><code>$ <%- config.npmClientName %> install <%= package.name %></code></pre>
 
     <table class="downloads">
       <tbody>
