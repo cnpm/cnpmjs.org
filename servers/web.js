@@ -18,6 +18,7 @@
 require('response-patch');
 var path = require('path');
 var http = require('http');
+var fs = require('fs');
 var connect = require('connect');
 var rt = require('connect-rt');
 var urlrouter = require('urlrouter');
@@ -49,9 +50,14 @@ app.use(connect.json());
 var viewDir = path.join(rootdir, 'view', 'web');
 var docDir = path.join(rootdir, 'docs', 'web');
 
+var layoutFile = path.join(viewDir, '_layout.html');
+var footer = config.customFooter || fs.readFileSync(path.join(viewDir, 'footer.html'), 'utf8');
+var layout = fs.readFileSync(path.join(viewDir, 'layout.html'), 'utf8').replace('{{footer}}', footer);
+fs.writeFileSync(layoutFile, layout);
+
 app.use('/', connectMarkdown({
   root: docDir,
-  layout: path.join(viewDir, 'layout.html'),
+  layout: layoutFile,
   titleHolder: '<%- locals.title %>',
   bodyHolder: '<%- locals.body %>',
   indexName: 'readme'
