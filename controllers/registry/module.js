@@ -437,6 +437,8 @@ exports.updateLatest = function (req, res, next) {
     }
     body._publish_on_cnpm = true;
     nextMod.package = body;
+    // reset publish time
+    nextMod.publish_time = Date.now();
     debug('update %s:%s %j', nextMod.package.name, nextMod.package.version, nextMod.package.dist);
     // change latest to version
     Module.update(nextMod, function (err) {
