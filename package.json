@@ -52,6 +52,7 @@
     "utility": "0.1.10"
   },
   "devDependencies": {
+    "autod": ">=0.0.10",
     "blanket": "*",
     "contributors": "*",
     "coveralls": "*",
