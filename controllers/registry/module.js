@@ -86,6 +86,7 @@ exports.show = function (req, res, next) {
       }
       var pkg = row.package;
       common.setDownloadURL(pkg, req);
+      pkg._cnpm_publish_time = pkg.publish_time;
       versions[pkg.version] = pkg;
       times[pkg.version] = row.publish_time ? new Date(row.publish_time) : row.gmt_modified;
       if ((!distTags.latest && !latestMod) || distTags.latest === row.version) {
@@ -140,6 +141,7 @@ exports.get = function (req, res, next) {
   Module[method](name, queryLabel, ep.done(function (mod) {
     if (mod) {
       common.setDownloadURL(mod.package, req);
+      mod.package._cnpm_publish_time = mod.publish_time;
       return res.json(mod.package);
     }
     ep.emit('notFound');

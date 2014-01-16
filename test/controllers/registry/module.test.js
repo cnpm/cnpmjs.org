@@ -96,6 +96,9 @@ describe('controllers/registry/module.test.js', function () {
         body.version.should.equal('0.2.1');
         body._id.should.equal('cnpmjs.org@0.2.1');
         body.dist.tarball.should.include('cnpmjs.org-0.2.1.tgz');
+        body.should.have.property('_cnpm_publish_time');
+        body._cnpm_publish_time.should.be.a.Number;
+        body.should.have.property('_publish_on_cnpm', true);
         done();
       });
     });
