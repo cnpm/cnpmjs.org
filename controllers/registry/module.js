@@ -86,7 +86,7 @@ exports.show = function (req, res, next) {
       }
       var pkg = row.package;
       common.setDownloadURL(pkg, req);
-      pkg._cnpm_publish_time = pkg.publish_time;
+      pkg._cnpm_publish_time = row.publish_time;
       versions[pkg.version] = pkg;
       times[pkg.version] = row.publish_time ? new Date(row.publish_time) : row.gmt_modified;
       if ((!distTags.latest && !latestMod) || distTags.latest === row.version) {

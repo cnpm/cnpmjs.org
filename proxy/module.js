@@ -59,7 +59,8 @@ exports.updateDescription = function (id, description, callback) {
   mysql.query(UPDATE_DESC_SQL, [description, id], callback);
 };
 
-var UPDATE_DIST_SQL = 'UPDATE module SET version=?, package=?, dist_tarball=?, dist_shasum=?, dist_size=? WHERE id=?;';
+var UPDATE_DIST_SQL = 'UPDATE module SET publish_time=?, version=?, package=?, \
+  dist_tarball=?, dist_shasum=?, dist_size=? WHERE id=?;';
 
 exports.update = function (mod, callback) {
   var pkg;
@@ -69,7 +70,8 @@ exports.update = function (mod, callback) {
     return callback(e);
   }
   var dist = mod.package.dist;
-  mysql.query(UPDATE_DIST_SQL, [mod.version, pkg, dist.tarball, dist.shasum, dist.size, mod.id],
+  mysql.query(UPDATE_DIST_SQL,
+    [mod.publish_time, mod.version, pkg, dist.tarball, dist.shasum, dist.size, mod.id],
   function (err, result) {
     if (err) {
       return callback(err);
