@@ -70,7 +70,7 @@ var helpers = {
 app.use(render({
   root: viewDir,
   viewExt: '.html',
-  layout: 'layout',
+  layout: '_layout',
   cache: config.viewCache,
   helpers: helpers
 }));
