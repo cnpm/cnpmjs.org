@@ -21,6 +21,11 @@ var common = require('../lib/common');
 
 module.exports = function (options) {
   return function auth(req, res, next) {
+    if (!req.session) {
+      // redis crash
+      req.session = {};
+      return next();
+    }
     req.session.onlySync = config.enablePrivate ? true : false;
     if (req.session.name) {
       req.session.isAdmin = common.isAdmin(req.session.name);
