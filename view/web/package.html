@@ -89,19 +89,13 @@
           %></td>
       </tr>
       <% } %>
-      <% if (package.repository && package.repository !== 'undefined') {
-      var gh = package.repository.url &&
-          package.repository.url.match(
-          /^(?:https?:\/\/|git(?::\/\/|@))(gist.github.com|github.com)[:\/](.*?)(?:.git)?$/)
-      if (gh) {
-        gh = 'https://' + gh[1] + '/' + gh[2]
-      }
-      %>
+      <% if (package.repository && package.repository !== 'undefined') { %>
       <tr>
         <th>Repository</td>
         <td>
-          <% if (gh) { %><a href="<%= gh %>" target="_blank"><% } %>
-          <%= package.repository.url %><% if (gh) { %></a><% } %>
+          <a href="<%= package.repository.weburl || package.repository.url %>" target="_blank">
+            <%= package.repository.url %>
+          </a>
           (<%= package.repository.type %>)
         </td>
       </tr>
