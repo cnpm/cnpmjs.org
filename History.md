@@ -1,4 +1,10 @@
 
+0.2.18 / 2014-01-20 
+==================
+
+  * Support gitlab git url to display and click. fixed #160
+  * fix redis crash
+
 0.2.17 / 2014-01-17 
 ==================
 
