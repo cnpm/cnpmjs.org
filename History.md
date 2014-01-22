@@ -1,4 +1,9 @@
 
+0.2.19 / 2014-01-22 
+==================
+
+  * npm install no need to check authorization header. fixed #171
+
 0.2.18 / 2014-01-20 
 ==================
 
