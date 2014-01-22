@@ -45,11 +45,12 @@ describe('middleware/auth.test.js', function () {
       .expect(200, done);
     });
 
-    it('should 401 with authorization and check fail', function (done) {
+    it('should pass with authorization and check fail', function (done) {
+      // npm install no need to check auth
       request(app)
       .get('/-/user/org.couchdb.user:cnpmjstest10')
       .set('authorization', 'basic ' + new Buffer('cnpmjstest10:cnpmjstest').toString('base64'))
-      .expect(401, done);
+      .expect(200, done);
     });
 
     it('should 500 with authorization and mysql error', function (done) {

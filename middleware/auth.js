@@ -1,4 +1,4 @@
-/*!
+/**!
  * cnpmjs.org - middleware/auth.js
  *
  * Copyright(c) cnpmjs.org and other contributors.
@@ -38,7 +38,12 @@ module.exports = function (options) {
     if (!authorization) {
       return next();
     }
+
     authorization = new Buffer(authorization, 'base64').toString().split(':');
+    if (authorization.length !== 2) {
+      return next();
+    }
+
     var username = authorization[0];
     var password = authorization[1];
 
@@ -49,10 +54,9 @@ module.exports = function (options) {
 
       if (!row) {
         debug('auth fail user: %j, headers: %j', row, req.headers);
-        return res.json(401, {
-          error: 'unauthorized',
-          reason: 'Name or password is incorrect.'
-        });
+        req.session.name = null;
+        req.session.isAdmin = false;
+        return next();
       }
 
       req.session.name = row.name;
