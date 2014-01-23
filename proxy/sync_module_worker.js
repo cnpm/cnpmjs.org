@@ -194,6 +194,8 @@ SyncModuleWorker.prototype._sync = function (name, pkg, callback) {
   var missingVersions = [];
   var missingTags = [];
   var missingDescriptions = [];
+  var missingReadmes = [];
+
   ep.all('existsMap', 'existsTags', function (map, tags) {
     var times = pkg.time || {};
     pkg.versions = pkg.versions || {};
@@ -239,7 +241,10 @@ SyncModuleWorker.prototype._sync = function (name, pkg, callback) {
       if (!version || !version.dist) {
         continue;
       }
-
+      //patch for readme
+      if (!version.readme) {
+        version.readme = pkg.readme;
+      }
       var publish_time = times[v];
       version.publish_time = publish_time ? Date.parse(publish_time) : null;
       if (!version.maintainers || !version.maintainers[0]) {
@@ -259,6 +264,14 @@ SyncModuleWorker.prototype._sync = function (name, pkg, callback) {
             missingDescriptions.push({
               id: exists.id,
               description: version.description
+            });
+          }
+
+          if (!exists.readme && version.readme) {
+            // * make sure readme exists
+            missingReadmes.push({
+              id: exists.id,
+              readme: version.readme
             });
           }
           continue;
@@ -317,10 +330,10 @@ SyncModuleWorker.prototype._sync = function (name, pkg, callback) {
     missingDescriptions.forEach(function (item) {
       Module.updateDescription(item.id, item.description, function (err, result) {
         if (err) {
-          return that.log('    save error, %s: description %j, error: %s', item.id, item.description, err);
+          return that.log('    save error, id： %s, description: %s, error: %s', item.id, item.description, err);
         }
         that.log('    saved, id: %s, description length: %d', item.id, item.description.length);
-        ep.emit('saveDescription');
+        ep.emitLater('saveDescription');
       });
     });
 
@@ -339,7 +352,7 @@ SyncModuleWorker.prototype._sync = function (name, pkg, callback) {
     missingTags.forEach(function (item) {
       Module.addTag(name, item[0], item[1], ep.done(function (result) {
         that.log('    added tag %s:%s, module_id: %s', item[0], item[1], result && result.module_id);
-        ep.emit('addTag');
+        ep.emitLater('addTag');
       }));
     });
 
@@ -348,7 +361,28 @@ SyncModuleWorker.prototype._sync = function (name, pkg, callback) {
     });
   });
 
-  ep.all('tagDone', 'descriptionDone', function () {
+  ep.once('syncDone', function () {
+    if (missingReadmes.length === 0) {
+      return ep.emit('readmeDone');
+    }
+
+    that.log('  [%s] saving %d readmes', name, missingReadmes.length);
+    missingReadmes.forEach(function (item) {
+      Module.updateReadme(item.id, item.readme, function (err, result) {
+        if (err) {
+          return that.log('    save error, id: %s, error: %s', item.id, err);
+        }
+        that.log('    saved, id: %s', item.id);
+        ep.emitLater('saveReadme');
+      });
+    });
+
+    ep.fater('saveReadme', missingReadmes.length, function () {
+      ep.emit('readmeDone');
+    });
+  });
+
+  ep.all('tagDone', 'descriptionDone', 'readmeDone', function () {
     // TODO: set latest version
     callback(null, versionNames);
   });

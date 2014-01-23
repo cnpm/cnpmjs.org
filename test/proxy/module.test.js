@@ -23,6 +23,7 @@ var Module = require('../../proxy/module');
 
 var fixtures = path.join(path.dirname(__dirname), 'fixtures');
 
+var id;
 describe('proxy/module.test.js', function () {
   afterEach(mm.restore);
 
@@ -53,6 +54,7 @@ describe('proxy/module.test.js', function () {
       };
       mod.package.dist = dist;
       Module.add(mod, function (err, result) {
+        id = result.id;
         should.not.exist(err);
         Module.getById(result.id, function (err, row) {
           should.not.exist(err);
@@ -71,6 +73,19 @@ describe('proxy/module.test.js', function () {
           r.should.have.keys('name', 'description');
         });
         done();
+      });
+    });
+  });
+
+  describe('updateReadme()', function () {
+    it('should update ok', function (done) {
+      Module.updateReadme(id, 'test', function (err, data) {
+        should.not.exist(err);
+        Module.getById(id, function (err, data) {
+          should.not.exist(err);
+          data.package.readme.should.equal('test');
+          done();
+        })
       });
     });
   });
