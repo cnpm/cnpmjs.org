@@ -267,7 +267,7 @@ SyncModuleWorker.prototype._sync = function (name, pkg, callback) {
             });
           }
 
-          if (!exists.readme && version.readme) {
+          if (!exists.package.readme && version.readme) {
             // * make sure readme exists
             missingReadmes.push({
               id: exists.id,
