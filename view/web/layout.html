@@ -29,6 +29,10 @@
       table.downloads td.count {
         text-align: right;
       }
+
+      .nav-tabs{margin:20px 0;}
+      .nav-cont{display:none;}
+      .nav-cont.active{display:block;}
     </style>
     <script>
       $(function () {
@@ -40,6 +44,15 @@
           if (val) {
             return location.href = '/browse/keyword/' + val;
           }
+        });
+
+        $(".nav-tabs li").each(function(index) {
+            $(this).data("index", index);
+        })
+        .on("click", function(e) {
+            $(".nav-tabs li.active,.nav-cont.active").removeClass("active");
+            $(this).addClass("active");
+            $(".nav-cont").eq($(this).data("index")).addClass("active");
         });
       });
     </script>
