@@ -330,9 +330,10 @@ SyncModuleWorker.prototype._sync = function (name, pkg, callback) {
     missingDescriptions.forEach(function (item) {
       Module.updateDescription(item.id, item.description, function (err, result) {
         if (err) {
-          return that.log('    save error, id： %s, description: %s, error: %s', item.id, item.description, err);
+          that.log('    save error, id： %s, description: %s, error: %s', item.id, item.description, err);
+        } else {
+          that.log('    saved, id: %s, description length: %d', item.id, item.description.length);
         }
-        that.log('    saved, id: %s, description length: %d', item.id, item.description.length);
         ep.emitLater('saveDescription');
       });
     });
@@ -370,14 +371,15 @@ SyncModuleWorker.prototype._sync = function (name, pkg, callback) {
     missingReadmes.forEach(function (item) {
       Module.updateReadme(item.id, item.readme, function (err, result) {
         if (err) {
-          return that.log('    save error, id: %s, error: %s', item.id, err);
+          that.log('    save error, id: %s, error: %s', item.id, err);
+        } else {
+          that.log('    saved, id: %s', item.id);
         }
-        that.log('    saved, id: %s', item.id);
         ep.emitLater('saveReadme');
       });
     });
 
-    ep.fater('saveReadme', missingReadmes.length, function () {
+    ep.after('saveReadme', missingReadmes.length, function () {
       ep.emit('readmeDone');
     });
   });
