@@ -59,6 +59,19 @@ exports.updateDescription = function (id, description, callback) {
   mysql.query(UPDATE_DESC_SQL, [description, id], callback);
 };
 
+var UPDATE_PACKAGE_SQL = 'UPDATE module SET package=? WHERE id=?;';
+exports.updateReadme = function (id, readme, callback) {
+  exports.getById(id, function (err, data) {
+    if (err) {
+      return callback(err);
+    }
+    data.package = data.package || {};
+    data.package.readme = readme;
+    var pkg = stringifyPackage(data.package);
+    mysql.query(UPDATE_PACKAGE_SQL, [pkg, id], callback);
+  });
+};
+
 var UPDATE_DIST_SQL = 'UPDATE module SET publish_time=?, version=?, package=?, \
   dist_tarball=?, dist_shasum=?, dist_size=? WHERE id=?;';
 
