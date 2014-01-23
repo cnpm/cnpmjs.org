@@ -1,4 +1,11 @@
 
+0.2.20 / 2014-01-23 
+==================
+
+  * hotfix sync missing dependencies and readmes
+  * fix sync readme error, fixed #174
+  * add updateReadme in module
+
 0.2.19 / 2014-01-22 
 ==================
 
