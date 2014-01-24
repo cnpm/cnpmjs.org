@@ -46,14 +46,14 @@
           }
         });
 
-        $(".nav-tabs li").each(function(index) {
-            $(this).data("index", index);
+        $(".nav-tabs li").each(function (index) {
+          $(this).data("index", index);
         })
-        .on("click", function(e) {
-            e.preventDefault();
-            $(".nav-tabs li.active,.nav-cont.active").removeClass("active");
-            $(this).addClass("active");
-            $(".nav-cont").eq($(this).data("index")).addClass("active");
+        .on("click", function (e) {
+          e.preventDefault();
+          $(".nav-tabs li.active,.nav-cont.active").removeClass("active");
+          $(this).addClass("active");
+          $(".nav-cont").eq($(this).data("index")).addClass("active");
         });
       });
     </script>
