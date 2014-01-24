@@ -15,201 +15,212 @@
     <% } %>
 
     <% if (package.description) { %>
-      <p class="description"><%= package.description %></p>
+      <!--<p class="description"><%= package.description %></p>-->
     <% } %>
 
-    <pre class="sh"><code>$ <%- config.npmClientName %> install <%= package.name %></code></pre>
+    <!--<pre class="sh"><code>$ <%- config.npmClientName %> install <%= package.name %></code></pre>-->
 
-    <table class="downloads">
-      <tbody>
-        <tr>
-          <td class="count"><%- download.today %></td><td> downloads today</td>
-          <td class="count"><%- download.thisweek %></td><td> downloads in this week</td>
-          <td class="count"><%- download.thismonth %></td><td> downloads in this month</td>
-        </tr>
-        <tr>
-          <td class="count"><%- download.lastday %></td><td> downloads in the last day</td>
-          <td class="count"><%- download.lastweek %></td><td> downloads in the last week</td>
-          <td class="count"><%- download.lastmonth %></td><td> downloads in the last month</td>
-        </tr>
-      </tbody>
-    </table>
-
-    <table class="metadata">
-      <% if (Array.isArray(package.maintainers) && package.maintainers.length > 0) { %>
-      <tr>
-        <th>Maintainers</th>
-        <td>
-        <% package.maintainers.forEach(function (m) { %>
-          <span class="user">
-            <a class="username" href="/~<%= m.name %>">
-              <% if (m.gravatar) { %>
-              <img src="<%- m.gravatar %>" class="avatar">
-              <% } %>
-              <%= m.name %>
-            </a>
-          </span>
-        <% }) %>
-        </td>
-      </tr>
-      <% } %>
-      <tr>
-        <th>Version</th>
-        <td>
-          <b>
-          <%= package.version %>
-          </b>
-          <% if (package.fromNow) { %>
-          last updated
-          <%= package.fromNow %>
-          <% } %>
-        </td>
-      </tr>
-      <% if (package.license) { %>
-      <tr>
-        <th>License</th>
-        <td>
-          <a href="<%= package.license.url %>" target="_blank"><%= package.license.name %></a>
-        </td>
-      </tr>
-      <% } %>
-      <%
-      if (typeof package.keywords === 'string') {
-        package.keywords = package.keywords.split(/\s*,?\s*/)
-      }
-      if (Array.isArray(package.keywords)) {
-      %>
-      <tr>
-        <th>Keywords</th>
-        <td><%-
-          package.keywords.map(function (kw) {
-            kw = kw.replace(/</g, '&lt;').replace(/"/g, '&quot;')
-            return '<a href="/browse/keyword/' + kw + '">' + kw + '</a>'
-          }).join(', ')
-          %></td>
-      </tr>
-      <% } %>
-      <% if (package.repository && package.repository !== 'undefined') { %>
-      <tr>
-        <th>Repository</td>
-        <td>
-          <a href="<%= package.repository.weburl || package.repository.url %>" target="_blank">
-            <%= package.repository.url %>
-          </a>
-          (<%= package.repository.type %>)
-        </td>
-      </tr>
-      <% } %>
-      <% if (typeof package.homepage === 'string') { %>
-      <tr>
-        <th>Homepage</td>
-        <td>
-          <a href="<%= encodeURI(package.homepage) %>" target="_blank"><%= package.homepage.replace(/</g, '&lt;') %></a>
-        </td>
-      </tr>
-      <% } %>
-      <% if (package.bugs && package.bugs.url) { %>
-      <tr>
-        <th>Bugs</td>
-        <td>
-          <a href="<%= package.bugs.url %>" target="_blank"><%= package.bugs.url %></a>
-        </td>
-      </tr>
-      <% } %>
-      <tr>
-        <%
-          var deps = Object.keys(package.dependencies || {})
-          var l = deps.length
-        %>
-        <th>Dependencies<%= l > 5 ? ' (' + l + ')' : '' %></th>
-        <td>
-          <%
-          if (l === 0) {
-            %>None<%
-          } else {
-            var m = 200
-            if (l > m) deps = deps.slice(0, m)
-            deps.forEach(function(pkg, i) {
-              if (i > 0) { %>, <% }
-              %>
-              <a href="/package/<%= pkg %>"><%= pkg %></a><%
-            })
-            if (l > m) {
-              %>, and <%= l-m %> more<%
-            }
-          }
-          %>
-        </td>
-      </tr>
-
-      <% if (package.users) {
-        var starredBy = package.starredBy
-        var l = starredBy.length
-      %>
-      <tr>
-        <th>Starred by<%= l > 5 ? ' (' + l + ')' : '' %></th>
-        <td>
-          <%
-          var max = 20
-          if (l > max) {
-            starredBy = starredBy.sort(function (a, b) {
-              return Math.random() * 2 - 1
-            }).slice(0, max)
-          }
-          starredBy.forEach(function (user, i) {
-            if (i > 0) { %>, <% }
-            %><a href="/~<%= user %>"><%= user %></a><%
-          })
-          if (l > max) {
-            %><br><a href="/browse/star/<%= package.name %>">and
-            <%= (l-max) %> more</a><%
-          }
-          %>
-        </td>
-      </tr>
-      <% } %>
-
-      <% if (Array.isArray(package.contributors) && package.contributors.length > 0) { %>
-      <tr>
-        <th>Contributors</th>
-        <td>
-        <% package.contributors.forEach(function (m) { %>
-          <span class="user">
-            <a class="username" target="_blank" href="<%= m.url %>">
-              <% if (m.gravatar) { %>
-              <img src="<%- m.gravatar %>" class="avatar">
-              <% } %>
-              <%= m.name %>
-            </a>
-          </span>
-        <% }) %>
-        </td>
-      </tr>
-      <% } %>
-
-      <% if (package.dist && package.dist.tarball) { %>
-      <tr>
-        <th>Download</th>
-        <td>
-          <a class="downloadlink" target="_blank" href="<%= package.dist.tarball %>">
-            <%= package.dist.tarball %>
-          </a>
-        </td>
-      </tr>
-      <% } %>
-    </table>
-
-    <div class="details">
-      <ul class="toc">
-        <% if (package.readme) { %>
-        <li><a href="#readme">Read Me</a></li>
-        <% } %>
-      </ul>
-
+    <ul class="nav nav-tabs">
       <% if (package.readme) { %>
-      <section id="readme">
-      <%- package.readme %>
-      </section>
+        <li class="active"><a href="#README">README</a></li>
+        <li><a href="#Metadata">Metadata</a></li>
+      <% } else { %>
+        <li class="active"><a href="#Metadata">Metadata</a></li>
       <% } %>
+      <li><a href="#Downloads">Downloads</a></li>
+    </ul>
+
+    <% if (package.readme) { %>
+    <div class="nav-cont active">
+        <div class="details">
+          <section id="readme">
+          <%- package.readme %>
+          </section>
+        </div>
     </div>
+    <% } %>
+
+    <div class="nav-cont">
+        <table class="metadata">
+          <% if (Array.isArray(package.maintainers) && package.maintainers.length > 0) { %>
+          <tr>
+            <th>Maintainers</th>
+            <td>
+            <% package.maintainers.forEach(function (m) { %>
+              <span class="user">
+                <a class="username" href="/~<%= m.name %>">
+                  <% if (m.gravatar) { %>
+                  <img src="<%- m.gravatar %>" class="avatar">
+                  <% } %>
+                  <%= m.name %>
+                </a>
+              </span>
+            <% }) %>
+            </td>
+          </tr>
+          <% } %>
+          <tr>
+            <th>Version</th>
+            <td>
+              <b>
+              <%= package.version %>
+              </b>
+              <% if (package.fromNow) { %>
+              last updated
+              <%= package.fromNow %>
+              <% } %>
+            </td>
+          </tr>
+          <% if (package.license) { %>
+          <tr>
+            <th>License</th>
+            <td>
+              <a href="<%= package.license.url %>" target="_blank"><%= package.license.name %></a>
+            </td>
+          </tr>
+          <% } %>
+          <%
+          if (typeof package.keywords === 'string') {
+            package.keywords = package.keywords.split(/\s*,?\s*/)
+          }
+          if (Array.isArray(package.keywords)) {
+          %>
+          <tr>
+            <th>Keywords</th>
+            <td><%-
+              package.keywords.map(function (kw) {
+                kw = kw.replace(/</g, '&lt;').replace(/"/g, '&quot;')
+                return '<a href="/browse/keyword/' + kw + '">' + kw + '</a>'
+              }).join(', ')
+              %></td>
+          </tr>
+          <% } %>
+          <% if (package.repository && package.repository !== 'undefined') { %>
+          <tr>
+            <th>Repository</td>
+            <td>
+              <a href="<%= package.repository.weburl || package.repository.url %>" target="_blank">
+                <%= package.repository.url %>
+              </a>
+              (<%= package.repository.type %>)
+            </td>
+          </tr>
+          <% } %>
+          <% if (typeof package.homepage === 'string') { %>
+          <tr>
+            <th>Homepage</td>
+            <td>
+              <a href="<%= encodeURI(package.homepage) %>" target="_blank"><%= package.homepage.replace(/</g, '&lt;') %></a>
+            </td>
+          </tr>
+          <% } %>
+          <% if (package.bugs && package.bugs.url) { %>
+          <tr>
+            <th>Bugs</td>
+            <td>
+              <a href="<%= package.bugs.url %>" target="_blank"><%= package.bugs.url %></a>
+            </td>
+          </tr>
+          <% } %>
+          <tr>
+            <%
+              var deps = Object.keys(package.dependencies || {})
+              var l = deps.length
+            %>
+            <th>Dependencies<%= l > 5 ? ' (' + l + ')' : '' %></th>
+            <td>
+              <%
+              if (l === 0) {
+                %>None<%
+              } else {
+                var m = 200
+                if (l > m) deps = deps.slice(0, m)
+                deps.forEach(function(pkg, i) {
+                  if (i > 0) { %>, <% }
+                  %>
+                  <a href="/package/<%= pkg %>"><%= pkg %></a><%
+                })
+                if (l > m) {
+                  %>, and <%= l-m %> more<%
+                }
+              }
+              %>
+            </td>
+          </tr>
+
+          <% if (package.users) {
+            var starredBy = package.starredBy
+            var l = starredBy.length
+          %>
+          <tr>
+            <th>Starred by<%= l > 5 ? ' (' + l + ')' : '' %></th>
+            <td>
+              <%
+              var max = 20
+              if (l > max) {
+                starredBy = starredBy.sort(function (a, b) {
+                  return Math.random() * 2 - 1
+                }).slice(0, max)
+              }
+              starredBy.forEach(function (user, i) {
+                if (i > 0) { %>, <% }
+                %><a href="/~<%= user %>"><%= user %></a><%
+              })
+              if (l > max) {
+                %><br><a href="/browse/star/<%= package.name %>">and
+                <%= (l-max) %> more</a><%
+              }
+              %>
+            </td>
+          </tr>
+          <% } %>
+
+          <% if (Array.isArray(package.contributors) && package.contributors.length > 0) { %>
+          <tr>
+            <th>Contributors</th>
+            <td>
+            <% package.contributors.forEach(function (m) { %>
+              <span class="user">
+                <a class="username" target="_blank" href="<%= m.url %>">
+                  <% if (m.gravatar) { %>
+                  <img src="<%- m.gravatar %>" class="avatar">
+                  <% } %>
+                  <%= m.name %>
+                </a>
+              </span>
+            <% }) %>
+            </td>
+          </tr>
+          <% } %>
+
+          <% if (package.dist && package.dist.tarball) { %>
+          <tr>
+            <th>Download</th>
+            <td>
+              <a class="downloadlink" target="_blank" href="<%= package.dist.tarball %>">
+                <%= package.dist.tarball %>
+              </a>
+            </td>
+          </tr>
+          <% } %>
+        </table>
+    </div>
+
+    <div class="nav-cont">
+        <table class="downloads">
+          <tbody>
+            <tr>
+              <td class="count"><%- download.today %></td><td> downloads today</td>
+              <td class="count"><%- download.thisweek %></td><td> downloads in this week</td>
+              <td class="count"><%- download.thismonth %></td><td> downloads in this month</td>
+            </tr>
+            <tr>
+              <td class="count"><%- download.lastday %></td><td> downloads in the last day</td>
+              <td class="count"><%- download.lastweek %></td><td> downloads in the last week</td>
+              <td class="count"><%- download.lastmonth %></td><td> downloads in the last month</td>
+            </tr>
+          </tbody>
+        </table>
+    </div>
+
   </div>
