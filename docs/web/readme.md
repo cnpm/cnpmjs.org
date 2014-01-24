@@ -188,14 +188,15 @@ Release [History](/history).
 $ git summary
 
  project  : cnpmjs.org
- repo age : 5 weeks
- active   : 98 days
- commits  : 239
- files    : 85
+ repo age : 7 weeks
+ active   : 132 days
+ commits  : 315
+ files    : 88
  authors  :
-   140  fengmk2                 58.6%
-    98  dead_horse              41.0%
-     1  Alsotang                0.4%
+   190  fengmk2                 60.3%
+   122  dead_horse              38.7%
+     2  4simple                 0.6%
+     1  Alsotang                0.3%
 ```
 
 ## npm and cnpm relation

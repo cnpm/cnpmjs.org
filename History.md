@@ -1,4 +1,12 @@
 
+0.2.21 / 2014-01-24 
+==================
+
+  * refactor code styles on package.html
+  * nav-tabs e.preventDefault
+  * Show registry server error response. fixed #178
+  * nav-tabs for package.html (@4simple)
+
 0.2.20 / 2014-01-23 
 ==================
 
