@@ -26,7 +26,16 @@ function request(url, options, callback) {
   options.dataType = options.dataType || 'json';
   options.timeout = options.timeout || 120000;
   url = config.sourceNpmRegistry + url;
-  urllib.request(url, options, callback);
+  urllib.request(url, options, function (err, data, res) {
+    if (err) {
+      var statusCode = res && res.statusCode || -1;
+      if (err.name === 'JSONResponseFormatError' && statusCode >= 500) {
+        err.name = 'NPMServerError';
+        err.message = 'Status ' + statusCode + ', ' + (data && data.toString() || 'empty body');
+      }
+    }
+    callback(err, data, res);
+  });
 }
 
 exports.get = function (name, callback) {
