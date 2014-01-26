@@ -104,7 +104,7 @@ exports.display = function (req, res, next) {
 exports.search = function (req, res, next) {
   var params = req.params;
   var word = req.params.word;
-  Module.search(word, function (err, packages) {
+  Module.search(word, function (err, result) {
     if (err) {
       return next(err);
     }
@@ -112,7 +112,8 @@ exports.search = function (req, res, next) {
     res.render('search', {
       title: 'Keyword - ' + word,
       keyword: word,
-      packages: packages || []
+      packages: result.searchMatchs,
+      keywords: result.keywordMatchs,
     });
   });
 };
@@ -126,10 +127,12 @@ exports.rangeSearch = function (req, res, next) {
     startKey = startKey.substring(0, startKey.length - 1);
   }
   var limit = Number(req.query.limit) || 20;
-  Module.search(startKey, {limit: limit}, function (err, packages) {
+  Module.search(startKey, {limit: limit}, function (err, result) {
     if (err) {
       return next(err);
     }
+
+    var packages = result.searchMatchs.concat(result.keywordMatchs);
 
     var rows = [];
     for (var i = 0; i < packages.length; i++) {

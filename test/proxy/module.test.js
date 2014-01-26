@@ -37,6 +37,79 @@ describe('proxy/module.test.js', function () {
     });
   });
 
+  describe('search()', function () {
+    it('should search modules', function (done) {
+      Module.search('as', function (err, data) {
+        should.not.exist(err);
+        data.should.have.keys('keywordMatchs', 'searchMatchs');
+        data.searchMatchs.length.should.above(0);
+        data.searchMatchs.forEach(function (row) {
+          row.should.have.keys('name', 'description');
+        });
+        done();
+      });
+    });
+
+    it('should search match keywords modules', function (done) {
+      Module.search('aa', function (err, data) {
+        should.not.exist(err);
+        data.should.have.keys('keywordMatchs', 'searchMatchs');
+        data.keywordMatchs.length.should.above(0);
+        data.keywordMatchs.forEach(function (row) {
+          row.should.have.keys('name', 'description');
+        });
+        done();
+      });
+    });
+
+    it('should search return empty', function (done) {
+      Module.search('emptyemptyemptyempty', function (err, data) {
+        should.not.exist(err);
+        data.should.eql({
+          keywordMatchs: [],
+          searchMatchs: []
+        });
+        done();
+      });
+    });
+  });
+
+  describe('addKeywords()', function () {
+    var mockName = 'aa' + Date.now();
+
+    after(function (done) {
+      mysql.query('DELETE FROM module_keyword WHERE name=?', [mockName], done);
+    });
+
+    it('should add diff keywords to module', function (done) {
+      Module.addKeywords(mockName, mockName, ['aa', 'bb', 'cc'], function (err, results) {
+        should.not.exist(err);
+        results.should.be.an.Array;
+        results.should.length(3);
+        done();
+      });
+    });
+
+    it('should add same keywords to module', function (done) {
+      Module.addKeywords('aa', 'desc aa', ['aa', 'bb', 'cc'], function (err, results) {
+        should.not.exist(err);
+        results.should.be.an.Array;
+        results.should.length(0);
+        done();
+      });
+    });
+  });
+
+  describe('getKeywords()', function () {
+    it('should get aa module keywords', function (done) {
+      Module.getKeywords('aa', function (err, keywords) {
+        should.not.exist(err);
+        keywords.should.eql(['aa', 'bb', 'cc']);
+        done();
+      });
+    });
+  });
+
   describe('add()', function () {
     it('should success ad he@0.3.6', function (done) {
       var sourcePackage = require('../fixtures/0.3.6.json');

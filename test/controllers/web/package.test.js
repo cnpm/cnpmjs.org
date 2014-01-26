@@ -38,11 +38,11 @@ describe('controllers/web/package.test.js', function () {
       .expect(200, function (err, res) {
         should.not.exist(err);
         res.body.should.have.keys('rows');
-        res.body.rows.should.eql([
-          { key: 'c', count: 1, value: { name: 'c', description: 'Give folders or directories comments and view them easy.' } },
-          { key: 'charset', count: 1,
-            value: { name: 'charset', description: 'Get the content charset from header and html content-type.' } }
-        ]);
+        res.body.rows.length.should.above(0);
+        res.body.rows.forEach(function (row) {
+          row.should.have.keys('key', 'count', 'value');
+          row.value.should.have.keys('name', 'description');
+        });
         done();
       });
     });
@@ -53,11 +53,11 @@ describe('controllers/web/package.test.js', function () {
       .expect(200, function (err, res) {
         should.not.exist(err);
         res.body.should.have.keys('rows');
-        res.body.rows.should.eql([
-          { key: 'c', count: 1, value: { name: 'c', description: 'Give folders or directories comments and view them easy.' } },
-          { key: 'charset', count: 1,
-            value: { name: 'charset', description: 'Get the content charset from header and html content-type.' } }
-        ]);
+        res.body.rows.length.should.above(0);
+        res.body.rows.forEach(function (row) {
+          row.should.have.keys('key', 'count', 'value');
+          row.value.should.have.keys('name', 'description');
+        });
         done();
       });
     });

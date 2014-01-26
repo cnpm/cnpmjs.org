@@ -14,6 +14,17 @@ CREATE TABLE `user` (
  KEY `gmt_modified` (`gmt_modified`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='user base info';
 
+CREATE TABLE `module_keyword` (
+ `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'primary key',
+ `gmt_create` datetime NOT NULL COMMENT 'create time',
+ `keyword` varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT 'keyword',
+ `name` varchar(100) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL COMMENT 'module name',
+ `description` longtext,
+ PRIMARY KEY (`id`),
+ UNIQUE KEY `keyword_module_name` (`keyword`,`name`),
+ KEY `name` (`name`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='module keyword';
+
 CREATE TABLE `module` (
  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'primary key',
  `gmt_create` datetime NOT NULL COMMENT 'create time',
