@@ -1,4 +1,9 @@
 
+0.2.23 / 2014-01-26 
+==================
+
+  * system admin can add, publish, remove the packages. fixed #176
+
 0.2.22 / 2014-01-26 
 ==================
 
