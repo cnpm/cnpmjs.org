@@ -29,6 +29,7 @@ var INSERT_MODULE_SQL = 'INSERT INTO module(gmt_create, gmt_modified, \
     dist_tarball=VALUES(dist_tarball), dist_shasum=VALUES(dist_shasum), dist_size=VALUES(dist_size);';
 
 exports.add = function (mod, callback) {
+  var keywords = mod.package.keywords;
   var pkg;
   try {
     pkg = stringifyPackage(mod.package);
@@ -51,6 +52,74 @@ exports.add = function (mod, callback) {
       return callback(err);
     }
     callback(null, {id: result.insertId, gmt_modified: new Date()});
+
+    if (typeof keywords === 'string') {
+      keywords = [keywords];
+    }
+
+    if (!Array.isArray(keywords)) {
+      return;
+    }
+
+    var words = [];
+    for (var i = 0; i < keywords.length; i++) {
+      var w = keywords[i];
+      if (typeof w === 'string') {
+        w = w.trim();
+        if (w) {
+          words.push(w);
+        }
+      }
+    }
+
+    if (words.length === 0) {
+      return;
+    }
+
+    // add keywords
+    exports.addKeywords(mod, description, words, utility.noop);
+  });
+};
+
+var GET_KEYWORD_SQL = 'SELECT keyword FROM module_keyword WHERE name=? ORDER BY keyword;';
+
+exports.getKeywords = function (name, callback) {
+  mysql.query(GET_KEYWORD_SQL, [name], function (err, rows) {
+    var keywords = [];
+    if (rows && rows.length) {
+      keywords = rows.map(function (r) {
+        return r.keyword;
+      });
+    }
+    callback(err, keywords);
+  });
+};
+
+var ADD_KEYWORD_SQL = 'INSERT INTO module_keyword(gmt_create, keyword, name, description) \
+  VALUES(now(), ?, ?, ?) \
+  ON DUPLICATE KEY UPDATE description=VALUES(description);';
+
+exports.addKeywords = function (name, description, keywords, callback) {
+  var sql = '';
+  var values = [];
+  for (var i = 0; i < keywords.length; i++) {
+    sql += ADD_KEYWORD_SQL;
+    values.push(keywords[i]);
+    values.push(name);
+    values.push(description);
+  }
+  mysql.query(sql, values, function (err, results) {
+    if (err) {
+      return callback(err);
+    }
+    var ids = [];
+    for (var i = 0; i < results.length; i++) {
+      var r = results[i];
+      if (r.insertId) {
+        ids.push(r.insertId);
+      }
+    }
+    callback(null, ids);
   });
 };
 
@@ -310,10 +379,10 @@ exports.listByAuthor = function (author, callback) {
   });
 };
 
-var SEARCH_SQLS = [
-  'SELECT module_id FROM tag WHERE name LIKE ? AND  tag="latest" ORDER BY name LIMIT ?;',
-  'SELECT name, description FROM module WHERE id IN (?) ORDER BY name;'
-];
+var SEARCH_MODULES_SQL = 'SELECT module_id FROM tag WHERE name LIKE ? AND tag="latest" ORDER BY name LIMIT ?;';
+var SEARCH_MODULES_BY_KEYWORD_SQL = 'SELECT name, description FROM module_keyword WHERE keyword = ? ORDER BY id DESC LIMIT ?;';
+var QUERY_MODULES_BY_ID_SQL = 'SELECT name, description FROM module WHERE id IN (?) ORDER BY name;';
+
 exports.search = function (word, options, callback) {
   if (typeof options === 'function') {
     callback = options;
@@ -321,21 +390,56 @@ exports.search = function (word, options, callback) {
   }
   options = options || {};
   var limit = options.limit || 100;
-  word = word.replace(/^%/, '') + '%'; //ignore prefix %
+  word = word.replace(/^%/, ''); //ignore prefix %
   var ep = eventproxy.create();
   ep.fail(callback);
-  mysql.query(SEARCH_SQLS[0], [word, limit], ep.done(function (rows) {
-    if (!rows || rows.length === 0) {
-      return callback(null, []);
+
+  // search flows:
+  // 1. prefix search by name
+  // 2. like search by name
+  // 3. keyword equal search
+  var ids = {};
+
+  mysql.query(SEARCH_MODULES_SQL, [word + '%', limit ], ep.done(function (rows) {
+    rows = rows || [];
+    if (rows.length > 0) {
+      for (var i = 0; i < rows.length; i++) {
+        ids[rows[i].module_id] = 1;
+      }
     }
-    ep.emit('ids', rows.map(function (r) {
-      return r.module_id;
-    }));
+    if (rows.length >= 20) {
+      return ep.emit('ids', Object.keys(ids));
+    }
+
+    mysql.query(SEARCH_MODULES_SQL, [ '%' + word + '%', limit ], ep.done('likeSearch'));
   }));
 
-  ep.on('ids', function (ids) {
-    mysql.query(SEARCH_SQLS[1], [ids], ep.done(function (modules) {
-      callback(null, modules);
+  mysql.query(SEARCH_MODULES_BY_KEYWORD_SQL, [ word, limit ], ep.done('keywordRows'));
+
+  ep.on('likeSearch', function (rows) {
+    rows = rows || [];
+    if (rows.length > 0) {
+      for (var i = 0; i < rows.length; i++) {
+        ids[rows[i].module_id] = 1;
+      }
+    }
+
+    ep.emit('ids', Object.keys(ids));
+  });
+
+  ep.all('ids', 'keywordRows', function (ids, keywordRows) {
+    keywordRows = keywordRows || [];
+    var data = {
+      keywordMatchs: keywordRows,
+      searchMatchs: []
+    };
+    if (ids.length === 0) {
+      return callback(null, data);
+    }
+
+    mysql.query(QUERY_MODULES_BY_ID_SQL, [ids], ep.done(function (modules) {
+      data.searchMatchs = modules;
+      callback(null, data);
     }));
   });
 };

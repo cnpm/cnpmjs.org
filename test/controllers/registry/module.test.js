@@ -140,6 +140,9 @@ describe('controllers/registry/module.test.js', function () {
         name: 'cnpmjstest10',
         email: 'cnpmjstest10@cnpmjs.org'
       }],
+      keywords: [
+        'testputmodule', 'test', 'cnpmjstest'
+      ]
     };
     var baseauth = 'Basic ' + new Buffer('cnpmjstest10:cnpmjstest10').toString('base64');
     var baseauthOther = 'Basic ' + new Buffer('cnpmjstest101:cnpmjstest101').toString('base64');
