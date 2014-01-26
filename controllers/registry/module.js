@@ -316,10 +316,8 @@ exports.upload = function (req, res, next) {
     if (err || !mod) {
       return next(err);
     }
-    var match = mod.package.maintainers.filter(function (item) {
-      return item.name === username;
-    });
-    if (match.length === 0 || mod.name !== name) {
+
+    if (!common.isMaintainer(req, mod.package.maintainers) || mod.name !== name) {
       return res.json(403, {
         error: 'no_perms',
         reason: 'Current user can not publish this module'
@@ -589,14 +587,8 @@ exports.add = function (req, res, next) {
   var username = req.session.name;
   var name = req.params.name;
   var pkg = req.body || {};
-  var maintainers = pkg.maintainers || [];
-  var match = maintainers.filter(function (item) {
-    return item.name === username;
-  });
 
-  debug('add module %s maintainers match: %j, current user: %s', name, match, username);
-
-  if (match.length === 0) {
+  if (!common.isMaintainer(req, pkg.maintainers)) {
     return res.json(403, {
       error: 'no_perms',
       reason: 'Current user can not publish this module'
@@ -640,11 +632,8 @@ exports.add = function (req, res, next) {
   ep.all('latest', 'next', function (latestMod, nextMod) {
     var maintainers = latestMod && latestMod.package.maintainers.length > 0 ?
       latestMod.package.maintainers : nextMod.package.maintainers;
-    var match = maintainers.filter(function (item) {
-      return item.name === username;
-    });
 
-    if (match.length === 0) {
+    if (!common.isMaintainer(req, maintainers)) {
       return res.json(403, {
         error: 'no_perms',
         reason: 'Current user can not publish this module'
@@ -681,12 +670,9 @@ exports.removeWithVersions = function (req, res, next) {
     if (!mods || !mods.length) {
       return next();
     }
-    //TODO replace this maintainer check
-    var match = mods[0].package.maintainers.filter(function (item) {
-      return item.name === username;
-    });
 
-    if (!match.length || mods[0].name !== name) {
+    var firstMod = mods[0];
+    if (!common.isMaintainer(req, firstMod.package.maintainers) || firstMod.name !== name) {
       return res.json(403, {
         error: 'no_perms',
         reason: 'Current user can not update this module'
@@ -724,11 +710,8 @@ exports.removeTar = function (req, res, next) {
     if (!mod) {
       return next();
     }
-    //TODO replace this maintainer check
-    var match = mod.package.maintainers.filter(function (item) {
-      return item.name === username;
-    });
-    if (!match.length || mod.name !== name) {
+
+    if (!common.isMaintainer(req, mod.package.maintainers) || mod.name !== name) {
       return res.json(403, {
         error: 'no_perms',
         reason: 'Current user can not delete this tarball'
@@ -759,15 +742,8 @@ exports.removeAll = function (req, res, next) {
     if (!mod) {
       return next();
     }
-    //TODO replace this maintainer check
-    var match = mod.package.maintainers.filter(function (item) {
-      return item.name === username;
-    });
-    if (req.session.isAdmin) {
-      match.push({name: username});
-    }
 
-    if (!match.length || mod.name !== name) {
+    if (!common.isMaintainer(req, mod.package.maintainers) || mod.name !== name) {
       return res.json(403, {
         error: 'no_perms',
         reason: 'Current user can not delete this tarball'
