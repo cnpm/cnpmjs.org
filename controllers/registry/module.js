@@ -665,12 +665,14 @@ exports.removeWithVersions = function (req, res, next) {
   var ep = eventproxy.create();
   ep.fail(next);
 
+  // step1: list all the versions
   Module.listByName(name, ep.doneLater('list'));
   ep.once('list', function (mods) {
     if (!mods || !mods.length) {
       return next();
     }
 
+    // step2: check permission
     var firstMod = mods[0];
     if (!common.isMaintainer(req, firstMod.package.maintainers) || firstMod.name !== name) {
       return res.json(403, {
@@ -679,19 +681,77 @@ exports.removeWithVersions = function (req, res, next) {
       });
     }
 
+    // step3: calculate which versions need to remove and
+    // which versions need to remain
     var removeVersions = [];
+    var removeVersionMaps = {};
+    var remainVersions = [];
+
     for (var i = 0; i < mods.length; i++) {
       var v = mods[i].version;
-      if (v !== 'next' && !versions[v]) {
+      if (v === 'next') {
+        continue;
+      }
+      if (!versions[v]) {
         removeVersions.push(v);
+        removeVersionMaps[v] = true;
+      } else {
+        remainVersions.push(v);
       }
     }
+
     if (!removeVersions.length) {
-      return res.json(201, {ok: true});
+      debug('no versions need to remove');
+      return res.json(201, { ok: true });
     }
-    Module.removeByNameAndVersions(name, removeVersions, ep.done(function () {
-      res.json(201, {ok: true});
+    debug('remove versions: %j, remain versions: %j', removeVersions, remainVersions);
+
+    // step 4: remove all the versions which need to remove
+    Module.removeByNameAndVersions(name, removeVersions, ep.done('removeModules'));
+
+    // step5: list all the tags
+    Module.listTags(name, ep.done(function (tags) {
+      var removeTags = [];
+      var latestRemoved = false;
+      tags.forEach(function (tag) {
+        // this tag need be removed
+        if (removeVersionMaps[tag.version]) {
+          removeTags.push(tag.id);
+          if (tag.tag === 'latest') {
+            latestRemoved = true;
+          }
+        }
+      });
+
+      if (!removeTags.length) {
+        debug('no tag need be remove');
+        ep.emit('removeTags');
+        ep.emit('latest');
+        return;
+      }
+
+      debug('remove tags: %j', removeTags);
+      // step 6: remove all the tags which need to remove
+      Module.removeTagsByIds(removeTags, ep.done('removeTags'));
+
+      // step 7: check if latest tag being removed.
+      //  need generate a new latest tag
+      if (!latestRemoved || !remainVersions[0]) {
+        ep.emit('latest');
+      } else {
+        debug('latest tags removed, generate a new latest tag with new version: %s',
+          remainVersions[0]);
+        ep.emit('newLatestVersion', remainVersions[0]);
+      }
     }));
+  });
+
+  ep.all('newLatestVersion', 'removeTags', function (version) {
+    Module.addTag(name, 'latest', version, ep.done('latest'));
+  });
+
+  ep.all('removeModules', 'removeTags', 'latest', function () {
+    return res.json(201, { ok: true });
   });
 };
 
