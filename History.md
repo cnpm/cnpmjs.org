@@ -1,4 +1,10 @@
 
+0.2.24 / 2014-02-13 
+==================
+
+  * fix if delete all the versions
+  * refactor remove module, fixed #186
+
 0.2.23 / 2014-01-26 
 ==================
 
