@@ -736,7 +736,7 @@ exports.removeWithVersions = function (req, res, next) {
 
       // step 7: check if latest tag being removed.
       //  need generate a new latest tag
-      if (!latestRemoved) {
+      if (!latestRemoved || !remainVersions[0]) {
         ep.emit('latest');
       } else {
         debug('latest tags removed, generate a new latest tag with new version: %s',

@@ -441,6 +441,7 @@ describe('controllers/registry/module.test.js', function () {
     it('should remove version ok', function (done) {
       //do not really remove it here
       mm.empty(Module, 'removeByNameAndVersions');
+      mm.empty(Module, 'removeTagsByIds');
       request(app)
       .put('/testputmodule/-rev/' + lastRev)
       .set('authorization', baseauth)
