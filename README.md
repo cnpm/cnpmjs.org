@@ -1,7 +1,7 @@
 cnpmjs.org
 =======
 
-[![Build Status](https://secure.travis-ci.org/cnpm/cnpmjs.org.png)](http://travis-ci.org/cnpm/cnpmjs.org) [![Coverage Status](https://coveralls.io/repos/cnpm/cnpmjs.org/badge.png)](https://coveralls.io/r/cnpm/cnpmjs.org)[![Dependency Status](https://gemnasium.com/cnpm/cnpmjs.org.png)](https://gemnasium.com/cnpm/cnpmjs.org)
+[![Build Status](https://secure.travis-ci.org/cnpm/cnpmjs.org.png)](http://travis-ci.org/cnpm/cnpmjs.org) [![Coverage Status](https://coveralls.io/repos/cnpm/cnpmjs.org/badge.png)](https://coveralls.io/r/cnpm/cnpmjs.org) [![Dependency Status](https://gemnasium.com/cnpm/cnpmjs.org.png)](https://gemnasium.com/cnpm/cnpmjs.org)
 
 [![NPM](https://nodei.co/npm/cnpmjs.org.png?downloads=true&stars=true)](https://nodei.co/npm/cnpmjs.org/)
 
@@ -27,6 +27,11 @@ $ npm install
 ```js
 $ node dispatch.js
 ```
+
+## Guide
+
+* [How to deploy cnpmjs.org](https://github.com/cnpm/cnpmjs.org/wiki/Deploy)
+* [NFS guide](https://github.com/cnpm/cnpmjs.org/wiki/NFS-Guide)
 
 ## Authors
 

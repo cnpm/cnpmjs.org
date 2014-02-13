@@ -255,7 +255,12 @@ exports.removeTags = function (name, callback) {
   mysql.query(DELETE_TAGS_SQL, [name], callback);
 };
 
-var SELECT_ALL_TAGS_SQL = 'SELECT tag, version, gmt_modified, module_id FROM tag WHERE name=?;';
+var DELETE_TAGS_BY_IDS_SQL = 'DELETE FROM tag WHERE id in (?)';
+exports.removeTagsByIds = function (ids, callback) {
+  mysql.query(DELETE_TAGS_BY_IDS_SQL, [ids], callback);
+};
+
+var SELECT_ALL_TAGS_SQL = 'SELECT id, tag, version, gmt_modified, module_id FROM tag WHERE name=?;';
 
 exports.listTags = function (name, callback) {
   mysql.query(SELECT_ALL_TAGS_SQL, [name], callback);
