@@ -26,6 +26,7 @@ var Module = require('../../proxy/module');
 var down = require('../download');
 var sync = require('../sync');
 var Log = require('../../proxy/module_log');
+var ModuleDeps = require('../../proxy/module_deps');
 var setDownloadURL = require('../../lib/common').setDownloadURL;
 
 exports.display = function (req, res, next) {
@@ -48,7 +49,13 @@ exports.display = function (req, res, next) {
 
   down.total(name, ep.done('download'));
 
-  ep.all('pkg', 'download', function (pkg, download) {
+  ModuleDeps.list(name, ep.done(function (rows) {
+    ep.emit('dependents', rows.map(function (r) {
+      return r.deps;
+    }));
+  }));
+
+  ep.all('pkg', 'download', 'dependents', function (pkg, download, dependents) {
     if (!pkg || !pkg.package) {
       return next();
     }
@@ -56,6 +63,10 @@ exports.display = function (req, res, next) {
     pkg.package.fromNow = moment(pkg.publish_time).fromNow();
     pkg = pkg.package;
     pkg.readme = marked(pkg.readme || '');
+    if (!pkg.readme) {
+      pkg.readme = pkg.description || '';
+    }
+
     if (pkg.maintainers) {
       for (var i = 0; i < pkg.maintainers.length; i++) {
         var maintainer = pkg.maintainers[i];
@@ -90,8 +101,9 @@ exports.display = function (req, res, next) {
     for (var k in download) {
       download[k] = humanize(download[k]);
     }
-
     setDownloadURL(pkg, req, config.registryHost);
+
+    pkg.dependents = dependents;
 
     res.render('package', {
       title: 'Package - ' + pkg.name,

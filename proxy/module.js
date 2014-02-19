@@ -175,6 +175,7 @@ function parseRow(row) {
     }
   }
 }
+exports.parseRow = parseRow;
 
 function stringifyPackage(pkg) {
   return encodeURIComponent(JSON.stringify(pkg));

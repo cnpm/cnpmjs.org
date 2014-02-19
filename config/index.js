@@ -88,6 +88,7 @@ var config = {
   backupFilePrefix: '/cnpm/backup/', // backup filepath prefix
   syncModel: 'none', // 'none', 'all', 'exist'
   syncConcurrency: 1,
+  maxDependencies: 200, // max handle number of package.json `dependencies` property
 };
 
 // load config/config.js, everything in config.js will cover the same key in index.js

@@ -22,10 +22,10 @@
 
     <ul class="nav nav-tabs">
       <% if (package.readme) { %>
-        <li class="active"><a href="#readme">README</a></li>
-        <li><a href="#meta">Meta</a></li>
+        <li class="active"><a href="#readme">Readme.md</a></li>
+        <li><a href="#meta">package.json</a></li>
       <% } else { %>
-        <li class="active"><a href="#meta">Meta</a></li>
+        <li class="active"><a href="#meta">package.json</a></li>
       <% } %>
     </ul>
 
@@ -141,7 +141,33 @@
             var deps = Object.keys(package.dependencies || {})
             var l = deps.length
           %>
-          <th>Dependencies<%= l > 5 ? ' (' + l + ')' : '' %></th>
+          <th>Dependencies<%= l > 0 ? ' (' + l + ')' : '' %></th>
+          <td>
+            <%
+            if (l === 0) {
+              %>None<%
+            } else {
+              var m = 200
+              if (l > m) deps = deps.slice(0, m)
+              deps.forEach(function(pkg, i) {
+                if (i > 0) { %>, <% }
+                %>
+                <a href="/package/<%= pkg %>"><%= pkg %></a><%
+              })
+              if (l > m) {
+                %>, and <%= l-m %> more<%
+              }
+            }
+            %>
+          </td>
+        </tr>
+
+        <tr>
+          <%
+            var deps = package.dependents || [];
+            var l = deps.length
+          %>
+          <th>Dependents<%= l > 0 ? ' (' + l + ')' : '' %></th>
           <td>
             <%
             if (l === 0) {
@@ -167,7 +193,7 @@
           var l = starredBy.length
         %>
         <tr>
-          <th>Starred by<%= l > 5 ? ' (' + l + ')' : '' %></th>
+          <th>Starred by<%= l > 0 ? ' (' + l + ')' : '' %></th>
           <td>
             <%
             var max = 20
