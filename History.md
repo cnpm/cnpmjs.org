@@ -1,5 +1,10 @@
 
-0.2.6 / 2014-02-19 
+0.2.27 / 2014-02-19 
+==================
+
+  * support json result in search, fixed #189
+
+0.2.26 / 2014-02-19 
 ==================
 
   * npm publish also need to add deps
