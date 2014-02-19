@@ -120,7 +120,14 @@ exports.search = function (req, res, next) {
     if (err) {
       return next(err);
     }
-
+    // return a json result
+    if (req.query && req.query.type === 'json') {
+      return res.json({
+        keyword: word,
+        packages: result.searchMatchs,
+        keywords: result.keywordMatchs
+      });
+    }
     res.render('search', {
       title: 'Keyword - ' + word,
       keyword: word,
