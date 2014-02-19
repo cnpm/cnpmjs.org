@@ -24,12 +24,13 @@ var crypto = require('crypto');
 var eventproxy = require('eventproxy');
 var urllib = require('urllib');
 var utility = require('utility');
+var ms = require('ms');
 var nfs = require('../common/nfs');
 var npm = require('./npm');
 var common = require('../lib/common');
 var Module = require('./module');
+var ModuleDeps = require('./module_deps');
 var Log = require('./module_log');
-var ms = require('ms');
 
 function SyncModuleWorker(options) {
   EventEmitter.call(this);
@@ -409,9 +410,12 @@ SyncModuleWorker.prototype._syncOneVersion = function (versionIndex, sourcePacka
     callback(err);
   });
 
-  that.log('    [%s:%d] syncing, version: %s, dist: %j, no deps: %s, publish on cnpm: %s',
+  var dependencies = Object.keys(sourcePackage.dependencies || {});
+
+  that.log('    [%s:%d] syncing, version: %s, dist: %j, no deps: %s, publish on cnpm: %s, dependencies: %d',
     sourcePackage.name, versionIndex, sourcePackage.version,
-    sourcePackage.dist, that.noDep, that._publish);
+    sourcePackage.dist, that.noDep, that._publish,
+    dependencies.length);
   if (!that.noDep) {
     for (var k in sourcePackage.dependencies) {
       that.add(k);
@@ -421,6 +425,11 @@ SyncModuleWorker.prototype._syncOneVersion = function (versionIndex, sourcePacka
       that.add(k);
     }
   }
+
+  // add deps relations
+  dependencies.forEach(function (depName) {
+    ModuleDeps.add(depName, sourcePackage.name, utility.noop);
+  });
 
   var shasum = crypto.createHash('sha1');
   var dataSize = 0;
