@@ -129,6 +129,13 @@ describe('controllers/web/package.test.js', function () {
       .expect(/Packages match/, done);
     });
 
+    it('should list by keyword with json ok', function (done) {
+      request(app)
+      .get('/browse/keyword/cnpm?type=json')
+      .expect(200)
+      .expect('content-type', 'application/json; charset=utf-8', done);
+    });
+
     it('should list no match ok', function (done) {
       request(app)
       .get('/browse/keyword/notexistpackage')
