@@ -21,3 +21,4 @@ backup/*.gz
 docs/web/history.md
 view/web/_layout.html
 bin/mysql.js
+bin/test.sql

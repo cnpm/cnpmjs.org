@@ -31,6 +31,7 @@ var common = require('../lib/common');
 var Module = require('./module');
 var ModuleDeps = require('./module_deps');
 var Log = require('./module_log');
+var config = require('../config');
 
 function SyncModuleWorker(options) {
   EventEmitter.call(this);
@@ -411,18 +412,28 @@ SyncModuleWorker.prototype._syncOneVersion = function (versionIndex, sourcePacka
   });
 
   var dependencies = Object.keys(sourcePackage.dependencies || {});
+  var devDependencies = Object.keys(sourcePackage.devDependencies || {});
 
-  that.log('    [%s:%d] syncing, version: %s, dist: %j, no deps: %s, publish on cnpm: %s, dependencies: %d',
+  that.log('    [%s:%d] syncing, version: %s, dist: %j, no deps: %s, publish on cnpm: %s, dependencies: %d, devDependencies: %d',
     sourcePackage.name, versionIndex, sourcePackage.version,
     sourcePackage.dist, that.noDep, that._publish,
-    dependencies.length);
+    dependencies.length, devDependencies.length);
+
+  if (dependencies.length > config.maxDependencies) {
+    dependencies = dependencies.slice(0, config.maxDependencies);
+  }
+
+  if (devDependencies.length > config.maxDependencies) {
+    devDependencies = devDependencies.slice(0, config.maxDependencies);
+  }
+
   if (!that.noDep) {
-    for (var k in sourcePackage.dependencies) {
-      that.add(k);
+    for (var i = 0; i < dependencies.length; i++) {
+      that.add(dependencies[i]);
     }
 
-    for (var k in sourcePackage.devDependencies) {
-      that.add(k);
+    for (var i = 0; i < devDependencies.length; i++) {
+      that.add(devDependencies[i]);
     }
   }
 
