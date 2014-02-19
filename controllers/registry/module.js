@@ -35,6 +35,7 @@ var Log = require('../../proxy/module_log');
 var DownloadTotal = require('../../proxy/download');
 var SyncModuleWorker = require('../../proxy/sync_module_worker');
 var logger = require('../../common/logger');
+var ModuleDeps = require('../../proxy/module_deps');
 
 exports.show = function (req, res, next) {
   var name = req.params.name;
@@ -390,6 +391,18 @@ exports.upload = function (req, res, next) {
   });
 };
 
+function _addDepsRelations(pkg) {
+  var dependencies = Object.keys(pkg.dependencies || {});
+  if (dependencies.length > config.maxDependencies) {
+    dependencies = dependencies.slice(0, config.maxDependencies);
+  }
+
+  // add deps relations
+  dependencies.forEach(function (depName) {
+    ModuleDeps.add(depName, pkg.name, utility.noop);
+  });
+}
+
 exports.updateLatest = function (req, res, next) {
   var username = req.session.name;
   var name = req.params.name;
@@ -437,6 +450,8 @@ exports.updateLatest = function (req, res, next) {
     }
     body._publish_on_cnpm = true;
     nextMod.package = body;
+    _addDepsRelations(body);
+
     // reset publish time
     nextMod.publish_time = Date.now();
     debug('update %s:%s %j', nextMod.package.name, nextMod.package.version, nextMod.package.dist);
@@ -557,6 +572,7 @@ exports.addPackageAndDist = function (req, res, next) {
     };
 
     mod.package.dist = dist;
+    _addDepsRelations(mod.package);
 
     Module.add(mod, ep.done(function (r) {
       debug('%s module: save file to %s, size: %d, sha1: %s, dist: %j, version: %s',

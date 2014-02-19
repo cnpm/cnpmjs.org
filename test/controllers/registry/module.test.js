@@ -25,6 +25,7 @@ var app = require('../../../servers/registry');
 var Module = require('../../../proxy/module');
 var Npm = require('../../../proxy/npm');
 var controller = require('../../../controllers/registry/module');
+var ModuleDeps = require('../../../proxy/module_deps');
 
 var fixtures = path.join(path.dirname(path.dirname(__dirname)), 'fixtures');
 
@@ -142,7 +143,11 @@ describe('controllers/registry/module.test.js', function () {
       }],
       keywords: [
         'testputmodule', 'test', 'cnpmjstest'
-      ]
+      ],
+      dependencies: {
+        'foo-testputmodule': "*",
+        'bar-testputmodule': '*'
+      }
     };
     var baseauth = 'Basic ' + new Buffer('cnpmjstest10:cnpmjstest10').toString('base64');
     var baseauthOther = 'Basic ' + new Buffer('cnpmjstest101:cnpmjstest101').toString('base64');
@@ -290,6 +295,7 @@ describe('controllers/registry/module.test.js', function () {
       var pkg = require(path.join(fixtures, 'testputmodule.json')).versions['0.1.8'];
       pkg.name = 'testputmodule';
       pkg.version = '0.1.9';
+      pkg.dependencies['foo-testputmodule'] = '*';
       request(app)
       .put('/' + pkg.name + '/' + pkg.version + '/-tag/latest')
       .set('authorization', baseauth)
@@ -297,7 +303,16 @@ describe('controllers/registry/module.test.js', function () {
       .expect(201, function (err, res) {
         should.not.exist(err);
         res.body.should.have.keys('ok', 'rev');
-        done();
+        // should get deps foo-testputmodule contains 'testputmodule'
+        ModuleDeps.list('foo-testputmodule', function (err, rows) {
+          should.not.exist(err);
+          var exists = rows.filter(function (r) {
+            return r.deps === 'testputmodule';
+          });
+          exists.should.length(1);
+          exists[0].deps.should.equal('testputmodule');
+          done();
+        });
       });
     });
 
