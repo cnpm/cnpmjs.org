@@ -1,4 +1,10 @@
 
+0.2.25 / 2014-02-19 
+==================
+
+  * max handle number of package.json `dependencies` property
+  * Dependents support. fixed #190
+
 0.2.24 / 2014-02-13 
 ==================
 
