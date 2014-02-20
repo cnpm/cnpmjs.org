@@ -25,8 +25,10 @@ var config = require('../config');
 var startTime = '' + microtime.now();
 
 exports.show = function *() {
-  var total = yield Total.get();
-  var download = yield Download.total(null);
+  var r = yield [Total.get(), Download.total()];
+  var total = r[0];
+  var download = r[1];
+
   total.download = download;
   total.db_name = 'registry';
   total.instance_start_time = startTime;
@@ -34,8 +36,6 @@ exports.show = function *() {
   total.app_version = version;
   total.donate = 'https://me.alipay.com/imk2';
   total.sync_model = config.syncModel;
-  // if (this.request.query.callback) {
-  //   return res.jsonp(total, req.query.callback);
-  // }
+
   this.body = total;
 };
