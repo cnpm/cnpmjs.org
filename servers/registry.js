@@ -59,14 +59,7 @@ routes(app);
 
 app.on('error', function (err, ctx) {
   err.url = err.url || ctx.request.url;
-  logger.error(err);
-  // if (config.debug) {
-  //   return next(err);
-  // }
-  // res.json(500, {
-  //   error: err.name,
-  //   reason: err.message
-  // });
+  err.status >= 500 && logger.error(err);
 });
 
 app = http.createServer(app.callback());

@@ -27,6 +27,10 @@ var sync = require('../controllers/sync');
 function routes(app) {
   app.get('/', jsonp(), total.show);
 
+  // sync from source npm
+  app.put('/:name/sync', sync.sync);
+  app.get('/:name/sync/log/:id', sync.getSyncLog);
+
   //before /:name/:version
   //get all modules, for npm search
   // app.get('/-/all', mod.listAllModules);
