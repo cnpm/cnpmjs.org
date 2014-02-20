@@ -21,6 +21,7 @@ var http = require('http');
 var forward = require('forward');
 var path = require('path');
 var rt = require('koa-rt');
+var bodyParser = require('koa-bodyparser');
 var rewrite = require('koa-rewrite');
 var router = require('koa-router');
 var routes = require('../routes/registry');
@@ -42,6 +43,7 @@ app.use(rewrite('/favicon.ico', '/public/favicon.ico'));
 
 app.keys = ['todokey', config.sessionSecret];
 app.use(session);
+app.use(bodyParser());
 // app.use(auth());
 
 /**

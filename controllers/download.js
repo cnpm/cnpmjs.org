@@ -19,6 +19,10 @@ var moment = require('moment');
 var DownloadTotal = require('../proxy/download');
 
 exports.total = function (name, callback) {
+  if (typeof name === 'function') {
+    callback = name;
+    name = null;
+  }
   var end = moment();
   var start = end.clone().subtract('months', 1).startOf('month');
   var lastday = end.clone().subtract('days', 1).format('YYYY-MM-DD');
