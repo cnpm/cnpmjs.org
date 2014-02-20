@@ -14,6 +14,7 @@
  * Module dependencies.
  */
 
+var thunkify = require('thunkify-wrap');
 var moment = require('moment');
 var DownloadTotal = require('../proxy/download');
 
@@ -74,3 +75,5 @@ exports.total = function (name, callback) {
 
   DownloadTotal[method].apply(DownloadTotal, args);
 };
+
+thunkify(exports);

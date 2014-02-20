@@ -15,27 +15,19 @@
  * Module dependencies.
  */
 
-var connect = require('connect');
-var RedisStore = require('connect-redis')(connect);
+var session = require('koa-sess');
+var redisStore = require('koa-redis');
 var config = require('../config');
 
-var session;
 var key = 'AuthSession';
 var cookie = { path: '/', httpOnly: true, maxAge: 3600000 * 24 * 30 };
+var options = {
+  key: key,
+  cookie: cookie,
+};
 
-if (config.debug) {
-  session = connect.cookieSession({
-    secret: config.sessionSecret,
-    key: key,
-    cookie: cookie
-  });
-} else {
-  session = connect.session({
-    key: key,
-    secret: config.sessionSecret,
-    store: config.sessionStore || new RedisStore(config.redis),
-    cookie: cookie,
-  });
+if (!config.debug) {
+  options.store = config.sessionStore || redisStore(config.redis);
 }
 
-module.exports = session;
+module.exports = session(options);

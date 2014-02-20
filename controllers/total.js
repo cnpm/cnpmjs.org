@@ -18,29 +18,24 @@
 var microtime = require('microtime');
 var eventproxy = require('eventproxy');
 var Total = require('../proxy/total');
-var down = require('./download');
+var Download = require('./download');
 var version = require('../package.json').version;
 var config = require('../config');
 
 var startTime = '' + microtime.now();
 
-exports.show = function (req, res, next) {
-  var ep = eventproxy.create();
-  ep.fail(next);
-
-  Total.get(ep.done('total'));
-  down.total(null, ep.done('download'));
-  ep.all('total', 'download', function (total, download) {
-    total.download = download;
-    total.db_name = 'registry';
-    total.instance_start_time = startTime;
-    total.node_version = process.version;
-    total.app_version = version;
-    total.donate = 'https://me.alipay.com/imk2';
-    total.sync_model = config.syncModel;
-    if (req.query.callback) {
-      return res.jsonp(total, req.query.callback);
-    }
-    res.json(total);
-  });
+exports.show = function *() {
+  var total = yield Total.get();
+  var download = yield Download.total(null);
+  total.download = download;
+  total.db_name = 'registry';
+  total.instance_start_time = startTime;
+  total.node_version = process.version;
+  total.app_version = version;
+  total.donate = 'https://me.alipay.com/imk2';
+  total.sync_model = config.syncModel;
+  // if (this.request.query.callback) {
+  //   return res.jsonp(total, req.query.callback);
+  // }
+  this.body = total;
 };

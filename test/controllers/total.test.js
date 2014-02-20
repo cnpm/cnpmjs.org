@@ -34,7 +34,7 @@ describe('controllers/total.test.js', function () {
   });
 
   describe('GET / in registry', function () {
-    it('should return total info', function (done) {
+    it.only('should return total info', function (done) {
       request(registryApp)
       .get('/')
       .expect(200, function (err, res) {
@@ -44,6 +44,7 @@ describe('controllers/total.test.js', function () {
         done();
       });
     });
+
     it('should return total info by jsonp', function (done) {
       request(registryApp)
       .get('?callback=totalCallback')
@@ -62,5 +63,5 @@ describe('controllers/total.test.js', function () {
         done();
       });
     });
-  });  
+  });
 });
