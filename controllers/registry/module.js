@@ -37,221 +37,204 @@ var SyncModuleWorker = require('../../proxy/sync_module_worker');
 var logger = require('../../common/logger');
 var ModuleDeps = require('../../proxy/module_deps');
 
-exports.show = function (req, res, next) {
-  var name = req.params.name;
-  var ep = eventproxy.create();
-  ep.fail(next);
+/**
+ * show all version of a module
+ */
+exports.show = function *(next) {
+  var name = this.params.name;
 
-  Module.listTags(name, ep.done('tags'));
-  Module.listByName(name, ep.done('rows'));
+  var r = yield [Module.listTags(name), Module.listByName(name)];
+  var tags = r[0];
+  var rows = r[1];
 
-  ep.all('tags', 'rows', function (tags, rows) {
-    debug('show module, user: %s, allowSync: %s, isAdmin: %s', req.session.name, req.session.allowSync, req.session.isAdmin);
-    // if module not exist in this registry,
-    // sync the module backend and return package info from official registry
-    // TODO: Need to change this logic, it will cause unpublish sync again.
-    // TODO: Hard to detect this show is on install flow or unpublish flow
-    if (rows.length === 0) {
-      if (!req.session.allowSync) {
-        return next();
-      }
-      var username = (req.session && req.session.name) || 'anonymous';
-      SyncModuleWorker.sync(name, username, function (err, result) {
-        if (err) {
-          return next(err);
-        }
-        if (!result.ok) {
-          return res.json(result.statusCode, result.pkg);
-        }
-        res.json(200, result.pkg);
-      });
+  debug('show module, user: %s, allowSync: %s, isAdmin: %s',
+    this.session.name, this.session.allowSync, this.session.isAdmin);
+  // if module not exist in this registry,
+  // sync the module backend and return package info from official registry
+  if (rows.length === 0) {
+    if (!this.session.allowSync) {
+      this.status = 404;
+      this.body = {
+        error: 'not_found',
+        reason: 'document not found'
+      };
       return;
     }
+    var username = (this.session && this.session.name) || 'anonymous';
+    var result = yield SyncModuleWorker.sync(name, username);
+    this.status = result.ok ? 200 : result.statusCode;
+    this.body = result.pkg;
+    return;
+  }
 
-    var nextMod = null;
-    var latestMod = null;
-    var distTags = {};
-    for (var i = 0; i < tags.length; i++) {
-      var t = tags[i];
-      distTags[t.tag] = t.version;
+  var nextMod = null;
+  var latestMod = null;
+
+  // set tags
+  var distTags = {};
+  for (var i = 0; i < tags.length; i++) {
+    var t = tags[i];
+    distTags[t.tag] = t.version;
+  }
+
+  // set versions and times
+  var versions = {};
+  var times = {};
+  var attachments = {};
+  for (var i = 0; i < rows.length; i++) {
+    var row = rows[i];
+    if (row.version === 'next') {
+      nextMod = row;
+      continue;
     }
-
-    var versions = {};
-    var times = {};
-    var attachments = {};
-    for (var i = 0; i < rows.length; i++) {
-      var row = rows[i];
-      if (row.version === 'next') {
-        nextMod = row;
-        continue;
-      }
-      var pkg = row.package;
-      common.setDownloadURL(pkg, req);
-      pkg._cnpm_publish_time = row.publish_time;
-      versions[pkg.version] = pkg;
-      times[pkg.version] = row.publish_time ? new Date(row.publish_time) : row.gmt_modified;
-      if ((!distTags.latest && !latestMod) || distTags.latest === row.version) {
-        latestMod = row;
-      }
+    var pkg = row.package;
+    common.setDownloadURL(pkg, this);
+    pkg._cnpm_publish_time = row.publish_time;
+    versions[pkg.version] = pkg;
+    times[pkg.version] = row.publish_time ? new Date(row.publish_time) : row.gmt_modified;
+    if ((!distTags.latest && !latestMod) || distTags.latest === row.version) {
+      latestMod = row;
     }
+  }
 
-    if (!latestMod) {
-      latestMod = nextMod || rows[0];
-    }
+  if (!latestMod) {
+    latestMod = nextMod || rows[0];
+  }
 
-    if (!nextMod) {
-      nextMod = latestMod;
-    }
+  if (!nextMod) {
+    nextMod = latestMod;
+  }
 
-    var rev = '';
-    if (nextMod) {
-      rev = String(nextMod.id);
-    }
+  var rev = '';
+  if (nextMod) {
+    rev = String(nextMod.id);
+  }
 
-    var info = {
-      _id: name,
-      _rev: rev,
-      name: name,
-      description: latestMod.package.description,
-      "dist-tags": distTags,
-      maintainers: latestMod.package.maintainers,
-      time: times,
-      author: latestMod.package.author,
-      repository: latestMod.package.repository,
-      versions: versions,
-      readme: latestMod.package.readme,
-      _attachments: attachments,
-    };
+  var info = {
+    _id: name,
+    _rev: rev,
+    name: name,
+    description: latestMod.package.description,
+    "dist-tags": distTags,
+    maintainers: latestMod.package.maintainers,
+    time: times,
+    author: latestMod.package.author,
+    repository: latestMod.package.repository,
+    versions: versions,
+    readme: latestMod.package.readme,
+    _attachments: attachments,
+  };
 
-    debug('show module %s: %s, latest: %s', name, rev, latestMod.version);
+  debug('show module %s: %s, latest: %s', name, rev, latestMod.version);
 
-    res.json(info);
-  });
+  this.body = info;
 };
 
-exports.get = function (req, res, next) {
-  var name = req.params.name;
-  var tag = req.params.version;
+/**
+ * get the special version or tag of a module
+ */
+exports.get = function *(next) {
+  var name = this.params.name;
+  var tag = this.params.version;
   var version = semver.valid(tag);
-  var ep = eventproxy.create();
-  ep.fail(next);
-
   var method = version ? 'get' : 'getByTag';
   var queryLabel = version ? version : tag;
 
-  Module[method](name, queryLabel, ep.done(function (mod) {
-    if (mod) {
-      common.setDownloadURL(mod.package, req);
-      mod.package._cnpm_publish_time = mod.publish_time;
-      return res.json(mod.package);
-    }
-    ep.emit('notFound');
-  }));
+  var mod = yield Module[method](name, queryLabel);
+  if (mod) {
+    common.setDownloadURL(mod.package, this);
+    mod.package._cnpm_publish_time = mod.publish_time;
+    this.body = mod.package;
+    return;
+  }
 
-  ep.once('notFound', function () {
-    if (!req.session.allowSync) {
-      return next();
-    }
+  // if not fond, sync from source registry
+  if (!this.session.allowSync) {
+    this.status = 404;
+    this.body = {
+      error: 'not exist',
+      reason: 'version not found: ' + version
+    };
+    return;
+  }
 
-    var username = (req.session && req.session.username) || 'anonymous';
-    SyncModuleWorker.sync(name, username, function (err, result) {
-      if (err) {
-        return next(err);
-      }
-      var pkg = result.pkg && result.pkg.versions[version];
-      if (!pkg) {
-        return res.json(404, {
-          error: 'not exist',
-          reason: 'version not found: ' + version
-        });
-      }
-      res.json(pkg);
-    });
-  });
+  var username = (this.session && this.session.username) || 'anonymous';
+  var result = yield SyncModuleWorker.sync(name, username);
+  var pkg = result.pkg && result.pkg.versions[version];
+  if (!pkg) {
+    this.status = 404;
+    this.body = {
+      error: 'not exist',
+      reason: 'version not found: ' + version
+    };
+    return;
+  }
+  this.body = pkg;
 };
 
 var _downloads = {};
 
 var DOWNLOAD_TIMEOUT = ms('10m');
 
-exports.download = function (req, res, next) {
-  var name = req.params.name;
-  var filename = req.params.filename;
+exports.download = function *(next) {
+  var name = this.params.name;
+  var filename = this.params.filename;
   var version = filename.slice(name.length + 1, -4);
-  var ep = eventproxy.create();
-  ep.fail(next);
-
-  Module.get(name, version, ep.doneLater('moduleInfo'));
-  ep.once('moduleInfo', function (row) {
-    if (!row || !row.package || !row.package.dist) {
-      return ep.emit('nodist');
-    }
-    var dist = row.package.dist;
-    if (dist.key) {
-      return ep.emit('key', dist);
-    } else {
-      return ep.emit('url', dist);
-    }
-    ep.emit('nodist');
-  });
-
-  ep.once('nodist', function () {
+  var ctx = this;
+  var row = yield Module.get(name, version);
+  // can not get dist
+  var url = nfs.url(common.getCDNKey(name, filename));
+  if (!row || !row.package || !row.package.dist) {
     if (!nfs.url) {
-      return next();
+      return yield next;
     }
-    ep.emit('url', nfs.url(common.getCDNKey(name, filename)));
-  });
-
-  ep.once('url', function (dist) {
-    res.statusCode = 302;
-    res.setHeader('Location', dist.tarball);
-    res.end();
+    this.status = 302;
+    this.set('Location', url);
     _downloads[name] = (_downloads[name] || 0) + 1;
-  });
-
-  ep.once('key', function (dist) {
-    if (!nfs.downloadStream && !nfs.download) {
-      return next();
-    }
-
+    return;
+  }
+  var dist = row.package.dist;
+  if (!dist.key) {
+    this.status = 302;
+    this.set('Location', dist.tarball || url);
     _downloads[name] = (_downloads[name] || 0) + 1;
+    return;
+  }
 
-    if (typeof dist.size === 'number') {
-      res.setHeader('Content-Length', dist.size);
-    }
-    res.setHeader('Content-Type', mime.lookup(dist.key));
-    res.setHeader('Content-Disposition', 'attachment; filename="' + filename + '"');
-    res.setHeader('ETag', dist.shasum);
+  // else use `dist.key` to get tarball from nfs
+  if (!nfs.downloadStream && !nfs.download) {
+    return yield next;
+  }
 
-    if (nfs.downloadStream) {
-      nfs.downloadStream(dist.key, res, {timeout: DOWNLOAD_TIMEOUT},
-      function (err) {
-        if (err) {
-          // TODO: just end or send error response?
-          return next(err);
-        }
-      });
-      return;
-    }
+  _downloads[name] = (_downloads[name] || 0) + 1;
 
-    // use download file api
-    var tmpPath = path.join(config.uploadDir, utility.randomString() + dist.key);
-    function cleanup() {
-      fs.unlink(tmpPath, utility.noop);
-    }
+  if (typeof dist.size === 'number') {
+    this.set('Content-Length', dist.size);
+  }
+  this.set('Content-Type', mime.lookup(dist.key));
+  this.set('Content-Disposition', 'attachment; filename="' + filename + '"');
+  this.set('ETag', dist.shasum);
 
-    nfs.download(dist.key, tmpPath, {timeout: DOWNLOAD_TIMEOUT},
-    function (err) {
-      if (err) {
-        cleanup();
-        return next(err);
-      }
-      var tarball = fs.createReadStream(tmpPath);
-      tarball.on('error', cleanup);
-      tarball.on('end', cleanup);
-      tarball.pipe(res);
-    });
-  });
+  if (nfs.downloadStream) {
+    yield nfs.downloadStream(dist.key, this.res, {timeout: DOWNLOAD_TIMEOUT});
+    return;
+  }
+
+  // use download file api
+  var tmpPath = path.join(config.uploadDir, utility.randomString() + dist.key);
+  function cleanup() {
+    fs.unlink(tmpPath, utility.noop);
+  }
+  try {
+    yield nfs.download(dist.key, tmpPath, {timeout: DOWNLOAD_TIMEOUT});
+  } catch (err) {
+    cleanup();
+    this.throw(err);
+  }
+  var tarball = fs.createReadStream(tmpPath);
+  tarball.on('error', cleanup);
+  tarball.on('end', cleanup);
+  this.body = tarball;
 };
 
 setInterval(function () {
@@ -298,96 +281,101 @@ setInterval(function () {
   next();
 }, 5000);
 
-exports.upload = function (req, res, next) {
-  var length = Number(req.headers['content-length']) || 0;
-  if (!length || req.headers['content-type'] !== 'application/octet-stream') {
-    return next();
+exports.upload = function *(next) {
+  var length = Number(this.get('content-length')) || 0;
+  if (!length || !this.is('application/octet-stream')) {
+    return yield next;
   }
 
-  var username = req.session.name;
-  var name = req.params.name;
-  var id = Number(req.params.rev);
-  var filename = req.params.filename;
+  var username = this.session.name;
+  var name = this.params.name;
+  var id = Number(this.params.rev);
+  var filename = this.params.filename;
   var version = filename.substring(name.length + 1);
   version = version.replace(/\.tgz$/, '');
   // save version on pkg upload
 
-  debug('%s: upload %s, file size: %d', username, req.url, length);
-  Module.getById(id, function (err, mod) {
-    if (err || !mod) {
-      return next(err);
-    }
+  debug('%s: upload %s, file size: %d', username, this.url, length);
+  var mod = yield Module.getById(id);
+  if (!mod) {
+    return yield next;
+  }
+  if (!common.isMaintainer(this, mod.package.maintainers) || mod.name !== name) {
+    this.status = 403;
+    this.body = {
+      error: 'no_perms',
+      reason: 'Current user can not publish this module'
+    };
+    return;
+  }
 
-    if (!common.isMaintainer(req, mod.package.maintainers) || mod.name !== name) {
-      return res.json(403, {
-        error: 'no_perms',
-        reason: 'Current user can not publish this module'
-      });
-    }
+  if (mod.version !+= 'next') {
+    // rev wrong
+    this.status = 403;
+    this.body = {
+      error: 'rev_wrong',
+      reason: 'rev not match next module'
+    };
+    return;
+  }
 
-    if (mod.version !== 'next') {
-      // rev wrong
-      return res.json(403, {
-        error: 'rev_wrong',
-        reason: 'rev not match next module'
-      });
-    }
-
-    var filepath = common.getTarballFilepath(filename);
-    var ws = fs.createWriteStream(filepath);
-    var shasum = crypto.createHash('sha1');
-    req.pipe(ws);
-    var dataSize = 0;
-    req.on('data', function (data) {
-      shasum.update(data);
-      dataSize += data.length;
-    });
-    ws.on('finish', function () {
-      if (dataSize !== length) {
-        return res.json(403, {
-          error: 'size_wrong',
-          reason: 'Header size ' + length + ' not match download size ' + dataSize,
-        });
-      }
-      shasum = shasum.digest('hex');
-
-      var options = {
-        key: common.getCDNKey(name, filename),
-        size: length,
-        shasum: shasum
+  var ctx = this;
+  var filepath = common.getTarballFilepath(filename);
+  var ws = fs.createWriteStream(filepath);
+  var shasum = crypto.createHash('sha1');
+  req.pipe(ws);
+  var dataSize = 0;
+  req.on('data', function (data) {
+    shasum.update(data);
+    dataSize += data.length;
+  });
+  ws.on('finish', function () {
+    if (dataSize !== length) {
+      ctx.status = 403;
+      ctx.body = {
+        error: 'size_wrong',
+        reason: 'Header size ' + length + ' not match download size ' + dataSize,
       };
-      nfs.upload(filepath, options, function (err, result) {
-        // remove tmp file whatever
-        fs.unlink(filepath, utility.noop);
-        if (err) {
-          return next(err);
-        }
+      return;
+    }
+    shasum = shasum.digest('hex');
 
-        var dist = {
-          shasum: shasum,
-          size: length
-        };
+    var options = {
+      key: common.getCDNKey(name, filename),
+      size: length,
+      shasum: shasum
+    };
+    var result;
+    try {
+      result = yield nfs.upload(filepath, options);
+    } catch (err) {
+      fs.unlink(filepath, utility.noop);
+      ctx.throw(err);
+    }
+    fs.unlink(filepath, utility.noop);
+    var dist = {
+      shasum: shasum,
+      size: length
+    };
 
-        // if nfs upload return a key, record it
-        if (result.url) {
-          dist.tarball = result.url;
-        } else if (result.key) {
-          dist.key = result.key;
-          dist.tarball = result.key;
-        }
+    // if nfs upload return a key, record it
+    if (result.url) {
+      dist.tarball = result.url;
+    } else if (result.key) {
+      dist.key = result.key;
+      dist.tarball = result.key;
+    }
 
-        mod.package.dist = dist;
-        mod.package.version = version;
-        debug('%s module: save file to %s, size: %d, sha1: %s, dist: %j, version: %s',
-          id, filepath, length, shasum, dist, version);
-        Module.update(mod, function (err, result) {
-          if (err) {
-            return next(err);
-          }
-          res.json(201, {ok: true, rev: String(result.id)});
-        });
-      });
-    });
+    mod.package.dist = dist;
+    mod.package.version = version;
+    debug('%s module: save file to %s, size: %d, sha1: %s, dist: %j, version: %s',
+      id, filepath, length, shasum, dist, version);
+    var updateResult = yield module.update(mod);
+    ctx.status = 201;
+    ctx.body = {
+      ok: true,
+      rev: String(updateResult.id)
+    };
   });
 };
 
