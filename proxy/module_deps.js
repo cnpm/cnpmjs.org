@@ -14,6 +14,7 @@
  * Module dependencies.
  */
 
+var thunkify = require('thunkify-wrap');
 var mysql = require('../common/mysql');
 
 var LIST_DEPS_SQL = 'SELECT deps FROM module_deps WHERE name=?;';
@@ -39,3 +40,5 @@ var DELETE_DEPS_SQL = 'DELETE FROM module_deps WHERE name=? AND deps=?;';
 exports.remove = function (name, deps, callback) {
   mysql.query(DELETE_DEPS_SQL, [name, deps], callback);
 };
+
+thunkify(exports);

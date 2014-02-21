@@ -14,13 +14,15 @@
  * Module dependencies.
  */
 
-module.exports = function publishable(req, res, next) {
-  if (req.session.onlySync && !req.session.isAdmin) {
+module.exports = function *publishable(next) {
+  if (this.session.onlySync && !this.session.isAdmin) {
     // private mode, only admin user can publish
-    return res.json(403, {
+    this.status = 403;
+    this.body = {
       error: 'no_perms',
       reason: 'Private mode enable, only admin can publish this module'
-    });
+    };
+    return;
   }
-  next();
+  yield next;
 };

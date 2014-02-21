@@ -21,25 +21,25 @@ var config = require('../config');
  * req.session.allowSync  -  allow sync triggle by cnpm install
  */
 
-module.exports = function (req, res, next) {
+module.exports = function *(next) {
   if (!config.syncByInstall || !config.enablePrivate) {
     // only config.enablePrivate should enable sync on install
-    return next();
+    return yield next;
   }
   // request not by node, consider it request from web
-  if (req.headers['user-agent'] && req.headers['user-agent'].indexOf('node') !== 0) {
-    return next();
+  if (this.get('user-agent') && this.get('user-agent').indexOf('node') !== 0) {
+    return yield next;
   }
 
-  req.session.allowSync = true;
-  if (req.session.isAdmin) {
+  this.session.allowSync = true;
+  if (this.session.isAdmin) {
     // if current user is admin, should not enable auto sync on install, because it would be unpublish
-    req.session.allowSync = false;
+    this.session.allowSync = false;
   }
 
   // TODO: allow sync will let publish sync package...
-  req.session.allowSync = false;
+  this.session.allowSync = false;
 
-  debug('%s allowSync: %s', req.session.name, req.session.allowSync);
-  next();
+  debug('%s allowSync: %s', this.session.name, this.session.allowSync);
+  yield next;
 };
