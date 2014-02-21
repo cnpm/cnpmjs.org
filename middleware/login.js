@@ -14,12 +14,14 @@
  * Module dependencies.
  */
 
-module.exports = function login(req, res, next) {
-  if (!req.session.name) {
-    return res.json(401, {
+module.exports = function *login(next) {
+  if (!this.session.name) {
+    this.status = 401;
+    this.body = {
       error: 'unauthorized',
       reason: 'Login first.'
-    });
+    };
+    return;
   }
-  next();
+  yield next;
 };
