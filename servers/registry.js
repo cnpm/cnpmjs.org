@@ -15,14 +15,15 @@
  * Module dependencies.
  */
 
-require('response-patch');
+var koa = require('koa');
+var app = module.exports = koa();
 var http = require('http');
-var connect = require('connect');
-var rt = require('connect-rt');
-var responseCookie = require('response-cookie');
-var urlrouter = require('urlrouter');
 var forward = require('forward');
 var path = require('path');
+var rt = require('koa-rt');
+var bodyParser = require('koa-bodyparser');
+var rewrite = require('koa-rewrite');
+var router = require('koa-router');
 var routes = require('../routes/registry');
 var logger = require('../common/logger');
 var config = require('../config');
@@ -30,54 +31,41 @@ var session = require('../common/session');
 var auth = require('../middleware/auth');
 
 var rootdir = path.dirname(__dirname);
-var app = connect();
 
 app.use(rt({headerName: 'X-ReadTime'}));
-app.use(function (req, res, next) {
-  res.req = req;
-  next();
-});
 
-app.use('/favicon.ico', forward(path.join(rootdir, 'public', 'favicon.png')));
+app.use(rewrite('/favicon.ico', '/public/favicon.ico'));
 
-app.use('/dist', connect.static(config.uploadDir));
+// app.use(responseCookie());
+// app.use(connect.cookieParser());
+// app.use(connect.query());
+// app.use(connect.json());
 
-app.use(responseCookie());
-app.use(connect.cookieParser());
-app.use(connect.query());
-app.use(connect.json());
+app.keys = ['todokey', config.sessionSecret];
 app.use(session);
+app.use(bodyParser());
 app.use(auth());
 
 /**
  * Routes
  */
 
-app.use(urlrouter(routes));
-
-app.use(function (req, res, next) {
-  res.json(404, {error: 'not_found', reason: 'document not found'});
-});
+app.use(router(app));
+routes(app);
 
 /**
  * Error handler
  */
 
-app.use(function (err, req, res, next) {
-  err.url = err.url || req.url;
-  logger.error(err);
-  if (process.env.NODE_ENV !== 'test') {
-    console.error(err.stack);
-  }
-  if (config.debug) {
-    return next(err);
-  }
-  res.json(500, {
-    error: err.name,
-    reason: err.message
-  });
+app.on('error', function (err, ctx) {
+  err.url = err.url || ctx.request.url;
+  err.status >= 500 && logger.error(err);
 });
 
-app = http.createServer(app);
+app = http.createServer(app.callback());
+
+if (!module.parent) {
+  app.listen(config.registryPort);
+}
 
 module.exports = app;
