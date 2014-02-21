@@ -35,7 +35,9 @@ var pool = mysql.createPool({
 exports.pool = pool;
 
 exports.query = function (sql, values, cb) {
-  pool.query(sql, values, cb);
+  pool.query(sql, values, function (err, rows) {
+    cb(err, rows);
+  });
 };
 
 exports.queryOne = function (sql, values, cb) {

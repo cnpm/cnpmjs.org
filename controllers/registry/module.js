@@ -9,7 +9,7 @@
  *  fengmk2 <fengmk2@gmail.com> (http://fengmk2.github.com)
  */
 
-// 'use strict';
+'use strict';
 
 /**
  * Module dependencies.
@@ -180,10 +180,10 @@ exports.download = function *(next) {
   var name = this.params.name;
   var filename = this.params.filename;
   var version = filename.slice(name.length + 1, -4);
-  var ctx = this;
   var row = yield Module.get(name, version);
   // can not get dist
   var url = nfs.url(common.getCDNKey(name, filename));
+
   if (!row || !row.package || !row.package.dist) {
     if (!nfs.url) {
       return yield next;
@@ -195,6 +195,7 @@ exports.download = function *(next) {
   }
   var dist = row.package.dist;
   if (!dist.key) {
+    debug('get tarball by 302');
     this.status = 302;
     this.set('Location', dist.tarball || url);
     _downloads[name] = (_downloads[name] || 0) + 1;
@@ -377,8 +378,6 @@ exports.upload = function *(next) {
     ok: true,
     rev: String(updateResult.id)
   };
-  console.log(mod);
-  console.log(yield Module.getById(updateResult.id));
 };
 
 function _addDepsRelations(pkg) {
@@ -406,7 +405,7 @@ exports.updateLatest = function *(next) {
     return;
   }
 
-  var nextMod = yield Module.get(name, version);
+  var nextMod = yield Module.get(name, 'next');
   if (!nextMod) {
     debug('can not get nextMod');
     return yield next;
@@ -754,7 +753,6 @@ exports.removeTar = function *(next) {
   }
   var key = mod.package.dist && mod.package.dist.key;
   key = key || common.getCDNKey(mod.name, filename);
-
   yield nfs.remove(key);
   this.body = { ok: true };
 };
@@ -782,17 +780,18 @@ exports.removeAll = function *(next) {
   }
   Total.plusDeleteModule(utility.noop);
   yield [Module.removeByName(name), Module.removeTags(name)];
-
   var keys = [];
   for (var i = 0; i < mods.length; i++) {
     var key = urlparse(mods[i].dist_tarball).path;
     key && keys.push(key);
   }
-  yield keys.map(function (key) {
-    return nfs.remove(key);
-  });
-
-  this.status = 201;
+  try {
+    yield keys.map(function (key) {
+      return nfs.remove(key);
+    });
+  } catch (err) {
+    // ignore error here
+  }
   this.body = { ok: true };
 };
 
@@ -836,7 +835,7 @@ exports.listAllModulesSince = function *(next) {
     return;
   }
 
-  debug('list all modules from %s', req.startkey);
+  debug('list all modules from %s', query.startkey);
   var startkey = Number(query.startkey) || 0;
   var updated = Date.now();
   var mods = yield Module.listSince(startkey);
@@ -844,8 +843,7 @@ exports.listAllModulesSince = function *(next) {
 };
 
 exports.listAllModuleNames = function *(next) {
-  yield Module.listShort();
-  this.body = mods.map(function (m) {
+  this.body = (yield Module.listShort()).map(function (m) {
     return m.name;
   });
 };
