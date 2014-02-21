@@ -47,110 +47,109 @@ exports.show = function *(next) {
 //    type: 'user',
 //    roles: [],
 //    date: '2013-12-04T12:56:13.714Z' } }
-exports.add = function (req, res, next) {
-  var name = req.params.name;
-  var body = req.body || {};
+exports.add = function *() {
+  var name = this.params.name;
+  var body = this.request.body || {};
   var user = {
     name: body.name,
     salt: body.salt,
     password_sha: body.password_sha,
     email: body.email,
-    ip: req.socket && req.socket.remoteAddress || '0.0.0.0',
+    ip: this.ip || '0.0.0.0',
     // roles: body.roles || [],
   };
+
   if (!user.name || !user.salt || !user.password_sha || !user.email) {
-    return res.json(422, {
+    this.status = 422;
+    this.body = {
       error: 'paramError',
       reason: 'params missing'
-    });
+    };
+    return;
   }
   debug('add user: %j', user);
-  var ep = eventproxy.create();
-  ep.fail(next);
 
-  User.get(name, ep.doneLater(function (row) {
-    if (row) {
-      return res.json(409, {
-        error: 'conflict',
-        reason: 'Document update conflict.'
-      });
-    }
-    User.add(user, ep.done('add'));
-  }));
+  var existUser = yield User.get(name);
+  if (existUser) {
+    this.status = 409;
+    this.body = {
+      error: 'conflict',
+      reason: 'Document update conflict.'
+    };
+    return;
+  }
 
-  ep.once('add', function (result) {
-    res.setHeader('etag', '"' + result.rev + '"');
-    // location: 'http://registry.npmjs.org/_users/org.couchdb.user:cnpmjstest1',
-    res.json(201, {
-      ok: true,
-      id: 'org.couchdb.user:' + name,
-      rev: result.rev
-    });
-  });
+  var result = yield User.add(user);
+  this.etag = '"' + result.rev + '"';
+  this.status = 201;
+  this.body = {
+    ok: true,
+    id: 'org.couchdb.user:' + name,
+    rev: result.rev
+  };
 };
 
-exports.authSession = function (req, res, next) {
+exports.authSession = function *() {
   // body: {"name":"foo","password":"****"}
-  var body = req.body || {};
+  var body = this.request.body || {};
   var name = body.name;
   var password = body.password;
-  User.auth(name, password, function (err, user) {
-    debug('authSession %s: %j', name, user);
-    if (err) {
-      return next(err);
-    }
-    if (!user) {
-      return res.json(401, {ok: false, name: null, roles: []});
-    }
+  var user = yield User.auth(name, password);
+  debug('authSession %s: %j', name, user);
 
-    req.session.name = user.name;
-    res.json(200, {ok: true, name: user.name, roles: []});
-  });
+  if (!user) {
+    this.status = 401;
+    this.body = {ok: false, name: null, roles: []};
+    return;
+  }
+
+  this.session.name = user.name;
+  this.body = {ok: true, name: user.name, roles: []};
 };
 
-exports.update = function (req, res, next) {
-  var name = req.params.name;
-  var rev = req.params.rev;
+exports.update = function *(next) {
+  var name = this.params.name;
+  var rev = this.params.rev;
   if (!name || !rev) {
-    return next();
+    return yield next;
   }
 
-  debug('update: %s, rev: %s, session.name: %s', name, rev, req.session.name);
+  debug('update: %s, rev: %s, session.name: %s', name, rev, this.session.name);
 
-  if (name !== req.session.name) {
+  if (name !== this.session.name) {
     // must authSession first
-    res.statusCode = 401;
-    return res.json({
+    this.status = 401;
+    this.body = {
       error: 'unauthorized',
       reason: 'Name is incorrect.'
-    });
+    };
+    return;
   }
 
-  var body = req.body || {};
+  var body = this.request.body || {};
   var user = {
     name: body.name,
     salt: body.salt,
     password_sha: body.password_sha,
     email: body.email,
-    ip: req.socket && req.socket.remoteAddress || '0.0.0.0',
+    ip: this.ip || '0.0.0.0',
     rev: body.rev || body._rev,
     // roles: body.roles || [],
   };
-  User.update(user, function (err, result) {
-    if (err) {
-      return next(err);
-    }
-    //check rev error
-    if (!result) {
-      return res.json(409, {
-        error: 'conflict',
-        reason: 'Document update conflict.'
-      });
-    }
-    res.json(201, {
-      ok: true,
-      id: 'org.couchdb.user:' + user.name,
-      rev: result.rev
-    });
-  });
+  var result = yield User.update(user);
+  if (!result) {
+    this.status = 409;
+    this.body = {
+      error: 'conflict',
+      reason: 'Document update conflict.'
+    };
+    return;
+  }
+
+  this.status = 201;
+  this.body = {
+    ok: true,
+    id: 'org.couchdb.user:' + user.name,
+    rev: result.rev
+  };
 };

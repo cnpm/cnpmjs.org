@@ -44,7 +44,7 @@ app.use(rewrite('/favicon.ico', '/public/favicon.ico'));
 app.keys = ['todokey', config.sessionSecret];
 app.use(session);
 app.use(bodyParser());
-// app.use(auth());
+app.use(auth());
 
 /**
  * Routes
