@@ -11,10 +11,7 @@
   },
   "config": {
     "blanket": {
-      "pattern": "//^((?!(node_modules|test|common)).)*$/",
-      "data-cover-flags": {
-        "debug": false
-      }
+      "pattern": "//^((?!(node_modules|test|common)).)*$/"
     },
     "travis-cov": {
       "threshold": 90
@@ -64,7 +61,7 @@
     "blanket": "*",
     "contributors": "*",
     "coveralls": "*",
-    "mm": "0.1.8",
+    "mm": "0.2.0",
     "mocha": "*",
     "mocha-lcov-reporter": "*",
     "pedding": "0.0.3",
