@@ -33,7 +33,7 @@ module.exports = function (options) {
         this.session.name, this.session.onlySync, this.session.isAdmin, this.header);
       return yield next;
     }
-    var authorization = (req.headers.authorization || '').split(' ')[1] || '';
+    var authorization = (this.get('authorization') || '').split(' ')[1] || '';
     authorization = authorization.trim();
     if (!authorization) {
       return yield next;
