@@ -14,6 +14,7 @@
  * Module dependencies.
  */
 
+var thunkify = require('thunkify-wrap');
 var utility = require('utility');
 var config = require('../config');
 var mysql = require('../common/mysql');
@@ -105,3 +106,4 @@ exports.update = function (user, callback) {
   });
 };
 
+thunkify(exports);
