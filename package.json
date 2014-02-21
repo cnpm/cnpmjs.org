@@ -18,7 +18,8 @@
     }
   },
   "dependencies": {
-    "bagpipe": "0.3.5",
+    "co-read": "0.0.1",
+    "co-write": "0.3.0",
     "connect": "2.13.0",
     "connect-markdown": "0.0.3",
     "connect-render": "0.3.2",
