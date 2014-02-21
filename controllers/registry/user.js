@@ -1,4 +1,4 @@
-/*!
+/**!
  * cnpmjs.org - controllers/registry/user.js
  *
  * Copyright(c) cnpmjs.org and other contributors.
@@ -18,30 +18,24 @@
 var debug = require('debug')('cnpmjs.org:controllers:registry');
 var logger = require('../../common/logger');
 var User = require('../../proxy/user');
-var eventproxy = require('eventproxy');
 
-exports.show = function (req, res, next) {
-  var name = req.params.name;
-  User.get(name, function (err, row) {
-    if (err) {
-      return next(err);
-    }
-    if (!row) {
-      return next();
-    }
-
-    res.setHeader('etag', '"' + row.rev + '"');
-    var data = {
-      _id: 'org.couchdb.user:' + row.name,
-      _rev: row.rev,
-      name: row.name,
-      email: row.email,
-      type: 'user',
-      roles: [],
-      date: row.gmt_modified,
-    };
-    res.json(data);
-  });
+exports.show = function *(next) {
+  var name = this.params.name;
+  var user = yield User.get(name);
+  if (!user) {
+    return yield next;
+  }
+  this.etag = '"' + user.rev + '"';
+  var data = {
+    _id: 'org.couchdb.user:' + user.name,
+    _rev: user.rev,
+    name: user.name,
+    email: user.email,
+    type: 'user',
+    roles: [],
+    date: user.gmt_modified,
+  };
+  this.body = data;
 };
 
 // json:

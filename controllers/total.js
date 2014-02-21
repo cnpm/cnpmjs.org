@@ -16,7 +16,6 @@
  */
 
 var microtime = require('microtime');
-var eventproxy = require('eventproxy');
 var Total = require('../proxy/total');
 var Download = require('./download');
 var version = require('../package.json').version;

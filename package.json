@@ -86,7 +86,7 @@
     "cnpmjs.org", "npm", "npmjs", "npmjs.org", "registry"
   ],
   "engines": {
-    "node": ">= 0.8.0"
+    "node": ">= 0.11.9"
   },
   "author": [
     "fengmk2 <fengmk2@gmail.com> (http://fengmk2.github.com)",
