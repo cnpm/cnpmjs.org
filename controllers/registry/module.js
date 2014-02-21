@@ -9,7 +9,7 @@
  *  fengmk2 <fengmk2@gmail.com> (http://fengmk2.github.com)
  */
 
-'use strict';
+// 'use strict';
 
 /**
  * Module dependencies.
@@ -20,8 +20,8 @@ var path = require('path');
 var fs = require('fs');
 var crypto = require('crypto');
 var utility = require('utility');
-var eventproxy = require('eventproxy');
-var Bagpipe = require('bagpipe');
+var coRead = require('co-read');
+var coWrite = require('co-write');
 var urlparse = require('url').parse;
 var mime = require('mime');
 var semver = require('semver');
@@ -284,6 +284,7 @@ setInterval(function () {
 exports.upload = function *(next) {
   var length = Number(this.get('content-length')) || 0;
   if (!length || !this.is('application/octet-stream')) {
+    debug('request length or type error');
     return yield next;
   }
 
@@ -298,6 +299,7 @@ exports.upload = function *(next) {
   debug('%s: upload %s, file size: %d', username, this.url, length);
   var mod = yield Module.getById(id);
   if (!mod) {
+    debug('can not get this module');
     return yield next;
   }
   if (!common.isMaintainer(this, mod.package.maintainers) || mod.name !== name) {
@@ -309,7 +311,7 @@ exports.upload = function *(next) {
     return;
   }
 
-  if (mod.version !+= 'next') {
+  if (mod.version !== 'next') {
     // rev wrong
     this.status = 403;
     this.body = {
@@ -318,65 +320,65 @@ exports.upload = function *(next) {
     };
     return;
   }
-
-  var ctx = this;
   var filepath = common.getTarballFilepath(filename);
   var ws = fs.createWriteStream(filepath);
   var shasum = crypto.createHash('sha1');
-  req.pipe(ws);
   var dataSize = 0;
-  req.on('data', function (data) {
-    shasum.update(data);
-    dataSize += data.length;
-  });
-  ws.on('finish', function () {
-    if (dataSize !== length) {
-      ctx.status = 403;
-      ctx.body = {
-        error: 'size_wrong',
-        reason: 'Header size ' + length + ' not match download size ' + dataSize,
-      };
-      return;
-    }
-    shasum = shasum.digest('hex');
 
-    var options = {
-      key: common.getCDNKey(name, filename),
-      size: length,
-      shasum: shasum
+  var buf;
+  while(buf = yield coRead(this.req)) {
+    shasum.update(buf);
+    dataSize += buf.length;
+    coWrite(ws, buf);
+  }
+  if (dataSize !== length) {
+    this.status = 403;
+    this.body = {
+      error: 'size_wrong',
+      reason: 'Header size ' + length + ' not match download size ' + dataSize,
     };
-    var result;
-    try {
-      result = yield nfs.upload(filepath, options);
-    } catch (err) {
-      fs.unlink(filepath, utility.noop);
-      ctx.throw(err);
-    }
+    return;
+  }
+  shasum = shasum.digest('hex');
+
+  var options = {
+    key: common.getCDNKey(name, filename),
+    size: length,
+    shasum: shasum
+  };
+  var result;
+  try {
+    result = yield nfs.upload(filepath, options);
+  } catch (err) {
     fs.unlink(filepath, utility.noop);
-    var dist = {
-      shasum: shasum,
-      size: length
-    };
+    this.throw(err);
+  }
+  fs.unlink(filepath, utility.noop);
+  var dist = {
+    shasum: shasum,
+    size: length
+  };
 
-    // if nfs upload return a key, record it
-    if (result.url) {
-      dist.tarball = result.url;
-    } else if (result.key) {
-      dist.key = result.key;
-      dist.tarball = result.key;
-    }
+  // if nfs upload return a key, record it
+  if (result.url) {
+    dist.tarball = result.url;
+  } else if (result.key) {
+    dist.key = result.key;
+    dist.tarball = result.key;
+  }
 
-    mod.package.dist = dist;
-    mod.package.version = version;
-    debug('%s module: save file to %s, size: %d, sha1: %s, dist: %j, version: %s',
-      id, filepath, length, shasum, dist, version);
-    var updateResult = yield module.update(mod);
-    ctx.status = 201;
-    ctx.body = {
-      ok: true,
-      rev: String(updateResult.id)
-    };
-  });
+  mod.package.dist = dist;
+  mod.package.version = version;
+  debug('%s module: save file to %s, size: %d, sha1: %s, dist: %j, version: %s',
+    id, filepath, length, shasum, dist, version);
+  var updateResult = yield Module.update(mod);
+  this.status = 201;
+  this.body = {
+    ok: true,
+    rev: String(updateResult.id)
+  };
+  console.log(mod);
+  console.log(yield Module.getById(updateResult.id));
 };
 
 function _addDepsRelations(pkg) {
@@ -391,100 +393,100 @@ function _addDepsRelations(pkg) {
   });
 }
 
-exports.updateLatest = function (req, res, next) {
-  var username = req.session.name;
-  var name = req.params.name;
-  var version = semver.valid(req.params.version);
+exports.updateLatest = function *(next) {
+  var username = this.session.name;
+  var name = this.params.name;
+  var version = semver.valid(this.params.version);
   if (!version) {
-    return res.json(400, {
+    this.status = 400;
+    this.body = {
       error: 'Params Invalid',
-      reason: 'Invalid version: ' + req.params.version,
-    });
+      reason: 'Invalid version: ' + this.params.version,
+    };
+    return;
   }
-  Module.get(name, 'next', function (err, nextMod) {
-    if (err) {
-      return next(err);
-    }
-    if (!nextMod) {
-      return next();
-    }
-    var match = nextMod.package.maintainers.filter(function (item) {
-      return item.name === username;
-    });
-    if (match.length === 0) {
-      return res.json(401, {
-        error: 'noperms',
-        reason: 'Current user can not publish this module'
-      });
-    }
 
-    // check version if not match pkg upload
-    if (nextMod.package.version !== version) {
-      return res.json(403, {
-        error: 'version_wrong',
-        reason: 'version not match'
-      });
-    }
-
-    var body = req.body;
-    nextMod.version = version;
-    nextMod.author = username;
-    body.dist = nextMod.package.dist;
-    body.maintainers = nextMod.package.maintainers;
-    if (!body.author) {
-      body.author = {
-        name: username,
-      };
-    }
-    body._publish_on_cnpm = true;
-    nextMod.package = body;
-    _addDepsRelations(body);
-
-    // reset publish time
-    nextMod.publish_time = Date.now();
-    debug('update %s:%s %j', nextMod.package.name, nextMod.package.version, nextMod.package.dist);
-    // change latest to version
-    Module.update(nextMod, function (err) {
-      if (err) {
-        debug('update nextMod %s error: %s', name, err);
-        return next(err);
-      }
-      // set latest tag
-      Module.addTag(name, 'latest', version, function (err) {
-        if (err) {
-          return next(err);
-        }
-        // add a new next version
-        nextMod.version = 'next';
-        Module.add(nextMod, function (err, result) {
-          if (err) {
-            return next(err);
-          }
-          res.json(201, {ok: true, rev: String(result.id)});
-        });
-      });
-    });
+  var nextMod = yield Module.get(name, version);
+  if (!nextMod) {
+    debug('can not get nextMod');
+    return yield next;
+  }
+  var match = nextMod.package.maintainers.filter(function (item) {
+    return item.name === username;
   });
+  if (match.length === 0) {
+    this.status = 401;
+    this.body = {
+      error: 'noperms',
+      reason: 'Current user can not publish this module'
+    };
+    return;
+  }
+
+  // check version if not match pkg upload
+  if (nextMod.package.version !== version) {
+    this.status = 403;
+    this.body = {
+      error: 'version_wrong',
+      reason: 'version not match'
+    };
+    return;
+  }
+
+  var body = this.request.body;
+  nextMod.version = version;
+  nextMod.author = username;
+  body.dist = nextMod.package.dist;
+  body.maintainers = nextMod.package.maintainers;
+  if (!body.author) {
+    body.author = {
+      name: username,
+    };
+  }
+  body._publish_on_cnpm = true;
+  nextMod.package = body;
+  _addDepsRelations(body);
+
+  // reset publish time
+  nextMod.publish_time = Date.now();
+  debug('update %s:%s %j', nextMod.package.name, nextMod.package.version, nextMod.package.dist);
+  // change latest to version
+  try {
+    yield Module.update(nextMod);
+  } catch (err) {
+    debug('update nextMod %s error: %s', name, err);
+    return this.throw(err);
+  }
+  yield Module.addTag(name, 'latest', version);
+  nextMod.version = 'next';
+  var addResult = yield Module.add(nextMod);
+  this.status = 201;
+  this.body = {
+    ok: true,
+    rev: String(addResult.id)
+  };
 };
 
-exports.addPackageAndDist = function (req, res, next) {
+exports.addPackageAndDist = function *(next) {
   // 'dist-tags': { latest: '0.0.2' },
   //  _attachments:
   // { 'nae-sandbox-0.0.2.tgz':
   //    { content_type: 'application/octet-stream',
   //      data: 'H4sIAAAAA
   //      length: 9883
-  var pkg = req.body;
-  var username = req.session.name;
-  var name = req.params.name;
+  var pkg = this.request.body;
+  var username = this.session.name;
+  var name = this.params.name;
   var filename = Object.keys(pkg._attachments)[0];
   var attachment = pkg._attachments[filename];
   var version = filename.match(/\-([\.\d\w\_]+?)\.tgz$/);
   if (!version) {
-    return res.json(403, {
+    this.status = 403;
+    this.bdoy = {
       error: 'version_error',
       reason: filename + ' version not found',
-    });
+    };
+    return;
   }
   version = version[1];
   var versionPackage = pkg.versions[version];
@@ -497,123 +499,107 @@ exports.addPackageAndDist = function (req, res, next) {
 
   debug('addPackageAndDist %s:%s, attachment size: %s', name, version, attachment.length);
 
-  var ep = eventproxy.create();
-  ep.fail(next);
-  Module.get(name, version, ep.done('exists'));
 
+  var exists = yield Module.get(name, version);
   var shasum;
-  ep.on('exists', function (exists) {
-    if (exists) {
-      return res.json(409, {
-        error: 'conflict',
-        reason: 'Document update conflict.'
-      });
-    }
-
-    // upload attachment
-    var tarballBuffer;
-    try {
-      tarballBuffer = new Buffer(attachment.data, 'base64');
-    } catch (e) {
-      return next(e);
-    }
-
-    if (tarballBuffer.length !== attachment.length) {
-      return res.json(403, {
-        error: 'size_wrong',
-        reason: 'Attachment size ' + attachment.length + ' not match download size ' + tarballBuffer.length,
-      });
-    }
-
-    shasum = crypto.createHash('sha1');
-    shasum.update(tarballBuffer);
-    shasum = shasum.digest('hex');
-
-    var options = {
-      key: common.getCDNKey(name, filename),
-      shasum: shasum
+  if (exists) {
+    this.status = 409;
+    this.body = {
+      error: 'conflict',
+      reason: 'Document update conflict.'
     };
-    nfs.uploadBuffer(tarballBuffer, options, ep.done('upload'));
-  });
+    return;
+  }
 
-  ep.on('upload', function (result) {
-    debug('upload %j', result);
+  // upload attachment
+  var tarballBuffer;
+  tarballBuffer = new Buffer(attachment.data, 'base64');
 
-    var dist = {
-      shasum: shasum,
-      size: attachment.length
+  if (tarballBuffer.length !== attachment.length) {
+    this.status = 403;
+    this.body = {
+      error: 'size_wrong',
+      reason: 'Attachment size ' + attachment.length + ' not match download size ' + tarballBuffer.length,
     };
+    return;
+  }
 
-    // if nfs upload return a key, record it
-    if (result.url) {
-      dist.tarball = result.url;
-    } else if (result.key) {
-      dist.key = result.key;
-      dist.tarball = result.key;
-    }
+  shasum = crypto.createHash('sha1');
+  shasum.update(tarballBuffer);
+  shasum = shasum.digest('hex');
 
-    var mod = {
-      name: name,
-      version: version,
-      author: username,
-      package: versionPackage
-    };
+  var options = {
+    key: common.getCDNKey(name, filename),
+    shasum: shasum
+  };
+  var uploadResult = yield nfs.uploadBuffer(tarballBuffer, options);
+  debug('upload %j', uploadResult);
 
-    mod.package.dist = dist;
-    _addDepsRelations(mod.package);
+  var dist = {
+    shasum: shasum,
+    size: attachment.length
+  };
 
-    Module.add(mod, ep.done(function (r) {
-      debug('%s module: save file to %s, size: %d, sha1: %s, dist: %j, version: %s',
-        r.id, dist.tarball, dist.size, shasum, dist, version);
-      ep.emit('saveModule', r.id);
-    }));
-  });
+  // if nfs upload return a key, record it
+  if (uploadResult.url) {
+    dist.tarball = uploadResult.url;
+  } else if (uploadResult.key) {
+    dist.key = uploadResult.key;
+    dist.tarball = uploadResult.key;
+  }
 
-  ep.on('saveModule', function () {
-    if (tags.length === 0) {
-      return ep.emit('saveTags');
-    }
+  var mod = {
+    name: name,
+    version: version,
+    author: username,
+    package: versionPackage
+  };
 
-    tags.forEach(function (item) {
-      Module.addTag(name, item[0], item[1], ep.done('saveTag'));
+  mod.package.dist = dist;
+  _addDepsRelations(mod.package);
+
+  var addResult = yield Module.add(mod);
+  debug('%s module: save file to %s, size: %d, sha1: %s, dist: %j, version: %s',
+    addResult.id, dist.tarball, dist.size, shasum, dist, version);
+
+  if (tags.length) {
+    yield tags.map(function (tag) {
+      return Module.addTag(name, tag[0], tag[1]);
     });
-    ep.after('saveTag', tags.length, function () {
-      ep.emit('saveTags');
-    });
-  });
+  }
 
-  ep.all('saveModule', 'saveTags', function (moduleId) {
-    res.json(201, {ok: true, rev: String(moduleId)});
-  });
+  this.status = 201;
+  this.body = {
+    ok: true,
+    rev: String(addResult.id)
+  };
 };
 
-exports.add = function (req, res, next) {
-  var username = req.session.name;
-  var name = req.params.name;
-  var pkg = req.body || {};
+exports.add = function *(next) {
+  var username = this.session.name;
+  var name = this.params.name;
+  var pkg = this.request.body || {};
 
-  if (!common.isMaintainer(req, pkg.maintainers)) {
-    return res.json(403, {
+  if (!common.isMaintainer(this, pkg.maintainers)) {
+    this.status = 403;
+    this.body = {
       error: 'no_perms',
       reason: 'Current user can not publish this module'
-    });
+    };
+    return;
   }
 
   if (pkg._attachments && Object.keys(pkg._attachments).length > 0) {
-    return exports.addPackageAndDist(req, res, next);
+    return exports.addPackageAndDist.call(this, next);
   }
 
-  var ep = eventproxy.create();
-  ep.fail(next);
+  var r = yield [Module.getLatest(name), Module.get(name, 'next')];
+  var latestMod = r[0];
+  var nextMod = r[1];
 
-  Module.getLatest(name, ep.doneLater('latest'));
-  Module.get(name, 'next', ep.done(function (nextMod) {
-    if (nextMod) {
-      nextMod.exists = true;
-      return ep.emit('next', nextMod);
-    }
-    // ensure next module exits
-    // because updateLatest will create next module fail
+  if (nextMod) {
+    nextMod.exists = true;
+  } else {
     nextMod = {
       name: name,
       version: 'next',
@@ -624,220 +610,191 @@ exports.add = function (req, res, next) {
         description: pkg.description,
         readme: pkg.readme,
         maintainers: pkg.maintainers,
-      },
+      }
     };
     debug('add next module: %s', name);
-    Module.add(nextMod, ep.done(function (result) {
-      nextMod.id = result.id;
-      ep.emit('next', nextMod);
-    }));
-  }));
+    var result = yield Module.add(nextMod);
+    nextMod.id = result.id;
+  }
 
-  ep.all('latest', 'next', function (latestMod, nextMod) {
-    var maintainers = latestMod && latestMod.package.maintainers.length > 0 ?
-      latestMod.package.maintainers : nextMod.package.maintainers;
+  var maintainers = latestMod && latestMod.package.maintainers.length > 0 ?
+    latestMod.package.maintainers : nextMod.package.maintainers;
 
-    if (!common.isMaintainer(req, maintainers)) {
-      return res.json(403, {
-        error: 'no_perms',
-        reason: 'Current user can not publish this module'
-      });
-    }
+  if (!common.isMaintainer(this, maintainers)) {
+    this.status = 403;
+    this.body = {
+      error: 'no_perms',
+      reason: 'Current user can not publish this module'
+    };
+    return;
+  }
 
-    debug('add %s rev: %s, version: %s', name, nextMod.id, nextMod.version);
+  debug('add %s rev: %s, version: %s', name, nextMod.id, nextMod.version);
 
-    if (latestMod || nextMod.version !== 'next') {
-      return res.json(409, {
-        error: 'conflict',
-        reason: 'Document update conflict.'
-      });
-    }
-
-    res.json(201, {
-      ok: true,
-      id: name,
-      rev: String(nextMod.id),
-    });
-  });
+  if (latestMod || nextMod.version !== 'next') {
+    this.status = 409;
+    this.body = {
+      error: 'conflict',
+      reason: 'Document update conflict.'
+    };
+    return;
+  }
+  this.status = 201;
+  this.body = {
+    ok: true,
+    id: name,
+    rev: String(nextMod.id),
+  };
 };
 
-exports.removeWithVersions = function (req, res, next) {
-  debug('removeWithVersions module %s, with info %j', req.params.name, req.body);
-  var name = req.params.name;
-  var username = req.session.name;
-  var versions = req.body.versions || {};
-  var ep = eventproxy.create();
-  ep.fail(next);
+exports.removeWithVersions = function *(next) {
+  debug('removeWithVersions module %s, with info %j', this.params.name, this.request.body);
+  var name = this.params.name;
+  var username = this.session.name;
+  var versions = this.request.body.versions || {};
 
   // step1: list all the versions
-  Module.listByName(name, ep.doneLater('list'));
-  ep.once('list', function (mods) {
-    if (!mods || !mods.length) {
-      return next();
+  var mods = yield Module.listByName(name);
+  if (!mods || !mods.length) {
+    return yield next;
+  }
+
+  // step2: check permission
+  var firstMod = mods[0];
+  if (!common.isMaintainer(this, firstMod.package.maintainers) || firstMod.name !== name) {
+    this.status = 403;
+    this.body = {
+      error: 'no_perms',
+      reason: 'Current user can not update this module'
+    };
+    return;
+  }
+
+  // step3: calculate which versions need to remove and
+  // which versions need to remain
+  var removeVersions = [];
+  var removeVersionMaps = {};
+  var remainVersions = [];
+
+  for (var i = 0; i < mods.length; i++) {
+    var v = mods[i].version;
+    if (v === 'next') {
+      continue;
     }
-
-    // step2: check permission
-    var firstMod = mods[0];
-    if (!common.isMaintainer(req, firstMod.package.maintainers) || firstMod.name !== name) {
-      return res.json(403, {
-        error: 'no_perms',
-        reason: 'Current user can not update this module'
-      });
+    if (!versions[v]) {
+      removeVersions.push(v);
+      removeVersionMaps[v] = true;
+    } else {
+      remainVersions.push(v);
     }
+  }
 
-    // step3: calculate which versions need to remove and
-    // which versions need to remain
-    var removeVersions = [];
-    var removeVersionMaps = {};
-    var remainVersions = [];
+  if (!removeVersions.length) {
+    debug('no versions need to remove');
+    this.status = 201;
+    this.body = { ok: true };
+    return;
+  }
+  debug('remove versions: %j, remain versions: %j', removeVersions, remainVersions);
 
-    for (var i = 0; i < mods.length; i++) {
-      var v = mods[i].version;
-      if (v === 'next') {
-        continue;
+  // step 4: remove all the versions which need to remove
+  yield Module.removeByNameAndVersions(name, removeVersions);
+  var tags = yield Module.listTags(name);
+
+  var removeTags = [];
+  var latestRemoved = false;
+  tags.forEach(function (tag) {
+    // this tag need be removed
+    if (removeVersionMaps[tag.version]) {
+      removeTags.push(tag.id);
+      if (tag.tag === 'latest') {
+        latestRemoved = true;
       }
-      if (!versions[v]) {
-        removeVersions.push(v);
-        removeVersionMaps[v] = true;
-      } else {
-        remainVersions.push(v);
-      }
     }
-
-    if (!removeVersions.length) {
-      debug('no versions need to remove');
-      return res.json(201, { ok: true });
-    }
-    debug('remove versions: %j, remain versions: %j', removeVersions, remainVersions);
-
-    // step 4: remove all the versions which need to remove
-    Module.removeByNameAndVersions(name, removeVersions, ep.done('removeModules'));
-
-    // step5: list all the tags
-    Module.listTags(name, ep.done(function (tags) {
-      var removeTags = [];
-      var latestRemoved = false;
-      tags.forEach(function (tag) {
-        // this tag need be removed
-        if (removeVersionMaps[tag.version]) {
-          removeTags.push(tag.id);
-          if (tag.tag === 'latest') {
-            latestRemoved = true;
-          }
-        }
-      });
-
-      if (!removeTags.length) {
-        debug('no tag need be remove');
-        ep.emit('removeTags');
-        ep.emit('latest');
-        return;
-      }
-
-      debug('remove tags: %j', removeTags);
-      // step 6: remove all the tags which need to remove
-      Module.removeTagsByIds(removeTags, ep.done('removeTags'));
-
-      // step 7: check if latest tag being removed.
-      //  need generate a new latest tag
-      if (!latestRemoved || !remainVersions[0]) {
-        ep.emit('latest');
-      } else {
-        debug('latest tags removed, generate a new latest tag with new version: %s',
+  });
+  if (removeTags.length) {
+    debug('remove tags: %j', removeTags);
+    // step 5: remove all the tags
+    yield Module.removeTagsByIds(removeTags);
+    if (latestRemoved && remainVersions[0]) {
+      debug('latest tags removed, generate a new latest tag with new version: %s',
           remainVersions[0]);
-        ep.emit('newLatestVersion', remainVersions[0]);
-      }
-    }));
-  });
-
-  ep.all('newLatestVersion', 'removeTags', function (version) {
-    Module.addTag(name, 'latest', version, ep.done('latest'));
-  });
-
-  ep.all('removeModules', 'removeTags', 'latest', function () {
-    return res.json(201, { ok: true });
-  });
+      // step 6: insert new latest tag
+      yield Module.addTag(name, 'latest', remainVersions[0]);
+    }
+  } else {
+    debug('no tag need to be remove');
+  }
+  this.status = 201;
+  this.bdoy = { ok: true };
 };
 
 
-exports.removeTar = function (req, res, next) {
-  debug('remove tarball with filename: %s, id: %s', req.params.filename, req.params.rev);
-  var id = Number(req.params.rev);
-  var filename = req.params.filename;
-  var name = req.params.name;
-  var username = req.session.name;
-  var ep = eventproxy.create();
-  ep.fail(next);
+exports.removeTar = function *(next) {
+  debug('remove tarball with filename: %s, id: %s', this.params.filename, this.params.rev);
+  var id = Number(this.params.rev);
+  var filename = this.params.filename;
+  var name = this.params.name;
+  var username = this.session.name;
 
-  Module.getById(id, ep.doneLater('get'));
-  ep.once('get', function (mod) {
-    if (!mod) {
-      return next();
-    }
+  var mod = yield Module.getById(id);
+  if (!mod) {
+    return yield next;
+  }
 
-    if (!common.isMaintainer(req, mod.package.maintainers) || mod.name !== name) {
-      return res.json(403, {
-        error: 'no_perms',
-        reason: 'Current user can not delete this tarball'
-      });
-    }
-    var key = mod.package.dist && mod.package.dist.key;
-    key = key || common.getCDNKey(mod.name, filename);
+  if (!common.isMaintainer(this, mod.package.maintainers) || mod.name !== name) {
+    this.status = 403;
+    this.body = {
+      error: 'no_perms',
+      reason: 'Current user can not delete this tarball'
+    };
+    return;
+  }
+  var key = mod.package.dist && mod.package.dist.key;
+  key = key || common.getCDNKey(mod.name, filename);
 
-    nfs.remove(key, ep.done(function () {
-      res.json(200, {ok: true});
-    }));
-  });
+  yield nfs.remove(key);
+  this.body = { ok: true };
 };
 
-exports.removeAll = function (req, res, next) {
-  debug('remove all the module with name: %s, id: %s', req.params.name, req.params.rev);
-  var id = Number(req.params.rev);
-  var name = req.params.name;
-  var username = req.session.name;
+exports.removeAll = function *(next) {
+  debug('remove all the module with name: %s, id: %s', this.params.name, this.params.rev);
+  var id = Number(this.params.rev);
+  var name = this.params.name;
+  var username = this.session.name;
 
-  var ep = eventproxy.create();
-  ep.fail(next);
+  var mods = yield Module.listByName(name);
+  debug('removeAll module %s: %d', name, mods.length);
+  var mod = mods[0];
+  if (!mod) {
+    return yield next;
+  }
 
-  Module.listByName(name, ep.doneLater('list'));
-  ep.once('list', function (mods) {
-    debug('removeAll module %s: %d', name, mods.length);
-    var mod = mods[0];
-    if (!mod) {
-      return next();
-    }
+  if (!common.isMaintainer(this, mod.package.maintainers) || mod.name !== name) {
+    res.status = 403;
+    res.body = {
+      error: 'no_perms',
+      reason: 'Current user can not delete this tarball'
+    };
+    return;
+  }
+  Total.plusDeleteModule(utility.noop);
+  yield [Module.removeByName(name), Module.removeTags(name)];
 
-    if (!common.isMaintainer(req, mod.package.maintainers) || mod.name !== name) {
-      return res.json(403, {
-        error: 'no_perms',
-        reason: 'Current user can not delete this tarball'
-      });
-    }
-    Total.plusDeleteModule(utility.noop);
-    Module.removeByName(name, ep.done('remove'));
-    Module.removeTags(name, ep.done('removeTags'));
+  var keys = [];
+  for (var i = 0; i < mods.length; i++) {
+    var key = urlparse(mods[i].dist_tarball).path;
+    key && keys.push(key);
+  }
+  yield keys.map(function (key) {
+    return nfs.remove(key);
   });
 
-  ep.all('list', 'remove', 'removeTags', function (mods) {
-    var keys = [];
-    for (var i = 0; i < mods.length; i++) {
-      var key = urlparse(mods[i].dist_tarball).path;
-      key && keys.push(key);
-    }
-    var queue = new Bagpipe(5);
-    keys.forEach(function (key) {
-      queue.push(nfs.remove.bind(nfs), key, function () {
-        //ignore err here
-        ep.emit('removeTar');
-      });
-    });
-    ep.after('removeTar', keys.length, function () {
-      res.json(200, {ok: true});
-    });
-  });
+  this.status = 201;
+  this.body = { ok: true };
 };
 
-function parseModsForList(updated, mods, req) {
+function parseModsForList(updated, mods, ctx) {
   var results = {
     _updated: updated
   };
@@ -854,49 +811,39 @@ function parseModsForList(updated, mods, req) {
     pkg['dist-tags'] = {
       latest: pkg.version
     };
-    common.setDownloadURL(pkg, req);
+    common.setDownloadURL(pkg, ctx);
     results[mod.name] = pkg;
   }
   return results;
 }
 
-exports.listAllModules = function (req, res, next) {
+exports.listAllModules = function *(next) {
   var updated = Date.now();
-  Module.listSince(0, function (err, mods) {
-    if (err) {
-      return next(err);
-    }
-    return res.json(parseModsForList(updated, mods, req));
-  });
+  var mods = yield Module.listSince(0);
+  this.body = parseModsForList(updated, mods, this);
 };
 
-exports.listAllModulesSince = function (req, res, next) {
-  var query = req.query || {};
+exports.listAllModulesSince = function *(next) {
+  var query = this.query || {};
   if (query.stale !== 'update_after') {
-    return res.json(400, {
+    this.status = 400;
+    this.body = {
       error: 'query_parse_error',
       reason: 'Invalid value for `stale`.'
-    });
+    };
+    return;
   }
+
   debug('list all modules from %s', req.startkey);
   var startkey = Number(query.startkey) || 0;
   var updated = Date.now();
-  Module.listSince(startkey, function (err, mods) {
-    if (err) {
-      return next(err);
-    }
-    res.json(parseModsForList(updated, mods, req));
-  });
+  var mods = yield Module.listSince(startkey);
+  this.body = parseModsForList(updated, mods, this);
 };
 
-exports.listAllModuleNames = function (req, res, next) {
-  Module.listShort(function (err, mods) {
-    if (err) {
-      return next(err);
-    }
-    var results = mods.map(function (m) {
-      return m.name;
-    });
-    res.json(results);
+exports.listAllModuleNames = function *(next) {
+  yield Module.listShort();
+  this.body = mods.map(function (m) {
+    return m.name;
   });
 };
