@@ -14,6 +14,7 @@
  * Module dependencies.
  */
 
+var thunkify = require('thunkify-wrap');
 var utility = require('utility');
 var eventproxy = require('eventproxy');
 var config = require('../config');
@@ -449,3 +450,5 @@ exports.search = function (word, options, callback) {
     }));
   });
 };
+
+thunkify(exports);
