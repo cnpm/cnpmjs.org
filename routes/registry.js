@@ -63,14 +63,13 @@ function routes(app) {
   // app.put('/:name/-rev/:rev', [login, publishable], mod.removeWithVersions);
   // app.delete('/:name/-rev/:rev', [login, publishable], mod.removeAll);
 
-  // // try to create a new user
-  // // https://registry.npmjs.org/-/user/org.couchdb.user:fengmk2
+  // try to create a new user
+  // https://registry.npmjs.org/-/user/org.couchdb.user:fengmk2
   app.put('/-/user/org.couchdb.user::name', user.add);
   app.get('/-/user/org.couchdb.user::name', user.show);
-  // app.put('/-/user/org.couchdb.user::name/-rev/:rev', [login], user.update);
-
-  // // _session
-  // app.post('/_session', user.authSession);
+  app.put('/-/user/org.couchdb.user::name/-rev/:rev', login, user.update);
+  // _session
+  app.post('/_session', user.authSession);
 }
 
 module.exports = routes;

@@ -20,50 +20,40 @@ var config = require('../config');
 var common = require('../lib/common');
 
 module.exports = function (options) {
-  return function auth(req, res, next) {
-    if (!req.session) {
-      // redis crash
-      req.session = {};
-      return next();
-    }
-    req.session.onlySync = config.enablePrivate ? true : false;
-    if (req.session.name) {
-      req.session.isAdmin = common.isAdmin(req.session.name);
+  return function *auth(next) {
+    this.session.onlySync = config.enablePrivate ? true : false;
+    if (this.session.name) {
+      this.session.isAdmin = common.isAdmin(this.session.name);
       debug('auth exists user: %s, onlySync: %s, isAdmin: %s, headers: %j',
-        req.session.name, req.session.onlySync, req.session.isAdmin, req.headers);
-      return next();
+        this.session.name, this.session.onlySync, this.session.isAdmin, this.header);
+      return yield next;
     }
-    var authorization = (req.headers.authorization || '').split(' ')[1] || '';
+    var authorization = (this.get('authorization') || '').split(' ')[1] || '';
     authorization = authorization.trim();
     if (!authorization) {
-      return next();
+      return yield next;
     }
 
     authorization = new Buffer(authorization, 'base64').toString().split(':');
     if (authorization.length !== 2) {
-      return next();
+      return yield next;
     }
 
     var username = authorization[0];
     var password = authorization[1];
 
-    User.auth(username, password, function (err, row) {
-      if (err) {
-        return next(err);
-      }
+    var user = yield User.auth(username, password);
+    if (!user) {
+      debug('auth fail user: %j, headers: %j', user, this.header);
+      this.session.name = null;
+      this.session.isAdmin = false;
+      return yield next;
+    }
 
-      if (!row) {
-        debug('auth fail user: %j, headers: %j', row, req.headers);
-        req.session.name = null;
-        req.session.isAdmin = false;
-        return next();
-      }
-
-      req.session.name = row.name;
-      req.session.isAdmin = common.isAdmin(req.session.name);
-      debug('auth pass user: %j, onlySync: %s, isAdmin: %s, headers: %j',
-        row, req.session.onlySync, req.session.isAdmin, req.headers);
-      next();
-    });
+    this.session.name = user.name;
+    this.session.isAdmin = common.isAdmin(this.session.name);
+    debug('auth pass user: %j, onlySync: %s, isAdmin: %s, headers: %j',
+      user, this.session.onlySync, this.session.isAdmin, this.header);
+    yield next;
   };
 };
