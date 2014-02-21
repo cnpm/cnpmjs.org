@@ -27,10 +27,6 @@ var sync = require('../controllers/sync');
 function routes(app) {
   app.get('/', jsonp(), total.show);
 
-  // sync from source npm
-  app.put('/:name/sync', sync.sync);
-  app.get('/:name/sync/log/:id', sync.getSyncLog);
-
   //before /:name/:version
   //get all modules, for npm search
   // app.get('/-/all', mod.listAllModules);
@@ -38,21 +34,21 @@ function routes(app) {
   // //get all module names, for auto completion
   // app.get('/-/short', mod.listAllModuleNames);
 
-  // // module
-  // app.get('/:name', [syncByInstall], mod.show);
-  // app.get('/:name/:version', [syncByInstall], mod.get);
+  // module
+  app.get('/:name', syncByInstall, mod.show);
+  app.get('/:name/:version', syncByInstall, mod.get);
   // // try to add module
   // app.put('/:name', [login, publishable], mod.add);
 
-  // // sync from source npm
-  // app.put('/:name/sync', sync.sync);
-  // app.get('/:name/sync/log/:id', sync.getSyncLog);
+  // sync from source npm
+  app.put('/:name/sync', sync.sync);
+  app.get('/:name/sync/log/:id', sync.getSyncLog);
 
-  // app.get('/:name/download/:filename', mod.download);
+  app.get('/:name/download/:filename', mod.download);
 
-  // // put tarball
-  // // https://registry.npmjs.org/cnpmjs.org/-/cnpmjs.org-0.0.0.tgz/-rev/1-c85bc65e8d2470cc4d82b8f40da65b8e
-  // app.put('/:name/-/:filename/-rev/:rev', [login, publishable], mod.upload);
+  // put tarball
+  // https://registry.npmjs.org/cnpmjs.org/-/cnpmjs.org-0.0.0.tgz/-rev/1-c85bc65e8d2470cc4d82b8f40da65b8e
+  app.put('/:name/-/:filename/-rev/:rev', [login, publishable], mod.upload);
   // // delete tarball
   // app.delete('/:name/download/:filename/-rev/:rev', [login, publishable], mod.removeTar);
 
