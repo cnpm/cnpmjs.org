@@ -330,7 +330,7 @@ exports.upload = function *(next) {
   while(buf = yield coRead(this.req)) {
     shasum.update(buf);
     dataSize += buf.length;
-    coWrite(ws, buf);
+    yield coWrite(ws, buf);
   }
   if (dataSize !== length) {
     this.status = 403;
