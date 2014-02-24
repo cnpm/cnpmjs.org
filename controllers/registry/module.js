@@ -332,6 +332,7 @@ exports.upload = function *(next) {
     dataSize += buf.length;
     yield coWrite(ws, buf);
   }
+  ws.end();
   if (dataSize !== length) {
     this.status = 403;
     this.body = {
