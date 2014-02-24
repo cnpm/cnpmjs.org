@@ -592,7 +592,7 @@ exports.add = function *(next) {
   }
 
   if (pkg._attachments && Object.keys(pkg._attachments).length > 0) {
-    return exports.addPackageAndDist.call(this, next);
+    return yield exports.addPackageAndDist.call(this, next);
   }
 
   var r = yield [Module.getLatest(name), Module.get(name, 'next')];
