@@ -42,6 +42,7 @@ app.use(rewrite('/favicon.ico', '/public/favicon.ico'));
 // app.use(connect.json());
 
 app.keys = ['todokey', config.sessionSecret];
+app.outputError = true;
 app.use(session);
 app.use(bodyParser());
 app.use(auth());
@@ -61,7 +62,6 @@ routes(app);
 app.on('error', function (err, ctx) {
   err.url = err.url || ctx.request.url;
   logger.error(err);
-  console.error(err.stack);
 });
 
 app = http.createServer(app.callback());
