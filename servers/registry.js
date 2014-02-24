@@ -29,7 +29,7 @@ var logger = require('../common/logger');
 var config = require('../config');
 var session = require('../common/session');
 var auth = require('../middleware/auth');
-
+var notFound = require('../middleware/registry_not_found');
 var rootdir = path.dirname(__dirname);
 
 app.use(rt({headerName: 'X-ReadTime'}));
@@ -42,9 +42,11 @@ app.use(rewrite('/favicon.ico', '/public/favicon.ico'));
 // app.use(connect.json());
 
 app.keys = ['todokey', config.sessionSecret];
+app.outputError = true;
 app.use(session);
 app.use(bodyParser());
 app.use(auth());
+app.use(notFound);
 
 /**
  * Routes
@@ -59,7 +61,7 @@ routes(app);
 
 app.on('error', function (err, ctx) {
   err.url = err.url || ctx.request.url;
-  err.status >= 500 && logger.error(err);
+  logger.error(err);
 });
 
 app = http.createServer(app.callback());
