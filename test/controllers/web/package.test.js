@@ -148,7 +148,7 @@ describe('controllers/web/package.test.js', function () {
       request(app)
       .get('/browse/keyword/notexistpackage')
       .expect(500)
-      .expect(/MockError: mm mock error/, done);
+      .expect(/Internal Server Error/, done);
     });
   });
 
