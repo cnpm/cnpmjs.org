@@ -1,5 +1,5 @@
 /**!
- * cnpmjs.org - middleware/registry_not_found.js
+ * cnpmjs.org - middleware/web_not_found.js
  *
  * Copyright(c) cnpmjs.org and other contributors.
  * MIT Licensed
@@ -21,8 +21,7 @@ module.exports = function *notFound(next) {
     return;
   }
   this.status = 404;
-  this.body = {
-    error: 'not_found',
-    reason: 'document not found'
-  };
+  this.type = 'text/html';
+  this.charset = 'utf-8';
+  this.body = 'Cannot GET ' + this.path;
 };

@@ -36,13 +36,8 @@ app.use(rt({headerName: 'X-ReadTime'}));
 
 app.use(rewrite('/favicon.ico', '/public/favicon.ico'));
 
-// app.use(responseCookie());
-// app.use(connect.cookieParser());
-// app.use(connect.query());
-// app.use(connect.json());
-
 app.keys = ['todokey', config.sessionSecret];
-app.outputError = true;
+app.outputErrors = true;
 app.use(session);
 app.use(bodyParser());
 app.use(auth());
