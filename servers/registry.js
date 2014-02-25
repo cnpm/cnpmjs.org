@@ -45,7 +45,7 @@ app.use('/dist', connect.static(config.uploadDir));
 app.use(responseCookie());
 app.use(connect.cookieParser());
 app.use(connect.query());
-app.use(connect.json());
+app.use(connect.json({limit: config.jsonLimit}));
 app.use(session);
 app.use(auth());
 

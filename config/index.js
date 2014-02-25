@@ -51,6 +51,7 @@ var config = {
     port: 19533,
     pass: 'cnpmjs_dev'
   },
+  jsonLimit: '10mb', // max request json body size
   uploadDir: path.join(root, 'public', 'dist'),
   // qiniu cdn: http://www.qiniu.com/, it free for dev.
   qn: {

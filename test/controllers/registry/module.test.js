@@ -360,6 +360,60 @@ describe('controllers/registry/module.test.js', function () {
         done();
       });
     });
+
+    it('should publish with tgz base64, addPackageAndDist()', function (done) {
+      var pkg = require(path.join(fixtures, 'package_and_tgz.json'));
+      // delete first
+      request(app)
+      .del('/' + pkg.name + '/-rev/1')
+      .set('authorization', baseauth)
+      .expect({ok: true})
+      .expect(200, function (err, res) {
+        should.not.exist(err);
+
+        request(app)
+        .put('/' + pkg.name)
+        .set('authorization', baseauth)
+        .send(pkg)
+        .expect(201, function (err, res) {
+          should.not.exist(err);
+          res.body.should.have.keys('ok', 'rev');
+          res.body.ok.should.equal(true);
+
+          // upload again should 409
+          request(app)
+          .put('/' + pkg.name)
+          .set('authorization', baseauth)
+          .send(pkg)
+          .expect(409, function (err, res) {
+            should.not.exist(err);
+            res.body.should.eql({
+              error: 'conflict',
+              reason: 'Document update conflict.'
+            });
+            done();
+          });
+
+        });
+      });
+    });
+
+    it('should version_error when versions missing', function (done) {
+      var pkg = require(path.join(fixtures, 'package_and_tgz.json'));
+      delete pkg.versions;
+      request(app)
+      .put('/' + pkg.name)
+      .set('authorization', baseauth)
+      .send(pkg)
+      .expect(403, function (err, res) {
+        should.not.exist(err);
+        res.body.should.eql({
+          error: 'version_error',
+          reason: 'filename or version not found, filename: mk2testmodule-0.0.1.tgz, version: undefined'
+        });
+        done();
+      });
+    });
   });
 
   describe('GET /-/all', function () {
