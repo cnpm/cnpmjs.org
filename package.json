@@ -29,7 +29,7 @@
     "humanize-number": "0.0.2",
     "koa": "0.5.0",
     "koa-bodyparser": "0.0.1",
-    "koa-ejs": "0.0.0",
+    "koa-ejs": "0.0.1",
     "koa-jsonp": "0.0.3",
     "koa-markdown": "0.0.2",
     "koa-redis": "0.0.5",
