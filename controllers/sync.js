@@ -22,8 +22,8 @@ exports.sync = function *() {
   var name = this.params.name;
   var publish = this.query.publish === 'true';
   var noDep = this.query.nodeps === 'true';
-  if (publish && !req.session.isAdmin) {
-    this.statusCode = 403;
+  if (publish && !this.session.isAdmin) {
+    this.status = 403;
     this.body = {
       error: 'no_perms',
       reason: 'Only admin can publish'
@@ -39,24 +39,24 @@ exports.sync = function *() {
   var result = yield SyncModuleWorker.sync(name, username, options);
 
   if (!result.ok) {
-    this.statusCode = result.statusCode;
+    this.status = result.statusCode;
     this.body = result.pkg;
     return;
   }
-  this.statusCode = 201;
+  this.status = 201;
   this.body = {
     ok: true,
     logId: result.logId
   };
 };
 
-exports.getSyncLog = function *() {
+exports.getSyncLog = function *(next) {
   var logId = this.params.id;
   var name = this.params.name;
   var offset = Number(this.query.offset) || 0;
   var row = yield Log.get(logId);
   if (!row) {
-    return this.throw(404);
+    return yield next;
   }
 
   var log = row.log.trim();

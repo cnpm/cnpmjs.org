@@ -30,7 +30,6 @@ function sha1(s) {
 function passwordSha(password, salt) {
   return sha1(password + salt);
 }
-exports.passwordSha = passwordSha;
 
 exports.get = function (name, callback) {
   mysql.queryOne(SELECT_USER_SQL, [name], function (err, row) {
@@ -107,3 +106,4 @@ exports.update = function (user, callback) {
 };
 
 thunkify(exports);
+exports.passwordSha = passwordSha;

@@ -29,152 +29,143 @@ var Log = require('../../proxy/module_log');
 var ModuleDeps = require('../../proxy/module_deps');
 var setDownloadURL = require('../../lib/common').setDownloadURL;
 
-exports.display = function (req, res, next) {
-  var params = req.params;
+exports.display = function *(next) {
+  var params = this.params;
   var name = params.name;
   var tag = params.version;
-  var ep = eventproxy.create();
-  ep.fail(next);
 
-  if (tag) {
-    var version = semver.valid(tag);
-    if (version) {
-      Module.get(name, version, ep.done('pkg'));
-    } else {
-      Module.getByTag(name, tag, ep.done('pkg'));
-    }
+  var getPackageMethod;
+  var getPackageArgs;
+  var version = semver.valid(tag || '');
+  if (version) {
+    getPackageMethod = 'get';
+    getPackageArgs = [name, version];
   } else {
-    Module.getByTag(name, 'latest', ep.done('pkg'));
+    getPackageMethod = 'getByTag';
+    getPackageArgs = [name, tag || 'latest'];
+  }
+  var r = yield [
+    Module[getPackageMethod].apply(Module, getPackageArgs),
+    down.total(name),
+    ModuleDeps.list(name)
+  ];
+  var pkg = r[0];
+  var download = r[1];
+  var dependents = r[2];
+
+  if (!pkg || !pkg.package) {
+    return yield next;
   }
 
-  down.total(name, ep.done('download'));
+  pkg.package.fromNow = moment(pkg.publish_time).fromNow();
+  pkg = pkg.package;
+  pkg.readme = marked(pkg.readme || '');
+  if (!pkg.readme) {
+    pkg.readme = pkg.description || '';
+  }
 
-  ModuleDeps.list(name, ep.done(function (rows) {
-    ep.emit('dependents', rows.map(function (r) {
-      return r.deps;
-    }));
-  }));
-
-  ep.all('pkg', 'download', 'dependents', function (pkg, download, dependents) {
-    if (!pkg || !pkg.package) {
-      return next();
-    }
-
-    pkg.package.fromNow = moment(pkg.publish_time).fromNow();
-    pkg = pkg.package;
-    pkg.readme = marked(pkg.readme || '');
-    if (!pkg.readme) {
-      pkg.readme = pkg.description || '';
-    }
-
-    if (pkg.maintainers) {
-      for (var i = 0; i < pkg.maintainers.length; i++) {
-        var maintainer = pkg.maintainers[i];
-        if (maintainer.email) {
-          maintainer.gravatar = gravatar.url(maintainer.email, {s: '50', d: 'retro'}, false);
-        }
+  if (pkg.maintainers) {
+    for (var i = 0; i < pkg.maintainers.length; i++) {
+      var maintainer = pkg.maintainers[i];
+      if (maintainer.email) {
+        maintainer.gravatar = gravatar.url(maintainer.email, {s: '50', d: 'retro'}, false);
       }
     }
+  }
 
-    if (pkg.contributors) {
-      // registry.cnpmjs.org/compressible
-      if (!Array.isArray(pkg.contributors)) {
-        pkg.contributors = [pkg.contributors];
+  if (pkg.contributors) {
+    // registry.cnpmjs.org/compressible
+    if (!Array.isArray(pkg.contributors)) {
+      pkg.contributors = [pkg.contributors];
+    }
+    for (var i = 0; i < pkg.contributors.length; i++) {
+      var contributor = pkg.contributors[i];
+      if (contributor.email) {
+        contributor.gravatar = gravatar.url(contributor.email, {s: '50', d: 'retro'}, false);
       }
-      for (var i = 0; i < pkg.contributors.length; i++) {
-        var contributor = pkg.contributors[i];
-        if (contributor.email) {
-          contributor.gravatar = gravatar.url(contributor.email, {s: '50', d: 'retro'}, false);
-        }
-        if (config.packagePageContributorSearch || !contributor.url) {
-          contributor.url = '/~' + encodeURIComponent(contributor.name);
-        }
+      if (config.packagePageContributorSearch || !contributor.url) {
+        contributor.url = '/~' + encodeURIComponent(contributor.name);
       }
     }
+  }
 
-    if (pkg.repository && pkg.repository.url) {
-      pkg.repository.weburl = giturl.parse(pkg.repository.url);
-    }
+  if (pkg.repository && pkg.repository.url) {
+    pkg.repository.weburl = giturl.parse(pkg.repository.url);
+  }
 
-    setLicense(pkg);
+  setLicense(pkg);
 
-    for (var k in download) {
-      download[k] = humanize(download[k]);
-    }
-    setDownloadURL(pkg, req, config.registryHost);
+  for (var k in download) {
+    download[k] = humanize(download[k]);
+  }
+  setDownloadURL(pkg, this, config.registryHost);
 
-    pkg.dependents = dependents;
+  pkg.dependents = dependents;
 
-    res.render('package', {
-      title: 'Package - ' + pkg.name,
-      package: pkg,
-      download: download
-    });
+  yield this.render('package', {
+    title: 'Package - ' + pkg.name,
+    package: pkg,
+    download: download
   });
 };
 
-exports.search = function (req, res, next) {
-  var params = req.params;
-  var word = req.params.word;
-  Module.search(word, function (err, result) {
-    if (err) {
-      return next(err);
-    }
-    // return a json result
-    if (req.query && req.query.type === 'json') {
-      return res.json({
-        keyword: word,
-        packages: result.searchMatchs,
-        keywords: result.keywordMatchs
-      });
-    }
-    res.render('search', {
-      title: 'Keyword - ' + word,
+exports.search = function *(next) {
+  var params = this.params;
+  var word = params.word;
+  var result = yield Module.search(word);
+  // return a json result
+  if (this.query && this.query.type === 'json') {
+    this.body = {
       keyword: word,
       packages: result.searchMatchs,
-      keywords: result.keywordMatchs,
-    });
+      keywords: result.keywordMatchs
+    };
+    this.charset = 'utf-8';
+    return;
+  }
+
+  yield this.render('search', {
+    title: 'Keyword - ' + word,
+    keyword: word,
+    packages: result.searchMatchs,
+    keywords: result.keywordMatchs,
   });
 };
 
-exports.rangeSearch = function (req, res, next) {
-  var startKey = req.query.startkey || '';
+exports.rangeSearch = function *(next) {
+  var startKey = this.query.startkey || '';
   if (startKey[0] === '"') {
     startKey = startKey.substring(1);
   }
   if (startKey[startKey.length - 1] === '"') {
     startKey = startKey.substring(0, startKey.length - 1);
   }
-  var limit = Number(req.query.limit) || 20;
-  Module.search(startKey, {limit: limit}, function (err, result) {
-    if (err) {
-      return next(err);
-    }
+  var limit = Number(this.query.limit) || 20;
+  var result = yield Module.search(startKey, {limit: limit});
 
-    var packages = result.searchMatchs.concat(result.keywordMatchs);
+  var packages = result.searchMatchs.concat(result.keywordMatchs);
 
-    var rows = [];
-    for (var i = 0; i < packages.length; i++) {
-      var p = packages[i];
-      var row = {
-        key: p.name,
-        count: 1,
-        value: {
-          name: p.name,
-          description: p.description,
-        }
-      };
-      rows.push(row);
-    }
-    res.json({
-      rows: rows
-    });
-  });
+  var rows = [];
+  for (var i = 0; i < packages.length; i++) {
+    var p = packages[i];
+    var row = {
+      key: p.name,
+      count: 1,
+      value: {
+        name: p.name,
+        description: p.description,
+      }
+    };
+    rows.push(row);
+  }
+  this.body = {
+    rows: rows
+  };
 };
 
-exports.displaySync = function (req, res, next) {
-  var name = req.params.name || req.query.name;
-  res.render('sync', {
+exports.displaySync = function *(next) {
+  var name = this.params.name || this.query.name;
+  yield this.render('sync', {
     name: name,
     title: 'Sync - ' + name
   });
