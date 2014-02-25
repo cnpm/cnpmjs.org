@@ -26,7 +26,7 @@ function routes(app) {
   // app.get('/package/:name/:version', pkg.display);
   // app.get('/browse/keyword/:word', pkg.search);
 
-  // app.get('/~:name', user.display);
+  app.get('/~:name', user.display);
 
   // app.get('/sync/:name', pkg.displaySync);
   // app.put('/sync/:name', sync.sync);

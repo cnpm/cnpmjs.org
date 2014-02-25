@@ -15,31 +15,24 @@
  */
 var Module = require('../../proxy/module');
 var User = require('../../proxy/user');
-var eventproxy = require('eventproxy');
 
-exports.display = function (req, res, next) {
-  var name = req.params.name;
+exports.display = function *(next) {
+  var name = this.params.name;
 
-  var ep = eventproxy.create();
-  ep.fail(next);
-  Module.listByAuthor(name, ep.done('packages'));
-  User.get(name, ep.done('user'));
+  var r = yield [Module.listByAuthor(name), User.get(name)];
+  var packages = r[0];
+  var user = r[1];
+  if (!user && !packages.length) {
+    return yield next;
+  }
+  user = {
+    name: name,
+    email: user && user.email
+  };
 
-  ep.all('packages', 'user', function (packages, user) {
-    //because of sync, maybe no this user in database,
-    //but his packages in this registry
-    if (!user && !packages.length) {
-      return next();
-    }
-    user = {
-      name: name,
-      email: user && user.email
-    };
-
-    return res.render('profile', {
-      title: 'User - ' + name,
-      packages: packages || [],
-      user: user
-    });
+  yield this.render('profile', {
+    title: 'User - ' + name,
+    packages: packages || [],
+    user: user
   });
 };
