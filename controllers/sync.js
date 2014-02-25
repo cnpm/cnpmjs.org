@@ -37,6 +37,13 @@ exports.sync = function (req, res, next) {
     if (err) {
       return next(err);
     }
+    // friendly 404 reason info
+    if (result.statusCode === 404) {
+      return res.json(result.statusCode, {
+        ok: false,
+        reason: 'can not found ' + name + ' in the source registry'
+      });
+    }
     if (!result.ok) {
       return res.json(result.statusCode, result.pkg);
     }
