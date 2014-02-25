@@ -489,16 +489,17 @@ exports.addPackageAndDist = function (req, res, next) {
   var pkg = req.body;
   var username = req.session.name;
   var name = req.params.name;
-  var filename = Object.keys(pkg._attachments)[0];
-  var attachment = pkg._attachments[filename];
-  var version = filename.match(/\-([\.\d\w\_]+?)\.tgz$/);
-  if (!version) {
+  var filename = Object.keys(pkg._attachments || {})[0];
+  var version = Object.keys(pkg.versions || {})[0];
+
+  if (!version || !filename) {
     return res.json(403, {
       error: 'version_error',
-      reason: filename + ' version not found',
+      reason: 'filename or version not found, filename: ' + filename + ', version: ' + version,
     });
   }
-  version = version[1];
+
+  var attachment = pkg._attachments[filename];
   var versionPackage = pkg.versions[version];
   versionPackage._publish_on_cnpm = true;
   var distTags = pkg['dist-tags'] || {};
