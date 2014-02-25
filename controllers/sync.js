@@ -38,6 +38,15 @@ exports.sync = function *() {
 
   var result = yield SyncModuleWorker.sync(name, username, options);
 
+  // friendly 404 reason info
+  if (result.staticCache === 404) {
+    this.status = 404;
+    this.body = {
+      ok: false,
+      reason: 'can not found ' + name + ' in the source registry'
+    };
+    return;
+  }
   if (!result.ok) {
     this.status = result.statusCode;
     this.body = result.pkg;
