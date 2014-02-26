@@ -39,7 +39,7 @@ app.use(rewrite('/favicon.ico', '/public/favicon.ico'));
 app.keys = ['todokey', config.sessionSecret];
 app.outputErrors = true;
 app.use(session);
-app.use(bodyParser({limit: config.jsonLimit}));
+app.use(bodyParser({jsonLimit: config.jsonLimit}));
 app.use(auth());
 app.use(notFound);
 
