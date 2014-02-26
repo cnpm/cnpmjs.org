@@ -477,18 +477,18 @@ exports.addPackageAndDist = function *(next) {
   var pkg = this.request.body;
   var username = this.session.name;
   var name = this.params.name;
-  var filename = Object.keys(pkg._attachments)[0];
-  var attachment = pkg._attachments[filename];
-  var version = filename.match(/\-([\.\d\w\_]+?)\.tgz$/);
+  var filename = Object.keys(pkg._attachments || {})[0];
+  var version = Object.keys(pkg.versions || {})[0];
   if (!version) {
     this.status = 403;
     this.bdoy = {
       error: 'version_error',
-      reason: filename + ' version not found',
+      reason: 'filename or version not found, filename: ' + filename + ', version: ' + version,
     };
     return;
   }
-  version = version[1];
+
+  var attachment = pkg._attachments[filename];
   var versionPackage = pkg.versions[version];
   versionPackage._publish_on_cnpm = true;
   var distTags = pkg['dist-tags'] || {};
