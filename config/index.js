@@ -80,8 +80,8 @@ var config = {
   sourceNpmRegistry: 'http://registry.npmjs.org',
   enablePrivate: true, // enable private mode, only admin can publish, other use just can sync package from source npm
   admins: {
-    admin: 'admin@cnpmjs.org',
     fengmk2: 'fengmk2@gmail.com',
+    admin: 'admin@cnpmjs.org',
     dead_horse: 'dead_horse@qq.com',
     cnpmjstest10: 'cnpmjstest10@cnpmjs.org',
   },

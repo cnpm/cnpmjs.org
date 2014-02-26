@@ -1,4 +1,4 @@
-/*!
+/**!
  * cnpmjs.org - worker.js
  *
  * Copyright(c) cnpmjs.org and other contributors.
@@ -16,7 +16,7 @@
  */
 
 var graceful = require('graceful');
-
+var logger = require('./common/logger');
 var config = require('./config');
 var registry = require('./servers/registry');
 var web = require('./servers/web');
@@ -34,6 +34,7 @@ graceful({
     if (err.message) {
       err.message += ' (uncaughtException throw ' + throwErrorCount + ' times on pid:' + process.pid + ')';
     }
-    console.error(err);
+    console.error(err.stack);
+    logger.error(err);
   }
 });
