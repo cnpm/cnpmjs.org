@@ -15,7 +15,7 @@
  * Module dependencies.
  */
 
-var jsonp = require('koa-jsonp');
+var middlewares = require('koa-middlewares');
 var login = require('../middleware/login');
 var publishable = require('../middleware/publishable');
 var syncByInstall = require('../middleware/sync_by_install');
@@ -25,7 +25,7 @@ var user = require('../controllers/registry/user');
 var sync = require('../controllers/sync');
 
 function routes(app) {
-  app.get('/', jsonp(), total.show);
+  app.get('/', middlewares.jsonp(), total.show);
 
   //before /:name/:version
   //get all modules, for npm search
