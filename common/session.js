@@ -20,7 +20,7 @@ var redisStore = require('koa-redis');
 var config = require('../config');
 
 var key = 'AuthSession';
-var cookie = { path: '/', httpOnly: true, maxAge: 3600000 * 24 * 30 };
+var cookie = { path: '/', httpOnly: true, maxAge: 3600000 * 24 * 365, signed: false };
 var options = {
   key: key,
   cookie: cookie,
