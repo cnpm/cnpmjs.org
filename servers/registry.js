@@ -20,10 +20,7 @@ var app = module.exports = koa();
 var http = require('http');
 var forward = require('forward');
 var path = require('path');
-var rt = require('koa-rt');
-var bodyParser = require('koa-bodyparser');
-var rewrite = require('koa-rewrite');
-var router = require('koa-router');
+var middlewares = require('koa-middlewares');
 var routes = require('../routes/registry');
 var logger = require('../common/logger');
 var config = require('../config');
@@ -32,14 +29,14 @@ var auth = require('../middleware/auth');
 var notFound = require('../middleware/registry_not_found');
 var rootdir = path.dirname(__dirname);
 
-app.use(rt({headerName: 'X-ReadTime'}));
+app.use(middlewares.rt({headerName: 'X-ReadTime'}));
 
-app.use(rewrite('/favicon.ico', '/public/favicon.ico'));
+app.use(middlewares.rewrite('/favicon.ico', '/public/favicon.ico'));
 
 app.keys = ['todokey', config.sessionSecret];
 app.outputErrors = true;
 app.use(session);
-app.use(bodyParser({jsonLimit: config.jsonLimit}));
+app.use(middlewares.bodyParser({jsonLimit: config.jsonLimit}));
 app.use(auth());
 app.use(notFound);
 
@@ -47,7 +44,7 @@ app.use(notFound);
  * Routes
  */
 
-app.use(router(app));
+app.use(middlewares.router(app));
 routes(app);
 
 /**

@@ -15,8 +15,7 @@
  * Module dependencies.
  */
 
-var session = require('koa-sess');
-var redisStore = require('koa-redis');
+var middlewares = require('koa-middlewares');
 var config = require('../config');
 
 var key = 'AuthSession';
@@ -27,7 +26,7 @@ var options = {
 };
 
 if (!config.debug) {
-  options.store = config.sessionStore || redisStore(config.redis);
+  options.store = config.sessionStore || middlewares.RedisStore(config.redis);
 }
 
-module.exports = session(options);
+module.exports = middlewares.session(options);

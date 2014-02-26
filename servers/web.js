@@ -19,12 +19,8 @@ var path = require('path');
 var http = require('http');
 var fs = require('fs');
 var koa = require('koa');
-var rt = require('koa-rt');
-var bodyParser = require('koa-bodyparser');
+var middlewares = require('koa-middlewares');
 var markdown = require('koa-markdown');
-var staticCache = require('koa-static-cache');
-var render = require('koa-ejs');
-var router = require('koa-router');
 var session = require('../common/session');
 var opensearch = require('../middleware/opensearch');
 var notFound = require('../middleware/web_not_found');
@@ -36,8 +32,8 @@ var app = koa();
 
 var rootdir = path.dirname(__dirname);
 
-app.use(rt({headerName: 'X-ReadTime'}));
-app.use(staticCache(path.join(__dirname, '..', 'public'), {
+app.use(middlewares.rt({headerName: 'X-ReadTime'}));
+app.use(middlewares.staticCache(path.join(__dirname, '..', 'public'), {
   buffer: !config.debug,
   maxAge: config.debug ? 0 : 60 * 60 * 24 * 7,
   dir: path.join(rootdir, 'public')
@@ -46,7 +42,7 @@ app.use(opensearch);
 app.keys = ['todokey', config.sessionSecret];
 app.outputErrors = true;
 app.use(session);
-app.use(bodyParser());
+app.use(middlewares.bodyParser());
 app.use(notFound);
 
 var viewDir = path.join(rootdir, 'view', 'web');
@@ -72,7 +68,7 @@ var locals = {
   config: config
 };
 
-render(app, {
+middlewares.render(app, {
   root: viewDir,
   viewExt: 'html',
   layout: '_layout',
@@ -84,7 +80,7 @@ render(app, {
 /**
  * Routes
  */
-app.use(router(app));
+app.use(middlewares.router(app));
 routes(app);
 
 /**
