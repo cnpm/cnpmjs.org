@@ -21,6 +21,7 @@ var common = require('../lib/common');
 
 module.exports = function (options) {
   return function *auth(next) {
+    debug('%s, %s, %j', this.url, this.sessionId, this.session);
     if (!this.session) {
       // redis crash
       this.session = {};
