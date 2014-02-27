@@ -106,7 +106,7 @@ function getMissPackages(callback) {
 }
 
 //only sync not exist once
-var syncNotExist = true;
+var syncNotExist = false;
 module.exports = function sync(callback) {
   var ep = eventproxy.create();
   ep.fail(callback);

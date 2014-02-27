@@ -406,7 +406,7 @@ describe('controllers/registry/module.test.js', function () {
       .put('/' + pkg.name)
       .set('authorization', baseauth)
       .send(pkg)
-      .expect(403, function (err, res) {
+      .expect(400, function (err, res) {
         should.not.exist(err);
         res.body.should.eql({
           error: 'version_error',

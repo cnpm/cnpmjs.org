@@ -480,10 +480,9 @@ exports.addPackageAndDist = function *(next) {
   var name = this.params.name;
   var filename = Object.keys(pkg._attachments || {})[0];
   var version = Object.keys(pkg.versions || {})[0];
-
   if (!version || !filename) {
-    this.status = 403;
-    this.bdoy = {
+    this.status = 400;
+    this.body = {
       error: 'version_error',
       reason: 'filename or version not found, filename: ' + filename + ', version: ' + version
     };
