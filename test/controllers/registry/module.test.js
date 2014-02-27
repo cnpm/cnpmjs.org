@@ -66,24 +66,31 @@ describe('controllers/registry/module.test.js', function () {
     });
   });
 
-  describe('GET /:name', function () {
-    it('should return module info', function (done) {
+  describe('GET /:name get module package info', function () {
+    var etag;
+
+    it('should return module info and etag', function (done) {
       request(app)
       .get('/cnpmjs.org')
       .expect(200, function (err, res) {
         should.not.exist(err);
+        // should have etag
+        res.headers.should.have.property('etag');
+        etag = res.headers.etag;
         res.body.should.have.keys('_id', '_rev', 'name', 'description',
           'versions', 'dist-tags', 'readme', 'maintainers',
           'time', 'author', 'repository', '_attachments');
-        // res.body.author.should.eql({
-        //   "name": "fengmk2",
-        //   "email": "fengmk2@gmail.com",
-        //   "url": "http://fengmk2.github.com"
-        // });
         res.body.name.should.equal('cnpmjs.org');
         res.body.versions[Object.keys(res.body.versions)[0]].dist.tarball.should.include('/cnpmjs.org/download');
         done();
       });
+    });
+
+    it('should 304 when etag match', function (done) {
+      request(app)
+      .get('/cnpmjs.org')
+      .set('If-None-Match', etag)
+      .expect(304, done)
     });
   });
 
