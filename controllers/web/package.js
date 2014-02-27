@@ -90,7 +90,7 @@ exports.display = function *(next) {
   }
 
   if (pkg.repository && pkg.repository.url) {
-    pkg.repository.weburl = giturl.parse(pkg.repository.url);
+    pkg.repository.weburl = giturl.parse(pkg.repository.url) || pkg.repository.url;
   }
 
   setLicense(pkg);
