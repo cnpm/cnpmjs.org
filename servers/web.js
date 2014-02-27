@@ -15,37 +15,35 @@
  * Module dependencies.
  */
 
-require('response-patch');
 var path = require('path');
 var http = require('http');
 var fs = require('fs');
-var connect = require('connect');
-var rt = require('connect-rt');
-var urlrouter = require('urlrouter');
-var connectMarkdown = require('connect-markdown');
+var koa = require('koa');
+var middlewares = require('koa-middlewares');
+var markdown = require('koa-markdown');
+var session = require('../common/session');
+var opensearch = require('../middleware/opensearch');
+var notFound = require('../middleware/web_not_found');
 var routes = require('../routes/web');
 var logger = require('../common/logger');
 var config = require('../config');
-var session = require('../common/session');
-var render = require('connect-render');
-var opensearch = require('../middleware/opensearch');
-var app = connect();
+
+var app = koa();
 
 var rootdir = path.dirname(__dirname);
 
-app.use(rt({headerName: 'X-ReadTime'}));
-app.use(function (req, res, next) {
-  res.req = req;
-  next();
-});
-
-app.use('/public', connect.static(path.join(rootdir, 'public')));
-app.use('/opensearch.xml', opensearch);
-
-app.use(connect.cookieParser());
+app.use(middlewares.rt({headerName: 'X-ReadTime'}));
+app.use(middlewares.staticCache(path.join(__dirname, '..', 'public'), {
+  buffer: !config.debug,
+  maxAge: config.debug ? 0 : 60 * 60 * 24 * 7,
+  dir: path.join(rootdir, 'public')
+}));
+app.use(opensearch);
+app.keys = ['todokey', config.sessionSecret];
+app.outputErrors = true;
 app.use(session);
-app.use(connect.query());
-app.use(connect.json());
+app.use(middlewares.bodyParser());
+app.use(notFound);
 
 var viewDir = path.join(rootdir, 'view', 'web');
 var docDir = path.join(rootdir, 'docs', 'web');
@@ -57,7 +55,8 @@ var layout = fs.readFileSync(path.join(viewDir, 'layout.html'), 'utf8')
   .replace('{{logoURL}}', config.logoURL);
 fs.writeFileSync(layoutFile, layout);
 
-app.use('/', connectMarkdown({
+app.use(markdown({
+  baseUrl: '/',
   root: docDir,
   layout: layoutFile,
   titleHolder: '<%- locals.title %>',
@@ -65,41 +64,38 @@ app.use('/', connectMarkdown({
   indexName: 'readme'
 }));
 
-var helpers = {
+var locals = {
   config: config
 };
 
-app.use(render({
+middlewares.render(app, {
   root: viewDir,
-  viewExt: '.html',
+  viewExt: 'html',
   layout: '_layout',
   cache: config.viewCache,
-  helpers: helpers
-}));
+  debug: config.debug,
+  locals: locals
+});
 
 /**
  * Routes
  */
-
-app.use(urlrouter(routes));
+app.use(middlewares.router(app));
+routes(app);
 
 /**
  * Error handler
  */
 
-app.use(function (err, req, res, next) {
-  err.url = err.url || req.url;
+app.on('error', function (err, ctx) {
+  err.url = err.url || ctx.request.url;
   logger.error(err);
-  if (process.env.NODE_ENV !== 'test') {
-    console.error(err.stack);
-  }
-  if (config.debug) {
-    return next(err);
-  }
-  res.statusCode = 500;
-  res.send('Server has some problems. :(');
 });
 
-app = http.createServer(app);
+app = http.createServer(app.callback());
+
+if (!module.parent) {
+  app.listen(config.webPort);
+}
 
 module.exports = app;

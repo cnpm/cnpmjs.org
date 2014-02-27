@@ -17,6 +17,7 @@
 
 var fs = require('fs');
 var path = require('path');
+var thunkify = require('thunkify-wrap');
 var should = require('should');
 var request = require('supertest');
 var mm = require('mm');
@@ -532,17 +533,17 @@ describe('controllers/registry/module.test.js', function () {
 
     it('should download a file direct from nfs stream', function (done) {
       var nfs = require('../../../common/nfs');
-      mm(nfs, 'downloadStream', function (key, writeStream, options, callback) {
+      mm(nfs, 'downloadStream', thunkify(function (key, writeStream, options, callback) {
         options.timeout.should.equal(600000);
         nfs._client.download(key, {writeStream: writeStream, timeout: options.timeout}, callback);
-      });
+      }));
       Module.__get__ = Module.get;
-      mm(Module, 'get', function (name, version, callback) {
+      mm(Module, 'get', thunkify(function (name, version, callback) {
         Module.__get__(name, version, function (err, info) {
           info.package.dist.key = 'cutter/-/cutter-0.0.2.tgz';
           callback(err, info);
         });
-      });
+      }));
       request(app)
       .get('/cutter/download/cutter-0.0.2.tgz')
       .expect('ETag', 'c61fde5e8c26d053574d0c722097029fd1bc963a')

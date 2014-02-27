@@ -14,6 +14,7 @@
  * Module dependencies.
  */
 
+var thunkify = require('thunkify-wrap');
 var mysql = require('../common/mysql');
 
 var INSERT_LOG_SQL = 'INSERT INTO module_log(gmt_create, gmt_modified, name, username, log) \
@@ -40,3 +41,5 @@ var SELECT_SQL = 'SELECT * FROM module_log WHERE id=?;';
 exports.get = function (id, callback) {
   mysql.queryOne(SELECT_SQL, [id], callback);
 };
+
+thunkify(exports);

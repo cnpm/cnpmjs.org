@@ -15,6 +15,7 @@
  * Module dependencies.
  */
 
+var thunkify = require('thunkify-wrap');
 var debug = require('debug')('cnpmjs.org:proxy:sync_module_worker');
 var EventEmitter = require('events').EventEmitter;
 var util = require('util');
@@ -574,3 +575,5 @@ SyncModuleWorker.sync = function (name, username, options, callback) {
     });
   });
 };
+
+SyncModuleWorker.sync = thunkify(SyncModuleWorker.sync);

@@ -14,9 +14,10 @@
  * Module dependencies.
  */
 
+var thunkify = require('thunkify-wrap');
+var eventproxy = require('eventproxy');
 var config = require('../config');
 var mysql = require('../common/mysql');
-var eventproxy = require('eventproxy');
 
 var DB_SIZE_SQL = 'SELECT TABLE_NAME AS name, data_length, index_length \
   FROM information_schema.tables \
@@ -118,3 +119,5 @@ exports.updateSyncNum = function (params, callback) {
   ];
   mysql.query(UPDATE_SYNC_NUM_SQL, query, callback);
 };
+
+thunkify(exports);

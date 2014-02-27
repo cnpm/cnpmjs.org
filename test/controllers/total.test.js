@@ -1,4 +1,4 @@
-/*!
+/**!
  * cnpmjs.org - test/controllers/total.test.js
  *
  * Copyright(c) cnpmjs.org and other contributors.
@@ -17,9 +17,9 @@
 
 var should = require('should');
 var request = require('supertest');
+var pedding = require('pedding');
 var registryApp = require('../../servers/registry');
 var webApp = require('../../servers/web');
-var pedding = require('pedding');
 
 describe('controllers/total.test.js', function () {
   before(function (done) {
@@ -44,6 +44,7 @@ describe('controllers/total.test.js', function () {
         done();
       });
     });
+
     it('should return total info by jsonp', function (done) {
       request(registryApp)
       .get('?callback=totalCallback')
@@ -51,7 +52,8 @@ describe('controllers/total.test.js', function () {
       .expect(/totalCallback\({.*}\)/, done);
     });
   });
-  describe('GET /total in web', function () {
+
+  describe.skip('GET /total in web', function () {
     it('should return total info', function (done) {
       request(webApp)
       .get('/total')
@@ -62,5 +64,5 @@ describe('controllers/total.test.js', function () {
         done();
       });
     });
-  });  
+  });
 });

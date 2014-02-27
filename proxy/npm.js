@@ -14,6 +14,7 @@
  * Module dependencies.
  */
 
+var thunkify = require('thunkify-wrap');
 var urllib = require('urllib');
 var config = require('../config');
 
@@ -64,3 +65,5 @@ exports.getShort = function (callback) {
     timeout: 300000
   }, callback);
 };
+
+thunkify(exports);

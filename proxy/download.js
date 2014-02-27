@@ -14,6 +14,7 @@
  * Module dependencies.
  */
 
+var thunkify = require('thunkify-wrap');
 var config = require('../config');
 var mysql = require('../common/mysql');
 
@@ -41,3 +42,5 @@ var SELECT_ALL_TOTAL_SQL = 'SELECT date, sum(count) AS count \
 exports.getTotal = function (start, end, callback) {
   mysql.query(SELECT_ALL_TOTAL_SQL, [start, end], callback);
 };
+
+thunkify(exports);

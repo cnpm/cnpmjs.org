@@ -11,45 +11,39 @@
   },
   "config": {
     "blanket": {
-      "pattern": "//^((?!(node_modules|test|common)).)*$/",
-      "data-cover-flags": {
-        "debug": false
-      }
+      "pattern": "//^((?!(node_modules|test|common)).)*$/"
     },
     "travis-cov": {
       "threshold": 90
     }
   },
   "dependencies": {
-    "bagpipe": "0.3.5",
-    "connect": "2.12.0",
-    "connect-markdown": "0.0.3",
-    "connect-redis": "1.4.6",
-    "connect-render": "0.3.2",
-    "connect-rt": "0.0.2",
+    "co-read": "0.0.1",
+    "co-write": "0.3.0",
     "debug": "0.7.4",
     "eventproxy": "0.2.6",
     "forward": "0.0.4",
     "giturl": "0.0.1",
-    "graceful": "0.0.5",
+    "graceful": "0.0.6",
     "gravatar": "1.0.6",
     "humanize-number": "0.0.2",
+    "koa": "0.5.0",
+    "koa-markdown": "0.0.2",
+    "koa-middlewares": "0.0.2",
     "logfilestream": "0.1.0",
-    "marked": "0.3.0",
+    "marked": "0.3.1",
     "microtime": "0.5.1",
     "mime": "1.2.11",
     "mkdirp": "0.3.5",
     "moment": "2.5.1",
     "ms": "0.6.2",
-    "mysql": "2.0.1",
-    "nodemailer": "0.6.0",
+    "mysql": "2.1.0",
+    "nodemailer": "0.6.1",
     "qn": "0.2.0",
     "ready": "0.1.1",
-    "response-cookie": "0.0.2",
-    "response-patch": "0.1.1",
     "semver": "2.2.1",
+    "thunkify-wrap": "0.0.1",
     "urllib": "0.5.5",
-    "urlrouter": "0.5.4",
     "utility": "0.1.10"
   },
   "devDependencies": {
@@ -57,11 +51,11 @@
     "blanket": "*",
     "contributors": "*",
     "coveralls": "*",
-    "mm": "0.1.8",
+    "mm": "0.2.0",
     "mocha": "*",
     "mocha-lcov-reporter": "*",
     "pedding": "0.0.3",
-    "should": "3.0.1",
+    "should": "3.1.3",
     "supertest": "0.9.0",
     "travis-cov": "*"
   },
@@ -79,7 +73,7 @@
     "cnpmjs.org", "npm", "npmjs", "npmjs.org", "registry"
   ],
   "engines": {
-    "node": ">= 0.8.0"
+    "node": ">= 0.11.9"
   },
   "author": [
     "fengmk2 <fengmk2@gmail.com> (http://fengmk2.github.com)",

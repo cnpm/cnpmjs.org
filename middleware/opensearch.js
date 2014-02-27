@@ -24,8 +24,11 @@ var template = '<?xml version="1.0" encoding="UTF-8"?>\
 
 var lastModifyDate = new Date();
 
-module.exports = function publishable(req, res, next) {
-  res.charset = res.charset || 'utf-8';
-  res.setHeader('Content-Type', 'text/xml');
-  res.send(template.replace('${host}', req.headers.host));
+module.exports = function *publishable(next) {
+  if (this.path === '/opensearch.xml') {
+    this.type = 'text/xml';
+    this.charset = 'utf-8';
+    this.body = template.replace('${host}', this.host);
+  }
+  yield next;
 };

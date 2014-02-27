@@ -14,9 +14,9 @@
  * Module dependencies.
  */
 
+var thunkify = require('thunkify-wrap');
 var qn = require('qn');
 var config = require('../config');
-
 var client = qn.create(config.qn);
 
 exports._client = client;
@@ -61,3 +61,5 @@ exports.url = function (key) {
 exports.remove = function (key, callback) {
   client.delete(key, callback);
 };
+
+thunkify(exports);

@@ -16,18 +16,22 @@
 
 var should = require('should');
 var request = require('supertest');
+var mm = require('mm');
 var app = require('../../../servers/registry');
 var user = require('../../../proxy/user');
-var mm = require('mm');
+var mysql = require('../../../common/mysql');
 
 describe('controllers/registry/user.test.js', function () {
   before(function (done) {
     app.listen(0, done);
   });
+
   after(function (done) {
     app.close(done);
   });
+
   afterEach(mm.restore);
+
   describe('GET /-/user/org.couchdb.user:name', function () {
     it('should return user info', function (done) {
       request(app)
@@ -47,7 +51,7 @@ describe('controllers/registry/user.test.js', function () {
     });
 
     it('should return 500 when mysql error', function (done) {
-      mm.error(user, 'get', 'mock error');
+      mm.error(mysql, 'query', 'mock mysql error');
       request(app)
       .get('/-/user/org.couchdb.user:cnpmjstest1')
       .expect(500, done);
@@ -91,7 +95,7 @@ describe('controllers/registry/user.test.js', function () {
         password_sha: 'password_sha',
         email: 'email'
       })
-      .expect(500, done);      
+      .expect(500, done);
     });
 
     it('should 201 when user.add ok', function (done) {

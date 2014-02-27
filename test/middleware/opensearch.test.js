@@ -30,8 +30,8 @@ describe('middleware/opensearch.test.js', function () {
     it('should get 200', function (done) {
       request(app)
       .get('/opensearch.xml')
-      .set('host', 'localhost:7002')
-      .expect(/http:\/\/localhost:7002/, done);
+      .set('host', 'localhost')
+      .expect(/http:\/\/localhost/, done);
     });
   });
 });
