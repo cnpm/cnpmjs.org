@@ -9,7 +9,7 @@ cnpmjs.org
 
 ## What is this?
 
-Private npm registry and web for Enterprise, base on MySQL and [Simple Store Service](https://github.com/cnpm/cnpmjs.org/wiki/NFS-Guide).
+Private npm registry and web for Enterprise, base on [koa](http://koajs.com/), MySQL and [Simple Store Service](https://github.com/cnpm/cnpmjs.org/wiki/NFS-Guide).
 
 @[JacksonTian](https://github.com/JacksonTian/) had a talk about [private npm](https://speakerdeck.com/jacksontian/qi-ye-ji-node-dot-jskai-fa).
 
@@ -19,13 +19,13 @@ Private npm registry and web for Enterprise, base on MySQL and [Simple Store Ser
 ## Install
 
 ```bash
-$ npm install
+$ npm install --registry=http://r.cnpmjs.org --disturl=http://dist.u.qiniudn.com
 ```
 
 ## Usage
 
 ```js
-$ node dispatch.js
+$ node --harmony-generators dispatch.js
 ```
 
 ## Guide
@@ -39,14 +39,14 @@ $ node dispatch.js
 $ git summary
 
  project  : cnpmjs.org
- repo age : 7 weeks
- active   : 132 days
- commits  : 315
- files    : 88
+ repo age : 3 months
+ active   : 145 days
+ commits  : 366
+ files    : 94
  authors  :
-   190  fengmk2                 60.3%
-   122  dead_horse              38.7%
-     2  4simple                 0.6%
+   217  fengmk2                 59.3%
+   146  dead_horse              39.9%
+     2  4simple                 0.5%
      1  Alsotang                0.3%
 ```
 

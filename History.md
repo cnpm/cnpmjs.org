@@ -1,4 +1,38 @@
 
+0.3.0 / 2014-02-27 
+==================
+
+  * fix typo and dont sync not exists pkgs
+  * use koa-middlewares
+  * fix signed cookie not work on npm@1.3.25; node --harmony-generators
+  * fix opensearch test case
+  * update koa bodyparser
+  * logger.error(err) should send err stack email notice
+  * json body parse limit and bug fix.
+  * fix sync 404 reason not clear
+  * all controllers to koa
+  * controller/web/user.js to koa
+  * change web connect to koa
+  * use outputError
+  * use yield exports.addPackageAndDist.call(this, next);
+  * add end() when ws write end
+  * fix yield coWrite
+  * fix all the test of registry module.test.js
+  * convert registry/module.js to koa type
+  * fix auth middleware
+  * finish registry user controller koa and update mm to support thunkify. fixed #196
+  * change controllers/user.js to koa
+  * thunkify all proxy
+  * convert all middlewares to koa type
+  * change regsitry sync to koa
+  * addd koa-jsonp, koa-bodyparser, fix / controller
+  * first koa run registry home page /
+  * Merge pull request #212 from cnpm/fix-sync-404
+  * return friendly 404 reason
+  * Merge pull request #211 from cnpm/bug-fix
+  * override json limit to default 10mb. fixed #209
+  * fix #210 addPackageAndDist package version detect bug
+
 0.2.27 / 2014-02-19 
 ==================
 
