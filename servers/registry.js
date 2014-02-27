@@ -40,6 +40,9 @@ app.use(middlewares.bodyParser({jsonLimit: config.jsonLimit}));
 app.use(auth());
 app.use(notFound);
 
+app.use(middlewares.fresh());
+app.use(middlewares.etag());
+
 /**
  * Routes
  */
