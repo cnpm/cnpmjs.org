@@ -69,7 +69,7 @@ exports.show = function *(next) {
 
   var nextMod = null;
   var latestMod = null;
-  var readme;
+  var readme = null;
   // set tags
   var distTags = {};
   for (var i = 0; i < tags.length; i++) {
