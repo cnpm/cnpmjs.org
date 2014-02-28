@@ -1,4 +1,12 @@
 
+0.3.3 / 2014-02-28 
+==================
+
+  * Merge pull request #232 from cnpm/host-hotfix
+  * get request host from request.headers
+  * Merge pull request #231 from cnpm/bug-fix
+  * fix deps display bug#230 and nsf.url TypeError#229
+
 0.3.2 / 2014-02-28 
 ==================
 
