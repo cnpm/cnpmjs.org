@@ -1,4 +1,12 @@
 
+0.3.2 / 2014-02-28 
+==================
+
+  * update koa-sess and koa-redis
+  * fix sync all test
+  * remove nfs.downloadStream first, fix tmppath error
+  * fix fengmk2/giturl#1 bug
+
 0.3.1 / 2014-02-27 
 ==================
 
