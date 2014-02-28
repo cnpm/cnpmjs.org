@@ -182,10 +182,14 @@ exports.download = function *(next) {
   var version = filename.slice(name.length + 1, -4);
   var row = yield Module.get(name, version);
   // can not get dist
-  var url = nfs.url(common.getCDNKey(name, filename));
+  var url = null;
+
+  if (typeof nfs.url === 'function') {
+    url = nfs.url(common.getCDNKey(name, filename));
+  }
 
   if (!row || !row.package || !row.package.dist) {
-    if (!nfs.url) {
+    if (!url) {
       return yield next;
     }
     this.status = 302;
@@ -193,6 +197,7 @@ exports.download = function *(next) {
     _downloads[name] = (_downloads[name] || 0) + 1;
     return;
   }
+
   var dist = row.package.dist;
   if (!dist.key) {
     debug('get tarball by 302');
@@ -229,8 +234,8 @@ exports.download = function *(next) {
     this.throw(err);
   }
   var tarball = fs.createReadStream(tmpPath);
-  tarball.on('error', cleanup);
-  tarball.on('end', cleanup);
+  tarball.once('error', cleanup);
+  tarball.once('end', cleanup);
   this.body = tarball;
 };
 
