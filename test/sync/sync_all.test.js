@@ -50,7 +50,7 @@ describe('sync/sync_all.js', function () {
       mm.data(Module, 'listAllModuleNames', [{name: 'cnpmjs.org'}, {name: 'cutter'}]);
       sync(function (err, data) {
         should.not.exist(err);
-        data.successes.should.eql(['cnpm', 'cnpmjs.org', 'cutter']);
+        data.successes.should.eql(['cnpmjs.org', 'cutter']);
         done();
       });
     });

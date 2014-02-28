@@ -537,34 +537,6 @@ describe('controllers/registry/module.test.js', function () {
       .expect('Location', 'http://qtestbucket.qiniudn.com/cutter/-/cutter-0.0.2.tgz')
       .expect(302, done)
     });
-
-    it('should download a file direct from nfs stream', function (done) {
-      var nfs = require('../../../common/nfs');
-      mm(nfs, 'downloadStream', thunkify(function (key, writeStream, options, callback) {
-        options.timeout.should.equal(600000);
-        nfs._client.download(key, {writeStream: writeStream, timeout: options.timeout}, callback);
-      }));
-      Module.__get__ = Module.get;
-      mm(Module, 'get', thunkify(function (name, version, callback) {
-        Module.__get__(name, version, function (err, info) {
-          info.package.dist.key = 'cutter/-/cutter-0.0.2.tgz';
-          callback(err, info);
-        });
-      }));
-      request(app)
-      .get('/cutter/download/cutter-0.0.2.tgz')
-      .expect('ETag', 'c61fde5e8c26d053574d0c722097029fd1bc963a')
-      .expect('Content-Type', 'application/octet-stream')
-      .expect('Content-Length', '3139')
-      .expect('Content-Disposition', 'attachment; filename="cutter-0.0.2.tgz"')
-      .expect(200)
-      .end(function (err, res) {
-        should.not.exist(err);
-        // TODO: why supertest change buffer to text?
-        // res.text.length.should.equal(3139);
-        done();
-      });
-    });
   });
 
   describe('DELETE /:name/download/:filename/-rev/:rev', function () {
