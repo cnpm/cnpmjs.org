@@ -69,7 +69,7 @@ exports.show = function *(next) {
 
   var nextMod = null;
   var latestMod = null;
-
+  var readme;
   // set tags
   var distTags = {};
   for (var i = 0; i < tags.length; i++) {
@@ -94,7 +94,9 @@ exports.show = function *(next) {
     times[pkg.version] = row.publish_time ? new Date(row.publish_time) : row.gmt_modified;
     if ((!distTags.latest && !latestMod) || distTags.latest === row.version) {
       latestMod = row;
+      readme = pkg.readme;
     }
+    delete pkg.readme;
   }
 
   if (!latestMod) {
@@ -121,7 +123,7 @@ exports.show = function *(next) {
     author: latestMod.package.author,
     repository: latestMod.package.repository,
     versions: versions,
-    readme: latestMod.package.readme,
+    readme: readme,
     _attachments: attachments,
   };
 
