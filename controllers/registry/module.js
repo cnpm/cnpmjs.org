@@ -203,7 +203,7 @@ exports.download = function *(next) {
   }
 
   // else use `dist.key` to get tarball from nfs
-  if (!nfs.downloadStream && !nfs.download) {
+  if (!nfs.download) {
     return yield next;
   }
 
@@ -216,13 +216,9 @@ exports.download = function *(next) {
   this.set('Content-Disposition', 'attachment; filename="' + filename + '"');
   this.set('ETag', dist.shasum);
 
-  if (nfs.downloadStream) {
-    yield nfs.downloadStream(dist.key, this.res, {timeout: DOWNLOAD_TIMEOUT});
-    return;
-  }
-
   // use download file api
-  var tmpPath = path.join(config.uploadDir, utility.randomString() + dist.key);
+  var tmpPath = path.join(config.uploadDir,
+    utility.randomString() + dist.key.replace(/\//g, '-'));
   function cleanup() {
     fs.unlink(tmpPath, utility.noop);
   }
