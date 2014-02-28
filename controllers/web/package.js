@@ -51,7 +51,9 @@ exports.display = function *(next) {
   ];
   var pkg = r[0];
   var download = r[1];
-  var dependents = r[2];
+  var dependents = (r[2] || []).map(function (item) {
+    return item.deps;
+  });
 
   if (!pkg || !pkg.package) {
     return yield next;
