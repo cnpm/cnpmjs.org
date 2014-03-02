@@ -139,7 +139,7 @@ $ npm install cnpm -g
 
 ### install
 
-Install package from [r.cnpmjs.org](http://r.cnpmjs.org). When isntall a  package or version not exist, it will try to install from official registry([registry.npmjs.org](http://registry.npmjs.org)), and sync this package to cnpm in the backend.
+Install package from [r.cnpmjs.org](http://r.cnpmjs.org). When installing a package or version does not exist, it will try to install from the official registry([registry.npmjs.org](http://registry.npmjs.org)), and sync this package to cnpm in the backend.
 
 ```
 $ cnpm install [name]
