@@ -4,35 +4,30 @@ TIMEOUT = 30000
 MOCHA_OPTS =
 
 install:
-	@npm install --registry=http://registry.cnpmjs.org --cache=${HOME}/.npm/.cache/cnpm --disturl=http://dist.u.qiniudn.com
+	@npm install --registry=http://registry.cnpmjs.org \
+		--cache=${HOME}/.npm/.cache/cnpm --disturl=http://dist.u.qiniudn.com
 
-test: install
-	@NODE_ENV=test ./node_modules/mocha/bin/mocha \
-		--harmony-generators \
+test:
+	@NODE_ENV=test node --harmony \
+		node_modules/.bin/istanbul cover ./node_modules/.bin/_mocha \
+		-- -u exports \
 		--reporter $(REPORTER) \
 		--timeout $(TIMEOUT) \
-		--require should \
 		$(MOCHA_OPTS) \
 		$(TESTS)
+	@-$(MAKE) check-coverage
 
-test-cov:
-	@$(MAKE) test MOCHA_OPTS='--require blanket' REPORTER=travis-cov
+check-coverage:
+	@./node_modules/.bin/istanbul check-coverage \
+		--statements 100 \
+		--functions 100 \
+		--branches 100 \
+		--lines 100
 
-test-cov-html:
-	@rm -f coverage.html
-	@$(MAKE) test MOCHA_OPTS='--require blanket' REPORTER=html-cov > coverage.html
-	@ls -lh coverage.html
+contributors:
+	@./node_modules/.bin/contributors -f plain -o AUTHORS
 
-test-coveralls: test
-	@echo TRAVIS_JOB_ID $(TRAVIS_JOB_ID)
-	@-$(MAKE) test MOCHA_OPTS='--require blanket' REPORTER=mocha-lcov-reporter | ./node_modules/coveralls/bin/coveralls.js
-
-test-all: test test-cov
-
-contributors: install
-	@./node_modules/contributors/bin/contributors -f plain -o AUTHORS
-
-autod: install
+autod:
 	@./node_modules/.bin/autod -w -e public,view,docs,backup
 	@$(MAKE) install
 
