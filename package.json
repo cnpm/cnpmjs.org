@@ -4,24 +4,16 @@
   "description": "Private npm registry and web for Enterprise, base on MySQL and Simple Store Service",
   "main": "index.js",
   "scripts": {
-    "test": "make test-all",
+    "test": "make test",
     "start": "./bin/nodejsctl start && cp History.md docs/web/history.md",
     "status": "./bin/nodejsctl status",
     "stop": "./bin/nodejsctl stop"
-  },
-  "config": {
-    "blanket": {
-      "pattern": "//^((?!(node_modules|test|common)).)*$/"
-    },
-    "travis-cov": {
-      "threshold": 90
-    }
   },
   "dependencies": {
     "co-read": "0.0.1",
     "co-write": "0.3.0",
     "debug": "0.7.4",
-    "eventproxy": "0.2.7",
+    "eventproxy": "0.3.0",
     "forward": "0.0.4",
     "giturl": "0.0.2",
     "graceful": "0.0.6",
@@ -48,16 +40,13 @@
   },
   "devDependencies": {
     "autod": ">=0.0.13",
-    "blanket": "*",
     "contributors": "*",
-    "coveralls": "*",
+    "istanbul": "git://github.com/gotwarlost/istanbul.git#harmony",
     "mm": "0.2.0",
     "mocha": "*",
-    "mocha-lcov-reporter": "*",
     "pedding": "0.0.3",
     "should": "3.1.3",
-    "supertest": "0.9.0",
-    "travis-cov": "*"
+    "supertest": "0.9.0"
   },
   "homepage": "https://github.com/cnpm/cnpmjs.org",
   "repository": {
