@@ -45,6 +45,10 @@ app.use(session);
 app.use(middlewares.bodyParser());
 app.use(notFound);
 
+app.use(middlewares.gzip());
+app.use(middlewares.fresh());
+app.use(middlewares.etag());
+
 var viewDir = path.join(rootdir, 'view', 'web');
 var docDir = path.join(rootdir, 'docs', 'web');
 
