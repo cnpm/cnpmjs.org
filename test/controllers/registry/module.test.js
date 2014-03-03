@@ -86,6 +86,26 @@ describe('controllers/registry/module.test.js', function () {
       });
     });
 
+    it('should return module info and gzip when accept-encoding=gzip', function (done) {
+      request(app)
+      .get('/cnpmjs.org')
+      .set('accept-encoding', 'gzip')
+      .expect('content-encoding', 'gzip')
+      .expect(200, function (err, res) {
+        // console.log(res.headers)
+        should.not.exist(err);
+        // should have etag
+        res.headers.should.have.property('etag');
+        etag = res.headers.etag;
+        res.body.should.have.keys('_id', '_rev', 'name', 'description',
+          'versions', 'dist-tags', 'readme', 'maintainers',
+          'time', 'author', 'repository', '_attachments');
+        res.body.name.should.equal('cnpmjs.org');
+        res.body.versions[Object.keys(res.body.versions)[0]].dist.tarball.should.include('/cnpmjs.org/download');
+        done();
+      });
+    });
+
     it('should 304 when etag match', function (done) {
       request(app)
       .get('/cnpmjs.org')

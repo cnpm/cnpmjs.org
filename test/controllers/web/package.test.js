@@ -78,9 +78,14 @@ describe('controllers/web/package.test.js', function () {
       request(app)
       .get('/package/cutter')
       .expect(200)
+      .expect('content-encoding', 'gzip')
       .expect(/<div id="package">/)
       .expect(/<th>Maintainers<\/th>/)
-      .expect(/<th>Version<\/th>/, done);
+      .expect(/<th>Version<\/th>/, function (err, res) {
+        should.not.exist(err);
+        res.should.have.header('etag');
+        done();
+      });
     });
 
     it('should get 404', function (done) {
