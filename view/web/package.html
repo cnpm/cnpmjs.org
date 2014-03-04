@@ -188,27 +188,27 @@
           </td>
         </tr>
 
-        <% if (package.users) {
-          var starredBy = package.starredBy
-          var l = starredBy.length
+        <% if (package.users.length > 0) {
+          var users = package.users
+          var l = users.length
         %>
         <tr>
-          <th>Starred by<%= l > 0 ? ' (' + l + ')' : '' %></th>
+          <th>Starred by (<%= l %>)</th>
           <td>
             <%
             var max = 20
             if (l > max) {
-              starredBy = starredBy.sort(function (a, b) {
+              users = users.sort(function (a, b) {
                 return Math.random() * 2 - 1
               }).slice(0, max)
             }
-            starredBy.forEach(function (user, i) {
+            users.forEach(function (user, i) {
               if (i > 0) { %>, <% }
               %><a href="/~<%= user %>"><%= user %></a><%
             })
             if (l > max) {
               %><br><a href="/browse/star/<%= package.name %>">and
-              <%= (l-max) %> more</a><%
+              <%= (l - max) %> more</a><%
             }
             %>
           </td>

@@ -36,6 +36,7 @@ var DownloadTotal = require('../../proxy/download');
 var SyncModuleWorker = require('../../proxy/sync_module_worker');
 var logger = require('../../common/logger');
 var ModuleDeps = require('../../proxy/module_deps');
+var ModuleStar = require('../../proxy/module_star');
 
 /**
  * show all version of a module
@@ -43,9 +44,19 @@ var ModuleDeps = require('../../proxy/module_deps');
 exports.show = function *(next) {
   var name = this.params.name;
 
-  var r = yield [Module.listTags(name), Module.listByName(name)];
+  var r = yield [
+    Module.listTags(name),
+    Module.listByName(name),
+    ModuleStar.listUsers(name)
+  ];
   var tags = r[0];
   var rows = r[1];
+  var users = r[2];
+  var userMap = {};
+  for (var i = 0; i < users.length; i++) {
+    userMap[users[i]] = true;
+  }
+  users = userMap;
 
   debug('show module, user: %s, allowSync: %s, isAdmin: %s',
     this.session.name, this.session.allowSync, this.session.isAdmin);
@@ -81,6 +92,8 @@ exports.show = function *(next) {
   var versions = {};
   var times = {};
   var attachments = {};
+  var createdTime = null;
+  var modifiedTime = null;
   for (var i = 0; i < rows.length; i++) {
     var row = rows[i];
     if (row.version === 'next') {
@@ -91,12 +104,30 @@ exports.show = function *(next) {
     common.setDownloadURL(pkg, this);
     pkg._cnpm_publish_time = row.publish_time;
     versions[pkg.version] = pkg;
-    times[pkg.version] = row.publish_time ? new Date(row.publish_time) : row.gmt_modified;
+    var t = times[pkg.version] = row.publish_time ? new Date(row.publish_time) : row.gmt_modified;
     if ((!distTags.latest && !latestMod) || distTags.latest === row.version) {
       latestMod = row;
       readme = pkg.readme;
     }
     delete pkg.readme;
+
+    if (!createdTime || t < createdTime) {
+      createdTime = t;
+    }
+    if (!modifiedTime || t > modifiedTime) {
+      modifiedTime = t;
+    }
+  }
+
+  if (modifiedTime && createdTime) {
+    var ts = {
+      modified: modifiedTime,
+      created: createdTime,
+    };
+    for (var t in times) {
+      ts[t] = times[t];
+    }
+    times = ts;
   }
 
   if (!latestMod) {
@@ -112,20 +143,28 @@ exports.show = function *(next) {
     rev = String(nextMod.id);
   }
 
+  var pkg = latestMod.package;
+
   var info = {
     _id: name,
     _rev: rev,
     name: name,
-    description: latestMod.package.description,
+    description: pkg.description,
     "dist-tags": distTags,
-    maintainers: latestMod.package.maintainers,
+    maintainers: pkg.maintainers,
     time: times,
-    author: latestMod.package.author,
-    repository: latestMod.package.repository,
+    users: users,
+    author: pkg.author,
+    repository: pkg.repository,
     versions: versions,
     readme: readme,
     _attachments: attachments,
   };
+
+  info.readmeFilename = pkg.readmeFilename;
+  info.homepage = pkg.homepage;
+  info.bugs = pkg.bugs;
+  info.license = pkg.license;
 
   debug('show module %s: %s, latest: %s', name, rev, latestMod.version);
 

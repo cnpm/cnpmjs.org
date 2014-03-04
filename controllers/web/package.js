@@ -28,6 +28,7 @@ var sync = require('../sync');
 var Log = require('../../proxy/module_log');
 var ModuleDeps = require('../../proxy/module_deps');
 var setDownloadURL = require('../../lib/common').setDownloadURL;
+var ModuleStar = require('../../proxy/module_star');
 
 exports.display = function *(next) {
   var params = this.params;
@@ -47,13 +48,15 @@ exports.display = function *(next) {
   var r = yield [
     Module[getPackageMethod].apply(Module, getPackageArgs),
     down.total(name),
-    ModuleDeps.list(name)
+    ModuleDeps.list(name),
+    ModuleStar.listUsers(name),
   ];
   var pkg = r[0];
   var download = r[1];
   var dependents = (r[2] || []).map(function (item) {
     return item.deps;
   });
+  var users = r[3];
 
   if (!pkg || !pkg.package) {
     return yield next;
@@ -61,6 +64,7 @@ exports.display = function *(next) {
 
   pkg.package.fromNow = moment(pkg.publish_time).fromNow();
   pkg = pkg.package;
+  pkg.users = users;
   pkg.readme = marked(pkg.readme || '');
   if (!pkg.readme) {
     pkg.readme = pkg.description || '';

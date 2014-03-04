@@ -45,6 +45,7 @@
   },
   "devDependencies": {
     "autod": ">=0.0.13",
+    "co": "3.0.4",
     "contributors": "*",
     "cov": "*",
     "istanbul": "git://github.com/gotwarlost/istanbul.git#harmony",
