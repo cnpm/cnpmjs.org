@@ -1,4 +1,14 @@
 
+0.3.4 / 2014-03-04 
+==================
+
+  * add cov
+  * use istanbul run test coverage
+  * gzip support. fix #241
+  * readme spelling patch (@stanzheng)
+  * default readme to null, fixed #233
+  * remove readme in versions
+
 0.3.3 / 2014-02-28 
 ==================
 
