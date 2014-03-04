@@ -79,9 +79,15 @@ describe('controllers/registry/module.test.js', function () {
         etag = res.headers.etag;
         res.body.should.have.keys('_id', '_rev', 'name', 'description',
           'versions', 'dist-tags', 'readme', 'maintainers',
-          'time', 'author', 'repository', '_attachments');
+          'time', 'author', 'repository', '_attachments',
+          'users', 'readmeFilename', 'homepage', 'bugs', 'license');
         res.body.name.should.equal('cnpmjs.org');
-        res.body.versions[Object.keys(res.body.versions)[0]].dist.tarball.should.include('/cnpmjs.org/download');
+        res.body.versions[Object.keys(res.body.versions)[0]]
+          .dist.tarball.should.include('/cnpmjs.org/download');
+        res.body.time.should.have.property('modified');
+        res.body.time.modified.should.be.a.String;
+        res.body.time.should.have.property('created');
+        res.body.time.created.should.be.a.String;
         done();
       });
     });
@@ -99,7 +105,8 @@ describe('controllers/registry/module.test.js', function () {
         etag = res.headers.etag;
         res.body.should.have.keys('_id', '_rev', 'name', 'description',
           'versions', 'dist-tags', 'readme', 'maintainers',
-          'time', 'author', 'repository', '_attachments');
+          'time', 'author', 'repository', '_attachments',
+          'users', 'readmeFilename', 'homepage', 'bugs', 'license');
         res.body.name.should.equal('cnpmjs.org');
         res.body.versions[Object.keys(res.body.versions)[0]].dist.tarball.should.include('/cnpmjs.org/download');
         done();
@@ -237,7 +244,7 @@ describe('controllers/registry/module.test.js', function () {
       .expect(200, function (err, res) {
         should.not.exist(err);
         res.body.should.have.keys('_id', '_rev', 'name', 'description', 'versions', 'dist-tags',
-          'readme', 'maintainers', 'time', '_attachments');
+          'readme', 'maintainers', 'time', '_attachments', 'users');
         res.body.versions.should.eql({});
         res.body.time.should.eql({});
         res.body['dist-tags'].should.eql({});

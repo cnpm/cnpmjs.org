@@ -18,7 +18,7 @@ var SyncModuleWorker = require('../proxy/sync_module_worker');
 var mysql = require('../common/mysql');
 var Log = require('../proxy/module_log');
 
-var name = process.argv[2] || 'address,pedding';
+var name = process.argv[2] || 'byte';
 var names = name.split(',');
 
 Log.create({
@@ -30,8 +30,8 @@ Log.create({
     name: names,
     username: 'fengmk2',
     concurrency: names.length,
-    noDep: true,
-    publish: true,
+    // noDep: true,
+    // publish: true,
   });
 
   worker.start();

@@ -15,6 +15,7 @@
  * Module dependencies.
  */
 
+var co = require('co');
 var thunkify = require('thunkify-wrap');
 var debug = require('debug')('cnpmjs.org:proxy:sync_module_worker');
 var EventEmitter = require('events').EventEmitter;
@@ -33,6 +34,7 @@ var Module = require('./module');
 var ModuleDeps = require('./module_deps');
 var Log = require('./module_log');
 var config = require('../config');
+var ModuleStar = require('./module_star');
 
 function SyncModuleWorker(options) {
   EventEmitter.call(this);
@@ -145,6 +147,36 @@ SyncModuleWorker.prototype.next = function (concurrencyId) {
   });
 };
 
+function _listStarUsers(modName, callback) {
+  co(function *() {
+    var users;
+    var err;
+    try {
+      users = yield ModuleStar.listUsers(modName);
+      var userMap = {};
+      for (var i = 0; i < users.length; i++) {
+        userMap[users[i]] = true;
+      }
+      users = userMap;
+    } catch (e) {
+      err = e;
+    }
+    callback(err, users);
+  })();
+}
+
+function _addStar(modName, username, callback) {
+  co(function *() {
+    var err;
+    try {
+      yield ModuleStar.add(modName, username);
+    } catch (e) {
+      err = e;
+    }
+    callback(err);
+  })();
+};
+
 SyncModuleWorker.prototype._sync = function (name, pkg, callback) {
   var username = this.username;
   var that = this;
@@ -194,12 +226,24 @@ SyncModuleWorker.prototype._sync = function (name, pkg, callback) {
     ep.emit('existsTags', tags);
   }));
 
+  _listStarUsers(name, ep.done('existsStarUsers'));
+
   var missingVersions = [];
   var missingTags = [];
   var missingDescriptions = [];
   var missingReadmes = [];
+  var missingStarUsers = [];
 
-  ep.all('existsMap', 'existsTags', function (map, tags) {
+  ep.all('existsMap', 'existsTags', 'existsStarUsers', function (map, tags, existsStarUsers) {
+    var starUsers = pkg.users || {};
+    for (var k in starUsers) {
+      if (!existsStarUsers[k]) {
+        missingStarUsers.push(k);
+      }
+    }
+
+    that.log('  [%s] found %d missing star users', name, missingStarUsers.length);
+
     var times = pkg.time || {};
     pkg.versions = pkg.versions || {};
     var versionNames = Object.keys(times);
@@ -300,7 +344,7 @@ SyncModuleWorker.prototype._sync = function (name, pkg, callback) {
       return a.publish_time - b.publish_time;
     });
     missingVersions = versions;
-    that.log('  [%s] %d versions', name, versions.length);
+    that.log('  [%s] %d versions need to sync', name, versions.length);
     ep.emit('syncModule', missingVersions.shift());
   });
 
@@ -318,13 +362,16 @@ SyncModuleWorker.prototype._sync = function (name, pkg, callback) {
 
       var nextVersion = missingVersions.shift();
       if (!nextVersion) {
+        ep.unbind('syncModule');
         return ep.emit('syncDone', result);
       }
+
+      // next
       ep.emit('syncModule', nextVersion);
     });
   });
 
-  ep.on('syncDone', function () {
+  ep.once('syncDone', function () {
     if (missingDescriptions.length === 0) {
       return ep.emit('descriptionDone');
     }
@@ -346,7 +393,7 @@ SyncModuleWorker.prototype._sync = function (name, pkg, callback) {
     });
   });
 
-  ep.on('syncDone', function () {
+  ep.once('syncDone', function () {
     if (missingTags.length === 0) {
       return ep.emit('tagDone');
     }
@@ -387,7 +434,28 @@ SyncModuleWorker.prototype._sync = function (name, pkg, callback) {
     });
   });
 
-  ep.all('tagDone', 'descriptionDone', 'readmeDone', function () {
+  ep.once('syncDone', function () {
+    if (missingStarUsers.length === 0) {
+      return ep.emit('starUserDone');
+    }
+
+    that.log('  [%s] saving %d star users', name, missingStarUsers.length);
+    missingStarUsers.forEach(function (username) {
+      _addStar(name, username, function (err) {
+        if (err) {
+          that.log('    add star user error, %s', err);
+        }
+        ep.emitLater('addStarUser');
+      });
+    });
+
+    ep.after('addStarUser', missingStarUsers.length, function () {
+      ep.emit('starUserDone');
+    });
+  });
+
+  ep.all('tagDone', 'descriptionDone', 'readmeDone', 'starUserDone',
+  function () {
     // TODO: set latest version
     callback(null, versionNames);
   });
