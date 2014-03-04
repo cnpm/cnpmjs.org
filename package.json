@@ -9,6 +9,11 @@
     "status": "./bin/nodejsctl status",
     "stop": "./bin/nodejsctl stop"
   },
+  "config": {
+    "cov": {
+      "threshold": 83
+    }
+  },
   "dependencies": {
     "co-read": "0.0.1",
     "co-write": "0.3.0",
@@ -21,7 +26,7 @@
     "humanize-number": "0.0.2",
     "koa": "0.5.0",
     "koa-markdown": "0.0.2",
-    "koa-middlewares": "0.0.7",
+    "koa-middlewares": "0.0.8",
     "logfilestream": "0.1.0",
     "marked": "0.3.1",
     "microtime": "0.5.1",
@@ -41,6 +46,7 @@
   "devDependencies": {
     "autod": ">=0.0.13",
     "contributors": "*",
+    "cov": "*",
     "istanbul": "git://github.com/gotwarlost/istanbul.git#harmony",
     "mm": "0.2.0",
     "mocha": "*",

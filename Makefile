@@ -24,6 +24,9 @@ check-coverage:
 		--branches 100 \
 		--lines 100
 
+cov:
+	@./node_modules/.bin/cov coverage
+
 contributors:
 	@./node_modules/.bin/contributors -f plain -o AUTHORS
 
