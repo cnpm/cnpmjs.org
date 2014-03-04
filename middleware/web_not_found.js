@@ -20,6 +20,12 @@ module.exports = function *notFound(next) {
   if (this.status) {
     return;
   }
+
+  var m = /^\/([\w\-\_\.]+)\/?$/.exec(this.url);
+  if (m) {
+    return this.redirect('/package/' + m[1]);
+  }
+
   this.status = 404;
   this.type = 'text/html';
   this.charset = 'utf-8';
