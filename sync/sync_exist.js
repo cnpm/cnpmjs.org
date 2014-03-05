@@ -24,6 +24,7 @@ var debug = require('debug')('cnpmjs.org:sync:sync_hot');
 var utility = require('utility');
 var Status = require('./status');
 var ms = require('ms');
+var thunkify = require('thunkify-wrap');
 
 function intersection(arrOne, arrTwo) {
   arrOne = arrOne || [];
@@ -39,71 +40,66 @@ function intersection(arrOne, arrTwo) {
   return results;
 }
 
-module.exports = function sync(callback) {
-  var ep = eventproxy.create();
-  ep.fail(callback);
+module.exports = function *sync() {
   var syncTime = Date.now();
 
-  Module.listShort(ep.doneLater(function (packages) {
-    packages = packages.map(function (p) {
-      return p.name;
-    });
-    ep.emit('existPackages', packages);
-  }));
-  Total.getTotalInfo(ep.doneLater('totalInfo'));
-
-  ep.once('totalInfo', function (info) {
-    if (!info) {
-      return callback(new Error('can not found total info'));
-    }
-    if (!info.last_exist_sync_time) {
-      debug('First time sync all packages from official registry');
-      return Npm.getShort(ep.done(function (pkgs) {
-        if (!info.last_sync_module) {
-          return ep.emit('allPackages', pkgs);
-        }
-        // start from last success
-        var lastIndex = pkgs.indexOf(info.last_sync_module);
-        if (lastIndex > 0) {
-          pkgs = pkgs.slice(lastIndex);
-        }
-        ep.emit('allPackages', pkgs);
-      }));
-    }
-    Npm.getAllSince(info.last_exist_sync_time - ms('10m'), ep.done(function (data) {
-      if (!data) {
-        return ep.emit('allPackages', []);
-      }
-      if (data._updated) {
-        syncTime = data._updated;
-        delete data._updated;
-      }
-
-      return ep.emit('allPackages', Object.keys(data));
-    }));
+  var r = yield [Module.listShort(), Total.getTotalInfo()];
+  var existPackages = r[0].map(function (p) {
+    return p.name;
   });
+  var info = r[1];
+  if (!info) {
+    throw new Error('can not found total info');
+  }
 
-  ep.all('existPackages', 'allPackages', function (existPackages, allPackages) {
-    var packages = intersection(existPackages, allPackages);
-    debug('Total %d packages to sync', packages.length);
-    var worker = new SyncModuleWorker({
-      username: 'admin',
-      name: packages,
-      concurrency: config.syncConcurrency,
-    });
-    Status.init({
-      worker: worker,
-      need: packages.length
-    }).start();
-    worker.start();
-    worker.once('end', function () {
-      debug('All packages sync done, successes %d, fails %d',
-        worker.successes.length, worker.fails.length);
-      Total.setLastExistSyncTime(syncTime, utility.noop);
-      callback(null, {
-        successes: worker.successes,
-        fails: worker.fails
-      });
-    });
+  var allPackages;
+  if (!info.last_exist_sync_time) {
+    debug('First time sync all packages from official registry');
+    var pkgs = yield Npm.getShort();
+
+    if (info.last_sync_module) {
+      // start from last success
+      var lastIndex = pkgs.indexOf(info.last_sync_module);
+      if (lastIndex > 0) {
+        pkgs = pkgs.slice(lastIndex);
+      }
+    }
+    allPackages = pkgs;
+  } else {
+    debug('sync new module from last exist sync time');
+    var data = yield Npm.getAllSince(info.last_exist_sync_time - ms('10m'));
+    if (!data) {
+      allPackages = [];
+    }
+    if (data._updated) {
+      syncTime = data._updated;
+      delete data._updated;
+    }
+    allPackages = Object.keys(data);
+  }
+
+  var packages = intersection(existPackages, allPackages);
+  if (!packages.length) {
+    debug('no packages need be sync');
+    return;
+  }
+  debug('Total %d packages to sync', packages.length);
+
+  var worker = new SyncModuleWorker({
+    username: 'admin',
+    name: packages,
+    concurrency: config.syncConcurrency
   });
+  Status.init({need: packages.length}, worker);
+  worker.start();
+  yield thunkify(worker)();
+
+  debug('All packages sync done, successes %d, fails %d',
+    worker.successes.length, worker.fails.length);
+
+  Total.setLastExistSyncTime(syncTime, utility.noop);
+  return {
+    successes: worker.successes,
+    fails: worker.fails
+  };
 };

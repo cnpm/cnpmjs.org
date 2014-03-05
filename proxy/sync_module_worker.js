@@ -96,12 +96,23 @@ SyncModuleWorker.prototype.start = function () {
   }
 };
 
+SyncModuleWorker.prototype.pushSuccess = function (name) {
+  this.successes.push(name);
+  this.emit('success', name);
+};
+
+SyncModuleWorker.prototype.pushFail = function (name) {
+  this.fails.push(name);
+  this.emit('fail', name);
+};
+
 SyncModuleWorker.prototype.add = function (name) {
   if (this.nameMap[name]) {
     return;
   }
   this.nameMap[name] = true;
   this.names.push(name);
+  this.emit('add', name);
   this.log('    add dependencies: %s', name);
 };
 
@@ -121,9 +132,9 @@ SyncModuleWorker.prototype.next = function (concurrencyId) {
     }
     if (err) {
       if (statusCode === 404) {
-        that.successes.push(name);
+        that.pushSuccess(name);
       } else {
-        that.fails.push(name);
+        that.pushFail(name);
       }
       that.log('[error] [%s] get package error: %s', name, err.stack);
       delete that.syncingNames[name];
@@ -134,14 +145,13 @@ SyncModuleWorker.prototype.next = function (concurrencyId) {
     that._sync(name, pkg, function (err, versions) {
       delete that.syncingNames[name];
       if (err) {
-        that.fails.push(name);
+        that.pushFail(name);
         that.log('[error] [%s] sync error: %s', name, err.stack);
         return that.next(concurrencyId);
       }
       that.log('[%s] synced success, %d versions: %s',
         name, versions.length, versions.join(', '));
-      that.successes.push(name);
-      that.emit('success', name);
+      that.pushSuccess(name);
       that.next(concurrencyId);
     });
   });

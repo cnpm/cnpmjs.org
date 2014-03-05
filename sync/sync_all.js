@@ -25,6 +25,7 @@ var Total = require('../proxy/total');
 var SyncModuleWorker = require('../proxy/sync_module_worker');
 var Module = require('../proxy/module');
 var co = require('co');
+var thunkify = require('thunkify-wrap');
 
 function subtract(subtracter, minuend) {
   subtracter = subtracter || [];
@@ -95,7 +96,7 @@ function *getMissPackages(callback) {
   return subtract(allPackages, existPackages);
 }
 
-function *sync() {
+module.exports = function *sync() {
   var syncTime = Date.now();
   var info = yield Total.getTotalInfo();
   if (!info) {
@@ -112,79 +113,30 @@ function *sync() {
   }
 
   packages = packages || [];
+  if (!packages.length) {
+    debug('no packages need be sync');
+    return;
+  }
+  debug('Total %d packages to sync', packages.length);
+
   var worker = new SyncModuleWorker({
     username: 'admin',
     name: packages,
     noDep: true,
     concurrency: config.syncConcurrency,
   });
-  // Status.init({
-  //   worker: worker,
-  //   need: packages.length
-  // }).start();
+  Status.init({need: packages.length}, worker);
   worker.start();
-  worker.once('end', function () {
-    debug('All packages sync done, successes %d, fails %d',
+  yield thunkify(worker)();
+
+  debug('All packages sync done, successes %d, fails %d',
       worker.successes.length, worker.fails.length);
-    //only when all succss, set last sync time
-    !worker.fails.length && Total.setLastSyncTime(syncTime, utility.noop);
-    callback(null, {
-      successes: worker.successes,
-      fails: worker.fails
-    });
-  });
-}
-module.exports = function sync(callback) {
-  var ep = eventproxy.create();
-  ep.fail(callback);
-  var syncTime = Date.now();
-  Total.getTotalInfo(ep.doneLater('totalInfo'));
-
-  ep.once('totalInfo', function (info) {
-    if (!info) {
-      return callback(new Error('can not found total info'));
-    }
-    debug('Last sync time %s', new Date(info.last_sync_time));
-    // TODO: 记录上次同步的最后一个模块名称
-    if (!info.last_sync_time) {
-      debug('First time sync all packages from official registry');
-      return getFirstSyncPackages(info.last_sync_module, ep.done('syncPackages'));
-    }
-    if (syncNotExist) {
-      getMissPackages(ep.done('missPackages'));
-      syncNotExist = false;
-    } else {
-      ep.emitLater('missPackages', []);
-    }
-    getCommonSyncPackages(info.last_sync_time - ms('10m'), ep.doneLater('newestPackages'));
-    ep.all('missPackages', 'newestPackages', function (missPackages, newestPackages) {
-      ep.emit('syncPackages', union(missPackages, newestPackages));
-    });
-  });
-
-  ep.once('syncPackages', function (packages) {
-    packages = packages || [];
-    debug('Total %d packages to sync', packages.length);
-    var worker = new SyncModuleWorker({
-      username: 'admin',
-      name: packages,
-      noDep: true,
-      concurrency: config.syncConcurrency,
-    });
-    Status.init({
-      worker: worker,
-      need: packages.length
-    }).start();
-    worker.start();
-    worker.once('end', function () {
-      debug('All packages sync done, successes %d, fails %d',
-        worker.successes.length, worker.fails.length);
-      //only when all succss, set last sync time
-      !worker.fails.length && Total.setLastSyncTime(syncTime, utility.noop);
-      callback(null, {
-        successes: worker.successes,
-        fails: worker.fails
-      });
-    });
-  });
+  //only when all succss, set last sync time
+  if (!worker.fails.length) {
+    Total.setLastSyncTime(syncTime, utility.noop);
+  }
+  return {
+    successes: worker.successes,
+    fails: worker.fails
+  };
 };

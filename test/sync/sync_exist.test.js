@@ -18,6 +18,7 @@ var mm = require('mm');
 var Npm = require('../../proxy/npm');
 var Total = require('../../proxy/total');
 var should = require('should');
+var co = require('co');
 
 describe('sync/sync_exist.js', function () {
   describe('sync()', function () {
@@ -26,11 +27,11 @@ describe('sync/sync_exist.js', function () {
     it('should sync first time ok', function (done) {
       mm.data(Npm, 'getShort', ['cnpmjs.org', 'cutter']);
       mm.data(Total, 'getTotalInfo', {last_exist_sync_time: 0});
-      sync(function (err, data) {
-        should.not.exist(err);
+      co(function *() {
+        var data = yield sync();
         data.successes.should.eql(['cnpmjs.org', 'cutter']);
         done();
-      });
+      })();
     });
 
     it('should sync common ok', function (done) {
@@ -40,11 +41,11 @@ describe('sync/sync_exist.js', function () {
         cutter: {}
       });
       mm.data(Total, 'getTotalInfo', {last_exist_sync_time: Date.now()});
-      sync(function (err, data) {
-        should.not.exist(err);
+      co(function *() {
+        var data = yield sync();
         data.successes.should.eql(['cnpmjs.org', 'cutter']);
         done();
-      });
+      })();
     });
   });
 });
