@@ -66,7 +66,7 @@ module.exports = function *sync() {
     }
     allPackages = pkgs;
   } else {
-    debug('sync new module from last exist sync time');
+    debug('sync new module from last exist sync time: %s', info.last_sync_time);
     var data = yield Npm.getAllSince(info.last_exist_sync_time - ms('10m'));
     if (!data) {
       allPackages = [];

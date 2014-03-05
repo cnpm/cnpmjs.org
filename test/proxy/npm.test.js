@@ -19,6 +19,7 @@ var mm = require('mm');
 var fs = require('fs');
 var path = require('path');
 var npm = require('../../proxy/npm');
+var co = require('co');
 
 var fixtures = path.join(path.dirname(__dirname), 'fixtures');
 
@@ -26,41 +27,45 @@ describe('proxy/npm.test.js', function () {
   afterEach(mm.restore);
 
   it('should return a module info from source npm', function (done) {
-    npm.get('pedding', function (err, data) {
-      should.not.exist(err);
-      should.exist(data);
+    co(function *() {
+      var data = yield npm.get.bind(null, 'pedding');
       data.name.should.equal('pedding');
       done();
-    });
+    })();
   });
 
   it('should return null when module not exist', function (done) {
-    npm.get('pedding-not-exists', function (err, data) {
-      should.not.exist(err);
+    co(function *() {
+      var data = yield npm.get.bind(null, 'pedding-not-exists');
       should.not.exist(data);
       done();
-    });
+    })();
   });
 
   it('should return error when http error', function (done) {
     mm.http.request(/\//, '{');
-    npm.get('pedding-not-exists', function (err, data) {
-      should.exist(err);
-      err.name.should.equal('JSONResponseFormatError');
-      should.not.exist(data);
-      done();
-    });
+    co(function *() {
+      try {
+        var data = yield npm.get.bind(null, 'pedding-not-exists');
+      } catch (err) {
+        err.name.should.equal('JSONResponseFormatError');
+        done();
+      }
+    })();
   });
 
   it('should return ServerError when http 500 response', function (done) {
     var content = fs.readFileSync(path.join(fixtures, '500.txt'), 'utf8');
     mm.http.request(/\//, content, { statusCode: 500 });
     // http://registry.npmjs.org/octopie
-    npm.get('octopie', function (err, data) {
-      should.exist(err);
-      err.name.should.equal('NPMServerError');
-      err.message.should.equal('Status 500, ' + content);
-      done();
-    });
+    co(function *() {
+      try {
+        var data = yield npm.get.bind(null, 'octopie');
+      } catch (err) {
+        err.name.should.equal('NPMServerError');
+        err.message.should.equal('Status 500, ' + content);
+        done();
+      }
+    })();
   });
 });
