@@ -72,6 +72,7 @@ var config = {
     debug: false
   },
 
+  disturl: 'http://dist.u.qiniudn.com',
   logoURL: 'http://ww4.sinaimg.cn/large/69c1d4acgw1ebfly5kjlij208202oglr.jpg',
   registryHost: 'r.cnpmjs.org',
   customFooter: '', // you can add copyright and site total script html here
