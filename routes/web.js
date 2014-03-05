@@ -1,4 +1,4 @@
-/*!
+/**!
  * cnpmjs.org - routes/web.js
  *
  * Copyright(c) cnpmjs.org and other contributors.
@@ -19,6 +19,7 @@ var pkg = require('../controllers/web/package');
 var user = require('../controllers/web/user');
 var sync = require('../controllers/sync');
 var total = require('../controllers/total');
+var dist = require('../controllers/web/dist');
 
 function routes(app) {
   app.get('/total', total.show);
@@ -34,6 +35,8 @@ function routes(app) {
   app.get('/sync', pkg.displaySync);
 
   app.get('/_list/search/search', pkg.rangeSearch);
+
+  app.get(/^\/dist(\/.+)?/, dist.redirect);
 }
 
 module.exports = routes;
