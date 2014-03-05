@@ -20,7 +20,7 @@ Private npm registry and web for Enterprise, base on [koa](http://koajs.com/), M
 ## Install
 
 ```bash
-$ npm install --registry=http://r.cnpmjs.org --disturl=http://dist.u.qiniudn.com
+$ npm install --registry=http://r.cnpmjs.org --disturl=http://cnpmjs.org/dist
 ```
 
 ## Usage

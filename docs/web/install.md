@@ -103,13 +103,13 @@ npm install -g cnpm
 alias lnpm='cnpm --registry=http://localhost:7001\
  --registryweb=http://localhost:7002\
  --cache=$HOME/.npm/.cache/lnpm\
- --disturl=http://dist.u.qiniudn.com\
+ --disturl=http://cnpmjs.org/dist\
  --userconfig=$HOME/.lnpmrc'
 
  #or put this in .zshrc or .bashrc
  echo "#lnpm alias\nalias lnpm='cnpm --registry=http://localhost:7001\
  --registryweb=http://localhost:7002\
  --cache=$HOME/.npm/.cache/lnpm\
- --disturl=http://dist.u.qiniudn.com\
+ --disturl=http://cnpmjs.org/dist\
  --userconfig=$HOME/.lnpmrc'" >> $HOME/.zshrc && source $HOME/.zshrc
 ```

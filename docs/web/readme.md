@@ -122,13 +122,13 @@ alias it:
 ```bash
 alias cnpm="npm --registry=http://r.cnpmjs.org \
 --cache=$HOME/.npm/.cache/cnpm \
---disturl=http://dist.u.qiniudn.com \
+--disturl=http://cnpmjs.org/dist \
 --userconfig=$HOME/.cnpmrc"
 
 #Or alias it in .bashrc or .zshrc
 $ echo '\n#alias for cnpm\nalias cnpm="npm --registry=http://r.cnpmjs.org \
   --cache=$HOME/.npm/.cache/cnpm \
-  --disturl=http://dist.u.qiniudn.com \
+  --disturl=http://cnpmjs.org/dist \
   --userconfig=$HOME/.cnpmrc"' >> ~/.zshrc && source ~/.zshrc
 ```
 
