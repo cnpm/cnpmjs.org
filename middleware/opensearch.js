@@ -30,5 +30,5 @@ module.exports = function *publishable(next) {
     this.charset = 'utf-8';
     this.body = template.replace('${host}', this.host);
   }
-  yield next;
+  yield* next;
 };

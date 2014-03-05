@@ -59,7 +59,7 @@ exports.display = function *(next) {
   var users = r[3];
 
   if (!pkg || !pkg.package) {
-    return yield next;
+    return yield* next;
   }
 
   pkg.package.fromNow = moment(pkg.publish_time).fromNow();

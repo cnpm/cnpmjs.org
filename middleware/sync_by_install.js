@@ -24,11 +24,11 @@ var config = require('../config');
 module.exports = function *(next) {
   if (!config.syncByInstall || !config.enablePrivate) {
     // only config.enablePrivate should enable sync on install
-    return yield next;
+    return yield* next;
   }
   // request not by node, consider it request from web
   if (this.get('user-agent') && this.get('user-agent').indexOf('node') !== 0) {
-    return yield next;
+    return yield* next;
   }
 
   this.session.allowSync = true;
@@ -41,5 +41,5 @@ module.exports = function *(next) {
   this.session.allowSync = false;
 
   debug('%s allowSync: %s', this.session.name, this.session.allowSync);
-  yield next;
+  yield* next;
 };

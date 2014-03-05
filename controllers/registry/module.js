@@ -231,7 +231,7 @@ exports.download = function *(next) {
 
   if (!row || !row.package || !row.package.dist) {
     if (!url) {
-      return yield next;
+      return yield* next;
     }
     this.status = 302;
     this.set('Location', url);
@@ -250,7 +250,7 @@ exports.download = function *(next) {
 
   // else use `dist.key` to get tarball from nfs
   if (!nfs.download) {
-    return yield next;
+    return yield* next;
   }
 
   _downloads[name] = (_downloads[name] || 0) + 1;
@@ -328,7 +328,7 @@ exports.upload = function *(next) {
   var length = Number(this.get('content-length')) || 0;
   if (!length || !this.is('application/octet-stream')) {
     debug('request length or type error');
-    return yield next;
+    return yield* next;
   }
 
   var username = this.session.name;
@@ -343,7 +343,7 @@ exports.upload = function *(next) {
   var mod = yield Module.getById(id);
   if (!mod) {
     debug('can not get this module');
-    return yield next;
+    return yield* next;
   }
   if (!common.isMaintainer(this, mod.package.maintainers) || mod.name !== name) {
     this.status = 403;
@@ -451,7 +451,7 @@ exports.updateLatest = function *(next) {
   var nextMod = yield Module.get(name, 'next');
   if (!nextMod) {
     debug('can not get nextMod');
-    return yield next;
+    return yield* next;
   }
   var match = nextMod.package.maintainers.filter(function (item) {
     return item.name === username;
@@ -699,7 +699,7 @@ exports.removeWithVersions = function *(next) {
   // step1: list all the versions
   var mods = yield Module.listByName(name);
   if (!mods || !mods.length) {
-    return yield next;
+    return yield* next;
   }
 
   // step2: check permission
@@ -782,7 +782,7 @@ exports.removeTar = function *(next) {
 
   var mod = yield Module.getById(id);
   if (!mod) {
-    return yield next;
+    return yield* next;
   }
 
   if (!common.isMaintainer(this, mod.package.maintainers) || mod.name !== name) {
@@ -809,7 +809,7 @@ exports.removeAll = function *(next) {
   debug('removeAll module %s: %d', name, mods.length);
   var mod = mods[0];
   if (!mod) {
-    return yield next;
+    return yield* next;
   }
 
   if (!common.isMaintainer(this, mod.package.maintainers) || mod.name !== name) {
