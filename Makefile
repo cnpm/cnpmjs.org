@@ -5,7 +5,7 @@ MOCHA_OPTS =
 
 install:
 	@npm install --registry=http://registry.cnpmjs.org \
-		--cache=${HOME}/.npm/.cache/cnpm --disturl=http://dist.u.qiniudn.com
+		--disturl=http://cnpmjs.org/dist
 
 test:
 	@NODE_ENV=test node --harmony \

@@ -1,4 +1,11 @@
 
+0.3.5 / 2014-03-05 
+==================
+
+  * redirect /dist/xxx.tgz => http://dist.u.qiniudn.com/xxx.tgz fixed #249
+  * redirect /name to /package/name when /name is 404. fixed #245
+  * Add missing properies and sync missing star users. fixed #235
+
 0.3.4 / 2014-03-04 
 ==================
 
