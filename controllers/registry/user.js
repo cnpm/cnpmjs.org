@@ -23,7 +23,7 @@ exports.show = function *(next) {
   var name = this.params.name;
   var user = yield User.get(name);
   if (!user) {
-    return yield next;
+    return yield* next;
   }
   this.etag = '"' + user.rev + '"';
   var data = {
@@ -111,7 +111,7 @@ exports.update = function *(next) {
   var name = this.params.name;
   var rev = this.params.rev;
   if (!name || !rev) {
-    return yield next;
+    return yield* next;
   }
 
   debug('update: %s, rev: %s, session.name: %s', name, rev, this.session.name);

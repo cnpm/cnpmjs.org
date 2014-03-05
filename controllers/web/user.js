@@ -23,7 +23,7 @@ exports.display = function *(next) {
   var packages = r[0];
   var user = r[1];
   if (!user && !packages.length) {
-    return yield next;
+    return yield* next;
   }
   user = {
     name: name,

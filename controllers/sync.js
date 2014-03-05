@@ -65,7 +65,7 @@ exports.getSyncLog = function *(next) {
   var offset = Number(this.query.offset) || 0;
   var row = yield Log.get(logId);
   if (!row) {
-    return yield next;
+    return yield* next;
   }
 
   var log = row.log.trim();

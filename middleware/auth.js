@@ -25,24 +25,24 @@ module.exports = function (options) {
     if (!this.session) {
       // redis crash
       this.session = {};
-      return yield next;
+      return yield* next;
     }
     this.session.onlySync = config.enablePrivate ? true : false;
     if (this.session.name) {
       this.session.isAdmin = common.isAdmin(this.session.name);
       debug('auth exists user: %s, onlySync: %s, isAdmin: %s, headers: %j',
         this.session.name, this.session.onlySync, this.session.isAdmin, this.header);
-      return yield next;
+      return yield* next;
     }
     var authorization = (this.get('authorization') || '').split(' ')[1] || '';
     authorization = authorization.trim();
     if (!authorization) {
-      return yield next;
+      return yield* next;
     }
 
     authorization = new Buffer(authorization, 'base64').toString().split(':');
     if (authorization.length !== 2) {
-      return yield next;
+      return yield* next;
     }
 
     var username = authorization[0];
@@ -53,13 +53,13 @@ module.exports = function (options) {
       debug('auth fail user: %j, headers: %j', row, this.header);
       this.session.name = null;
       this.session.isAdmin = false;
-      return yield next;
+      return yield* next;
     }
 
     this.session.name = row.name;
     this.session.isAdmin = common.isAdmin(this.session.name);
     debug('auth pass user: %j, onlySync: %s, isAdmin: %s, headers: %j',
       row, this.session.onlySync, this.session.isAdmin, this.header);
-    yield next;
+    yield* next;
   };
 };

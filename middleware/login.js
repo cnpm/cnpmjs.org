@@ -23,5 +23,5 @@ module.exports = function *login(next) {
     };
     return;
   }
-  yield next;
+  yield* next;
 };

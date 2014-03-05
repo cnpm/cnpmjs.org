@@ -1,4 +1,4 @@
-/*!
+/**!
  * cnpmjs.org - dispatch.js
  *
  * Copyright(c) cnpmjs.org and other contributors.
