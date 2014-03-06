@@ -29,6 +29,8 @@ $ npm install --registry=http://r.cnpmjs.org --disturl=http://cnpmjs.org/dist
 $ node --harmony-generators dispatch.js
 ```
 
+**Notice**: need node version >=0.11.9
+
 ## Guide
 
 * [How to deploy cnpmjs.org](https://github.com/cnpm/cnpmjs.org/wiki/Deploy)
