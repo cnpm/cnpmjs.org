@@ -167,7 +167,7 @@ describe('controllers/web/package.test.js', function () {
         url: 'http://opensource.org/licenses/MIT'
       });
 
-      var p = {license: ['http://foo/MIT']};
+      p = {license: ['http://foo/MIT']};
       pkg.setLicense(p);
       p.license.should.have.keys('name', 'url');
       p.license.should.eql({
@@ -175,7 +175,7 @@ describe('controllers/web/package.test.js', function () {
         url: 'http://foo/MIT'
       });
 
-      var p = {license: {name: 'mit', url: 'http://foo/mit'}};
+      p = {license: {name: 'mit', url: 'http://foo/mit'}};
       pkg.setLicense(p);
       p.license.should.have.keys('name', 'url');
       p.license.should.eql({

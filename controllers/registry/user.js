@@ -16,7 +16,6 @@
  */
 
 var debug = require('debug')('cnpmjs.org:controllers:registry');
-var logger = require('../../common/logger');
 var User = require('../../proxy/user');
 
 exports.show = function *(next) {

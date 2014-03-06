@@ -117,7 +117,7 @@ describe('controllers/registry/module.test.js', function () {
       request(app)
       .get('/cnpmjs.org')
       .set('If-None-Match', etag)
-      .expect(304, done)
+      .expect(304, done);
     });
   });
 
@@ -562,7 +562,7 @@ describe('controllers/registry/module.test.js', function () {
       request(app)
       .get('/cutter/download/cutter-0.0.2.tgz')
       .expect('Location', 'http://qtestbucket.qiniudn.com/cutter/-/cutter-0.0.2.tgz')
-      .expect(302, done)
+      .expect(302, done);
     });
   });
 

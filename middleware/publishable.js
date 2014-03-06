@@ -24,5 +24,5 @@ module.exports = function *publishable(next) {
     };
     return;
   }
-  yield* next;
+  yield *next;
 };

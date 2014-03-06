@@ -45,7 +45,7 @@ describe('proxy/module_star.test.js', function () {
       yield Star.add('testmodule', 'mk2');
 
       var rows = yield Star.listUsers('testmodule');
-      rows.should.containDeep(['fengmk2', 'mk1', 'mk2'])
+      rows.should.containDeep(['fengmk2', 'mk1', 'mk2']);
       done();
     })();
   });
@@ -57,7 +57,7 @@ describe('proxy/module_star.test.js', function () {
       yield Star.add('testmodule2', 'fengmk2');
 
       var rows = yield Star.listUserModules('fengmk2');
-      rows.should.containDeep(['testmodule', 'testmodule1', 'testmodule2'])
+      rows.should.containDeep(['testmodule', 'testmodule1', 'testmodule2']);
       done();
     })();
   });
