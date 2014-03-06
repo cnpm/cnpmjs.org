@@ -20,6 +20,15 @@ test:
 		$(TESTS)
 	@-$(MAKE) check-coverage
 
+test-dev: install
+	@NODE_ENV=test ./node_modules/mocha/bin/mocha \
+		--harmony-generators \
+		--reporter $(REPORTER) \
+		--timeout $(TIMEOUT) \
+		--require should \
+		$(MOCHA_OPTS) \
+		$(TESTS)
+
 check-coverage:
 	@./node_modules/.bin/istanbul check-coverage \
 		--statements 100 \
