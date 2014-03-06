@@ -17,10 +17,9 @@
 var thunkify = require('thunkify-wrap');
 var urllib = require('urllib');
 var config = require('../config');
-var co = require('co');
 thunkify(urllib, ['request']);
 
-function *request(url, options) {
+function *request (url, options) {
   options = options || {};
   options.dataType = options.dataType || 'json';
   options.timeout = options.timeout || 120000;
@@ -40,7 +39,7 @@ function *request(url, options) {
   return r;
 }
 
-exports.get = co(function *(name) {
+exports.get = function *(name) {
   var r = yield request('/' + name);
   var data = r[0];
   var res = r[1];
@@ -48,20 +47,20 @@ exports.get = co(function *(name) {
     data = null;
   }
   return data;
-});
+};
 
-exports.getAllSince = co(function *(startkey) {
+exports.getAllSince = function *(startkey) {
   var r = yield request('/-/all/since?stale=update_after&startkey=' + startkey, {
     dataType: 'json',
     timeout: 300000
   });
   return r[0];
-});
+};
 
-exports.getShort = co(function *() {
+exports.getShort = function *() {
   var r = yield request('/-/short', {
     dataType: 'json',
     timeout: 300000
   });
   return r[0];
-});
+};

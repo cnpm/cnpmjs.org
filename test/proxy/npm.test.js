@@ -28,7 +28,7 @@ describe('proxy/npm.test.js', function () {
 
   it('should return a module info from source npm', function (done) {
     co(function *() {
-      var data = yield npm.get.bind(null, 'pedding');
+      var data = yield npm.get('pedding');
       data.name.should.equal('pedding');
       done();
     })();
@@ -36,7 +36,7 @@ describe('proxy/npm.test.js', function () {
 
   it('should return null when module not exist', function (done) {
     co(function *() {
-      var data = yield npm.get.bind(null, 'pedding-not-exists');
+      var data = yield npm.get('pedding-not-exists');
       should.not.exist(data);
       done();
     })();
@@ -46,7 +46,7 @@ describe('proxy/npm.test.js', function () {
     mm.http.request(/\//, '{');
     co(function *() {
       try {
-        var data = yield npm.get.bind(null, 'pedding-not-exists');
+        var data = yield npm.get('pedding-not-exists');
       } catch (err) {
         err.name.should.equal('JSONResponseFormatError');
         done();
@@ -60,7 +60,7 @@ describe('proxy/npm.test.js', function () {
     // http://registry.npmjs.org/octopie
     co(function *() {
       try {
-        var data = yield npm.get.bind(null, 'octopie');
+        var data = yield npm.get('octopie');
       } catch (err) {
         err.name.should.equal('NPMServerError');
         err.message.should.equal('Status 500, ' + content);
