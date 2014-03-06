@@ -37,9 +37,6 @@ module.exports = function *(next) {
     this.session.allowSync = false;
   }
 
-  // TODO: allow sync will let publish sync package...
-  this.session.allowSync = false;
-
   debug('%s allowSync: %s', this.session.name, this.session.allowSync);
   yield *next;
 };
