@@ -158,7 +158,7 @@ describe('proxy/module.test.js', function () {
           should.not.exist(err);
           data.package.readme.should.equal('test');
           done();
-        })
+        });
       });
     });
   });

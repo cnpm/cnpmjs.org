@@ -175,7 +175,7 @@ function _addStar(modName, username, callback) {
     }
     callback(err);
   })();
-};
+}
 
 SyncModuleWorker.prototype._sync = function (name, pkg, callback) {
   var username = this.username;

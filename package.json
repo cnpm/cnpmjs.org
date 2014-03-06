@@ -20,7 +20,6 @@
     "co-write": "0.3.0",
     "debug": "0.7.4",
     "eventproxy": "0.3.0",
-    "forward": "0.0.4",
     "giturl": "0.0.2",
     "graceful": "0.0.6",
     "gravatar": "1.0.6",
@@ -40,8 +39,8 @@
     "qn": "0.2.0",
     "ready": "0.1.1",
     "semver": "2.2.1",
-    "thunkify-wrap": "0.0.4",
-    "urllib": "0.5.5",
+    "thunkify-wrap": "0.0.5",
+    "urllib": "0.5.6",
     "utility": "0.1.10"
   },
   "devDependencies": {
@@ -49,6 +48,7 @@
     "contributors": "*",
     "cov": "*",
     "istanbul": "git://github.com/gotwarlost/istanbul.git#harmony",
+    "jshint": "*",
     "mm": "0.2.0",
     "mocha": "*",
     "pedding": "0.0.3",

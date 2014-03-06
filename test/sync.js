@@ -18,8 +18,8 @@ var SyncModuleWorker = require('../proxy/sync_module_worker');
 var mysql = require('../common/mysql');
 var Log = require('../proxy/module_log');
 
-var name = process.argv[2] || 'byte';
-var names = name.split(',');
+var names = process.argv[2] || 'byte';
+names = names.split(',');
 
 Log.create({
   name: names[0],

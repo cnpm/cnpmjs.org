@@ -31,7 +31,6 @@ var Module = require('../../proxy/module');
 var Total = require('../../proxy/total');
 var nfs = require('../../common/nfs');
 var common = require('../../lib/common');
-var Log = require('../../proxy/module_log');
 var DownloadTotal = require('../../proxy/download');
 var SyncModuleWorker = require('../../proxy/sync_module_worker');
 var logger = require('../../common/logger');
@@ -369,7 +368,7 @@ exports.upload = function *(next) {
   var dataSize = 0;
 
   var buf;
-  while(buf = yield coRead(this.req)) {
+  while (buf = yield coRead(this.req)) {
     shasum.update(buf);
     dataSize += buf.length;
     yield coWrite(ws, buf);
@@ -801,9 +800,9 @@ exports.removeTar = function *(next) {
 
 exports.removeAll = function *(next) {
   debug('remove all the module with name: %s, id: %s', this.params.name, this.params.rev);
-  var id = Number(this.params.rev);
+  // var id = Number(this.params.rev);
   var name = this.params.name;
-  var username = this.session.name;
+  // var username = this.session.name;
 
   var mods = yield Module.listByName(name);
   debug('removeAll module %s: %d', name, mods.length);
@@ -813,8 +812,8 @@ exports.removeAll = function *(next) {
   }
 
   if (!common.isMaintainer(this, mod.package.maintainers) || mod.name !== name) {
-    res.status = 403;
-    res.body = {
+    this.status = 403;
+    this.body = {
       error: 'no_perms',
       reason: 'Current user can not delete this tarball'
     };
@@ -860,13 +859,13 @@ function parseModsForList(updated, mods, ctx) {
   return results;
 }
 
-exports.listAllModules = function *(next) {
+exports.listAllModules = function *() {
   var updated = Date.now();
   var mods = yield Module.listSince(0);
   this.body = parseModsForList(updated, mods, this);
 };
 
-exports.listAllModulesSince = function *(next) {
+exports.listAllModulesSince = function *() {
   var query = this.query || {};
   if (query.stale !== 'update_after') {
     this.status = 400;
@@ -884,7 +883,7 @@ exports.listAllModulesSince = function *(next) {
   this.body = parseModsForList(updated, mods, this);
 };
 
-exports.listAllModuleNames = function *(next) {
+exports.listAllModuleNames = function *() {
   this.body = (yield Module.listShort()).map(function (m) {
     return m.name;
   });

@@ -7,6 +7,9 @@ install:
 	@npm install --registry=http://registry.cnpmjs.org \
 		--disturl=http://cnpmjs.org/dist
 
+jshint:
+	@./node_modules/.bin/jshint ./
+
 test:
 	@NODE_ENV=test node --harmony \
 		node_modules/.bin/istanbul cover ./node_modules/.bin/_mocha \
@@ -31,7 +34,7 @@ contributors:
 	@./node_modules/.bin/contributors -f plain -o AUTHORS
 
 autod:
-	@./node_modules/.bin/autod -w -e public,view,docs,backup
+	@./node_modules/.bin/autod -w -e public,view,docs,backup,coverage
 	@$(MAKE) install
 
 .PHONY: test

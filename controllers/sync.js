@@ -61,7 +61,6 @@ exports.sync = function *() {
 
 exports.getSyncLog = function *(next) {
   var logId = this.params.id;
-  var name = this.params.name;
   var offset = Number(this.query.offset) || 0;
   var row = yield Log.get(logId);
   if (!row) {
