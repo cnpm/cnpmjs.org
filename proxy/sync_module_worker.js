@@ -364,6 +364,7 @@ SyncModuleWorker.prototype._sync = function *(name, pkg) {
   while (missingVersions.length) {
     var index = syncIndex++;
     var syncModule = missingVersions.shift();
+    console.log(syncModule.dist);
     try {
       var result = yield that._syncOneVersion(index, syncModule);
       versionNames.push(syncModule.version);
