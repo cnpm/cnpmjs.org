@@ -1,4 +1,14 @@
 
+0.3.6 / 2014-03-06 
+==================
+
+  * install missing package should sync it from source npm. fixed #252
+  * npm publish dont contains .jshint*
+  * npm test run jshint
+  * Add jshint check: $ make jshint
+  * use `yield* next` instead of `yield next`
+  * replace dist.u.qiniudn.com with cnpmjs.org/dist
+
 0.3.5 / 2014-03-05 
 ==================
 
