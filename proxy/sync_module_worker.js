@@ -24,7 +24,6 @@ var util = require('util');
 var fs = require('fs');
 var path = require('path');
 var crypto = require('crypto');
-var eventproxy = require('eventproxy');
 var urllib = require('urllib');
 var utility = require('utility');
 var ms = require('ms');
@@ -160,16 +159,16 @@ SyncModuleWorker.prototype.next = function *(concurrencyId) {
   try {
     var versions = yield that._sync(name, pkg);
   } catch (err) {
-    delete that.syncingNames[name];
     that.pushFail(name);
     that.log('[error] [%s] sync error: %s', name, err.stack);
+    delete that.syncingNames[name];
     yield that.next(concurrencyId);
     return;
   }
-  delete that.syncingNames[name];
   that.log('[%s] synced success, %d versions: %s',
     name, versions.length, versions.join(', '));
   that.pushSuccess(name);
+  delete that.syncingNames[name];
   yield that.next(concurrencyId);
 };
 
@@ -361,10 +360,13 @@ SyncModuleWorker.prototype._sync = function *(name, pkg) {
 
   var versionNames = [];
   var syncIndex = 0;
+
   while (missingVersions.length) {
     var index = syncIndex++;
     var syncModule = missingVersions.shift();
-    console.log(syncModule.dist);
+    if (!syncModule.dist.tarball) {
+      continue;
+    }
     try {
       var result = yield that._syncOneVersion(index, syncModule);
       versionNames.push(syncModule.version);
@@ -422,7 +424,7 @@ SyncModuleWorker.prototype._sync = function *(name, pkg) {
 
   function *syncReadme() {
     if (missingReadmes.length === 0) {
-      return ep.emit('readmeDone');
+      return;
     }
     that.log('  [%s] saving %d readmes', name, missingReadmes.length);
 
@@ -443,7 +445,7 @@ SyncModuleWorker.prototype._sync = function *(name, pkg) {
 
   function *syncUser() {
     if (missingStarUsers.length === 0) {
-      return ep.emit('starUserDone');
+      return;
     }
 
     that.log('  [%s] saving %d star users', name, missingStarUsers.length);

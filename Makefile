@@ -11,6 +11,16 @@ jshint:
 	@./node_modules/.bin/jshint ./
 
 test:
+	@NODE_ENV=test ./node_modules/mocha/bin/mocha \
+		--harmony-generators \
+		--reporter $(REPORTER) \
+		--timeout $(TIMEOUT) \
+		--require should \
+		$(MOCHA_OPTS) \
+		$(TESTS)
+
+
+test-cov:
 	@NODE_ENV=test node --harmony \
 		node_modules/.bin/istanbul cover ./node_modules/.bin/_mocha \
 		-- -u exports \
@@ -19,15 +29,6 @@ test:
 		$(MOCHA_OPTS) \
 		$(TESTS)
 	@-$(MAKE) check-coverage
-
-test-dev: install
-	@NODE_ENV=test ./node_modules/mocha/bin/mocha \
-		--harmony-generators \
-		--reporter $(REPORTER) \
-		--timeout $(TIMEOUT) \
-		--require should \
-		$(MOCHA_OPTS) \
-		$(TESTS)
 
 check-coverage:
 	@./node_modules/.bin/istanbul check-coverage \
