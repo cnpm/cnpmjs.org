@@ -144,7 +144,7 @@ SyncModuleWorker.prototype.next = function *(concurrencyId) {
     }
     that.log('[error] [%s] get package error: %s', name, err.stack);
     delete that.syncingNames[name];
-    yield that.next(concurrencyId);
+    yield *that.next(concurrencyId);
     return;
   }
   if (!pkg) {
@@ -157,12 +157,12 @@ SyncModuleWorker.prototype.next = function *(concurrencyId) {
   that.log('[c#%d] [%s] start...', concurrencyId, name);
   var versions;
   try {
-    var versions = yield that._sync(name, pkg);
+    versions = yield that._sync(name, pkg);
   } catch (err) {
     that.pushFail(name);
     that.log('[error] [%s] sync error: %s', name, err.stack);
     delete that.syncingNames[name];
-    yield that.next(concurrencyId);
+    yield *that.next(concurrencyId);
     return;
   }
   that.log('[%s] synced success, %d versions: %s',
@@ -178,11 +178,11 @@ function *_listStarUsers(modName) {
   users.forEach(function (user) {
     userMap[user] = true;
   });
-  return users;
+  return userMap;
 }
 
 function *_addStar(modName, username) {
-  yield ModuleDeps.add(modName, username);
+  yield ModuleStar.add(modName, username);
 }
 
 SyncModuleWorker.prototype._sync = function *(name, pkg) {
@@ -315,8 +315,8 @@ SyncModuleWorker.prototype._sync = function *(name, pkg) {
       // * shasum make sure equal
       if ((version.publish_time === exists.publish_time) ||
           (!version.publish_time && exists.publish_time)) {
-        debug('  [%s] %s publish_time equal: %s, %s',
-          name, version.version, version.publish_time, exists.publish_time);
+        // debug('  [%s] %s publish_time equal: %s, %s',
+        //   name, version.version, version.publish_time, exists.publish_time);
         // * publish_time make sure equal
         if (exists.description === null && version.description) {
           // * make sure description exists

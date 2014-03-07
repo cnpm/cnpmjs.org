@@ -8,7 +8,7 @@ install:
 		--disturl=http://cnpmjs.org/dist
 
 jshint:
-	@./node_modules/.bin/jshint ./
+	@-./node_modules/.bin/jshint ./
 
 test:
 	@NODE_ENV=test ./node_modules/mocha/bin/mocha \

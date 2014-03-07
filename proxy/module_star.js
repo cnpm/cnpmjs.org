@@ -34,7 +34,8 @@ exports.remove = function *(name, user) {
 
 exports.listUsers = function *(name) {
   var sql = 'SELECT user FROM module_star WHERE name = ?;';
-  return (yield mysql.query(sql, [name])).map(function (r) {
+  var rows = yield mysql.query(sql, [name]);
+  return rows.map(function (r) {
     return r.user;
   });
 };
