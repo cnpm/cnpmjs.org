@@ -349,18 +349,18 @@ SyncModuleWorker.prototype._sync = function *(name, pkg) {
 
   if (versions.length === 0) {
     that.log('  [%s] all versions are exists', name);
-    return versions;
+  } else {
+    versions.sort(function (a, b) {
+      return a.publish_time - b.publish_time;
+    });
+    that.log('  [%s] %d versions need to sync', name, versions.length);
   }
 
-  versions.sort(function (a, b) {
-    return a.publish_time - b.publish_time;
-  });
   missingVersions = versions;
-  that.log('  [%s] %d versions need to sync', name, versions.length);
-
   var versionNames = [];
   var syncIndex = 0;
 
+  // sync missing versions
   while (missingVersions.length) {
     var index = syncIndex++;
     var syncModule = missingVersions.shift();
@@ -376,6 +376,7 @@ SyncModuleWorker.prototype._sync = function *(name, pkg) {
     }
   }
 
+  // sync missing descriptions
   function *syncDes() {
     if (missingDescriptions.length === 0) {
       return;
@@ -398,6 +399,7 @@ SyncModuleWorker.prototype._sync = function *(name, pkg) {
     }
   }
 
+  // sync missing tags
   function *syncTag() {
     if (missingTags.length === 0) {
       return;
@@ -422,6 +424,7 @@ SyncModuleWorker.prototype._sync = function *(name, pkg) {
     }
   }
 
+  // sycn missing readme
   function *syncReadme() {
     if (missingReadmes.length === 0) {
       return;
@@ -443,13 +446,14 @@ SyncModuleWorker.prototype._sync = function *(name, pkg) {
     }
   }
 
+  // sync missing star users
   function *syncUser() {
     if (missingStarUsers.length === 0) {
       return;
     }
 
     that.log('  [%s] saving %d star users', name, missingStarUsers.length);
-    var res = gather(missingStarUsers.map(function (username) {
+    var res = yield gather(missingStarUsers.map(function (username) {
       return _addStar(name, username);
     }));
 
