@@ -22,6 +22,7 @@ var utility = require('utility');
 var debug = require('debug')('cnpmjs.org:sync:index');
 var Total = require('../proxy/total');
 var logger = require('../common/logger');
+var co = require('co');
 
 var sync;
 
@@ -40,22 +41,27 @@ Total.updateSyncStatus(0, utility.noop);
 // the same time only sync once
 var syncing = false;
 
-function handleSync() {
+var handleSync = co(function *() {
   debug('mode: %s, syncing: %s', config.syncModel, syncing);
-  // check sync every one 30 minutes
   if (!syncing) {
     syncing = true;
     debug('start syncing');
-    sync(function (err, data) {
-      if (config.debug) {
-        console.log(err, data);
-      } else {
-        sendMailToAdmin(err, data, new Date());
-      }
-      syncing = false;
-    });
+    var data;
+    var error;
+    try {
+      var data = yield *sync();
+    } catch (err) {
+      error = err;
+    }
+    if (config.debug) {
+      error && console.error(error.stack);
+      data && console.log(data);
+    } else {
+      sendMailToAdmin(error, data, new Date());
+    }
+    syncing = false;
   }
-}
+});
 
 if (sync) {
   handleSync();

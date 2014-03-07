@@ -24,6 +24,8 @@ var Npm = require('../proxy/npm');
 var Total = require('../proxy/total');
 var SyncModuleWorker = require('../proxy/sync_module_worker');
 var Module = require('../proxy/module');
+var co = require('co');
+var thunkify = require('thunkify-wrap');
 
 function subtract(subtracter, minuend) {
   subtracter = subtracter || [];
@@ -55,109 +57,86 @@ function union(arrOne, arrTwo) {
  * when sync from official at the first time
  * get all packages by short and restart from last synced module
  * @param {String} lastSyncModule
- * @param {Function} callback
  */
-function getFirstSyncPackages(lastSyncModule, callback) {
-  Npm.getShort(function (err, pkgs) {
-    if (err || !lastSyncModule) {
-      return callback(err, pkgs);
-    }
-    // start from last success
-    var lastIndex = pkgs.indexOf(lastSyncModule);
-    if (lastIndex > 0) {
-      pkgs = pkgs.slice(lastIndex);
-    }
-    return callback(null, pkgs);
-  });
+function *getFirstSyncPackages(lastSyncModule) {
+  var pkgs = yield Npm.getShort();
+  if (!lastSyncModule) {
+    return pkgs;
+  }
+  // start from last success
+  var lastIndex = pkgs.indexOf(lastSyncModule);
+  if (lastIndex > 0) {
+    return pkgs.slice(lastIndex);
+  }
 }
 
 /**
  * get all the packages that update time > lastSyncTime
  * @param {Number} lastSyncTime
- * @param {Function} callback
  */
-function getCommonSyncPackages(lastSyncTime, callback) {
-  Npm.getAllSince(lastSyncTime, function (err, data) {
-    if (err || !data) {
-      return callback(err, []);
-    }
-    delete data._updated;
-    return callback(null, Object.keys(data));
-  });
+function *getCommonSyncPackages(lastSyncTime) {
+  var data = yield Npm.getAllSince(lastSyncTime);
+  if (!data) {
+    return [];
+  }
+  delete data._updated;
+  return Object.keys(data);
 }
 
 /**
  * get all the missing packages
  * @param {Function} callback
  */
-function getMissPackages(callback) {
-  var ep = eventproxy.create();
-  ep.fail(callback);
-  Npm.getShort(ep.doneLater('allPackages'));
-  Module.listAllModuleNames(ep.doneLater(function (rows) {
-    var existPackages = rows.map(function (row) {
-      return row.name;
-    });
-    ep.emit('existPackages', existPackages);
-  }));
-  ep.all('allPackages', 'existPackages', function (allPackages, existPackages) {
-    callback(null, subtract(allPackages, existPackages));
+function *getMissPackages(callback) {
+  var r = yield [Npm.getShort(), Module.listAllModuleNames];
+  var allPackages = r[0];
+  var existPackages = r[1].map(function (row) {
+    return row.name;
   });
+  return subtract(allPackages, existPackages);
 }
 
-//only sync not exist once
-var syncNotExist = false;
-module.exports = function sync(callback) {
-  var ep = eventproxy.create();
-  ep.fail(callback);
+module.exports = function *sync() {
   var syncTime = Date.now();
-  Total.getTotalInfo(ep.doneLater('totalInfo'));
+  var info = yield Total.getTotalInfo();
+  if (!info) {
+    throw new Error('can not found total info');
+  }
 
-  ep.once('totalInfo', function (info) {
-    if (!info) {
-      return callback(new Error('can not found total info'));
-    }
-    debug('Last sync time %s', new Date(info.last_sync_time));
-    // TODO: 记录上次同步的最后一个模块名称
-    if (!info.last_sync_time) {
-      debug('First time sync all packages from official registry');
-      return getFirstSyncPackages(info.last_sync_module, ep.done('syncPackages'));
-    }
-    if (syncNotExist) {
-      getMissPackages(ep.done('missPackages'));
-      syncNotExist = false;
-    } else {
-      ep.emitLater('missPackages', []);
-    }
-    getCommonSyncPackages(info.last_sync_time - ms('10m'), ep.doneLater('newestPackages'));
-    ep.all('missPackages', 'newestPackages', function (missPackages, newestPackages) {
-      ep.emit('syncPackages', union(missPackages, newestPackages));
-    });
-  });
+  var packages;
+  debug('Last sync time %s', new Date(info.last_sync_time));
+  if (!info.last_sync_time) {
+    debug('First time sync all packages from official registry');
+    packages = yield getFirstSyncPackages(info.last_sync_module);
+  } else {
+    packages = yield getCommonSyncPackages(info.last_sync_time - ms('10m'));
+  }
 
-  ep.once('syncPackages', function (packages) {
-    packages = packages || [];
-    debug('Total %d packages to sync', packages.length);
-    var worker = new SyncModuleWorker({
-      username: 'admin',
-      name: packages,
-      noDep: true,
-      concurrency: config.syncConcurrency,
-    });
-    Status.init({
-      worker: worker,
-      need: packages.length
-    }).start();
-    worker.start();
-    worker.once('end', function () {
-      debug('All packages sync done, successes %d, fails %d',
-        worker.successes.length, worker.fails.length);
-      //only when all succss, set last sync time
-      !worker.fails.length && Total.setLastSyncTime(syncTime, utility.noop);
-      callback(null, {
-        successes: worker.successes,
-        fails: worker.fails
-      });
-    });
+  packages = packages || [];
+  if (!packages.length) {
+    debug('no packages need be sync');
+    return;
+  }
+  debug('Total %d packages to sync', packages.length);
+
+  var worker = new SyncModuleWorker({
+    username: 'admin',
+    name: packages,
+    noDep: true,
+    concurrency: config.syncConcurrency,
   });
+  Status.init({need: packages.length}, worker);
+  worker.start();
+  yield thunkify(worker)();
+
+  debug('All packages sync done, successes %d, fails %d',
+      worker.successes.length, worker.fails.length);
+  //only when all succss, set last sync time
+  if (!worker.fails.length) {
+    Total.setLastSyncTime(syncTime, utility.noop);
+  }
+  return {
+    successes: worker.successes,
+    fails: worker.fails
+  };
 };

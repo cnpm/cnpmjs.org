@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "co": "3.0.4",
+    "co-gather": "0.0.1",
     "co-read": "0.0.1",
     "co-write": "0.3.0",
     "debug": "0.7.4",
