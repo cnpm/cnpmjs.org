@@ -349,7 +349,7 @@ SyncModuleWorker.prototype._sync = function *(name, pkg) {
 
   if (versions.length === 0) {
     that.log('  [%s] all versions are exists', name);
-    return versionNames;
+    return versions;
   }
 
   versions.sort(function (a, b) {
