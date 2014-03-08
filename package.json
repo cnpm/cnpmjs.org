@@ -25,7 +25,7 @@
     "graceful": "0.0.6",
     "gravatar": "1.0.6",
     "humanize-number": "0.0.2",
-    "koa": "0.5.0",
+    "koa": "0.5.1",
     "koa-markdown": "0.0.2",
     "koa-middlewares": "0.0.8",
     "logfilestream": "0.1.0",
@@ -41,7 +41,7 @@
     "ready": "0.1.1",
     "semver": "2.2.1",
     "thunkify-wrap": "0.0.5",
-    "urllib": "0.5.6",
+    "urllib": "0.5.8",
     "utility": "0.1.10"
   },
   "devDependencies": {

@@ -126,7 +126,7 @@ exports.search = function *(next) {
       packages: result.searchMatchs,
       keywords: result.keywordMatchs
     };
-    this.charset = 'utf-8';
+    this.type = 'application/json; charset=utf-8';
     return;
   }
 
