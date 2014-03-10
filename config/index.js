@@ -17,6 +17,7 @@
 
 var path = require('path');
 var fs = require('fs');
+var os = require('os');
 var mkdirp = require('mkdirp');
 
 fs.existsSync = fs.existsSync || path.existsSync;
@@ -29,6 +30,7 @@ var config = {
   registryPort: 7001,
   webPort: 7002,
   enableCluster: false,
+  numCPUs: os.cpus().length,
   debug: true, // if debug
   logdir: path.join(root, '.tmp', 'logs'),
   viewCache: false,
