@@ -35,6 +35,7 @@ describe('controllers/web/package.test.js', function () {
     it('should search with "c"', function (done) {
       request(app)
       .get('/_list/search/search?startkey="c"&limit=2')
+      .expect('content-type', 'application/json')
       .expect(200, function (err, res) {
         should.not.exist(err);
         res.body.should.have.keys('rows');
@@ -79,11 +80,13 @@ describe('controllers/web/package.test.js', function () {
       .get('/package/cutter')
       .expect(200)
       .expect('content-encoding', 'gzip')
+      .expect('content-type', 'text/html; charset=utf-8')
       .expect(/<div id="package">/)
       .expect(/<th>Maintainers<\/th>/)
       .expect(/<th>Version<\/th>/, function (err, res) {
         should.not.exist(err);
         res.should.have.header('etag');
+        res.text.should.include('<meta charset="utf-8">');
         done();
       });
     });

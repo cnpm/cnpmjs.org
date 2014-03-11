@@ -72,6 +72,7 @@ describe('controllers/registry/module.test.js', function () {
     it('should return module info and etag', function (done) {
       request(app)
       .get('/cnpmjs.org')
+      .expect('content-type', 'application/json')
       .expect(200, function (err, res) {
         should.not.exist(err);
         // should have etag

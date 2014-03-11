@@ -31,6 +31,7 @@ describe('controllers/web/user.test.js', function () {
       request(app)
       .get('/~dead_horse')
       .expect(200)
+      .expect('content-type', 'text/html; charset=utf-8')
       .expect(/<div id="profile">/)
       .expect(/Packages by /, done);
     });
