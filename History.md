@@ -1,4 +1,21 @@
 
+0.3.7 / 2014-03-11 
+==================
+
+  * show worker die date time
+  * update to koa@0.5.1
+  * hotfix for star user
+  * fix yield gather, sync missing deps even no missing versions
+  * fix return versions
+  * fix makefile, remove eventproxy
+  * refactor sync_module_worker
+  * add make test-dev, fixed #259
+  * change npm.js to generator
+  * update urllib, proxy/npm.js use generator
+  * sync_all and sync_exist to generator
+  * change function to generator
+  * need node >= v0.11.9
+
 0.3.6 / 2014-03-06 
 ==================
 
