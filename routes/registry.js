@@ -16,6 +16,7 @@
  */
 
 var middlewares = require('koa-middlewares');
+var limit = require('../middleware/limit');
 var login = require('../middleware/login');
 var publishable = require('../middleware/publishable');
 var syncByInstall = require('../middleware/sync_by_install');
@@ -44,7 +45,8 @@ function routes(app) {
   app.put('/:name/sync', sync.sync);
   app.get('/:name/sync/log/:id', sync.getSyncLog);
 
-  app.get('/:name/download/:filename', mod.download);
+  // need limit by ip
+  app.get('/:name/download/:filename', limit, mod.download);
 
   // put tarball
   // https://registry.npmjs.org/cnpmjs.org/-/cnpmjs.org-0.0.0.tgz/-rev/1-c85bc65e8d2470cc4d82b8f40da65b8e
