@@ -93,6 +93,15 @@ var config = {
   syncModel: 'none', // 'none', 'all', 'exist'
   syncConcurrency: 1,
   maxDependencies: 200, // max handle number of package.json `dependencies` property
+
+  limit: {
+    enable: false,
+    token: 'koa-limit:download',
+    limit: 1000,
+    interval: 1000 * 60 * 60 * 24,
+    writeList: [],
+    blackList: []
+  }
 };
 
 // load config/config.js, everything in config.js will cover the same key in index.js
