@@ -33,6 +33,7 @@ app.use(middlewares.rewrite('/favicon.ico', '/public/favicon.ico'));
 
 app.keys = ['todokey', config.sessionSecret];
 app.outputErrors = true;
+app.proxy = true;
 app.use(session);
 app.use(middlewares.bodyParser({jsonLimit: config.jsonLimit}));
 app.use(auth());

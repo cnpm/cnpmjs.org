@@ -100,7 +100,8 @@ var config = {
     limit: 1000,
     interval: 1000 * 60 * 60 * 24,
     writeList: [],
-    blackList: []
+    blackList: [],
+    message: 'request frequency limited, any question, please contact fengmk2@gmail.com',
   }
 };
 

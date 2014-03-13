@@ -42,6 +42,7 @@ app.use(middlewares.staticCache(path.join(__dirname, '..', 'public'), {
 app.use(opensearch);
 app.keys = ['todokey', config.sessionSecret];
 app.outputErrors = true;
+app.proxy = true;
 app.use(session);
 app.use(middlewares.bodyParser());
 app.use(notFound);

@@ -27,7 +27,7 @@
     "gravatar": "1.0.6",
     "humanize-number": "0.0.2",
     "koa": "0.5.1",
-    "koa-limit": "0.0.2",
+    "koa-limit": "0.0.3",
     "koa-markdown": "0.0.3",
     "koa-middlewares": "0.0.9",
     "logfilestream": "0.1.0",
@@ -44,7 +44,7 @@
     "redis": "0.10.1",
     "semver": "2.2.1",
     "thunkify-wrap": "0.0.5",
-    "urllib": "0.5.10",
+    "urllib": "0.5.11",
     "utility": "0.1.10"
   },
   "devDependencies": {
