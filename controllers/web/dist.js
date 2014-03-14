@@ -18,6 +18,11 @@ var config = require('../../config');
 
 exports.redirect = function *(next) {
   var params = this.params;
+  // a bug in koa-router
+  // i'll make a PR
+  if (params[0] === 'undefined') {
+    params[0] = '/';
+  }
   var url = config.disturl + (params[0] || '/');
   this.redirect(url);
 };
