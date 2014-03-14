@@ -1,4 +1,13 @@
 
+0.3.9 / 2014-03-14 
+==================
+
+  * custom user-agent
+  * use co-urllib instead of thunkify urllib; fix mock http.request test cases
+  * request limit custom message
+  * add config.redis check
+  * add koa-limit, fixed #267
+
 0.3.8 / 2014-03-11 
 ==================
 
