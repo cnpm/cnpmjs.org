@@ -24,7 +24,7 @@ var util = require('util');
 var fs = require('fs');
 var path = require('path');
 var crypto = require('crypto');
-var urllib = require('urllib');
+var urllib = require('co-urllib');
 var utility = require('utility');
 var ms = require('ms');
 var nfs = require('../common/nfs');
@@ -35,8 +35,6 @@ var ModuleDeps = require('./module_deps');
 var Log = require('./module_log');
 var config = require('../config');
 var ModuleStar = require('./module_star');
-
-var request = thunkify(urllib.request);
 
 function SyncModuleWorker(options) {
   EventEmitter.call(this);
@@ -524,9 +522,8 @@ SyncModuleWorker.prototype._syncOneVersion = function *(versionIndex, sourcePack
 
   try {
     // get tarball
-    var r = yield request(downurl, options);
-    var response = r[1];
-    var statusCode = response && response.statusCode || -1;
+    var r = yield *urllib.request(downurl, options);
+    var statusCode = r.status || -1;
     if (statusCode === 404) {
       shasum = sourcePackage.dist.shasum;
       return yield afterUpload({
