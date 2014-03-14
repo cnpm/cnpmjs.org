@@ -21,12 +21,12 @@ var os = require('os');
 var mkdirp = require('mkdirp');
 
 fs.existsSync = fs.existsSync || path.existsSync;
-var pkg = require('../package.json');
+var version = require('../package.json').version;
 
 var root = path.dirname(__dirname);
 
 var config = {
-  version: pkg.version,
+  version: version,
   registryPort: 7001,
   webPort: 7002,
   enableCluster: false,

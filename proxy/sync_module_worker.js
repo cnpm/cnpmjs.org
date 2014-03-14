@@ -36,6 +36,8 @@ var Log = require('./module_log');
 var config = require('../config');
 var ModuleStar = require('./module_star');
 
+var USER_AGENT = 'sync.cnpmjs.org/' + config.version + ' ' + urllib.USER_AGENT;
+
 function SyncModuleWorker(options) {
   EventEmitter.call(this);
   this._logId = options.logId;
@@ -479,6 +481,9 @@ SyncModuleWorker.prototype._syncOneVersion = function *(versionIndex, sourcePack
     writeStream: ws,
     followRedirect: true,
     timeout: 600000, // 10 minutes download
+    headers: {
+      'user-agent': USER_AGENT
+    }
   };
 
   var dependencies = Object.keys(sourcePackage.dependencies || {});

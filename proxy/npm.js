@@ -17,10 +17,15 @@
 var urllib = require('co-urllib');
 var config = require('../config');
 
+var USER_AGENT = 'cnpmjs.org/' + config.version + ' ' + urllib.USER_AGENT;
+
 function *request (url, options) {
   options = options || {};
   options.dataType = options.dataType || 'json';
   options.timeout = options.timeout || 120000;
+  options.headers = {
+    'user-agent': USER_AGENT
+  };
   url = config.sourceNpmRegistry + url;
   var r;
   try {
