@@ -30,7 +30,7 @@
     "koa": "0.5.1",
     "koa-limit": "1.0.0",
     "koa-markdown": "0.0.3",
-    "koa-middlewares": "0.0.9",
+    "koa-middlewares": "0.0.10",
     "logfilestream": "0.1.0",
     "marked": "0.3.2",
     "microtime": "0.5.1",

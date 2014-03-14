@@ -15,7 +15,8 @@
  */
 
 module.exports = function *login(next) {
-  if (!this.session.name) {
+  var session = yield *this.session;
+  if (!session.name) {
     this.status = 401;
     this.body = {
       error: 'unauthorized',

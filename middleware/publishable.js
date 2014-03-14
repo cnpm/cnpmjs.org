@@ -15,7 +15,8 @@
  */
 
 module.exports = function *publishable(next) {
-  if (this.session.onlySync && !this.session.isAdmin) {
+  var session = yield *this.session;
+  if (session.onlySync && !session.isAdmin) {
     // private mode, only admin user can publish
     this.status = 403;
     this.body = {
