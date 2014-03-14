@@ -1,4 +1,4 @@
-/*!
+/**!
  * cnpmjs.org - common/redis.js
  *
  * Copyright(c) cnpmjs.org and other contributors.
@@ -32,6 +32,7 @@ if (!config.redis || !config.redis.host || !config.redis.port) {
   module.exports = wrapper(_client);
 
 } else {
-  console.warn('can not found')
+  console.warn('[%s] [worker:%s:common/redis.js] Redis config can not found',
+    Date(), process.pid);
   module.exports = null;
 }

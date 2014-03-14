@@ -14,10 +14,8 @@
  * Module dependencies.
  */
 
-var thunkify = require('thunkify-wrap');
-var urllib = require('urllib');
+var urllib = require('co-urllib');
 var config = require('../config');
-thunkify(urllib, ['request']);
 
 function *request (url, options) {
   options = options || {};
@@ -26,9 +24,9 @@ function *request (url, options) {
   url = config.sourceNpmRegistry + url;
   var r;
   try {
-    r = yield urllib.request(url, options);
+    r = yield *urllib.request(url, options);
   } catch (err) {
-    var statusCode = err.res ? err.res.statusCode : 200;
+    var statusCode = err.status || -1;
     var data = err.data || '[empty]';
     if (err.name === 'JSONResponseFormatError' && statusCode >= 500) {
       err.name = 'NPMServerError';
@@ -41,9 +39,8 @@ function *request (url, options) {
 
 exports.get = function *(name) {
   var r = yield request('/' + name);
-  var data = r[0];
-  var res = r[1];
-  if (res && res.statusCode === 404) {
+  var data = r.data;
+  if (r.status === 404) {
     data = null;
   }
   return data;
@@ -54,7 +51,7 @@ exports.getAllSince = function *(startkey) {
     dataType: 'json',
     timeout: 300000
   });
-  return r[0];
+  return r.data;
 };
 
 exports.getShort = function *() {
@@ -62,5 +59,5 @@ exports.getShort = function *() {
     dataType: 'json',
     timeout: 300000
   });
-  return r[0];
+  return r.data;
 };
