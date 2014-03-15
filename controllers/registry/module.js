@@ -714,8 +714,8 @@ exports.updateMaintainers = function *(next) {
   if (!latestMod || !latestMod.package) {
     return yield *next;
   }
-
-  if (!common.isMaintainer(this, latestMod.package.maintainers)) {
+  var session = yield *this.session;
+  if (!common.isMaintainer(session, latestMod.package.maintainers)) {
     this.status = 403;
     this.body = {
       error: 'no_perms',
