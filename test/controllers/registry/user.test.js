@@ -171,6 +171,11 @@ describe('controllers/registry/user.test.js', function () {
       mm.error(user, 'update', 'mock error');
       request(app)
       .put('/-/user/org.couchdb.user:cnpmjstest10/-rev/:1-123')
+      .send({
+        name: 'cnpmjstest10',
+        password: 'cnpmjstest10',
+        email: 'cnpmjstest10@cnpmjs.org'
+      })
       .set('authorization', 'basic ' + new Buffer('cnpmjstest10:cnpmjstest10').toString('base64'))
       .expect(500, done);
     });
@@ -180,6 +185,8 @@ describe('controllers/registry/user.test.js', function () {
       .put('/-/user/org.couchdb.user:cnpmjstest10/-rev/:1-123')
       .set('authorization', 'basic ' + new Buffer('cnpmjstest10:cnpmjstest10').toString('base64'))
       .send({
+        name: 'cnpmjstest10',
+        password: 'cnpmjstest10',
         email: 'cnpmjstest10@cnpmjs.org',
         rev: '1-123'
       })
@@ -192,6 +199,8 @@ describe('controllers/registry/user.test.js', function () {
       .put('/-/user/org.couchdb.user:cnpmjstest10/-rev/:1-123')
       .set('authorization', 'basic ' + new Buffer('cnpmjstest10:cnpmjstest10').toString('base64'))
       .send({
+        name: 'cnpmjstest10',
+        password: 'cnpmjstest10',
         email: 'cnpmjstest10@cnpmjs.org',
         rev: '1-123'
       })

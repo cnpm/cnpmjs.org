@@ -1,4 +1,4 @@
-/*!
+/**!
  * cnpmjs.org - test/controllers/registry/module.test.js
  *
  * Copyright(c) cnpmjs.org and other contributors.
@@ -125,14 +125,14 @@ describe('controllers/registry/module.test.js', function () {
   describe('GET /:name/:(version|tag)', function () {
     it('should return module@version info', function (done) {
       request(app)
-      .get('/cnpmjs.org/0.2.1')
+      .get('/cnpmjs.org/0.3.9')
       .expect(200, function (err, res) {
         should.not.exist(err);
         var body = res.body;
         body.name.should.equal('cnpmjs.org');
-        body.version.should.equal('0.2.1');
-        body._id.should.equal('cnpmjs.org@0.2.1');
-        body.dist.tarball.should.include('cnpmjs.org-0.2.1.tgz');
+        body.version.should.match(/\d+\.\d+\.\d+/);
+        body._id.should.match(/cnpmjs\.org@\d+\.\d+\.\d+/);
+        body.dist.tarball.should.match(/cnpmjs\.org-\d+\.\d+\.\d+\.tgz/);
         body.should.have.property('_cnpm_publish_time');
         body._cnpm_publish_time.should.be.a.Number;
         body.should.have.property('_publish_on_cnpm', true);
@@ -154,17 +154,94 @@ describe('controllers/registry/module.test.js', function () {
       });
     });
 
-    it('should get cnpmjs.org@0.2.1 with _publish_on_cnpm=true', function (done) {
+    it('should get cnpmjs.org@latest with _publish_on_cnpm=true', function (done) {
       request(app)
-      .get('/cnpmjs.org/0.2.1')
+      .get('/cnpmjs.org/latest')
       .expect(200, function (err, res) {
         should.not.exist(err);
         var body = res.body;
         body.name.should.equal('cnpmjs.org');
-        body.version.should.equal('0.2.1');
+        // body.version.should.equal('latest');
         body._publish_on_cnpm.should.equal(true);
         done();
       });
+    });
+  });
+
+  describe('PUT /:name/-rev/id update maintainers', function () {
+    before(function (done) {
+      request(app)
+      .put('/cnpmjs.org/-rev/1')
+      .send({
+        maintainers: [{
+          name: 'cnpmjstest10',
+          email: 'cnpmjstest10@cnpmjs.org'
+        }]
+      })
+      .set('authorization', baseauth)
+      .expect('content-type', 'application/json', done);
+    });
+
+    it('should add new maintainers', function (done) {
+      request(app)
+      .put('/cnpmjs.org/-rev/1')
+      .send({
+        maintainers: [{
+          name: 'cnpmjstest10',
+          email: 'cnpmjstest10@cnpmjs.org'
+        }, {
+          name: 'fengmk2',
+          email: 'fengmk2@cnpmjs.org'
+        }]
+      })
+      .set('authorization', baseauth)
+      .expect(201)
+      .expect('content-type', 'application/json', done);
+    });
+
+    it('should add again new maintainers', function (done) {
+      request(app)
+      .put('/cnpmjs.org/-rev/1')
+      .send({
+        maintainers: [{
+          name: 'cnpmjstest10',
+          email: 'cnpmjstest10@cnpmjs.org'
+        }, {
+          name: 'fengmk2',
+          email: 'fengmk2@cnpmjs.org'
+        }]
+      })
+      .set('authorization', baseauth)
+      .expect(201)
+      .expect('content-type', 'application/json', done);
+    });
+
+    it('should rm maintainers', function (done) {
+      request(app)
+      .put('/cnpmjs.org/-rev/1')
+      .send({
+        maintainers: [{
+          name: 'cnpmjstest10',
+          email: 'cnpmjstest10@cnpmjs.org'
+        }]
+      })
+      .set('authorization', baseauth)
+      .expect(201)
+      .expect('content-type', 'application/json', done);
+    });
+
+    it('should rm again maintainers', function (done) {
+      request(app)
+      .put('/cnpmjs.org/-rev/1')
+      .send({
+        maintainers: [{
+          name: 'cnpmjstest10',
+          email: 'cnpmjstest10@cnpmjs.org'
+        }]
+      })
+      .set('authorization', baseauth)
+      .expect(201)
+      .expect('content-type', 'application/json', done);
     });
   });
 

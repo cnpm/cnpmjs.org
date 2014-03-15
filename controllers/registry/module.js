@@ -689,16 +689,60 @@ exports.add = function *(next) {
   };
 };
 
+exports.updateOrRemove = function *(next) {
+  debug('updateOrRemove module %s, %j', this.params.name, this.request.body);
+  var body = this.request.body;
+  if (body.versions) {
+    yield *exports.removeWithVersions.call(this, next);
+  } else if (body.maintainers && body.maintainers.length > 0) {
+    yield *exports.updateMaintainers.call(this, next);
+  } else {
+    yield *next;
+  }
+};
+
+exports.updateMaintainers = function *(next) {
+  var name = this.params.name;
+  var body = this.request.body;
+  debug('updateMaintainers module %s, %j', name, body);
+
+  var latestMod = yield Module.getLatest(name);
+
+  if (!latestMod || !latestMod.package) {
+    return yield *next;
+  }
+
+  if (!common.isMaintainer(this, latestMod.package.maintainers)) {
+    this.status = 403;
+    this.body = {
+      error: 'no_perms',
+      reason: 'Current user can not publish this module'
+    };
+    return;
+  }
+
+  var r = yield *Module.updateMaintainers(latestMod.id, body.maintainers);
+  debug('result: %j', r);
+
+  this.status = 201;
+  this.body = {
+    ok: true,
+    id: name,
+    rev: String(latestMod.id),
+  };
+};
+
 exports.removeWithVersions = function *(next) {
-  debug('removeWithVersions module %s, with info %j', this.params.name, this.request.body);
   var name = this.params.name;
   var username = this.session.name;
   var versions = this.request.body.versions || {};
 
+  debug('removeWithVersions module %s, with versions %j', name, Object.keys(versions));
+
   // step1: list all the versions
   var mods = yield Module.listByName(name);
   if (!mods || !mods.length) {
-    return yield* next;
+    return yield *next;
   }
 
   // step2: check permission
@@ -768,9 +812,8 @@ exports.removeWithVersions = function *(next) {
     debug('no tag need to be remove');
   }
   this.status = 201;
-  this.bdoy = { ok: true };
+  this.body = { ok: true };
 };
-
 
 exports.removeTar = function *(next) {
   debug('remove tarball with filename: %s, id: %s', this.params.filename, this.params.rev);
