@@ -21,7 +21,7 @@ var config = require('../config');
  * req.session.allowSync  -  allow sync triggle by cnpm install
  */
 
-module.exports = function *(next) {
+module.exports = function *syncByInstall(next) {
   if (!config.syncByInstall || !config.enablePrivate) {
     // only config.enablePrivate should enable sync on install
     return yield *next;
@@ -30,13 +30,19 @@ module.exports = function *(next) {
   if (this.get('user-agent') && this.get('user-agent').indexOf('node') !== 0) {
     return yield *next;
   }
-
-  this.session.allowSync = true;
-  if (this.session.isAdmin) {
+  var session = {};
+  try {
+    session = yield *this.session;
+    session.allowSync = true;
+  } catch (err) {
+    console.warn('get session error in syncByInstall');
+    yield *next;
+  }
+  if (session.isAdmin) {
     // if current user is admin, should not enable auto sync on install, because it would be unpublish
-    this.session.allowSync = false;
+    session.allowSync = false;
   }
 
-  debug('%s allowSync: %s', this.session.name, this.session.allowSync);
+  debug('%s allowSync: %s', session.name, session.allowSync);
   yield *next;
 };

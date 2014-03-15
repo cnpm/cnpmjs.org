@@ -21,17 +21,13 @@ var common = require('../lib/common');
 
 module.exports = function (options) {
   return function *auth(next) {
-    debug('%s, %s, %j', this.url, this.sessionId, this.session);
-    if (!this.session) {
-      // redis crash
-      this.session = {};
-      return yield *next;
-    }
-    this.session.onlySync = config.enablePrivate ? true : false;
-    if (this.session.name) {
-      this.session.isAdmin = common.isAdmin(this.session.name);
+    var session = yield *this.session;
+    debug('%s, %s, %j', this.url, this.sessionId, session);
+    session.onlySync = config.enablePrivate ? true : false;
+    if (session.name) {
+      session.isAdmin = common.isAdmin(session.name);
       debug('auth exists user: %s, onlySync: %s, isAdmin: %s, headers: %j',
-        this.session.name, this.session.onlySync, this.session.isAdmin, this.header);
+        session.name, session.onlySync, session.isAdmin, this.header);
       return yield *next;
     }
     var authorization = (this.get('authorization') || '').split(' ')[1] || '';
@@ -51,15 +47,15 @@ module.exports = function (options) {
     var row = yield User.auth(username, password);
     if (!row) {
       debug('auth fail user: %j, headers: %j', row, this.header);
-      this.session.name = null;
-      this.session.isAdmin = false;
+      session.name = null;
+      session.isAdmin = false;
       return yield *next;
     }
 
-    this.session.name = row.name;
-    this.session.isAdmin = common.isAdmin(this.session.name);
+    session.name = row.name;
+    session.isAdmin = common.isAdmin(session.name);
     debug('auth pass user: %j, onlySync: %s, isAdmin: %s, headers: %j',
-      row, this.session.onlySync, this.session.isAdmin, this.header);
+      row, session.onlySync, session.isAdmin, this.header);
     yield *next;
   };
 };

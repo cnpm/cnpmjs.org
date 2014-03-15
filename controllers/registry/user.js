@@ -137,8 +137,8 @@ exports.authSession = function *() {
     this.body = {ok: false, name: null, roles: []};
     return;
   }
-
-  this.session.name = user.name;
+  var session = yield *this.session;
+  session.name = user.name;
   this.body = {ok: true, name: user.name, roles: []};
 };
 
@@ -148,10 +148,10 @@ exports.update = function *(next) {
   if (!name || !rev) {
     return yield* next;
   }
+  var session = yield *this.session;
+  debug('update: %s, rev: %s, session.name: %s', name, rev, session.name);
 
-  debug('update: %s, rev: %s, session.name: %s', name, rev, this.session.name);
-
-  if (name !== this.session.name) {
+  if (name !== session.name) {
     // must authSession first
     this.status = 401;
     this.body = {
