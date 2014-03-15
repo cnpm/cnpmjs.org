@@ -56,13 +56,10 @@ exports.show = function *(next) {
     userMap[users[i]] = true;
   }
   users = userMap;
-  var session = yield *this.session;
-  debug('show module, user: %s, allowSync: %s, isAdmin: %s',
-    session.name, session.allowSync, session.isAdmin);
   // if module not exist in this registry,
   // sync the module backend and return package info from official registry
   if (rows.length === 0) {
-    if (!session.allowSync) {
+    if (!this.allowSync) {
       this.status = 404;
       this.body = {
         error: 'not_found',
@@ -70,8 +67,7 @@ exports.show = function *(next) {
       };
       return;
     }
-    var username = (session && session.name) || 'anonymous';
-    var result = yield SyncModuleWorker.sync(name, username);
+    var result = yield SyncModuleWorker.sync(name, 'sync-by-install');
     this.status = result.ok ? 200 : result.statusCode;
     this.body = result.pkg;
     return;
@@ -187,9 +183,8 @@ exports.get = function *(next) {
     this.body = mod.package;
     return;
   }
-  var session = yield *this.session;
   // if not fond, sync from source registry
-  if (!session.allowSync) {
+  if (!this.allowSync) {
     this.status = 404;
     this.body = {
       error: 'not exist',
@@ -198,8 +193,7 @@ exports.get = function *(next) {
     return;
   }
 
-  var username = (session && session.username) || 'anonymous';
-  var result = yield SyncModuleWorker.sync(name, username);
+  var result = yield SyncModuleWorker.sync(name, 'sync-by-install');
   var pkg = result.pkg && result.pkg.versions[version];
   if (!pkg) {
     this.status = 404;
