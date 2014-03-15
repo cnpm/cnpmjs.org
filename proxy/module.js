@@ -20,7 +20,8 @@ var eventproxy = require('eventproxy');
 var config = require('../config');
 var mysql = require('../common/mysql');
 
-var MODULE_COLUMNS = 'id, publish_time, gmt_create, gmt_modified, author, name, version, description, package, dist_tarball, dist_shasum, dist_size';
+var MODULE_COLUMNS = 'id, publish_time, gmt_create, gmt_modified, author, name, \
+  version, description, package, dist_tarball, dist_shasum, dist_size';
 
 var INSERT_MODULE_SQL = 'INSERT INTO module(gmt_create, gmt_modified, \
   publish_time, author, name, version, package, dist_tarball, dist_shasum, dist_size, description) \
@@ -452,3 +453,10 @@ exports.search = function (word, options, callback) {
 };
 
 thunkify(exports);
+
+exports.updateMaintainers = function *(id, maintainers) {
+  var mod = yield exports.getById(id);
+  mod.package.maintainers = maintainers;
+  var pkg = stringifyPackage(mod.package);
+  return yield mysql.query(UPDATE_PACKAGE_SQL, [pkg, id]);
+};

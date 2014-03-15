@@ -45,7 +45,7 @@
     "redis": "0.10.1",
     "semver": "2.2.1",
     "thunkify-wrap": "0.0.5",
-    "utility": "0.1.10"
+    "utility": "0.1.11"
   },
   "devDependencies": {
     "autod": ">=0.0.13",
