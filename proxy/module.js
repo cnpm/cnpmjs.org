@@ -185,7 +185,7 @@ exports.updateReadme = function (id, readme, callback) {
 };
 
 var UPDATE_DIST_SQL = multiline(function () {/*
-  UDPATE
+  UPDATE
     module
   SET
     publish_time=?,
