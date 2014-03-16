@@ -18,12 +18,11 @@ var Log = require('../proxy/module_log');
 var SyncModuleWorker = require('../proxy/sync_module_worker');
 
 exports.sync = function *() {
-  var session = yield *this.session;
-  var username = session.name || 'anonymous';
+  var username = this.user.name || 'anonymous';
   var name = this.params.name;
   var publish = this.query.publish === 'true';
   var noDep = this.query.nodeps === 'true';
-  if (publish && !session.isAdmin) {
+  if (publish && !this.user.isAdmin) {
     this.status = 403;
     this.body = {
       error: 'no_perms',

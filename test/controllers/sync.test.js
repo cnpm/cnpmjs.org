@@ -1,4 +1,4 @@
-/*!
+/**!
  * cnpmjs.org - test/controllers/sync.test.js
  *
  * Copyright(c) cnpmjs.org and other contributors.
@@ -17,12 +17,12 @@
 
 var request = require('supertest');
 var should = require('should');
-var registryApp = require('../../servers/registry');
-var webApp = require('../../servers/web');
 var pedding = require('pedding');
 var mm = require('mm');
-var Npm = require('../../proxy/npm');
 var path = require('path');
+var Npm = require('../../proxy/npm');
+var registryApp = require('../../servers/registry');
+var webApp = require('../../servers/web');
 
 describe('controllers/sync.test.js', function () {
   before(function (done) {
@@ -45,8 +45,6 @@ describe('controllers/sync.test.js', function () {
       request(registryApp)
       .del('/utility/-rev/123')
       .set('authorization', baseauth)
-      // .expect(200)
-      // .expect({ok: true})
       .end(function (err, res) {
         should.not.exist(err);
 
@@ -59,20 +57,6 @@ describe('controllers/sync.test.js', function () {
           res.body.should.have.keys('ok', 'logId');
           logIdRegistry = res.body.logId;
           done();
-          // setTimeout(function () {
-          //   request(registryApp)
-          //   .get('/utility')
-          //   .expect(200)
-          //   .end(function (err, res) {
-          //     should.not.exist(err);
-          //     Object.keys(res.body.versions).length.should.above(0);
-          //     for (var v in res.body.versions) {
-          //       var pkg = res.body.versions[v];
-          //       pkg.should.have.property('_publish_on_cnpm', true);
-          //     }
-          //     done();
-          //   });
-          // }, 5000);
         });
       });
     });
@@ -88,9 +72,20 @@ describe('controllers/sync.test.js', function () {
       }, done);
     });
 
-    it('should sync success', function (done) {
+    it('should sync through web success', function (done) {
       mm.data(Npm, 'get', require(path.join(fixtures, 'utility.json')));
-      done = pedding(2, done);
+      request(webApp)
+      .put('/sync/utility')
+      .end(function (err, res) {
+        should.not.exist(err);
+        res.body.should.have.keys('ok', 'logId');
+        logIdWeb = res.body.logId;
+        done();
+      });
+    });
+
+    it('should sync through registry success', function (done) {
+      mm.data(Npm, 'get', require(path.join(fixtures, 'utility.json')));
       request(registryApp)
       .put('/utility/sync')
       .set('authorization', baseauth)
@@ -98,14 +93,6 @@ describe('controllers/sync.test.js', function () {
         should.not.exist(err);
         res.body.should.have.keys('ok', 'logId');
         logIdRegistry = res.body.logId;
-        done();
-      });
-      request(webApp)
-      .put('/sync/utility')
-      .end(function (err, res) {
-        should.not.exist(err);
-        res.body.should.have.keys('ok', 'logId');
-        logIdWeb = res.body.logId;
         done();
       });
     });

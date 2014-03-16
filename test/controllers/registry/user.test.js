@@ -1,4 +1,4 @@
-/*!
+/**!
  * cnpmjs.org - test/controllers/registry/user.test.js
  *
  * Copyright(c) cnpmjs.org and other contributors.
@@ -149,7 +149,12 @@ describe('controllers/registry/user.test.js', function () {
         ok: true,
         name: 'name',
         roles: []
-      }, done);
+      }, function (err, res) {
+        should.not.exist(err);
+        should.exist(res.headers['set-cookie']);
+        res.headers['set-cookie'].join(';').should.include('AuthSession=');
+        done();
+      });
     });
   });
 

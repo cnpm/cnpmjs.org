@@ -1,4 +1,4 @@
-/*!
+/**!
  * cnpmjs.org - middleware/sync_by_install.js
  *
  * Copyright(c) cnpmjs.org and other contributors.
@@ -14,11 +14,10 @@
  * Module dependencies.
  */
 
-var debug = require('debug')('cnpmjs.org:middleware:sync_by_install');
 var config = require('../config');
 
 /**
- * req.session.allowSync  -  allow sync triggle by cnpm install
+ * this.allowSync  -  allow sync triggle by cnpm install
  */
 
 module.exports = function *syncByInstall(next) {
@@ -27,7 +26,8 @@ module.exports = function *syncByInstall(next) {
     return yield *next;
   }
   // request not by node, consider it request from web
-  if (this.get('user-agent') && this.get('user-agent').indexOf('node') !== 0) {
+  var ua = this.get('user-agent');
+  if (!ua || ua.indexOf('node') < 0) {
     return yield *next;
   }
 

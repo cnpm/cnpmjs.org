@@ -148,11 +148,10 @@ exports.update = function *(next) {
   if (!name || !rev) {
     return yield* next;
   }
-  var session = yield *this.session;
-  debug('update: %s, rev: %s, session.name: %s', name, rev, session.name);
+  debug('update: %s, rev: %s, user.name: %s', name, rev, this.user.name);
 
-  if (name !== session.name) {
-    // must authSession first
+  if (name !== this.user.name) {
+    // must auth user first
     this.status = 401;
     this.body = {
       error: 'unauthorized',

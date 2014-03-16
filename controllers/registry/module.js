@@ -321,10 +321,9 @@ exports.upload = function *(next) {
   var length = Number(this.get('content-length')) || 0;
   if (!length || !this.is('application/octet-stream')) {
     debug('request length or type error');
-    return yield* next;
+    return yield *next;
   }
-  var session = yield *this.session;
-  var username = session.name;
+  var username = this.user.name;
   var name = this.params.name;
   var id = Number(this.params.rev);
   var filename = this.params.filename;
@@ -338,7 +337,7 @@ exports.upload = function *(next) {
     debug('can not get this module');
     return yield* next;
   }
-  if (!common.isMaintainer(session, mod.package.maintainers) || mod.name !== name) {
+  if (!common.isMaintainer(this.user, mod.package.maintainers) || mod.name !== name) {
     this.status = 403;
     this.body = {
       error: 'no_perms',
@@ -429,8 +428,7 @@ function _addDepsRelations(pkg) {
 }
 
 exports.updateLatest = function *(next) {
-  var session = yield *this.session;
-  var username = session.name;
+  var username = this.user.name;
   var name = this.params.name;
   var version = semver.valid(this.params.version);
   if (!version) {
@@ -512,8 +510,7 @@ exports.addPackageAndDist = function *(next) {
   //      length: 9883
 
   var pkg = this.request.body;
-  var session = yield *this.session;
-  var username = session.name;
+  var username = this.user.name;
   var name = this.params.name;
   var filename = Object.keys(pkg._attachments || {})[0];
   var version = Object.keys(pkg.versions || {})[0];
@@ -614,12 +611,11 @@ exports.addPackageAndDist = function *(next) {
 };
 
 exports.add = function *(next) {
-  var session = yield *this.session;
-  var username = session.name;
+  var username = this.user.name;
   var name = this.params.name;
   var pkg = this.request.body || {};
 
-  if (!common.isMaintainer(session, pkg.maintainers)) {
+  if (!common.isMaintainer(this.user, pkg.maintainers)) {
     this.status = 403;
     this.body = {
       error: 'no_perms',
@@ -659,7 +655,7 @@ exports.add = function *(next) {
   var maintainers = latestMod && latestMod.package.maintainers.length > 0 ?
     latestMod.package.maintainers : nextMod.package.maintainers;
 
-  if (!common.isMaintainer(session, maintainers)) {
+  if (!common.isMaintainer(this.user, maintainers)) {
     this.status = 403;
     this.body = {
       error: 'no_perms',
@@ -708,8 +704,7 @@ exports.updateMaintainers = function *(next) {
   if (!latestMod || !latestMod.package) {
     return yield *next;
   }
-  var session = yield *this.session;
-  if (!common.isMaintainer(session, latestMod.package.maintainers)) {
+  if (!common.isMaintainer(this.user, latestMod.package.maintainers)) {
     this.status = 403;
     this.body = {
       error: 'no_perms',
@@ -731,8 +726,7 @@ exports.updateMaintainers = function *(next) {
 
 exports.removeWithVersions = function *(next) {
   debug('removeWithVersions module %s, with info %j', this.params.name, this.request.body);
-  var session = yield *this.session;
-  var username = session.name;
+  var username = this.user.name;
   var name = this.params.name;
   var versions = this.request.body.versions || {};
 
@@ -746,7 +740,7 @@ exports.removeWithVersions = function *(next) {
 
   // step2: check permission
   var firstMod = mods[0];
-  if (!common.isMaintainer(session, firstMod.package.maintainers) || firstMod.name !== name) {
+  if (!common.isMaintainer(this.user, firstMod.package.maintainers) || firstMod.name !== name) {
     this.status = 403;
     this.body = {
       error: 'no_perms',
@@ -819,15 +813,14 @@ exports.removeTar = function *(next) {
   var id = Number(this.params.rev);
   var filename = this.params.filename;
   var name = this.params.name;
-  var session = yield *this.session;
-  var username = session.name;
+  var username = this.user.name;
 
   var mod = yield Module.getById(id);
   if (!mod) {
     return yield* next;
   }
 
-  if (!common.isMaintainer(session, mod.package.maintainers) || mod.name !== name) {
+  if (!common.isMaintainer(this.user, mod.package.maintainers) || mod.name !== name) {
     this.status = 403;
     this.body = {
       error: 'no_perms',
@@ -845,8 +838,6 @@ exports.removeAll = function *(next) {
   debug('remove all the module with name: %s, id: %s', this.params.name, this.params.rev);
   // var id = Number(this.params.rev);
   var name = this.params.name;
-  var session = yield *this.session;
-  // var username = session.name;
 
   var mods = yield Module.listByName(name);
   debug('removeAll module %s: %d', name, mods.length);
@@ -855,7 +846,7 @@ exports.removeAll = function *(next) {
     return yield* next;
   }
 
-  if (!common.isMaintainer(session, mod.package.maintainers) || mod.name !== name) {
+  if (!common.isMaintainer(this.user, mod.package.maintainers) || mod.name !== name) {
     this.status = 403;
     this.body = {
       error: 'no_perms',

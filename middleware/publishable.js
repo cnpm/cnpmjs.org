@@ -14,9 +14,10 @@
  * Module dependencies.
  */
 
+var config = require('../config');
+
 module.exports = function *publishable(next) {
-  var session = yield *this.session;
-  if (session.onlySync && !session.isAdmin) {
+  if (config.enablePrivate && !this.user.isAdmin) {
     // private mode, only admin user can publish
     this.status = 403;
     this.body = {

@@ -23,7 +23,8 @@ var cookie = { path: '/', httpOnly: true, maxAge: 3600000 * 24 * 365, signed: fa
 var options = {
   key: key,
   cookie: cookie,
-  defer: true
+  defer: true,
+  rolling: false
 };
 
 if (!config.debug) {

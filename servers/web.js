@@ -25,6 +25,7 @@ var markdown = require('koa-markdown');
 var session = require('../common/session');
 var opensearch = require('../middleware/opensearch');
 var notFound = require('../middleware/web_not_found');
+var auth = require('../middleware/auth');
 var routes = require('../routes/web');
 var logger = require('../common/logger');
 var config = require('../config');
@@ -45,6 +46,7 @@ app.outputErrors = true;
 app.proxy = true;
 app.use(session);
 app.use(middlewares.bodyParser());
+app.use(auth());
 app.use(notFound);
 
 app.use(middlewares.gzip());
