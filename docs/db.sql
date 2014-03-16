@@ -9,10 +9,15 @@ CREATE TABLE `user` (
  `roles` varchar(200) NOT NULL DEFAULT '[]',
  `rev` varchar(40) NOT NULL,
  `email` varchar(400) NOT NULL,
+ `json` longtext CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'json details',
+ `npm_user` tinyint(1) DEFAULT '0' COMMENT 'user sync from npm or not, 1: true, other: false',
  PRIMARY KEY (`id`),
  UNIQUE KEY `name` (`name`),
  KEY `gmt_modified` (`gmt_modified`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='user base info';
+-- ALTER TABLE `user`
+--   ADD `json` longtext CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'json details',
+--   ADD `npm_user` tinyint(1) DEFAULT '0' COMMENT 'user sync from npm or not, 1: true, other: false';
 
 CREATE TABLE `module_keyword` (
  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'primary key',

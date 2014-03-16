@@ -19,23 +19,35 @@ var debug = require('debug')('cnpmjs.org:controllers:registry');
 var utility = require('utility');
 var crypto = require('crypto');
 var User = require('../../proxy/user');
+var config = require('../../config');
 
 exports.show = function *(next) {
   var name = this.params.name;
   var user = yield User.get(name);
   if (!user) {
-    return yield* next;
+    return yield *next;
   }
-  this.etag = '"' + user.rev + '"';
-  var data = {
-    _id: 'org.couchdb.user:' + user.name,
-    _rev: user.rev,
-    name: user.name,
-    email: user.email,
-    type: 'user',
-    roles: [],
-    date: user.gmt_modified,
+
+  var data = user.json;
+  if (!data) {
+    data = {
+      _id: 'org.couchdb.user:' + user.name,
+      _rev: user.rev,
+      name: user.name,
+      email: user.email,
+      type: 'user',
+      roles: [],
+      date: user.gmt_modified,
+    };
+  }
+  data._cnpm_meta = {
+    id: user.id,
+    npm_user: user.npm_user,
+    gmt_create: user.gmt_create,
+    gmt_modified: user.gmt_modified,
+    admin: !!config.admins[user.name],
   };
+
   this.body = data;
 };
 
