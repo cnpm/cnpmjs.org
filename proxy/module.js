@@ -19,16 +19,29 @@ var utility = require('utility');
 var eventproxy = require('eventproxy');
 var config = require('../config');
 var mysql = require('../common/mysql');
+var multiline = require('multiline');
 
 var MODULE_COLUMNS = 'id, publish_time, gmt_create, gmt_modified, author, name, \
   version, description, package, dist_tarball, dist_shasum, dist_size';
 
-var INSERT_MODULE_SQL = 'INSERT INTO module(gmt_create, gmt_modified, \
-  publish_time, author, name, version, package, dist_tarball, dist_shasum, dist_size, description) \
-  VALUES(now(), now(), ?, ?, ?, ?, ?, ?, ?, ?, ?) \
-  ON DUPLICATE KEY UPDATE gmt_modified=now(), publish_time=VALUES(publish_time), description=VALUES(description), \
-    author=VALUES(author), name=VALUES(name), version=VALUES(version), package=VALUES(package), \
-    dist_tarball=VALUES(dist_tarball), dist_shasum=VALUES(dist_shasum), dist_size=VALUES(dist_size);';
+var INSERT_MODULE_SQL = multiline(function () {/*
+  INSERT INTO
+    module(gmt_create, gmt_modified, publish_time, author, name, version,
+      package, dist_tarball, dist_shasum, dist_size, description)
+  VALUES
+    (now(), now(), ?, ?, ?, ?, ?, ?, ?, ?, ?)
+  ON DUPLICATE KEY UPDATE
+    gmt_modified=now(),
+    publish_time=VALUES(publish_time),
+    description=VALUES(description),
+    author=VALUES(author),
+    name=VALUES(name),
+    version=VALUES(version),
+    package=VALUES(package),
+    dist_tarball=VALUES(dist_tarball),
+    dist_shasum=VALUES(dist_shasum),
+    dist_size=VALUES(dist_size);
+*/});
 
 exports.add = function (mod, callback) {
   var keywords = mod.package.keywords;
@@ -83,7 +96,16 @@ exports.add = function (mod, callback) {
   });
 };
 
-var GET_KEYWORD_SQL = 'SELECT keyword FROM module_keyword WHERE name=? ORDER BY keyword;';
+var GET_KEYWORD_SQL = multiline(function () {/*
+  SELECT
+    keyword
+  FROM
+    module_keyword
+  WHERE
+    name = ?
+  ORDER BY
+    keyword;
+*/});
 
 exports.getKeywords = function (name, callback) {
   mysql.query(GET_KEYWORD_SQL, [name], function (err, rows) {
@@ -97,9 +119,14 @@ exports.getKeywords = function (name, callback) {
   });
 };
 
-var ADD_KEYWORD_SQL = 'INSERT INTO module_keyword(gmt_create, keyword, name, description) \
-  VALUES(now(), ?, ?, ?) \
-  ON DUPLICATE KEY UPDATE description=VALUES(description);';
+var ADD_KEYWORD_SQL = multiline(function () {/*
+  INSERT INTO
+    module_keyword(gmt_create, keyword, name, description)
+  VALUES
+    (now(), ?, ?, ?)
+  ON DUPLICATE KEY UPDATE
+    description=VALUES(description);
+*/});
 
 exports.addKeywords = function (name, description, keywords, callback) {
   var sql = '';
@@ -125,12 +152,26 @@ exports.addKeywords = function (name, description, keywords, callback) {
   });
 };
 
-var UPDATE_DESC_SQL = 'UPDATE module SET description=? WHERE id=?;';
+var UPDATE_DESC_SQL = multiline(function () {/*
+  UPDATE
+    module
+  SET
+    description=?
+  WHERE
+    id=?;
+*/});
 exports.updateDescription = function (id, description, callback) {
   mysql.query(UPDATE_DESC_SQL, [description, id], callback);
 };
 
-var UPDATE_PACKAGE_SQL = 'UPDATE module SET package=? WHERE id=?;';
+var UPDATE_PACKAGE_SQL = multiline(function () {/*
+  UPDATE
+    module
+  SET
+    package=?
+  WHERE
+    id=?;
+*/});
 exports.updateReadme = function (id, readme, callback) {
   exports.getById(id, function (err, data) {
     if (err) {
@@ -143,9 +184,19 @@ exports.updateReadme = function (id, readme, callback) {
   });
 };
 
-var UPDATE_DIST_SQL = 'UPDATE module SET publish_time=?, version=?, package=?, \
-  dist_tarball=?, dist_shasum=?, dist_size=? WHERE id=?;';
-
+var UPDATE_DIST_SQL = multiline(function () {/*
+  UDPATE
+    module
+  SET
+    publish_time=?,
+    version=?,
+    package=?,
+    dist_tarball=?,
+    dist_shasum=?,
+    dist_size=?
+  WHERE
+    id=?;
+*/});
 exports.update = function (mod, callback) {
   var pkg;
   try {
@@ -183,8 +234,16 @@ function stringifyPackage(pkg) {
   return encodeURIComponent(JSON.stringify(pkg));
 }
 
-var SELECT_MODULE_BY_ID_SQL = 'SELECT ' + MODULE_COLUMNS + ' FROM module WHERE id=?;';
 
+var SELECT_MODULE_BY_ID_SQL = multiline(function () {/*
+  SELECT
+    id, publish_time, gmt_create, gmt_modified, author, name,
+    version, description, package, dist_tarball, dist_shasum, dist_size
+  FROM
+    module
+  WHERE
+    id=?;
+*/});
 exports.getById = function (id, callback) {
   id = Number(id);
   mysql.queryOne(SELECT_MODULE_BY_ID_SQL, [id], function (err, row) {
@@ -201,8 +260,15 @@ exports.getById = function (id, callback) {
   });
 };
 
-var SELECT_MODULE_SQL = 'SELECT ' + MODULE_COLUMNS + ' FROM module WHERE name=? AND version=?;';
-
+var SELECT_MODULE_SQL = multiline(function () {/*
+  SELECT
+    id, publish_time, gmt_create, gmt_modified, author, name,
+    version, description, package, dist_tarball, dist_shasum, dist_size
+  FROM
+    module
+  WHERE
+    name=? AND version=?;
+*/});
 exports.get = function (name, version, callback) {
   mysql.queryOne(SELECT_MODULE_SQL, [name, version], function (err, row) {
     if (err || !row) {
@@ -218,14 +284,26 @@ exports.get = function (name, version, callback) {
   });
 };
 
-var INSERT_TAG_SQL = 'INSERT INTO tag(gmt_create, gmt_modified, \
-  name, tag, version, module_id) \
-  VALUES(now(), now(), ?, ?, ?, ?) \
-  ON DUPLICATE KEY UPDATE gmt_modified=now(), module_id=VALUES(module_id), \
-    name=VALUES(name), tag=VALUES(tag), version=VALUES(version);';
-
-var SELECT_MODULE_ID_SQL = 'SELECT id FROM module WHERE name=? AND version=?;';
-
+var SELECT_MODULE_ID_SQL = multiline(function () {/*
+  SELECT
+    id
+  FROM
+    module
+  WHERE
+    name=? AND version=?;
+*/});
+var INSERT_TAG_SQL = multiline(function () {/*
+  INSERT INTO
+    tag(gmt_create, gmt_modified, name, tag, version, module_id)
+  VALUES
+    (now(), now(), ?, ?, ?, ?)
+  ON DUPLICATE KEY UPDATE
+    gmt_modified=now(),
+    module_id=VALUES(module_id),
+    name=VALUES(name),
+    tag=VALUES(tag),
+    version=VALUES(version);
+*/});
 exports.addTag = function (name, tag, version, callback) {
   mysql.queryOne(SELECT_MODULE_ID_SQL, [name, version], function (err, row) {
     if (err) {
@@ -241,8 +319,14 @@ exports.addTag = function (name, tag, version, callback) {
   });
 };
 
-var SELECT_TAG_SQL = 'SELECT tag, version, gmt_modified, module_id FROM tag WHERE name=? AND tag=?;';
-
+var SELECT_TAG_SQL = multiline(function () {/*
+  SELECT
+    tag, version, gmt_modified, module_id
+  FROM
+    tag
+  WHERE
+    name=? AND tag=?;
+*/});
 exports.getByTag = function (name, tag, callback) {
   mysql.queryOne(SELECT_TAG_SQL, [name, tag], function (err, row) {
     if (err || !row) {
@@ -252,26 +336,51 @@ exports.getByTag = function (name, tag, callback) {
   });
 };
 
-var DELETE_TAGS_SQL = 'DELETE FROM tag WHERE name=?;';
-
+var DELETE_TAGS_SQL = multiline(function () {/*
+  DELETE FROM
+    tag
+  WHERE
+    name=?;
+*/});
 exports.removeTags = function (name, callback) {
   mysql.query(DELETE_TAGS_SQL, [name], callback);
 };
 
-var DELETE_TAGS_BY_IDS_SQL = 'DELETE FROM tag WHERE id in (?)';
+var DELETE_TAGS_BY_IDS_SQL = multiline(function () {/*
+  DELETE FROM
+    tag
+  WHERE
+    id in (?);
+*/});
 exports.removeTagsByIds = function (ids, callback) {
   mysql.query(DELETE_TAGS_BY_IDS_SQL, [ids], callback);
 };
 
-var SELECT_ALL_TAGS_SQL = 'SELECT id, tag, version, gmt_modified, module_id FROM tag WHERE name=?;';
-
+var SELECT_ALL_TAGS_SQL = multiline(function () {/*
+  SELECT
+    id, tag, version, gmt_modified, module_id
+  FROM
+    tag
+  WHERE
+    name=?;
+*/});
 exports.listTags = function (name, callback) {
   mysql.query(SELECT_ALL_TAGS_SQL, [name], callback);
 };
 
-var SELECT_LATEST_MODULE_SQL = 'SELECT ' + MODULE_COLUMNS +
-  ' FROM module WHERE name=? AND version <> "next" ORDER BY publish_time DESC LIMIT 1;';
-
+var SELECT_LATEST_MODULE_SQL = multiline(function () {/*
+  SELECT
+    id, publish_time, gmt_create, gmt_modified, author, name,
+    version, description, package, dist_tarball, dist_shasum, dist_size
+  FROM
+    module
+  WHERE
+    name=? AND version <> "next"
+  ORDER BY
+    publish_time DESC
+  LIMIT
+    1;
+*/});
 exports.getLatest = function (name, callback) {
   exports.getByTag(name, 'latest', function (err, row) {
     if (err || row) {
@@ -294,8 +403,17 @@ exports.getLatest = function (name, callback) {
   });
 };
 
-var LIST_MODULE_SQL = 'SELECT ' + MODULE_COLUMNS + ' FROM module WHERE name=? ORDER BY id DESC;';
-
+var LIST_MODULE_SQL = multiline(function () {/*
+  SELECT
+    id, publish_time, gmt_create, gmt_modified, author, name,
+    version, description, package, dist_tarball, dist_shasum, dist_size
+  FROM
+    module
+  WHERE
+    name=?
+  ORDER BY
+    id DESC;
+*/});
 exports.listByName = function (name, callback) {
   mysql.query(LIST_MODULE_SQL, [name], function (err, rows) {
     if (err) {
@@ -315,10 +433,23 @@ exports.listByName = function (name, callback) {
   });
 };
 
-var LIST_SINCE_SQLS = [
-  'SELECT module_id FROM tag WHERE tag="latest" AND gmt_modified>?',
-  'SELECT name, package FROM module WHERE id IN (?);'
-];
+var LIST_SINCE_SQLS = [];
+LIST_SINCE_SQLS.push(multiline(function () {/*
+  SELECT
+    module_id
+  FROM
+    tag
+  WHERE
+    tag="latest" AND gmt_modified>?;
+*/}));
+LIST_SINCE_SQLS.push(multiline(function () {/*
+  SELECT
+    name, package
+  FROM
+    module
+  WHERE
+    id IN (?);
+*/}));
 exports.listSince = function (start, callback) {
   var ep = eventproxy.create();
   ep.fail(callback);
@@ -336,31 +467,81 @@ exports.listSince = function (start, callback) {
   });
 };
 
-var LIST_SHORT_SQL = 'SELECT distinct(name) FROM tag ORDER BY name';
+var LIST_SHORT_SQL = multiline(function () {/*
+  SELECT
+    distinct(name)
+  FROM
+    tag
+  ORDER BY
+    name;
+*/});
 exports.listShort = function (callback) {
   mysql.query(LIST_SHORT_SQL, callback);
 };
 
-var LIST_ALL_MODULE_NAMES_SQL = 'SELECT distinct(name) FROM module ORDER BY name';
+var LIST_ALL_MODULE_NAMES_SQL = multiline(function () {/*
+  SELECT
+    distinct(name)
+  FROM
+    module
+  ORDER BY
+    name;
+*/});
 exports.listAllModuleNames = function (callback) {
   mysql.query(LIST_ALL_MODULE_NAMES_SQL, callback);
 };
 
-var DELETE_MODULE_BY_NAME_SQL = 'DELETE FROM module WHERE name=?;';
+var DELETE_MODULE_BY_NAME_SQL = multiline(function () {/*
+  DELETE FROM
+    module
+  WHERE
+    name=?;
+*/});
 exports.removeByName = function (name, callback) {
   mysql.query(DELETE_MODULE_BY_NAME_SQL, [name], callback);
 };
 
-var DELETE_MODULE_BY_NAME_AND_VERSIONS_SQL = 'DELETE FROM module WHERE name=? AND version IN(?);';
+var DELETE_MODULE_BY_NAME_AND_VERSIONS_SQL = multiline(function () {/*
+  DELETE FROM
+    module
+  WHERE
+    name=? AND version in(?);
+*/});
 exports.removeByNameAndVersions = function (name, versions, callback) {
   mysql.query(DELETE_MODULE_BY_NAME_AND_VERSIONS_SQL, [name, versions], callback);
 };
 
-var LIST_BY_AUTH_SQLS = [
-  'SELECT distinct(name) AS name FROM module WHERE author = ? ORDER BY publish_time DESC LIMIT 100;',
-  'SELECT module_id FROM tag WHERE tag="latest" AND name IN (?)',
-  'SELECT name, description FROM module WHERE id IN (?) ORDER BY publish_time DESC'
-];
+var LIST_BY_AUTH_SQLS = [];
+LIST_BY_AUTH_SQLS.push(multiline(function () {/*
+  SELECT
+    distinct(name) AS name
+  FROM
+    module
+  WHERE
+    author=?
+  ORDER BY
+    publish_time DESC
+  LIMIT
+    100;
+*/}));
+LIST_BY_AUTH_SQLS.push(multiline(function () {/*
+  SELECT
+    module_id
+  FROM
+    tag
+  WHERE
+    tag="latest" AND name IN (?);
+*/}));
+LIST_BY_AUTH_SQLS.push(multiline(function () {/*
+  SELECT
+    name, description
+  FROM
+    module
+  WHERE
+    id IN (?)
+  ORDER BY
+    publish_time DESC;
+*/}));
 exports.listByAuthor = function (author, callback) {
   var ep = eventproxy.create();
   ep.fail(callback);
@@ -387,10 +568,40 @@ exports.listByAuthor = function (author, callback) {
   });
 };
 
-var SEARCH_MODULES_SQL = 'SELECT module_id FROM tag WHERE name LIKE ? AND tag="latest" ORDER BY name LIMIT ?;';
-var SEARCH_MODULES_BY_KEYWORD_SQL = 'SELECT name, description FROM module_keyword WHERE keyword = ? ORDER BY id DESC LIMIT ?;';
-var QUERY_MODULES_BY_ID_SQL = 'SELECT name, description FROM module WHERE id IN (?) ORDER BY name;';
-
+var SEARCH_MODULES_SQL = multiline(function () {/*
+  SELECT
+    module_id
+  FROM
+    tag
+  WHERE
+    name LIKE ? AND tag="latest"
+  ORDER BY
+    name
+  LIMIT
+    ?;
+*/});
+var SEARCH_MODULES_BY_KEYWORD_SQL = multiline(function () {/*
+  SELECT
+    name, description
+  FROM
+    module_keyword
+  WHERE
+    keyword=?
+  ORDER BY
+    id DESC
+  LIMIT
+    ?;
+*/});
+var QUERY_MODULES_BY_ID_SQL = multiline(function () {/*
+  SELECT
+    name, description
+  FROM
+    module
+  WHERE
+    id IN (?)
+  ORDER BY
+    name;
+*/});
 exports.search = function (word, options, callback) {
   if (typeof options === 'function') {
     callback = options;

@@ -38,6 +38,7 @@
     "mkdirp": "0.3.5",
     "moment": "2.5.1",
     "ms": "0.6.2",
+    "multiline": "0.2.0",
     "mysql": "2.1.1",
     "nodemailer": "0.6.1",
     "qn": "0.2.1",
