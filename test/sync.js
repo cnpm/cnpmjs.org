@@ -25,6 +25,9 @@ Log.create({
   name: names[0],
   username: 'fengmk2',
 }, function (err, result) {
+  if (err) {
+    throw err;
+  }
   var worker = new SyncModuleWorker({
     logId: result.id,
     name: names,

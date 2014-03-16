@@ -122,3 +122,12 @@ exports.saveNpmUser = function *(user) {
     yield mysql.query(sql, [JSON.stringify(user), user._rev, row.id]);
   }
 };
+
+exports.listByNames = function *(names) {
+  if (names.length === 0) {
+    return [];
+  }
+
+  var sql = 'SELECT id, name, email, json FROM user where name in (?);';
+  return yield mysql.query(sql, [names]);
+};

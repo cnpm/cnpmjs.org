@@ -35,6 +35,7 @@ var ModuleDeps = require('./module_deps');
 var Log = require('./module_log');
 var config = require('../config');
 var ModuleStar = require('./module_star');
+var User = require('./user');
 
 var USER_AGENT = 'sync.cnpmjs.org/' + config.version + ' ' + urllib.USER_AGENT;
 
@@ -185,6 +186,14 @@ function *_addStar(modName, username) {
   yield ModuleStar.add(modName, username);
 }
 
+function *_saveNpmUser(username) {
+  var user = yield *npm.getUser(username);
+  if (!user) {
+    return;
+  }
+  yield User.saveNpmUser(user);
+}
+
 SyncModuleWorker.prototype._sync = function *(name, pkg) {
   var username = this.username;
   var that = this;
@@ -238,6 +247,25 @@ SyncModuleWorker.prototype._sync = function *(name, pkg) {
   var missingDescriptions = [];
   var missingReadmes = [];
   var missingStarUsers = [];
+  var npmUsernames = {};
+
+  // find out all user names
+  for (var v in pkg.versions) {
+    var p = pkg.versions[v];
+    var contributors = p.contributors || [];
+    if (contributors && !Array.isArray(contributors)) {
+      contributors = [contributors];
+    }
+
+    var maintainers = p.maintainers || [];
+    if (maintainers && !Array.isArray(maintainers)) {
+      maintainers = [maintainers];
+    }
+
+    maintainers.concat(contributors).forEach(function (m) {
+      npmUsernames[m.name.toLowerCase()] = 1;
+    });
+  }
 
   // get the missing star users
   var starUsers = pkg.users || {};
@@ -245,9 +273,9 @@ SyncModuleWorker.prototype._sync = function *(name, pkg) {
     if (!existsStarUsers[k]) {
       missingStarUsers.push(k);
     }
+    npmUsernames[k.toLowerCase()] = 1;
   }
   that.log('  [%s] found %d missing star users', name, missingStarUsers.length);
-
 
   var times = pkg.time || {};
   pkg.versions = pkg.versions || {};
@@ -446,8 +474,45 @@ SyncModuleWorker.prototype._sync = function *(name, pkg) {
     }
   }
 
+  function *syncMissingUsers() {
+    var missingUsers = [];
+    var names = Object.keys(npmUsernames);
+    if (names.length === 0) {
+      return;
+    }
+    var rows = yield *User.listByNames(names);
+    var map = {};
+    rows.forEach(function (r) {
+      map[r.name] = r;
+    });
+    names.forEach(function (username) {
+      var r = map[username];
+      if (!r || !r.json) {
+        missingUsers.push(username);
+      }
+    });
+
+    if (missingUsers.length === 0) {
+      that.log('  [%s] all %d npm users exists', name, names.length);
+      return;
+    }
+
+    that.log('  [%s] saving %d/%d missing npm users: %j',
+      name, missingUsers.length, names.length, missingUsers);
+    var res = yield gather(missingUsers.map(function (username) {
+      return _saveNpmUser(username);
+    }));
+
+    for (var i = 0; i < res.length; i++) {
+      var r = res[i];
+      if (r.error) {
+        that.log('    save npm user error, %s', r.error.message);
+      }
+    }
+  }
+
   // sync missing star users
-  function *syncUser() {
+  function *syncMissingStarUsers() {
     if (missingStarUsers.length === 0) {
       return;
     }
@@ -465,7 +530,7 @@ SyncModuleWorker.prototype._sync = function *(name, pkg) {
     }
   }
 
-  yield [syncDes(), syncTag(), syncReadme(), syncUser()];
+  yield [syncDes(), syncTag(), syncReadme(), syncMissingStarUsers(), syncMissingUsers()];
   return versionNames;
 };
 

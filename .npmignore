@@ -10,6 +10,7 @@ backup/*.json
 backup/*.gz
 view/web/_layout.html
 bin/mysql.js
+bin/test.sql
 coverage/
 .jshintrc
 .jshintignore
