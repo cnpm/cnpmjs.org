@@ -17,7 +17,7 @@
 
 var debug = require('debug')('cnpmjs.org:controllers:registry');
 var utility = require('utility');
-var config = require('../../config');
+var crypto = require('crypto');
 var User = require('../../proxy/user');
 
 exports.show = function *(next) {
@@ -42,7 +42,7 @@ exports.show = function *(next) {
 function ensurePasswordSalt(user, body) {
   if (!user.password_sha && body.password) {
     // create password_sha on server
-    user.salt = utility.sha1(body.name + config.passwordSalt);
+    user.salt = crypto.randomBytes(30).toString('hex');
     user.password_sha = utility.sha1(body.password + user.salt);
   }
 }

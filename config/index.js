@@ -47,7 +47,6 @@ var config = {
   mysqlMaxConnections: 4,
   mysqlQueryTimeout: 5000,
 
-  passwordSalt: 'a801bfe13d98b3d5183f9c35c988bb5e5664ae68', // sha1('cnpmjs.org.user.password.salt'),
   sessionSecret: 'cnpmjs.org test session secret',
   redis: {
     host: 'pub-redis-19533.us-east-1-4.3.ec2.garantiadata.com',
