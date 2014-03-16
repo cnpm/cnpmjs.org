@@ -23,13 +23,15 @@ module.exports = function (options) {
   return function *auth(next) {
     var session = yield *this.session;
     debug('%s, %s, %j', this.url, this.sessionId, session);
-    session.onlySync = config.enablePrivate ? true : false;
+    this.user = {};
+
     if (session.name) {
-      session.isAdmin = common.isAdmin(session.name);
-      debug('auth exists user: %s, onlySync: %s, isAdmin: %s, headers: %j',
-        session.name, session.onlySync, session.isAdmin, this.header);
+      this.user.name = session.name;
+      this.user.isAdmin = common.isAdmin(session.name);
+      debug('auth exists user: %j, headers: %j', this.user, this.header);
       return yield *next;
     }
+
     var authorization = (this.get('authorization') || '').split(' ')[1] || '';
     authorization = authorization.trim();
     if (!authorization) {
@@ -47,15 +49,12 @@ module.exports = function (options) {
     var row = yield User.auth(username, password);
     if (!row) {
       debug('auth fail user: %j, headers: %j', row, this.header);
-      session.name = null;
-      session.isAdmin = false;
       return yield *next;
     }
 
-    session.name = row.name;
-    session.isAdmin = common.isAdmin(session.name);
-    debug('auth pass user: %j, onlySync: %s, isAdmin: %s, headers: %j',
-      row, session.onlySync, session.isAdmin, this.header);
+    this.user.name = row.name;
+    this.user.isAdmin = common.isAdmin(row.name);
+    debug('auth pass user: %j, headers: %j', this.user, this.header);
     yield *next;
   };
 };

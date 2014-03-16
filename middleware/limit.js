@@ -23,7 +23,7 @@ var limitConfig = config.limit;
 if (!limitConfig.enable) {
   module.exports = function *ignoreLimit(next) {
     yield *next;
-  }
+  };
 } else {
 
   if (!config.debug) {
@@ -32,4 +32,3 @@ if (!limitConfig.enable) {
 
   module.exports = limit(limitConfig);
 }
-

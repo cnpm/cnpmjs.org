@@ -89,6 +89,8 @@ describe('controllers/registry/module.test.js', function () {
         res.body.time.modified.should.be.a.String;
         res.body.time.should.have.property('created');
         res.body.time.created.should.be.a.String;
+        // should not contains authSession cookie
+        should.not.exist(res.headers['set-cookie']);
         done();
       });
     });
@@ -110,6 +112,7 @@ describe('controllers/registry/module.test.js', function () {
           'users', 'readmeFilename', 'homepage', 'bugs', 'license');
         res.body.name.should.equal('cnpmjs.org');
         res.body.versions[Object.keys(res.body.versions)[0]].dist.tarball.should.include('/cnpmjs.org/download');
+        should.not.exist(res.headers['set-cookie']);
         done();
       });
     });
@@ -708,7 +711,11 @@ describe('controllers/registry/module.test.js', function () {
       request(app)
       .del('/testputmodule/-rev/' + lastRev)
       .set('authorization', baseauth)
-      .expect(200, done);
+      .expect(200, function (err, res) {
+        should.not.exist(err);
+        should.not.exist(res.headers['set-cookie']);
+        done();
+      });
     });
   });
 });
