@@ -1,5 +1,24 @@
 # npm publish flow
 
+## Flows
+
+1. try to put package.json and tgz, maybe base64 tgz body
+2. if new version not exists, publish success
+3. if new version exists, 409, try to get full package info with ?write=true
+4. if new version had publish, show: "Update the 'version' field in package.json and try again."
+
+```bash
+$ cnpm publish
+npm http PUT http://r.cnpmjs.org/cnpmjs.org
+npm http 409 http://r.cnpmjs.org/cnpmjs.org
+npm http GET http://r.cnpmjs.org/cnpmjs.org?write=true
+npm http 200 http://r.cnpmjs.org/cnpmjs.org?write=true
+npm ERR! publish fail Cannot publish over existing version.
+npm ERR! publish fail Update the 'version' field in package.json and try again.
+```
+
+## Details
+
 code: https://github.com/isaacs/npm-registry-client/blob/master/lib/publish.js
 
 * couch login if token not exists: [couch-login](https://github.com/isaacs/couch-login)

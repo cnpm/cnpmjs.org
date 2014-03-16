@@ -1,4 +1,18 @@
 
+0.3.10 / 2014-03-16 
+==================
+
+  * Only /_session request send the authSession. fixed #223
+  * sync npm user info when maintainers and contributors not exists. fixed #82
+  * save npm user to mysql
+  * password salt always be randoms
+  * remove session access in /name and /name/version, fixed #274
+  * fix update maintainer session error
+  * update koa-middlewares
+  * fix test, fix sync_by_install
+  * use defer session
+  * Support npm owner|author add [name] [pkg]. fixed #271
+
 0.3.9 / 2014-03-14 
 ==================
 
