@@ -6,6 +6,7 @@
  *
  * Authors:
  *  dead_horse <dead_horse@qq.com> (http://deadhorse.me)
+ *  fengmk2 <fengmk2@gmail.com> (http://fengmk2.cnpmjs.org)
  */
 
 'use strict';
@@ -14,10 +15,15 @@
  * Module dependencies.
  */
 
-var mysql = require('../../common/mysql');
 var should = require('should');
-var user = require('../../proxy/user');
+var co = require('co');
 var mm = require('mm');
+var path = require('path');
+var fs = require('fs');
+var mysql = require('../../common/mysql');
+var user = require('../../proxy/user');
+
+var fixtures = path.join(path.dirname(__dirname), 'fixtures');
 
 var mockUser = {
   name: 'mockuser',
@@ -49,7 +55,9 @@ describe('proxy/user.test.js', function () {
     it('should get user ok', function (done) {
       user.get('mockuser', function (err, data) {
         should.not.exist(err);
-        data.should.have.keys('id', 'rev', 'name', 'email', 'salt', 'password_sha', 'ip', 'roles', 'gmt_create', 'gmt_modified');
+        data.should.have.keys('id', 'rev', 'name', 'email', 'salt',
+          'json', 'npm_user',
+          'password_sha', 'ip', 'roles', 'gmt_create', 'gmt_modified');
         done();
       });
     });
@@ -68,7 +76,9 @@ describe('proxy/user.test.js', function () {
     it('should auth user ok', function (done) {
       user.auth(mockUser.name, mockUser.password, function (err, data) {
         should.not.exist(err);
-        data.should.have.keys('id', 'rev', 'name', 'email', 'salt', 'password_sha', 'ip', 'roles', 'gmt_create', 'gmt_modified');
+        data.should.have.keys('id', 'rev', 'name', 'email', 'salt',
+          'json', 'npm_user',
+          'password_sha', 'ip', 'roles', 'gmt_create', 'gmt_modified');
         done();
       });
     });
@@ -152,5 +162,33 @@ describe('proxy/user.test.js', function () {
         done();
       });
     });
+  });
+
+  describe('saveNpmUser()', function () {
+    var existUser = JSON.parse(fs.readFileSync(path.join(fixtures, 'fengmk2.json')));
+    var notExistUser = JSON.parse(fs.readFileSync(path.join(fixtures, 'fengmk2.json')));
+    notExistUser.name = 'fengmk2-not-exists';
+
+    before(co(function *() {
+      yield mysql.query('delete from user where name=?', [notExistUser.name]);
+    }));
+
+    it('should save npm user to exists user', co(function *() {
+      yield user.saveNpmUser(existUser);
+      var r = yield mysql.queryOne('select rev, json, npm_user from user where name=?', existUser.name);
+      should.exist(r);
+      r.npm_user.should.equal(0);
+      r.rev.should.equal(existUser._rev);
+      JSON.parse(r.json).should.eql(existUser);
+    }));
+
+    it('should save npm user to not exists user and create it', co(function *() {
+      yield user.saveNpmUser(notExistUser);
+      var r = yield mysql.queryOne('select name, json, npm_user from user where name=?', notExistUser.name);
+      r.name.should.equal(notExistUser.name);
+      should.exist(r);
+      r.npm_user.should.equal(1);
+      JSON.parse(r.json).should.eql(notExistUser);
+    }));
   });
 });

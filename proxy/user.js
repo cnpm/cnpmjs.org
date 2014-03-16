@@ -18,26 +18,27 @@ var thunkify = require('thunkify-wrap');
 var utility = require('utility');
 var config = require('../config');
 var mysql = require('../common/mysql');
-var crypto = require('crypto');
 
-var COLUMNS = 'id, rev, name, email, salt, password_sha, ip, roles, gmt_create, gmt_modified';
+var COLUMNS = 'id, rev, name, email, salt, password_sha, ip, roles, json, \
+  npm_user, gmt_create, gmt_modified';
 var SELECT_USER_SQL = 'SELECT ' + COLUMNS + ' FROM user WHERE name=?;';
 
-function sha1(s) {
-  return crypto.createHash("sha1").update(s).digest("hex");
-}
-
 function passwordSha(password, salt) {
-  return sha1(password + salt);
+  return utility.sha1(password + salt);
 }
 
 exports.get = function (name, callback) {
   mysql.queryOne(SELECT_USER_SQL, [name], function (err, row) {
     if (row) {
       try {
-        row.roles = JSON.parse(row.roles);
+        row.roles = row.roles ? JSON.parse(row.roles) : [];
       } catch (e) {
         row.roles = [];
+      }
+      try {
+        row.json = row.json ? JSON.parse(row.json) : null;
+      } catch (e) {
+        row.json = null;
       }
     }
     callback(err, row);
@@ -106,4 +107,27 @@ exports.update = function (user, callback) {
 };
 
 thunkify(exports);
+
 exports.passwordSha = passwordSha;
+
+exports.saveNpmUser = function *(user) {
+  var sql = 'SELECT id, json FROM user WHERE name=?;';
+  var row = yield mysql.queryOne(sql, [user.name]);
+  if (!row) {
+    sql = 'INSERT INTO user(npm_user, json, rev, name, email, salt, password_sha, ip, gmt_create, gmt_modified) \
+      VALUES(1, ?, ?, ?, ?, "0", "0", "0", now(), now());';
+    yield mysql.query(sql, [JSON.stringify(user), user._rev, user.name, user.email]);
+  } else {
+    sql = 'UPDATE user SET json=?, rev=? WHERE id=?;';
+    yield mysql.query(sql, [JSON.stringify(user), user._rev, row.id]);
+  }
+};
+
+exports.listByNames = function *(names) {
+  if (names.length === 0) {
+    return [];
+  }
+
+  var sql = 'SELECT id, name, email, json FROM user where name in (?);';
+  return yield mysql.query(sql, [names]);
+};

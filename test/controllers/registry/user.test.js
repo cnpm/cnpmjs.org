@@ -1,4 +1,4 @@
-/*!
+/**!
  * cnpmjs.org - test/controllers/registry/user.test.js
  *
  * Copyright(c) cnpmjs.org and other contributors.
@@ -38,8 +38,23 @@ describe('controllers/registry/user.test.js', function () {
       .get('/-/user/org.couchdb.user:cnpmjstest1')
       .expect(200, function (err, res) {
         should.not.exist(err);
-        res.body.should.have.keys('_id', '_rev', 'name', 'email', 'type', 'roles', 'date');
+        res.body.should.have.keys('_id', '_rev', 'name', 'email', 'type',
+          '_cnpm_meta', 'roles', 'date');
         res.body.name.should.equal('cnpmjstest1');
+        done();
+      });
+    });
+
+    it('should return npm user info', function (done) {
+      request(app)
+      .get('/-/user/org.couchdb.user:fengmk2')
+      .expect(200, function (err, res) {
+        should.not.exist(err);
+        res.body.name.should.equal('fengmk2');
+        res.body.github.should.equal('fengmk2');
+        res.body._cnpm_meta.should.have.keys('id', 'npm_user', 'gmt_create',
+          'gmt_modified', 'admin');
+        res.body._cnpm_meta.admin.should.equal(true);
         done();
       });
     });
