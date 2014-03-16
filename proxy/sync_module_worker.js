@@ -252,17 +252,13 @@ SyncModuleWorker.prototype._sync = function *(name, pkg) {
   // find out all user names
   for (var v in pkg.versions) {
     var p = pkg.versions[v];
-    var contributors = p.contributors || [];
-    if (contributors && !Array.isArray(contributors)) {
-      contributors = [contributors];
-    }
 
     var maintainers = p.maintainers || [];
     if (maintainers && !Array.isArray(maintainers)) {
       maintainers = [maintainers];
     }
 
-    maintainers.concat(contributors).forEach(function (m) {
+    maintainers.forEach(function (m) {
       npmUsernames[m.name.toLowerCase()] = 1;
     });
   }
