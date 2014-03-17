@@ -92,7 +92,8 @@ module.exports = function *sync() {
   });
   Status.init({need: packages.length}, worker);
   worker.start();
-  yield thunkify(worker)();
+  var end = thunkify.event(worker);
+  yield end();
 
   debug('All packages sync done, successes %d, fails %d',
     worker.successes.length, worker.fails.length);
