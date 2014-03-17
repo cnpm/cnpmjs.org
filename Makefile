@@ -16,6 +16,7 @@ test:
 		--reporter $(REPORTER) \
 		--timeout $(TIMEOUT) \
 		--require should \
+		--require co-mocha\
 		$(MOCHA_OPTS) \
 		$(TESTS)
 
@@ -26,6 +27,8 @@ test-cov:
 		-- -u exports \
 		--reporter $(REPORTER) \
 		--timeout $(TIMEOUT) \
+		--require should \
+		--require co-mocha\
 		$(MOCHA_OPTS) \
 		$(TESTS)
 	@-$(MAKE) check-coverage
