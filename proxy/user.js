@@ -18,15 +18,17 @@ var thunkify = require('thunkify-wrap');
 var utility = require('utility');
 var config = require('../config');
 var mysql = require('../common/mysql');
+var multiline = require('multiline');
 
-var COLUMNS = 'id, rev, name, email, salt, password_sha, ip, roles, json, \
-  npm_user, gmt_create, gmt_modified';
-var SELECT_USER_SQL = 'SELECT ' + COLUMNS + ' FROM user WHERE name=?;';
-
-function passwordSha(password, salt) {
-  return utility.sha1(password + salt);
-}
-
+var SELECT_USER_SQL = multiline(function () {/*
+  SELECT
+    id, rev, name, email, salt, password_sha, ip,
+    roles, json, npm_user, gmt_create, gmt_modified
+  FROM
+    user
+  WHERE
+    name=?;
+*/});
 exports.get = function (name, callback) {
   mysql.queryOne(SELECT_USER_SQL, [name], function (err, row) {
     if (row) {
@@ -45,6 +47,10 @@ exports.get = function (name, callback) {
   });
 };
 
+function passwordSha(password, salt) {
+  return utility.sha1(password + salt);
+}
+
 exports.auth = function (name, password, callback) {
   exports.get(name, function (err, row) {
     if (err || !row) {
@@ -59,9 +65,14 @@ exports.auth = function (name, password, callback) {
   });
 };
 
-var INSERT_USER_SQL = 'INSERT INTO user(rev, name, email, salt, password_sha, ip, roles, gmt_create, gmt_modified) \
-  VALUES(?, ?, ?, ?, ?, ?, ?, now(), now())';
 
+var INSERT_USER_SQL = multiline(function () {/*
+  INSERT INTO
+    user(rev, name, email, salt, password_sha,
+    ip, roles, gmt_create, gmt_modified)
+  VALUES
+    (?, ?, ?, ?, ?, ?, ?, now(), now());
+*/});
 exports.add = function (user, callback) {
   var roles = user.roles || [];
   try {
@@ -76,9 +87,20 @@ exports.add = function (user, callback) {
   });
 };
 
-var UPDATE_USER_SQL = 'UPDATE user SET rev=?, email=?, salt=?, password_sha=?, ip=?, roles=?, gmt_modified=now() \
-  WHERE name=? AND rev=?;';
-
+var UPDATE_USER_SQL = multiline(function () {/*
+  UPDATE
+    user
+  SET
+    rev=?,
+    email=?,
+    salt=?,
+    password_sha=?,
+    ip=?,
+    roles=?,
+    gmt_modified=now()
+  WHERE
+    name=? AND rev=?;
+*/});
 exports.update = function (user, callback) {
   var rev = user.rev || user._rev;
   var revNo = Number(rev.split('-', 1));
@@ -123,11 +145,17 @@ exports.saveNpmUser = function *(user) {
   }
 };
 
+var LIST_BY_NAMES_SQL = multiline(function () {/*
+  SELECT
+    id, name, email, json
+  FROM
+    user
+  WHERE
+    name in (?);
+*/});
 exports.listByNames = function *(names) {
   if (names.length === 0) {
     return [];
   }
-
-  var sql = 'SELECT id, name, email, json FROM user where name in (?);';
-  return yield mysql.query(sql, [names]);
+  return yield mysql.query(LIST_BY_NAMES_SQL, [names]);
 };
