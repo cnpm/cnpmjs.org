@@ -18,13 +18,22 @@ var thunkify = require('thunkify-wrap');
 var eventproxy = require('eventproxy');
 var config = require('../config');
 var mysql = require('../common/mysql');
+var multiline = require('multiline');
 
-var DB_SIZE_SQL = 'SELECT TABLE_NAME AS name, data_length, index_length \
-  FROM information_schema.tables \
-  WHERE TABLE_SCHEMA = ? \
-  GROUP BY TABLE_NAME \
-  ORDER BY data_length DESC \
-  LIMIT 0 , 200';
+var DB_SIZE_SQL = multiline(function () {/*
+  SELECT
+    TABLE_NAME AS name, data_length, index_length
+  FROM
+    information_schema.tables
+  WHERE
+    TABLE_SCHEMA = ?
+  GROUP BY
+    TABLE_NAME
+  ORDER BY
+    data_length DESC
+  LIMIT
+    0, 200;
+*/});
 
 var TOTAL_MODULE_SQL = 'SELECT count(distinct(name)) AS count FROM module;';
 var TOTAL_VERSION_SQL = 'SELECT count(name) AS count FROM module;';
@@ -84,7 +93,14 @@ exports.get = function (callback) {
   });
 };
 
-var PLUS_DELETE_MODULE_SQL = 'UPDATE total SET module_delete=module_delete+1 WHERE name="total";';
+var PLUS_DELETE_MODULE_SQL = multiline(function () {/*
+  UPDATE
+    total
+  SET
+    module_delete=module_delete+1
+  WHERE
+    name="total";
+*/});
 exports.plusDeleteModule = function (callback) {
   mysql.query(PLUS_DELETE_MODULE_SQL, callback);
 };
@@ -93,24 +109,55 @@ exports.getTotalInfo = function (callback) {
   mysql.queryOne(TOTAL_INFO_SQL, callback);
 };
 
-var SET_LAST_SYNC_TIME_SQL = 'UPDATE total SET last_sync_time=? WHERE name="total";';
+var SET_LAST_SYNC_TIME_SQL = multiline(function () {/*
+  UPDATE
+    total
+  SET
+    last_sync_time=?
+  WHERE
+    name="total";
+*/});
 exports.setLastSyncTime = function (time, callback) {
   mysql.query(SET_LAST_SYNC_TIME_SQL, Number(time), callback);
 };
 
-var SET_LAST_EXIST_SYNC_TIME_SQL = 'UPDATE total SET last_exist_sync_time=? WHERE name="total";';
+var SET_LAST_EXIST_SYNC_TIME_SQL = multiline(function () {/*
+  UPDATE
+    total
+  SET
+    last_exist_sync_time=?
+  WHERE
+    name="total";
+*/});
 exports.setLastExistSyncTime = function (time, callback) {
   mysql.query(SET_LAST_EXIST_SYNC_TIME_SQL, Number(time), callback);
 };
 
-var UPDATE_SYNC_STATUS_SQL = 'UPDATE total SET sync_status = ? WHERE name="total";';
+var UPDATE_SYNC_STATUS_SQL = multiline(function () {/*
+  UPDATE
+    total
+  SET
+    sync_status=?
+  WHERE
+    name="total";
+*/});
 exports.updateSyncStatus = function (status, callback) {
   mysql.query(UPDATE_SYNC_STATUS_SQL, [status], callback);
 };
 
-var UPDATE_SYNC_NUM_SQL = 'UPDATE total SET sync_status = ?, need_sync_num = ?, \
-  success_sync_num = ?, fail_sync_num = ?, left_sync_num = ?, last_sync_module=? \
-  WHERE name="total";';
+var UPDATE_SYNC_NUM_SQL = multiline(function () {/*
+  UPDATE
+    total
+  SET
+    sync_status = ?,
+    need_sync_num = ?,
+    success_sync_num = ?,
+    fail_sync_num = ?,
+    left_sync_num = ?,
+    last_sync_module = ?
+  WHERE
+    name="total";
+*/});
 exports.updateSyncNum = function (params, callback) {
   var query = [
     params.syncStatus, params.need || 0,

@@ -15,11 +15,17 @@
  */
 
 var mysql = require('../common/mysql');
+var multiline = require('multiline');
 
+var ADD_SQL = multiline(function () {/*
+  INSERT iNTO
+    module_star(name, user)
+  VALUES
+    (?, ?);
+*/});
 exports.add = function *add(name, user) {
-  var sql = 'INSERT INTO module_star(name, user) VALUES(?, ?);';
   try {
-    yield mysql.query(sql, [name, user]);
+    yield mysql.query(ADD_SQL, [name, user]);
   } catch (err) {
     if (err.code !== 'ER_DUP_ENTRY') {
       throw err;
@@ -27,22 +33,41 @@ exports.add = function *add(name, user) {
   }
 };
 
+var REMOVE_SQL = multiline(function () {/*
+  DELETE FROM
+    module_star
+  WHERE
+    name = ? AND user = ?;
+*/});
 exports.remove = function *(name, user) {
-  var sql = 'DELETE FROM module_star WHERE name = ? AND user = ?;';
-  return yield mysql.query(sql, [name, user]);
+  return yield mysql.query(REMOVE_SQL, [name, user]);
 };
 
+var LIST_USERS_SQL = multiline(function () {/*
+  SELECT
+    user
+  FROM
+    module_star
+  WHERE
+    name = ?;
+*/});
 exports.listUsers = function *(name) {
-  var sql = 'SELECT user FROM module_star WHERE name = ?;';
-  var rows = yield mysql.query(sql, [name]);
+  var rows = yield mysql.query(LIST_USERS_SQL, [name]);
   return rows.map(function (r) {
     return r.user;
   });
 };
 
+var LIST_USER_MODULES_SQL = multiline(function () {/*
+  SELECT
+    name
+  FROM
+    module_star
+  WHERE
+    user = ?;
+*/});
 exports.listUserModules = function *(user) {
-  var sql = 'SELECT name FROM module_star WHERE user = ?;';
-  return (yield mysql.query(sql, [user])).map(function (r) {
+  return (yield mysql.query(LIST_USER_MODULES_SQL, [user])).map(function (r) {
     return r.name;
   });
 };

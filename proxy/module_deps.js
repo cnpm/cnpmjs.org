@@ -16,16 +16,26 @@
 
 var thunkify = require('thunkify-wrap');
 var mysql = require('../common/mysql');
+var multiline = require('multiline');
 
-var LIST_DEPS_SQL = 'SELECT deps FROM module_deps WHERE name=?;';
-
+var LIST_DEPS_SQL = multiline(function () {/*
+  SELECT
+    deps
+  FROM
+    module_deps
+  WHERE
+    name=?;
+*/});
 exports.list = function (name, callback) {
   mysql.query(LIST_DEPS_SQL, [name], callback);
 };
 
-var INSERT_DEPS_SQL = 'INSERT INTO module_deps(gmt_create, name, deps) \
-  VALUES(now(), ?, ?);';
-
+var INSERT_DEPS_SQL = multiline(function () {/*
+  INSERT INTO
+    module_deps(gmt_create, name, deps)
+  VALUES
+    (now(), ?, ?);
+*/});
 exports.add = function (name, deps, callback) {
   mysql.query(INSERT_DEPS_SQL, [name, deps], function (err, result) {
     if (err && err.code === 'ER_DUP_ENTRY') {
@@ -35,8 +45,12 @@ exports.add = function (name, deps, callback) {
   });
 };
 
-var DELETE_DEPS_SQL = 'DELETE FROM module_deps WHERE name=? AND deps=?;';
-
+var DELETE_DEPS_SQL = multiline(function () {/*
+  DELETE FROM
+    module_deps
+  WHERE
+    name=? AND deps=?;
+*/});
 exports.remove = function (name, deps, callback) {
   mysql.query(DELETE_DEPS_SQL, [name, deps], callback);
 };
