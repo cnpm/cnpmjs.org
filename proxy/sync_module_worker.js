@@ -609,7 +609,8 @@ SyncModuleWorker.prototype._syncOneVersion = function *(versionIndex, sourcePack
       shasum.update(data);
       dataSize += data.length;
     });
-    yield thunkify(rs)(); // after end event emit
+    var end = thunkify.event(rs);
+    yield end(); // after end event emit
 
     // check shasum
     shasum = shasum.digest('hex');
