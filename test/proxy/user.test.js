@@ -16,7 +16,6 @@
  */
 
 var should = require('should');
-var co = require('co');
 var mm = require('mm');
 var path = require('path');
 var fs = require('fs');
@@ -169,26 +168,26 @@ describe('proxy/user.test.js', function () {
     var notExistUser = JSON.parse(fs.readFileSync(path.join(fixtures, 'fengmk2.json')));
     notExistUser.name = 'fengmk2-not-exists';
 
-    before(co(function *() {
+    before(function *() {
       yield mysql.query('delete from user where name=?', [notExistUser.name]);
-    }));
+    });
 
-    it('should save npm user to exists user', co(function *() {
+    it('should save npm user to exists user', function *() {
       yield user.saveNpmUser(existUser);
       var r = yield mysql.queryOne('select rev, json, npm_user from user where name=?', existUser.name);
       should.exist(r);
       r.npm_user.should.equal(0);
       r.rev.should.equal(existUser._rev);
       JSON.parse(r.json).should.eql(existUser);
-    }));
+    });
 
-    it('should save npm user to not exists user and create it', co(function *() {
+    it('should save npm user to not exists user and create it', function *() {
       yield user.saveNpmUser(notExistUser);
       var r = yield mysql.queryOne('select name, json, npm_user from user where name=?', notExistUser.name);
       r.name.should.equal(notExistUser.name);
       should.exist(r);
       r.npm_user.should.equal(1);
       JSON.parse(r.json).should.eql(notExistUser);
-    }));
+    });
   });
 });

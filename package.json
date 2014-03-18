@@ -51,6 +51,7 @@
   "devDependencies": {
     "autod": ">=0.0.13",
     "chunkstream": "0.0.1",
+    "co-mocha": "0.0.2",
     "contributors": "*",
     "cov": "*",
     "istanbul": "git://github.com/gotwarlost/istanbul.git#harmony",
@@ -72,7 +73,11 @@
     "email": "fengmk2@gmail.com"
   },
   "keywords": [
-    "cnpmjs.org", "npm", "npmjs", "npmjs.org", "registry"
+    "cnpmjs.org",
+    "npm",
+    "npmjs",
+    "npmjs.org",
+    "registry"
   ],
   "engines": {
     "node": ">= 0.11.9"
