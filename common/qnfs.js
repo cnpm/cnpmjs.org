@@ -19,6 +19,8 @@ var qn = require('qn');
 var config = require('../config');
 var client = qn.create(config.qn);
 
+thunkify(client, ['delete', 'uploadFile', 'upload']);
+
 exports._client = client;
 
 /**
@@ -28,38 +30,45 @@ exports._client = client;
  * @param {Object} options
  *  - {String} key
  *  - {Number} size
- * @param {Function(err, result)} callback
- *  - {Object} result
- *   - {String} url
  */
-exports.upload = function (filepath, options, callback) {
-  client.delete(options.key, function (err, data) {
-    client.uploadFile(filepath, {key: options.key, size: options.size}, function (err, data) {
-      if (err) {
-        return callback(err);
-      }
-      callback(null, {url: data.url});
-    });
+exports.upload = function *(filepath, options) {
+  try {
+    yield client.delete(options.key);
+  } catch (err) {
+    // ignore error here
+  }
+
+  var res = yield client.uploadFile(filepath, {
+    key: options.key,
+    size: options.size
   });
+  var url = res && res[0] ? res[0].url : '';
+  return { url: url };
 };
 
-exports.uploadBuffer = function (buf, options, callback) {
-  client.delete(options.key, function (err, data) {
-    client.upload(buf, {key: options.key}, function (err, data) {
-      if (err) {
-        return callback(err);
-      }
-      callback(null, {url: data.url});
-    });
-  });
+exports.uploadBuffer = function *(buf, options) {
+  try {
+    yield client.delete(options.key);
+  } catch (err) {
+    // ignore error here
+  }
+
+  var res = yield client.upload(buf, {key: options.key});
+  var url = res && res[0] ? res[0].url : '';
+  return { url: url };
 };
 
 exports.url = function (key) {
   return client.resourceURL(key);
 };
 
-exports.remove = function (key, callback) {
-  client.delete(key, callback);
+exports.remove = function *(key) {
+  try {
+    return yield client.delete(key);
+  } catch (err) {
+    if (err.name === 'QiniuFileNotExistsError') {
+      return;
+    }
+    throw err;
+  }
 };
-
-thunkify(exports);
