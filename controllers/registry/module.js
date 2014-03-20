@@ -445,10 +445,7 @@ exports.updateLatest = function *(next) {
     debug('can not get nextMod');
     return yield* next;
   }
-  var match = nextMod.package.maintainers.filter(function (item) {
-    return item.name === username;
-  });
-  if (match.length === 0) {
+  if (!common.isMaintainer(this.user, nextMod.package.maintainers)) {
     this.status = 401;
     this.body = {
       error: 'noperms',
