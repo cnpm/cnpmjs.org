@@ -1,4 +1,15 @@
 
+0.3.11 / 2014-03-20 
+==================
+
+  * use common.isMaintainer, fixed #283
+  * update dependencies
+  * use co-mocha for test, fixed #279
+  * update thunkify-wrap, breaking change in thunkify-wrap
+  * refactor SQLs by using multiline
+  * use multiline to refactor sqls
+  * ignore contributors
+
 0.3.10 / 2014-03-16 
 ==================
 
