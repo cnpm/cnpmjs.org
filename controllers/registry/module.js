@@ -42,6 +42,20 @@ var ModuleStar = require('../../proxy/module_star');
  */
 exports.show = function *(next) {
   var name = this.params.name;
+  var modifiedTime = yield *Module.getLastModified(name);
+  debug('show %s, last modified: %s', name, modifiedTime);
+  if (modifiedTime) {
+    // use modifiedTime as etag
+    this.set('ETag', '"' + modifiedTime.getTime() + '"');
+
+    // must set status first
+    this.status = 200;
+    if (this.fresh) {
+      debug('%s not change at %s, 304 return', name, modifiedTime);
+      this.status = 304;
+      return;
+    }
+  }
 
   var r = yield [
     Module.listTags(name),
@@ -88,7 +102,6 @@ exports.show = function *(next) {
   var times = {};
   var attachments = {};
   var createdTime = null;
-  var modifiedTime = null;
   for (var i = 0; i < rows.length; i++) {
     var row = rows[i];
     if (row.version === 'next') {
@@ -108,9 +121,6 @@ exports.show = function *(next) {
 
     if (!createdTime || t < createdTime) {
       createdTime = t;
-    }
-    if (!modifiedTime || t > modifiedTime) {
-      modifiedTime = t;
     }
   }
 
@@ -162,7 +172,6 @@ exports.show = function *(next) {
   info.license = pkg.license;
 
   debug('show module %s: %s, latest: %s', name, rev, latestMod.version);
-
   this.body = info;
 };
 

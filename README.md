@@ -9,7 +9,8 @@ cnpmjs.org
 
 ## What is this?
 
-Private npm registry and web for Enterprise, base on [koa](http://koajs.com/), MySQL and [Simple Store Service](https://github.com/cnpm/cnpmjs.org/wiki/NFS-Guide).
+Private npm registry and web for Enterprise, base on [koa](http://koajs.com/),
+MySQL and [Simple Store Service](https://github.com/cnpm/cnpmjs.org/wiki/NFS-Guide).
 
 Our goal is to provide a low cost maintenance and easy to use solution for private npm.
 
@@ -21,15 +22,18 @@ Our goal is to provide a low cost maintenance and easy to use solution for priva
 
 ### Features
 
-* **Simple to deploy**: only need `mysql` and a [simple store system](https://github.com/cnpm/cnpmjs.org/wiki/NFS-Guide). You can get the source code through `npm` or `git`.
-* **Low cost and easy maintenance**: package.json info store in mysql, tarball store in CDN or other store systems.
-* **Automatic synchronization**: automatic synchronization from any registry specified, support tow sync modes.
-  - sync all modules from specified registry.
-  - only sync the modules that exist in you own registry.
+* **Simple to deploy**: only need `mysql` and a [simple store system](https://github.com/cnpm/cnpmjs.org/wiki/NFS-Guide).
+You can get the source code through `npm` or `git`.
+* **Low cost and easy maintenance**: `package.json` info store in MySQL, tarball(tgz file) store in CDN or other store systems.
+* **Automatic synchronization**: automatic synchronization from any registry specified, support two sync modes:
+  - Sync all modules from a specified registry, like [npm registry](http://registry.npmjs.org).
+  - Only sync the modules that exists in your own registry.
 * **Manual synchronization**: automatic synchronization may has little delay, but you can syn immediately by manually.
-* **Customized client**: we provide a client [cnpm](https://github.com/cnpm/cnpm) to extend npm with more features(sync command, gzip support). And it easy to wrap for your own registry which build with `cnpmjs.org`.
-* **Compatible with NPM client**: you can use the origin NPM client with `cnpmjs.org`, only need to change the registry in config. even include manual synchronization (throw `install` command).
-
+* **Customized client**: we provide a client [cnpm](https://github.com/cnpm/cnpm)
+to extend `npm` with more features(`sync` command, [gzip](https://github.com/npm/npm-registry-client/pull/40) support).
+And it easy to wrap for your own registry which build with `cnpmjs.org`.
+* **Compatible with NPM client**: you can use the origin NPM client with `cnpmjs.org`,
+only need to change the registry in config. Even include manual synchronization (through `install` command).
 
 ## Getting Start
 

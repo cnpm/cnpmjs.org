@@ -78,6 +78,7 @@ describe('controllers/registry/module.test.js', function () {
         // should have etag
         res.headers.should.have.property('etag');
         etag = res.headers.etag;
+        etag.should.match(/^"\d{13}"$/);
         res.body.should.have.keys('_id', '_rev', 'name', 'description',
           'versions', 'dist-tags', 'readme', 'maintainers',
           'time', 'author', 'repository', '_attachments',
