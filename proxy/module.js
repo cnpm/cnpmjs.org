@@ -671,3 +671,18 @@ exports.updateMaintainers = function *(id, maintainers) {
   var pkg = stringifyPackage(mod.package);
   return yield mysql.query(UPDATE_PACKAGE_SQL, [pkg, id]);
 };
+
+var GET_LAST_MODIFIED_MODULE_SQL = multiline(function () {/*
+  SELECT
+    id, gmt_modified
+  FROM
+    module
+  WHERE
+    name=?
+  ORDER BY
+    gmt_modified DESC;
+*/});
+exports.getLastModified = function *(name) {
+  var row = yield mysql.queryOne(GET_LAST_MODIFIED_MODULE_SQL, [name]);
+  return row && row.gmt_modified;
+};
