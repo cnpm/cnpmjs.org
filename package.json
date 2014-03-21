@@ -9,11 +9,6 @@
     "status": "./bin/nodejsctl status",
     "stop": "./bin/nodejsctl stop"
   },
-  "config": {
-    "cov": {
-      "threshold": 83
-    }
-  },
   "dependencies": {
     "co": "3.0.5",
     "co-gather": "0.0.1",
