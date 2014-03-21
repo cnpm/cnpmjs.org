@@ -1,20 +1,5 @@
 # cnpmjs.org: Private npm registry and web for Enterprise
 
-[![Build Status](https://secure.travis-ci.org/cnpm/cnpmjs.org.png)](http://travis-ci.org/cnpm/cnpmjs.org) [![Dependency Status](https://gemnasium.com/cnpm/cnpmjs.org.png)](https://gemnasium.com/cnpm/cnpmjs.org)
-
-[![NPM](https://nodei.co/npm/cnpmjs.org.png?downloads=true&stars=true)](https://nodei.co/npm/cnpmjs.org/)
-
-## What is this?
-
-> Private npm registry and web for Enterprise, base on [koa](http://koajs.com/), MySQL and [Simple Store Service](https://github.com/cnpm/cnpmjs.org/wiki/NFS-Guide).
-
-* @[dead-horse](https://github.com/dead-horse): [What is cnpm?](http://deadhorse.me/slides/cnpmjs.html)
-* @[JacksonTian](https://github.com/JacksonTian/) had a talk about [private npm](https://speakerdeck.com/jacksontian/qi-ye-ji-node-dot-jskai-fa).
-
-## Install your private npm registry
-
-@see [Install and Get Started](/install).
-
 ## Registry
 
 * Our public registry: [r.cnpmjs.org](http://r.cnpmjs.org), syncing from [registry.npmjs.org](http://registry.npmjs.org)
@@ -115,9 +100,15 @@ $(function () {
 });
 </script>
 
-## cnpm cli
+## Usage
 
-alias it:
+use our npm client [cnpm](https://github.com/cnpm/cnpm)(More suitable with cnpmjs.org and gzip support), you can get our client throw npm:
+
+```
+npm install -g cnpm --registry=http://r.cnpmjs.org
+```
+
+Or you can alias NPM to use it:
 
 ```bash
 alias cnpm="npm --registry=http://r.cnpmjs.org \
@@ -130,12 +121,6 @@ $ echo '\n#alias for cnpm\nalias cnpm="npm --registry=http://r.cnpmjs.org \
   --cache=$HOME/.npm/.cache/cnpm \
   --disturl=http://cnpmjs.org/dist \
   --userconfig=$HOME/.cnpmrc"' >> ~/.zshrc && source ~/.zshrc
-```
-
-Or you can just use our `cnpm` cli:
-
-```bash
-$ npm install cnpm -g
 ```
 
 ### install
@@ -189,15 +174,16 @@ Release [History](/history).
 $ git summary
 
  project  : cnpmjs.org
- repo age : 7 weeks
- active   : 132 days
- commits  : 315
- files    : 88
+ repo age : 4 months ago
+ commits  : 472
+ active   : 167 days
+ files    : 104
  authors  :
-   190  fengmk2                 60.3%
-   122  dead_horse              38.7%
-     2  4simple                 0.6%
-     1  Alsotang                0.3%
+   272  fengmk2                 57.6%
+   195  dead_horse              41.3%
+     2  4simple                 0.4%
+     2  Stanley Zheng           0.4%
+     1  Alsotang                0.2%
 ```
 
 ## npm and cnpm relation
