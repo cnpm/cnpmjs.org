@@ -21,7 +21,7 @@ Our goal is to provide a low cost maintenance and easy to use solution for priva
 
 ### Features
 
-* **Simple to deploy**: only need `mysql` and a [simple store system](https://github.com/cnpm/cnpmjs.org/wiki/NFS-Guide). You can get the source code throw `npm` or `git`.
+* **Simple to deploy**: only need `mysql` and a [simple store system](https://github.com/cnpm/cnpmjs.org/wiki/NFS-Guide). You can get the source code through `npm` or `git`.
 * **Low cost and easy maintenance**: package.json info store in mysql, tarball store in CDN or other store systems.
 * **Automatic synchronization**: aotumatic synchronization from any registry specified, support tow sync modes.
   - sync all modules from specified registry.

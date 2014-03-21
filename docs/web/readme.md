@@ -105,7 +105,7 @@ $(function () {
 use our npm client [cnpm](https://github.com/cnpm/cnpm)(More suitable with cnpmjs.org and gzip support), you can get our client throw npm:
 
 ```
-npm install -g cnpm
+npm install -g cnpm --registry=http://r.cnpmjs.org
 ```
 
 Or you can alias NPM to use it:
