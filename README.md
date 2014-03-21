@@ -11,30 +11,69 @@ cnpmjs.org
 
 Private npm registry and web for Enterprise, base on [koa](http://koajs.com/), MySQL and [Simple Store Service](https://github.com/cnpm/cnpmjs.org/wiki/NFS-Guide).
 
+Our goal is to provide a low cost maintenance and easy to use solution for private npm.
+
+## What can you do with `cnpmjs.org`
+
+* Build a private npm for your own enterprise. ([alibaba](http://www.alibaba.com/) is using `cnpmjs.org` now)
+* Build a mirror NPM. (we use it to build a mirror in China: [cnpmjs.org](http://cnpmjs.org/))
+* Build a completely independent NPM registry to store whatever you like.
+
+### Features
+
+* **Simple to deploy**: only need `mysql` and a [simple store system](https://github.com/cnpm/cnpmjs.org/wiki/NFS-Guide). You can get the source code throw `npm` or `git`.
+* **Low cost and easy maintenance**: package.json info store in mysql, tarball store in CDN or other store systems.
+* **Automatic synchronization**: aotumatic synchronization from any registry specified, support tow sync modes.
+  - sync all modules from specified registry.
+  - only sync the modules that exist in you own registry.
+* **Manual synchronization**: automatic synchronization may has little delay, but you can syn immediately by manually.
+* **Customized client**: we provide a client [cnpm](https://github.com/cnpm/cnpm) to extend npm with more features(sync command, gzip support). And it easy to wrap for your own registry which build with `cnpmjs.org`.
+* **Compatible with NPM client**: you can use the origin NPM client with `cnpmjs.org`, only need to change the registry in config. even include manual synchronization (throw `install` command).
+
+
+## Getting Start
+
 * @[dead-horse](https://github.com/dead-horse): [What is cnpm?](http://deadhorse.me/slides/cnpmjs.html)
-* @[JacksonTian](https://github.com/JacksonTian/) had a talk about [private npm](https://speakerdeck.com/jacksontian/qi-ye-ji-node-dot-jskai-fa).
+* install and deploy cnpmjs.org throw npm: [examples](https://github.com/cnpm/custom-cnpm-example)
+* Mirror NPM in China: [cnpmjs.org](http://cnpmjs.org)
+* cnpm client: [cnpm](https://github.com/cnpm/cnpm), `npm install -g cnpm`
+* [How to deploy cnpmjs.org](https://github.com/cnpm/cnpmjs.org/wiki/Deploy)
+* [NFS guide](https://github.com/cnpm/cnpmjs.org/wiki/NFS-Guide)
 
 ![cnpm](https://docs.google.com/drawings/d/12QeQfGalqjsB77mRnf5Iq5oSXHCIUTvZTwECMonqCmw/pub?w=480&h=360)
 
-
-## Install
-
-```bash
-$ npm install --registry=http://r.cnpmjs.org --disturl=http://cnpmjs.org/dist
-```
-
-## Usage
-
-```js
-$ node --harmony-generators dispatch.js
-```
+## Develop
 
 **Notice**: need node version >=0.11.9
 
-## Guide
+```bash
+# clone from git
+$ git clone git@github.com:cnpm/cnpmjs.org.git
 
-* [How to deploy cnpmjs.org](https://github.com/cnpm/cnpmjs.org/wiki/Deploy)
-* [NFS guide](https://github.com/cnpm/cnpmjs.org/wiki/NFS-Guide)
+# install dependencise
+$ make install
+
+# test
+$ make test
+
+# coverage
+$ make test-cov
+
+# udpate dependencies
+$ make autod
+
+# start server
+$ node --harmony-generators dispatch.js
+```
+
+## Contribute
+
+* clone the project
+* checkout a new branch
+* add new features or fix bugs in the new branch
+* make a pull request and we will review it ASAP
+
+Tips: make sure your code is follow the [node-style-guide](https://github.com/felixge/node-style-guide).
 
 ## Authors
 
@@ -42,15 +81,16 @@ $ node --harmony-generators dispatch.js
 $ git summary
 
  project  : cnpmjs.org
- repo age : 3 months
- active   : 145 days
- commits  : 366
- files    : 94
+ repo age : 4 months ago
+ commits  : 472
+ active   : 167 days
+ files    : 104
  authors  :
-   217  fengmk2                 59.3%
-   146  dead_horse              39.9%
-     2  4simple                 0.5%
-     1  Alsotang                0.3%
+   272  fengmk2                 57.6%
+   195  dead_horse              41.3%
+     2  4simple                 0.4%
+     2  Stanley Zheng           0.4%
+     1  Alsotang                0.2%
 ```
 
 ## License
