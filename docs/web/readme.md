@@ -102,7 +102,7 @@ $(function () {
 
 ## Usage
 
-use our npm client [cnpm](https://github.com/cnpm/cnpm)(More suitable with cnpmjs.org and gzip support), you can get our client throw npm:
+use our npm client [cnpm](https://github.com/cnpm/cnpm)(More suitable with cnpmjs.org and gzip support), you can get our client through npm:
 
 ```
 npm install -g cnpm --registry=http://r.cnpmjs.org

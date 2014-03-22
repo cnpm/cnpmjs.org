@@ -38,7 +38,7 @@ only need to change the registry in config. Even include manual synchronization 
 ## Getting Start
 
 * @[dead-horse](https://github.com/dead-horse): [What is cnpm?](http://deadhorse.me/slides/cnpmjs.html)
-* install and deploy cnpmjs.org throw npm: [examples](https://github.com/cnpm/custom-cnpm-example)
+* install and deploy cnpmjs.org through npm: [examples](https://github.com/cnpm/custom-cnpm-example)
 * Mirror NPM in China: [cnpmjs.org](http://cnpmjs.org)
 * cnpm client: [cnpm](https://github.com/cnpm/cnpm), `npm install -g cnpm`
 * [How to deploy cnpmjs.org](https://github.com/cnpm/cnpmjs.org/wiki/Deploy)
