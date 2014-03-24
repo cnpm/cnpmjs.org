@@ -20,7 +20,7 @@
       <a href="/sync/<%= keyword %>" target="_blank">SYNC</a> from official npm registry or
       <a href="https://npmjs.org/search?q=<%= keyword %>" target="_blank">SEARCH</a> in official npm website.
     </div>
-  <% } else if (packages[0].name !== keyword) { %>
+  <% } else if (!match) { %>
     <div class="alert alert-info">
       Can not found package <%= keyword %>. You can
       <a href="/sync/<%= keyword %>" target="_blank">SYNC</a> from official npm registry or
@@ -32,10 +32,19 @@
       Packages match "<span style="color: #09f;"><%= keyword %></span>"
     </h1>
     <hr />
+    <% if (match) { %>
+      <div class="package match">
+        <a href="/package/<%= match.name %>" class="package-name"><%= match.name %></a>
+        <span class="package-description"><%= match.description %></span>
+      </div>
+    <% } %>
     <% for (var i = 0; i < packages.length; i++) {
       var item = packages[i];
+      if (item.name === keyword) {
+        continue;
+      }
     %>
-      <div class="package <%= item.name === keyword ? 'match' : '' %>">
+      <div class="package">
         <a href="/package/<%= item.name %>" class="package-name"><%= item.name %></a>
         <span class="package-description"><%= item.description %></span>
       </div>

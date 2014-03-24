@@ -119,20 +119,31 @@ exports.search = function *(next) {
   var params = this.params;
   var word = params.word;
   var result = yield Module.search(word);
+
+  var match = null;
+  for (var i = 0; i < result.searchMatchs.length; i++) {
+    var p = result.searchMatchs[i];
+    if (p.name === word) {
+      match = p;
+      break;
+    }
+  }
+
   // return a json result
   if (this.query && this.query.type === 'json') {
     this.body = {
       keyword: word,
+      match: match,
       packages: result.searchMatchs,
-      keywords: result.keywordMatchs
+      keywords: result.keywordMatchs,
     };
     this.type = 'application/json; charset=utf-8';
     return;
   }
-
   yield this.render('search', {
     title: 'Keyword - ' + word,
     keyword: word,
+    match: match,
     packages: result.searchMatchs,
     keywords: result.keywordMatchs,
   });
