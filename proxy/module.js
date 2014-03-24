@@ -444,7 +444,7 @@ LIST_SINCE_SQLS.push(multiline(function () {/*
 */}));
 LIST_SINCE_SQLS.push(multiline(function () {/*
   SELECT
-    name
+    distinct(name)
   FROM
     module
   WHERE
@@ -465,6 +465,16 @@ exports.listSince = function (start, callback) {
   ep.once('ids', function (ids) {
     mysql.query(LIST_SINCE_SQLS[1], [ids], callback);
   });
+};
+
+var LIST_ALL_NAME_SQL = multiline(function () {/*
+  SELECT
+    distinct(name)
+  FROM
+    module;
+*/});
+exports.listAllNames = function (callback) {
+  mysql.query(LIST_ALL_NAME_SQL, [], callback);
 };
 
 var LIST_SHORT_SQL = multiline(function () {/*

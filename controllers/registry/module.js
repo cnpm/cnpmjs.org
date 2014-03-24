@@ -902,7 +902,7 @@ function parseModsForList(updated, mods, ctx) {
 
 exports.listAllModules = function *() {
   var updated = Date.now();
-  var mods = yield Module.listSince(0);
+  var mods = yield Module.listAllNames();
   var result = { _updated: updated };
   mods.forEach(function (mod) {
     result[mod.name] = true;
