@@ -555,7 +555,6 @@ describe('controllers/registry/module.test.js', function () {
         res.body._updated.should.be.a.Number;
         var keys = Object.keys(res.body);
         keys.length.should.be.above(1);
-        res.body[keys[1]].dist.tarball.should.include('/download/');
         done();
       });
     });
