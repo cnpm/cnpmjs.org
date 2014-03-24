@@ -444,7 +444,7 @@ LIST_SINCE_SQLS.push(multiline(function () {/*
 */}));
 LIST_SINCE_SQLS.push(multiline(function () {/*
   SELECT
-    name, package
+    name
   FROM
     module
   WHERE

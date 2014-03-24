@@ -903,7 +903,11 @@ function parseModsForList(updated, mods, ctx) {
 exports.listAllModules = function *() {
   var updated = Date.now();
   var mods = yield Module.listSince(0);
-  this.body = parseModsForList(updated, mods, this);
+  var result = { _updated: updated };
+  mods.forEach(function (mod) {
+    result[mod.name] = true;
+  });
+  this.body = result;
 };
 
 exports.listAllModulesSince = function *() {
@@ -921,7 +925,12 @@ exports.listAllModulesSince = function *() {
   var startkey = Number(query.startkey) || 0;
   var updated = Date.now();
   var mods = yield Module.listSince(startkey);
-  this.body = parseModsForList(updated, mods, this);
+  var result = { _updated: updated };
+  mods.forEach(function (mod) {
+    result[mod.name] = true;
+  });
+
+  this.body = result;
 };
 
 exports.listAllModuleNames = function *() {
