@@ -1,4 +1,17 @@
 
+0.3.12 / 2014-03-26
+==================
+
+ * fix result.successes not exist error
+ * fix search list
+ * add simple request for listall
+ * only return package name in /-/all and /-/all/since, fixed #291
+ * refine docs foloder
+ * use module gmt_modified as etag. fix #288
+ * fix typo, remove unused config in package.json
+ * web page only list cnpm registry related info
+ * use generator in qnfs
+
 0.3.11 / 2014-03-20 
 ==================
 
