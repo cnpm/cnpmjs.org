@@ -99,7 +99,7 @@ function sendMailToAdmin(err, result, syncTime) {
       'Start sync time is %s.\n %d packges sync failed: %j ...\n %d packages sync successes :%j ...',
       syncTime, result.fails.length, result.fails.slice(0, 10),
       result.successes.length, result.successes.slice(0, 10));
-  } else {
+  } else if (result.successes && result.successes.length) {
     subject = 'Sync Finished';
     type = 'log';
     html = util.format('Sync packages from official registry finished.\n' +
@@ -107,7 +107,7 @@ function sendMailToAdmin(err, result, syncTime) {
       syncTime, result.successes.length, result.successes.slice(0, 10));
   }
   debug('send email with type: %s, subject: %s, html: %s', type, subject, html);
-  if (type !== 'log') {
+  if (type && type !== 'log') {
     mail[type](to, subject, html, function (err) {
       if (err) {
         logger.info('send email with type: %s, subject: %s, html: %s', type, subject, html);
