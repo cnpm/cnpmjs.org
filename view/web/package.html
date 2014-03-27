@@ -85,6 +85,18 @@
             <% } %>
           </td>
         </tr>
+        <% if (package.engines) {%>
+        <tr>
+          <th>Engines</th>
+          <td>
+            <ul>
+            <% for (var k in package.engines) { %>
+              <li><%= k %>: <%= package.engines[k] %></li>
+            <% } %>
+            </ul>
+          </td>
+        </tr>
+        <% } %>
         <% if (package.license) { %>
         <tr>
           <th>License</th>
