@@ -15,7 +15,7 @@
  * Module dependencies.
  */
 
-var debug = require('debug')('cnpmjs.org:controllers:registry');
+var debug = require('debug')('cnpmjs.org:controllers:registry:user');
 var utility = require('utility');
 var crypto = require('crypto');
 var User = require('../../proxy/user');
