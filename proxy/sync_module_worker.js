@@ -651,6 +651,8 @@ SyncModuleWorker.prototype._syncOneVersion = function *(versionIndex, sourcePack
       publish_time: sourcePackage.publish_time,
     };
 
+    // delete _publish_on_cnpm, because other cnpm maybe sync from current cnpm
+    delete mod.package._publish_on_cnpm;
     if (that._publish) {
       // sync as publish
       mod.package._publish_on_cnpm = true;

@@ -47,7 +47,9 @@ describe('proxy/sync_module_worker.test.js', function () {
 
     worker.start();
     worker.on('end', function () {
-      worker.successes.concat(worker.fails).should.eql(['cnpmjs.org', 'cutter']);
+      var names = worker.successes.concat(worker.fails);
+      names.sort();
+      names.should.eql(['cnpmjs.org', 'cutter']);
       done();
     });
   });
