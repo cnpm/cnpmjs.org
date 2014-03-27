@@ -2,6 +2,8 @@
 0.3.13 / 2014-03-27
 ==================
 
+ * fix npm adduser update 409 bug
+ * fix multiline coverage
  * show package engines. fixed #280
  * dont sync local package field. fix #295
 
