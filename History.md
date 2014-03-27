@@ -1,4 +1,10 @@
 
+0.3.13 / 2014-03-27
+==================
+
+ * show package engines. fixed #280
+ * dont sync local package field. fix #295
+
 0.3.12 / 2014-03-26
 ==================
 
