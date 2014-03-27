@@ -121,7 +121,7 @@ exports.update = function (user, callback) {
 
   var values = [newRev, user.email, user.salt, user.password_sha, user.ip, roles, user.name, rev];
   mysql.query(UPDATE_USER_SQL, values, function (err, data) {
-    if (err || !data.affectedRows) {
+    if (err) {
       return callback(err);
     }
     callback(null, {rev: newRev});
