@@ -18,7 +18,7 @@ var thunkify = require('thunkify-wrap');
 var mysql = require('../common/mysql');
 var multiline = require('multiline');
 
-var INSERT_LOG_SQL = multiline(function () {/*
+var INSERT_LOG_SQL = multiline(function () {;/*
   INSERT INTO
     module_log(gmt_create, gmt_modified, name, username, log)
   VALUES
@@ -33,7 +33,7 @@ exports.create = function (data, callback) {
   });
 };
 
-var APPEND_SQL = multiline(function () {/*
+var APPEND_SQL = multiline(function () {;/*
   UPDATE
     module_log
   SET
@@ -49,7 +49,7 @@ exports.append = function (id, log, callback) {
   });
 };
 
-var SELECT_SQL = multiline(function () {/*
+var SELECT_SQL = multiline(function () {;/*
   SELECT
     *
   FROM

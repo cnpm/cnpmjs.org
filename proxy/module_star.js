@@ -17,7 +17,7 @@
 var mysql = require('../common/mysql');
 var multiline = require('multiline');
 
-var ADD_SQL = multiline(function () {/*
+var ADD_SQL = multiline(function () {;/*
   INSERT iNTO
     module_star(name, user)
   VALUES
@@ -33,7 +33,7 @@ exports.add = function *add(name, user) {
   }
 };
 
-var REMOVE_SQL = multiline(function () {/*
+var REMOVE_SQL = multiline(function () {;/*
   DELETE FROM
     module_star
   WHERE
@@ -43,7 +43,7 @@ exports.remove = function *(name, user) {
   return yield mysql.query(REMOVE_SQL, [name, user]);
 };
 
-var LIST_USERS_SQL = multiline(function () {/*
+var LIST_USERS_SQL = multiline(function () {;/*
   SELECT
     user
   FROM
@@ -58,7 +58,7 @@ exports.listUsers = function *(name) {
   });
 };
 
-var LIST_USER_MODULES_SQL = multiline(function () {/*
+var LIST_USER_MODULES_SQL = multiline(function () {;/*
   SELECT
     name
   FROM

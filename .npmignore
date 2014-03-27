@@ -14,3 +14,4 @@ bin/test.sql
 coverage/
 .jshintrc
 .jshintignore
+.DS_Store

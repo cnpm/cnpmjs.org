@@ -24,7 +24,7 @@ var multiline = require('multiline');
 var MODULE_COLUMNS = 'id, publish_time, gmt_create, gmt_modified, author, name, \
   version, description, package, dist_tarball, dist_shasum, dist_size';
 
-var INSERT_MODULE_SQL = multiline(function () {/*
+var INSERT_MODULE_SQL = multiline(function () {;/*
   INSERT INTO
     module(gmt_create, gmt_modified, publish_time, author, name, version,
       package, dist_tarball, dist_shasum, dist_size, description)
@@ -96,7 +96,7 @@ exports.add = function (mod, callback) {
   });
 };
 
-var GET_KEYWORD_SQL = multiline(function () {/*
+var GET_KEYWORD_SQL = multiline(function () {;/*
   SELECT
     keyword
   FROM
@@ -119,7 +119,7 @@ exports.getKeywords = function (name, callback) {
   });
 };
 
-var ADD_KEYWORD_SQL = multiline(function () {/*
+var ADD_KEYWORD_SQL = multiline(function () {;/*
   INSERT INTO
     module_keyword(gmt_create, keyword, name, description)
   VALUES
@@ -152,7 +152,7 @@ exports.addKeywords = function (name, description, keywords, callback) {
   });
 };
 
-var UPDATE_DESC_SQL = multiline(function () {/*
+var UPDATE_DESC_SQL = multiline(function () {;/*
   UPDATE
     module
   SET
@@ -164,7 +164,7 @@ exports.updateDescription = function (id, description, callback) {
   mysql.query(UPDATE_DESC_SQL, [description, id], callback);
 };
 
-var UPDATE_PACKAGE_SQL = multiline(function () {/*
+var UPDATE_PACKAGE_SQL = multiline(function () {;/*
   UPDATE
     module
   SET
@@ -184,7 +184,7 @@ exports.updateReadme = function (id, readme, callback) {
   });
 };
 
-var UPDATE_DIST_SQL = multiline(function () {/*
+var UPDATE_DIST_SQL = multiline(function () {;/*
   UPDATE
     module
   SET
@@ -235,7 +235,7 @@ function stringifyPackage(pkg) {
 }
 
 
-var SELECT_MODULE_BY_ID_SQL = multiline(function () {/*
+var SELECT_MODULE_BY_ID_SQL = multiline(function () {;/*
   SELECT
     id, publish_time, gmt_create, gmt_modified, author, name,
     version, description, package, dist_tarball, dist_shasum, dist_size
@@ -260,7 +260,7 @@ exports.getById = function (id, callback) {
   });
 };
 
-var SELECT_MODULE_SQL = multiline(function () {/*
+var SELECT_MODULE_SQL = multiline(function () {;/*
   SELECT
     id, publish_time, gmt_create, gmt_modified, author, name,
     version, description, package, dist_tarball, dist_shasum, dist_size
@@ -284,7 +284,7 @@ exports.get = function (name, version, callback) {
   });
 };
 
-var SELECT_MODULE_ID_SQL = multiline(function () {/*
+var SELECT_MODULE_ID_SQL = multiline(function () {;/*
   SELECT
     id
   FROM
@@ -292,7 +292,7 @@ var SELECT_MODULE_ID_SQL = multiline(function () {/*
   WHERE
     name=? AND version=?;
 */});
-var INSERT_TAG_SQL = multiline(function () {/*
+var INSERT_TAG_SQL = multiline(function () {;/*
   INSERT INTO
     tag(gmt_create, gmt_modified, name, tag, version, module_id)
   VALUES
@@ -319,7 +319,7 @@ exports.addTag = function (name, tag, version, callback) {
   });
 };
 
-var SELECT_TAG_SQL = multiline(function () {/*
+var SELECT_TAG_SQL = multiline(function () {;/*
   SELECT
     tag, version, gmt_modified, module_id
   FROM
@@ -336,7 +336,7 @@ exports.getByTag = function (name, tag, callback) {
   });
 };
 
-var DELETE_TAGS_SQL = multiline(function () {/*
+var DELETE_TAGS_SQL = multiline(function () {;/*
   DELETE FROM
     tag
   WHERE
@@ -346,7 +346,7 @@ exports.removeTags = function (name, callback) {
   mysql.query(DELETE_TAGS_SQL, [name], callback);
 };
 
-var DELETE_TAGS_BY_IDS_SQL = multiline(function () {/*
+var DELETE_TAGS_BY_IDS_SQL = multiline(function () {;/*
   DELETE FROM
     tag
   WHERE
@@ -356,7 +356,7 @@ exports.removeTagsByIds = function (ids, callback) {
   mysql.query(DELETE_TAGS_BY_IDS_SQL, [ids], callback);
 };
 
-var SELECT_ALL_TAGS_SQL = multiline(function () {/*
+var SELECT_ALL_TAGS_SQL = multiline(function () {;/*
   SELECT
     id, tag, version, gmt_modified, module_id
   FROM
@@ -368,7 +368,7 @@ exports.listTags = function (name, callback) {
   mysql.query(SELECT_ALL_TAGS_SQL, [name], callback);
 };
 
-var SELECT_LATEST_MODULE_SQL = multiline(function () {/*
+var SELECT_LATEST_MODULE_SQL = multiline(function () {;/*
   SELECT
     id, publish_time, gmt_create, gmt_modified, author, name,
     version, description, package, dist_tarball, dist_shasum, dist_size
@@ -403,7 +403,7 @@ exports.getLatest = function (name, callback) {
   });
 };
 
-var LIST_MODULE_SQL = multiline(function () {/*
+var LIST_MODULE_SQL = multiline(function () {;/*
   SELECT
     id, publish_time, gmt_create, gmt_modified, author, name,
     version, description, package, dist_tarball, dist_shasum, dist_size
@@ -434,7 +434,7 @@ exports.listByName = function (name, callback) {
 };
 
 var LIST_SINCE_SQLS = [];
-LIST_SINCE_SQLS.push(multiline(function () {/*
+LIST_SINCE_SQLS.push(multiline(function () {;/*
   SELECT
     module_id
   FROM
@@ -442,7 +442,7 @@ LIST_SINCE_SQLS.push(multiline(function () {/*
   WHERE
     tag="latest" AND gmt_modified>?;
 */}));
-LIST_SINCE_SQLS.push(multiline(function () {/*
+LIST_SINCE_SQLS.push(multiline(function () {;/*
   SELECT
     distinct(name)
   FROM
@@ -467,7 +467,7 @@ exports.listSince = function (start, callback) {
   });
 };
 
-var LIST_ALL_NAME_SQL = multiline(function () {/*
+var LIST_ALL_NAME_SQL = multiline(function () {;/*
   SELECT
     distinct(name)
   FROM
@@ -477,7 +477,7 @@ exports.listAllNames = function (callback) {
   mysql.query(LIST_ALL_NAME_SQL, [], callback);
 };
 
-var LIST_SHORT_SQL = multiline(function () {/*
+var LIST_SHORT_SQL = multiline(function () {;/*
   SELECT
     distinct(name)
   FROM
@@ -489,7 +489,7 @@ exports.listShort = function (callback) {
   mysql.query(LIST_SHORT_SQL, callback);
 };
 
-var LIST_ALL_MODULE_NAMES_SQL = multiline(function () {/*
+var LIST_ALL_MODULE_NAMES_SQL = multiline(function () {;/*
   SELECT
     distinct(name)
   FROM
@@ -501,7 +501,7 @@ exports.listAllModuleNames = function (callback) {
   mysql.query(LIST_ALL_MODULE_NAMES_SQL, callback);
 };
 
-var DELETE_MODULE_BY_NAME_SQL = multiline(function () {/*
+var DELETE_MODULE_BY_NAME_SQL = multiline(function () {;/*
   DELETE FROM
     module
   WHERE
@@ -511,7 +511,7 @@ exports.removeByName = function (name, callback) {
   mysql.query(DELETE_MODULE_BY_NAME_SQL, [name], callback);
 };
 
-var DELETE_MODULE_BY_NAME_AND_VERSIONS_SQL = multiline(function () {/*
+var DELETE_MODULE_BY_NAME_AND_VERSIONS_SQL = multiline(function () {;/*
   DELETE FROM
     module
   WHERE
@@ -522,7 +522,7 @@ exports.removeByNameAndVersions = function (name, versions, callback) {
 };
 
 var LIST_BY_AUTH_SQLS = [];
-LIST_BY_AUTH_SQLS.push(multiline(function () {/*
+LIST_BY_AUTH_SQLS.push(multiline(function () {;/*
   SELECT
     distinct(name) AS name
   FROM
@@ -534,7 +534,7 @@ LIST_BY_AUTH_SQLS.push(multiline(function () {/*
   LIMIT
     100;
 */}));
-LIST_BY_AUTH_SQLS.push(multiline(function () {/*
+LIST_BY_AUTH_SQLS.push(multiline(function () {;/*
   SELECT
     module_id
   FROM
@@ -542,7 +542,7 @@ LIST_BY_AUTH_SQLS.push(multiline(function () {/*
   WHERE
     tag="latest" AND name IN (?);
 */}));
-LIST_BY_AUTH_SQLS.push(multiline(function () {/*
+LIST_BY_AUTH_SQLS.push(multiline(function () {;/*
   SELECT
     name, description
   FROM
@@ -578,7 +578,7 @@ exports.listByAuthor = function (author, callback) {
   });
 };
 
-var SEARCH_MODULES_SQL = multiline(function () {/*
+var SEARCH_MODULES_SQL = multiline(function () {;/*
   SELECT
     module_id
   FROM
@@ -590,7 +590,7 @@ var SEARCH_MODULES_SQL = multiline(function () {/*
   LIMIT
     ?;
 */});
-var SEARCH_MODULES_BY_KEYWORD_SQL = multiline(function () {/*
+var SEARCH_MODULES_BY_KEYWORD_SQL = multiline(function () {;/*
   SELECT
     name, description
   FROM
@@ -602,7 +602,7 @@ var SEARCH_MODULES_BY_KEYWORD_SQL = multiline(function () {/*
   LIMIT
     ?;
 */});
-var QUERY_MODULES_BY_ID_SQL = multiline(function () {/*
+var QUERY_MODULES_BY_ID_SQL = multiline(function () {;/*
   SELECT
     name, description
   FROM
@@ -682,7 +682,7 @@ exports.updateMaintainers = function *(id, maintainers) {
   return yield mysql.query(UPDATE_PACKAGE_SQL, [pkg, id]);
 };
 
-var GET_LAST_MODIFIED_MODULE_SQL = multiline(function () {/*
+var GET_LAST_MODIFIED_MODULE_SQL = multiline(function () {;/*
   SELECT
     id, gmt_modified
   FROM

@@ -20,7 +20,7 @@ var config = require('../config');
 var mysql = require('../common/mysql');
 var multiline = require('multiline');
 
-var DB_SIZE_SQL = multiline(function () {/*
+var DB_SIZE_SQL = multiline(function () {;/*
   SELECT
     TABLE_NAME AS name, data_length, index_length
   FROM
@@ -93,7 +93,7 @@ exports.get = function (callback) {
   });
 };
 
-var PLUS_DELETE_MODULE_SQL = multiline(function () {/*
+var PLUS_DELETE_MODULE_SQL = multiline(function () {;/*
   UPDATE
     total
   SET
@@ -109,7 +109,7 @@ exports.getTotalInfo = function (callback) {
   mysql.queryOne(TOTAL_INFO_SQL, callback);
 };
 
-var SET_LAST_SYNC_TIME_SQL = multiline(function () {/*
+var SET_LAST_SYNC_TIME_SQL = multiline(function () {;/*
   UPDATE
     total
   SET
@@ -121,7 +121,7 @@ exports.setLastSyncTime = function (time, callback) {
   mysql.query(SET_LAST_SYNC_TIME_SQL, Number(time), callback);
 };
 
-var SET_LAST_EXIST_SYNC_TIME_SQL = multiline(function () {/*
+var SET_LAST_EXIST_SYNC_TIME_SQL = multiline(function () {;/*
   UPDATE
     total
   SET
@@ -133,7 +133,7 @@ exports.setLastExistSyncTime = function (time, callback) {
   mysql.query(SET_LAST_EXIST_SYNC_TIME_SQL, Number(time), callback);
 };
 
-var UPDATE_SYNC_STATUS_SQL = multiline(function () {/*
+var UPDATE_SYNC_STATUS_SQL = multiline(function () {;/*
   UPDATE
     total
   SET
@@ -145,7 +145,7 @@ exports.updateSyncStatus = function (status, callback) {
   mysql.query(UPDATE_SYNC_STATUS_SQL, [status], callback);
 };
 
-var UPDATE_SYNC_NUM_SQL = multiline(function () {/*
+var UPDATE_SYNC_NUM_SQL = multiline(function () {;/*
   UPDATE
     total
   SET

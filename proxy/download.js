@@ -19,7 +19,7 @@ var config = require('../config');
 var mysql = require('../common/mysql');
 var multiline = require('multiline');
 
-var PLUS_SQL = multiline(function () {/*
+var PLUS_SQL = multiline(function () {;/*
   INSERT INTO
     download_total(gmt_create, gmt_modified, date, name, count)
   VALUES
@@ -33,7 +33,7 @@ exports.plusTotal = function (data, callback) {
   mysql.query(PLUS_SQL, [data.date, data.name, data.count], callback);
 };
 
-var SELECT_ONE_TOTAL_SQL = multiline(function () {/*
+var SELECT_ONE_TOTAL_SQL = multiline(function () {;/*
   SELECT
     date, count
   FROM
@@ -45,7 +45,7 @@ exports.getModuleTotal = function (name, start, end, callback) {
   mysql.query(SELECT_ONE_TOTAL_SQL, [start, end, name], callback);
 };
 
-var SELECT_ALL_TOTAL_SQL = multiline(function () {/*
+var SELECT_ALL_TOTAL_SQL = multiline(function () {;/*
   SELECT
     date, sum(count) AS count
   FROM
