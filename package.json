@@ -49,7 +49,7 @@
     "co-mocha": "0.0.2",
     "contributors": "*",
     "cov": "*",
-    "istanbul": "git://github.com/gotwarlost/istanbul.git#harmony",
+    "istanbul-harmony": "*",
     "jshint": "*",
     "mm": "0.2.1",
     "mocha": "*",
