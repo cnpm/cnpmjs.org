@@ -20,7 +20,7 @@ var config = require('../config');
 var mysql = require('../common/mysql');
 var multiline = require('multiline');
 
-var SELECT_USER_SQL = multiline(function () {/*
+var SELECT_USER_SQL = multiline(function () {;/*
   SELECT
     id, rev, name, email, salt, password_sha, ip,
     roles, json, npm_user, gmt_create, gmt_modified
@@ -66,7 +66,7 @@ exports.auth = function (name, password, callback) {
 };
 
 
-var INSERT_USER_SQL = multiline(function () {/*
+var INSERT_USER_SQL = multiline(function () {;/*
   INSERT INTO
     user(rev, name, email, salt, password_sha,
     ip, roles, gmt_create, gmt_modified)
@@ -87,7 +87,7 @@ exports.add = function (user, callback) {
   });
 };
 
-var UPDATE_USER_SQL = multiline(function () {/*
+var UPDATE_USER_SQL = multiline(function () {;/*
   UPDATE
     user
   SET
@@ -145,7 +145,7 @@ exports.saveNpmUser = function *(user) {
   }
 };
 
-var LIST_BY_NAMES_SQL = multiline(function () {/*
+var LIST_BY_NAMES_SQL = multiline(function () {;/*
   SELECT
     id, name, email, json
   FROM

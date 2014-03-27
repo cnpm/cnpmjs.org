@@ -18,7 +18,7 @@ var thunkify = require('thunkify-wrap');
 var mysql = require('../common/mysql');
 var multiline = require('multiline');
 
-var LIST_DEPS_SQL = multiline(function () {/*
+var LIST_DEPS_SQL = multiline(function () {;/*
   SELECT
     deps
   FROM
@@ -30,7 +30,7 @@ exports.list = function (name, callback) {
   mysql.query(LIST_DEPS_SQL, [name], callback);
 };
 
-var INSERT_DEPS_SQL = multiline(function () {/*
+var INSERT_DEPS_SQL = multiline(function () {;/*
   INSERT INTO
     module_deps(gmt_create, name, deps)
   VALUES
@@ -45,7 +45,7 @@ exports.add = function (name, deps, callback) {
   });
 };
 
-var DELETE_DEPS_SQL = multiline(function () {/*
+var DELETE_DEPS_SQL = multiline(function () {;/*
   DELETE FROM
     module_deps
   WHERE
