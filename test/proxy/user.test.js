@@ -140,7 +140,8 @@ describe('proxy/user.test.js', function () {
       mockUser.rev = '1-error';
       user.update(mockUser, function (err, data) {
         should.not.exist(err);
-        should.not.exist(data);
+        should.exist(data);
+        data.result.affectedRows.should.equal(0);
         done();
       });
     });

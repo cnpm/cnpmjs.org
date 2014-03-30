@@ -255,11 +255,15 @@ SyncModuleWorker.prototype._sync = function *(name, pkg) {
 
     var maintainers = p.maintainers || [];
     if (maintainers && !Array.isArray(maintainers)) {
+      // http://r.cnpmjs.org/jasmine-node
+      // TODO: "maintainers": "Martin HĂ¤ger <martin.haeger@gmail.com>",
       maintainers = [maintainers];
     }
 
     maintainers.forEach(function (m) {
-      npmUsernames[m.name.toLowerCase()] = 1;
+      if (m.name) {
+        npmUsernames[m.name.toLowerCase()] = 1;
+      }
     });
   }
 

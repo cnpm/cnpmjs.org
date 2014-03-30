@@ -124,7 +124,7 @@ exports.update = function (user, callback) {
     if (err) {
       return callback(err);
     }
-    callback(null, {rev: newRev});
+    callback(null, {rev: newRev, result: data});
   });
 };
 
