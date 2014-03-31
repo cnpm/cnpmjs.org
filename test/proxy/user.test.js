@@ -127,11 +127,12 @@ describe('proxy/user.test.js', function () {
 
   describe('update()', function () {
     before(initUser);
+
     it('should update ok', function (done) {
       user.update(mockUser, function (err, data) {
         should.not.exist(err);
         should.exist(data);
-        data.should.have.keys(['rev']);
+        data.should.have.keys('rev', 'result');
         done();
       });
     });
