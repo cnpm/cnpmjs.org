@@ -200,7 +200,7 @@ describe('controllers/registry/user.test.js', function () {
       .expect(500, done);
     });
 
-    it('should 409 when req.body.rev error', function (done) {
+    it('should 201 when req.body.rev error', function (done) {
       request(app)
       .put('/-/user/org.couchdb.user:cnpmjstest10/-rev/:1-123')
       .set('authorization', 'basic ' + new Buffer('cnpmjstest10:cnpmjstest10').toString('base64'))
@@ -210,7 +210,7 @@ describe('controllers/registry/user.test.js', function () {
         email: 'cnpmjstest10@cnpmjs.org',
         rev: '1-123'
       })
-      .expect(409, done);
+      .expect(201, done);
     });
 
     it('should 201 update ok', function (done) {
