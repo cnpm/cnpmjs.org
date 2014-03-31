@@ -49,8 +49,8 @@ app.use(middlewares.bodyParser());
 app.use(auth());
 app.use(notFound);
 
-app.use(middlewares.gzip());
-app.use(middlewares.fresh());
+app.use(middlewares.compress());
+app.use(middlewares.conditional());
 app.use(middlewares.etag());
 
 var viewDir = path.join(rootdir, 'view', 'web');
