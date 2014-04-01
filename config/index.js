@@ -19,6 +19,7 @@ var path = require('path');
 var fs = require('fs');
 var os = require('os');
 var mkdirp = require('mkdirp');
+var copy = require('copy-to');
 
 fs.existsSync = fs.existsSync || path.existsSync;
 var version = require('../package.json').version;
@@ -108,10 +109,7 @@ var config = {
 // load config/config.js, everything in config.js will cover the same key in index.js
 var customConfig = path.join(root, 'config/config.js');
 if (fs.existsSync(customConfig)) {
-  var options = require(customConfig);
-  for (var k in options) {
-    config[k] = options[k];
-  }
+  copy(require(customConfig)).toCover(config);
 }
 
 mkdirp.sync(config.logdir);
@@ -123,7 +121,5 @@ config.loadConfig = function (customConfig) {
   if (!customConfig) {
     return;
   }
-  for (var key in customConfig) {
-    config[key] = customConfig[key];
-  }
+  copy(customConfig).toCover(config);
 };
