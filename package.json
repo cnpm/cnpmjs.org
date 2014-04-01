@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "co": "3.0.5",
+    "copy-to": "0.0.2",
     "co-gather": "0.0.1",
     "co-read": "0.0.1",
     "co-redis": "1.1.0",
