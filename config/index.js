@@ -38,13 +38,13 @@ var config = {
   // mysql config
   mysqlServers: [
     {
-      host: 'keydiary.mysql.rds.aliyuncs.com', // 'db4free.net'
+      host: '127.0.0.1',
       port: 3306,
-      user: 'cnpmjs',
-      password: 'cnpmjs123'
+      user: 'root',
+      password: ''
     }
   ],
-  mysqlDatabase: 'cnpmjstest',
+  mysqlDatabase: 'cnpmjs_test',
   mysqlMaxConnections: 4,
   mysqlQueryTimeout: 5000,
 

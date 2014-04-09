@@ -2,21 +2,29 @@ TESTS = $(shell ls -S `find test -type f -name "*.test.js" -print`)
 REPORTER = tap
 TIMEOUT = 30000
 MOCHA_OPTS =
+REGISTRY = --registry=http://r.cnpmjs.org
 
 install:
-	@npm install --registry=http://r.cnpmjs.org \
+	@npm install $(REGISTRY) \
 		--disturl=http://dist.cnpmjs.org
 
 jshint: install
 	@-./node_modules/.bin/jshint ./
 
-test: install
+pretest:
+	@mysql -uroot -e 'DROP DATABASE IF EXISTS cnpmjs_test;'
+	@mysql -uroot -e 'CREATE DATABASE cnpmjs_test;'
+	@mysql -uroot 'cnpmjs_test' < ./docs/db.sql
+	@mysql -uroot 'cnpmjs_test' -e 'show tables;'
+
+test: install pretest
 	@NODE_ENV=test ./node_modules/.bin/mocha \
 		--harmony-generators \
 		--reporter $(REPORTER) \
 		--timeout $(TIMEOUT) \
 		--require should \
-		--require co-mocha\
+		--require co-mocha \
+		--require ./test/init.js \
 		$(MOCHA_OPTS) \
 		$(TESTS)
 
@@ -28,7 +36,8 @@ test-cov cov: install
 		--reporter $(REPORTER) \
 		--timeout $(TIMEOUT) \
 		--require should \
-		--require co-mocha\
+		--require co-mocha \
+		--require ./test/init.js \
 		$(MOCHA_OPTS) \
 		$(TESTS)
 	@./node_modules/.bin/cov coverage

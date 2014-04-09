@@ -48,7 +48,18 @@ only need to change the registry in config. Even include manual synchronization 
 
 ## Develop
 
-**Notice**: need node version >=0.11.9
+### Dependencies
+
+* [node](http://nodejs.org) >=0.11.9
+* [mysql](http://dev.mysql.com/downloads/), include `mysqld` and `mysql cli`
+
+### Start MySQL
+
+```bash
+$ nohup mysqld &
+```
+
+### Clone codes and run test
 
 ```bash
 # clone from git
