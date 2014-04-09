@@ -39,7 +39,7 @@ exports.sync = function *() {
   var result = yield SyncModuleWorker.sync(name, username, options);
 
   // friendly 404 reason info
-  if (result.staticCache === 404) {
+  if (result.statusCode === 404) {
     this.status = 404;
     this.body = {
       ok: false,
@@ -48,7 +48,7 @@ exports.sync = function *() {
     return;
   }
   if (!result.ok) {
-    this.status = result.statusCode;
+    this.status = result.statusCode || 500;
     this.body = result.pkg;
     return;
   }

@@ -109,7 +109,7 @@ var config = {
 // load config/config.js, everything in config.js will cover the same key in index.js
 var customConfig = path.join(root, 'config/config.js');
 if (fs.existsSync(customConfig)) {
-  copy(require(customConfig)).toCover(config);
+  copy(require(customConfig)).override(config);
 }
 
 mkdirp.sync(config.logdir);
@@ -121,5 +121,5 @@ config.loadConfig = function (customConfig) {
   if (!customConfig) {
     return;
   }
-  copy(customConfig).toCover(config);
+  copy(customConfig).override(config);
 };
