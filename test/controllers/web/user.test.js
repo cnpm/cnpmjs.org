@@ -29,7 +29,7 @@ describe('controllers/web/user.test.js', function () {
   describe('GET /~:name', function (done) {
     it('should get 200', function (done) {
       request(app)
-      .get('/~dead_horse')
+      .get('/~cnpmjstest10')
       .expect(200)
       .expect('content-type', 'text/html; charset=utf-8')
       .expect(/<div id="profile">/)
@@ -44,7 +44,7 @@ describe('controllers/web/user.test.js', function () {
 
     it('should get not eixst user but have modules 200', function (done) {
       request(app)
-      .get('/~tjholowaychuk')
+      .get('/~cnpmjstest101')
       .expect(200)
       .expect(/<div id="profile">/)
       .expect(/Packages by/, done);

@@ -18,15 +18,24 @@ var crypto = require('crypto');
 var utility = require('utility');
 var User = require('../proxy/user');
 
-var user = {
-  name: 'cnpmjstest10',
-  email: 'fengmk2@gmail.com',
-  // password: 'cnpmjstest10',
-  ip: '127.0.0.1'
-};
-user.salt = crypto.randomBytes(30).toString('hex');
-user.password_sha = utility.sha1(user.name + user.salt);
+var usernames = [
+  'cnpmjstest101',
+  'cnpmjstest10'
+];
 
-User.add(user, function (err, result) {
-  console.log(err);
+usernames.forEach(function (name) {
+  var user = {
+    name: name,
+    email: 'fengmk2@gmail.com',
+    // password: 'cnpmjstest10',
+    ip: '127.0.0.1'
+  };
+  user.salt = crypto.randomBytes(30).toString('hex');
+  user.password_sha = utility.sha1(user.name + user.salt);
+
+  User.add(user, function (err, result) {
+    if (err) {
+      throw err;
+    }
+  });
 });

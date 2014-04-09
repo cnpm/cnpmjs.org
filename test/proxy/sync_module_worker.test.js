@@ -22,14 +22,14 @@ var Log = require('../../proxy/module_log');
 describe('proxy/sync_module_worker.test.js', function () {
   it('should start a sync worker', function (done) {
     Log.create({
-      name: 'cnpmjs.org',
+      name: 'mk2testmodule',
       username: 'fengmk2',
     }, function (err, result) {
       should.not.exist(err);
       result.id.should.above(0);
       var worker = new SyncModuleWorker({
         logId: result.id,
-        name: 'cnpmjs.org',
+        name: 'mk2testmodule',
         username: 'fengmk2'
       });
 
@@ -40,7 +40,7 @@ describe('proxy/sync_module_worker.test.js', function () {
 
   it('should start a sync worker with names and noDep', function (done) {
     var worker = new SyncModuleWorker({
-      name: ['cnpmjs.org', 'cutter'],
+      name: ['mk2testmodule'],
       noDep: true,
       username: 'fengmk2'
     });
@@ -49,14 +49,14 @@ describe('proxy/sync_module_worker.test.js', function () {
     worker.on('end', function () {
       var names = worker.successes.concat(worker.fails);
       names.sort();
-      names.should.eql(['cnpmjs.org', 'cutter']);
+      names.should.eql(['mk2testmodule']);
       done();
     });
   });
 
   it('should start a sync worker with names', function (done) {
     var worker = new SyncModuleWorker({
-      name: ['cnpmjs.org', 'cutter'],
+      name: ['mk2testmodule'],
       username: 'fengmk2'
     });
 

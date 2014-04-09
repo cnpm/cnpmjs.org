@@ -34,7 +34,7 @@ describe('middleware/auth.test.js', function () {
   describe('auth()', function () {
     it('should pass if no authorization', function (done) {
       request(app)
-      .get('/-/user/org.couchdb.user:cnpmjstest1')
+      .get('/-/user/org.couchdb.user:cnpmjstest10')
       .expect(200, done);
     });
 

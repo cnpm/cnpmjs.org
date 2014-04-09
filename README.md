@@ -88,7 +88,7 @@ $ node --harmony dispatch.js
 * Add new features or fix bugs in the new branch
 * Make a pull request and we will review it ASAP
 
-Tips: make sure your code is follow the [node-style-guide](https://github.com/felixge/node-style-guide).
+Tips: make sure your code is following the [node-style-guide](https://github.com/felixge/node-style-guide).
 
 ## Authors
 
