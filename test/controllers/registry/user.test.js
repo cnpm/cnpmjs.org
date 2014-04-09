@@ -35,17 +35,17 @@ describe('controllers/registry/user.test.js', function () {
   describe('GET /-/user/org.couchdb.user:name', function () {
     it('should return user info', function (done) {
       request(app)
-      .get('/-/user/org.couchdb.user:cnpmjstest1')
+      .get('/-/user/org.couchdb.user:cnpmjstest10')
       .expect(200, function (err, res) {
         should.not.exist(err);
         res.body.should.have.keys('_id', '_rev', 'name', 'email', 'type',
           '_cnpm_meta', 'roles', 'date');
-        res.body.name.should.equal('cnpmjstest1');
+        res.body.name.should.equal('cnpmjstest10');
         done();
       });
     });
 
-    it('should return npm user info', function (done) {
+    it.skip('should return npm user info', function (done) {
       request(app)
       .get('/-/user/org.couchdb.user:fengmk2')
       .expect(200, function (err, res) {

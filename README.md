@@ -46,15 +46,26 @@ only need to change the registry in config. Even include manual synchronization 
 
 ![cnpm](https://docs.google.com/drawings/d/12QeQfGalqjsB77mRnf5Iq5oSXHCIUTvZTwECMonqCmw/pub?w=480&h=360)
 
-## Develop
+## Develop on your local machine
 
-**Notice**: need node version >=0.11.9
+### Dependencies
+
+* [node](http://nodejs.org) >=0.11.9
+* [mysql](http://dev.mysql.com/downloads/) >= 0.5.0, include `mysqld` and `mysql cli`. I test on `mysql@5.6.16`.
+
+### Start MySQL
+
+```bash
+$ nohup mysqld &
+```
+
+### Clone codes and run test
 
 ```bash
 # clone from git
-$ git clone git@github.com:cnpm/cnpmjs.org.git
+$ git clone https://github.com/cnpm/cnpmjs.org.git
 
-# install dependencise
+# install dependencies
 $ make install
 
 # test
@@ -67,17 +78,17 @@ $ make test-cov
 $ make autod
 
 # start server
-$ node --harmony-generators dispatch.js
+$ node --harmony dispatch.js
 ```
 
-## Contribute
+## How to contribute
 
-* clone the project
-* checkout a new branch
-* add new features or fix bugs in the new branch
-* make a pull request and we will review it ASAP
+* Clone the project
+* Checkout a new branch
+* Add new features or fix bugs in the new branch
+* Make a pull request and we will review it ASAP
 
-Tips: make sure your code is follow the [node-style-guide](https://github.com/felixge/node-style-guide).
+Tips: make sure your code is following the [node-style-guide](https://github.com/felixge/node-style-guide).
 
 ## Authors
 

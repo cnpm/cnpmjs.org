@@ -17,14 +17,30 @@
 var should = require('should');
 var request = require('supertest');
 var mm = require('mm');
+var path = require('path');
 var mysql = require('../../../common/mysql');
 var app = require('../../../servers/web');
+var registry = require('../../../servers/registry');
 var pkg = require('../../../controllers/web/package');
 
+var fixtures = path.join(path.dirname(path.dirname(__dirname)), 'fixtures');
+
 describe('controllers/web/package.test.js', function () {
+  var baseauth = 'Basic ' + new Buffer('cnpmjstest10:cnpmjstest10').toString('base64');
+
   before(function (done) {
-    app.listen(0, done);
+    registry.listen(0, function () {
+      var pkg = require(path.join(fixtures, 'package_and_tgz.json'));
+      request(registry)
+      .put('/' + pkg.name)
+      .set('authorization', baseauth)
+      .send(pkg)
+      .expect(201, function () {
+        app.listen(0, done);
+      });
+    });
   });
+
   after(function (done) {
     app.close(done);
   });
@@ -32,9 +48,9 @@ describe('controllers/web/package.test.js', function () {
   afterEach(mm.restore);
 
   describe('GET /_list/search/search', function () {
-    it('should search with "c"', function (done) {
+    it('should search with "m"', function (done) {
       request(app)
-      .get('/_list/search/search?startkey="c"&limit=2')
+      .get('/_list/search/search?startkey="m"&limit=2')
       .expect('content-type', 'application/json')
       .expect(200, function (err, res) {
         should.not.exist(err);
@@ -48,9 +64,9 @@ describe('controllers/web/package.test.js', function () {
       });
     });
 
-    it('should search with c', function (done) {
+    it('should search with m', function (done) {
       request(app)
-      .get('/_list/search/search?startkey=c&limit=2')
+      .get('/_list/search/search?startkey=m&limit=2')
       .expect(200, function (err, res) {
         should.not.exist(err);
         res.body.should.have.keys('rows');
@@ -77,7 +93,7 @@ describe('controllers/web/package.test.js', function () {
   describe('GET /package/:name', function (done) {
     it('should get 200', function (done) {
       request(app)
-      .get('/package/cutter')
+      .get('/package/mk2testmodule')
       .expect(200)
       .expect('content-encoding', 'gzip')
       .expect('content-type', 'text/html; charset=utf-8')
@@ -101,7 +117,7 @@ describe('controllers/web/package.test.js', function () {
   describe('GET /package/:name/:version', function (done) {
     it('should 200 when get by version', function (done) {
       request(app)
-      .get('/package/cutter/0.0.2')
+      .get('/package/mk2testmodule/0.0.1')
       .expect(200)
       .expect(/<div id="package">/)
       .expect(/<th>Maintainers<\/th>/)
@@ -110,21 +126,22 @@ describe('controllers/web/package.test.js', function () {
 
     it('should 200 when get by tag', function (done) {
       request(app)
-      .get('/package/cutter/latest')
+      .get('/package/mk2testmodule/latest')
       .expect(200)
       .expect(/<div id="package">/)
       .expect(/<th>Maintainers<\/th>/)
       .expect(/<th>Version<\/th>/, done);
     });
+
     it('should 404 when get by version not exist', function (done) {
       request(app)
-      .get('/package/cutter/1.1.2')
+      .get('/package/mk2testmodule/1.1.2')
       .expect(404, done);
     });
 
     it('should 404 when get by tag', function (done) {
       request(app)
-      .get('/package/cutter/notexisttag')
+      .get('/package/mk2testmodule/notexisttag')
       .expect(404, done);
     });
   });
@@ -132,14 +149,14 @@ describe('controllers/web/package.test.js', function () {
   describe('GET　/browse/keyword/:word', function () {
     it('should list by keyword ok', function (done) {
       request(app)
-      .get('/browse/keyword/cnpm')
+      .get('/browse/keyword/mk2testmodule')
       .expect(200)
       .expect(/Packages match/, done);
     });
 
     it('should list by keyword with json ok', function (done) {
       request(app)
-      .get('/browse/keyword/cnpm?type=json')
+      .get('/browse/keyword/mk2testmodule?type=json')
       .expect(200)
       .expect('content-type', 'application/json; charset=utf-8', done);
     });

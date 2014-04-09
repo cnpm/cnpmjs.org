@@ -28,17 +28,17 @@ describe('middleware/web_not_found.test.js', function () {
   });
 
   describe('web_not_found()', function () {
-    it('should redirect /byte to /package/byte', function (done) {
+    it('should redirect /mk2testmodule to /package/mk2testmodule', function (done) {
       request(app)
-      .get('/byte')
-      .expect('Location', '/package/byte')
+      .get('/mk2testmodule')
+      .expect('Location', '/package/mk2testmodule')
       .expect(302, done);
     });
 
-    it('should redirect /byte/ to /package/byte', function (done) {
+    it('should redirect /mk2testmodule/ to /package/mk2testmodule', function (done) {
       request(app)
-      .get('/byte/')
-      .expect('Location', '/package/byte')
+      .get('/mk2testmodule/')
+      .expect('Location', '/package/mk2testmodule')
       .expect(302, done);
     });
 
@@ -48,9 +48,9 @@ describe('middleware/web_not_found.test.js', function () {
       .expect(404, done);
     });
 
-    it('should 200 /package/byte', function (done) {
+    it('should 200 /package/mk2testmodule', function (done) {
       request(app)
-      .get('/package/byte')
+      .get('/package/mk2testmodule')
       .expect(200, done);
     });
 
