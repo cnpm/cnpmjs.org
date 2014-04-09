@@ -1,4 +1,14 @@
 
+0.4.0 / 2014-04-09
+==================
+
+ * fix test cases to run on local machine
+ * add contribute guidelines
+ * use local mysql for dev env. fix #308
+ * use copy to
+ * use koa-compress and koa-conditional-get
+ * maintainers is string, fix #301
+
 0.3.13 / 2014-03-27
 ==================
 
