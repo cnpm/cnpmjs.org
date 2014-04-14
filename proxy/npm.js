@@ -26,7 +26,8 @@ function *request(url, options) {
   options.headers = {
     'user-agent': USER_AGENT
   };
-  url = config.sourceNpmRegistry + url;
+  var registry = options.registry || config.sourceNpmRegistry;
+  url = registry + url;
   var r;
   try {
     r = yield *urllib.request(url, options);
@@ -70,7 +71,8 @@ exports.getAllSince = function *(startkey) {
 
 exports.getShort = function *() {
   var r = yield *request('/-/short', {
-    timeout: 300000
+    timeout: 300000,
+    registry: 'http://r.cnpmjs.org', // registry.npmjs.org/-/short is 404 now.
   });
   return r.data;
 };
