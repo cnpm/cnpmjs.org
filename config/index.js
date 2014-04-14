@@ -30,6 +30,7 @@ var config = {
   version: version,
   registryPort: 7001,
   webPort: 7002,
+  bindingHost: '127.0.0.1', // only binding on 127.0.0.1 for local access
   enableCluster: false,
   numCPUs: os.cpus().length,
   debug: true, // if debug
@@ -50,9 +51,9 @@ var config = {
 
   sessionSecret: 'cnpmjs.org test session secret',
   redis: {
-    host: 'pub-redis-19533.us-east-1-4.3.ec2.garantiadata.com',
-    port: 19533,
-    pass: 'cnpmjs_dev'
+    // host: 'pub-redis-19533.us-east-1-4.3.ec2.garantiadata.com',
+    // port: 19533,
+    // pass: 'cnpmjs_dev'
   },
   jsonLimit: '10mb', // max request json body size
   uploadDir: path.join(root, 'public', 'dist'),

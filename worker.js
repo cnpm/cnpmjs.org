@@ -21,12 +21,14 @@ var config = require('./config');
 var registry = require('./servers/registry');
 var web = require('./servers/web');
 
-registry.listen(config.registryPort);
-web.listen(config.webPort);
+registry.listen(config.registryPort, config.bindingHost);
+web.listen(config.webPort, config.bindingHost);
 
-console.log('[%s] [worker:%d] Server started, registry server listen at %d, web listen at %d, cluster: %s',
+console.log('[%s] [worker:%d] Server started, registry server listen at %s:%d, web listen at %s%d, cluster: %s',
   new Date(), process.pid,
-  config.registryPort, config.webPort, config.enableCluster);
+  config.bindingHost, config.registryPort,
+  config.bindingHost, config.webPort,
+  config.enableCluster);
 
 graceful({
   server: [registry, web],

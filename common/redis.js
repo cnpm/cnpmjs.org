@@ -17,7 +17,7 @@
 var config = require('../config');
 
 // close redis by set config.redis to `null` or `{}`
-if (!config.redis || !config.redis.host || !config.redis.port) {
+if (config.redis && config.redis.host && config.redis.port) {
 
   var redis = require('redis');
   var wrapper = require('co-redis');
