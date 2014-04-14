@@ -1,4 +1,6 @@
-# cnpmjs.org: Private npm registry and web for Enterprise
+# cnpmjs.org: Private npm registry and web for Company
+
+So `cnpm` is meaning: **Company npm**.
 
 ## Registry
 
@@ -113,13 +115,13 @@ Or you can alias NPM to use it:
 ```bash
 alias cnpm="npm --registry=http://r.cnpmjs.org \
 --cache=$HOME/.npm/.cache/cnpm \
---disturl=http://cnpmjs.org/dist \
+--disturl=http://dist.cnpmjs.org \
 --userconfig=$HOME/.cnpmrc"
 
 #Or alias it in .bashrc or .zshrc
 $ echo '\n#alias for cnpm\nalias cnpm="npm --registry=http://r.cnpmjs.org \
   --cache=$HOME/.npm/.cache/cnpm \
-  --disturl=http://cnpmjs.org/dist \
+  --disturl=http://dist.cnpmjs.org \
   --userconfig=$HOME/.cnpmrc"' >> ~/.zshrc && source ~/.zshrc
 ```
 
@@ -166,34 +168,15 @@ $ cnpm info cnpm
 
 @see Github [Issues](https://github.com/cnpm/cnpmjs.org/issues)
 
-## Authors
+## Histories
 
 Release [History](/history).
-
-```bash
-$ git summary
-
- project  : cnpmjs.org
- repo age : 4 months ago
- commits  : 472
- active   : 167 days
- files    : 104
- authors  :
-   272  fengmk2                 57.6%
-   195  dead_horse              41.3%
-     2  4simple                 0.4%
-     2  Stanley Zheng           0.4%
-     1  Alsotang                0.2%
-```
 
 ## npm and cnpm relation
 
 ![npm&cnpm](https://docs.google.com/drawings/d/12QeQfGalqjsB77mRnf5Iq5oSXHCIUTvZTwECMonqCmw/pub?w=383&h=284)
 
 ## 捐赠 Donate
-如果您觉得 [cnpmjs.org] 对您有帮助，欢迎请作者一杯咖啡.
+如果您觉得 [cnpmjs.org](/) 对您有帮助，欢迎请作者一杯咖啡.
 
 [![Donate](https://img.alipay.com/sys/personalprod/style/mc/btn-index.png)](https://me.alipay.com/imk2)
-
- [cnpmjs.org]: http://cnpmjs.org/
- [registry.cnpmjs.org]: http://registry.cnpmjs.org/

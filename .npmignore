@@ -8,6 +8,8 @@ logo.png
 public/dist/
 backup/*.json
 backup/*.gz
+docs/web/history.md
+docs/web/_readme.md
 view/web/_layout.html
 bin/mysql.js
 bin/test.sql
@@ -15,3 +17,4 @@ coverage/
 .jshintrc
 .jshintignore
 .DS_Store
+config/web_readme.md

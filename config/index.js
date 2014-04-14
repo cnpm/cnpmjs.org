@@ -79,6 +79,8 @@ var config = {
   disturl: 'http://dist.u.qiniudn.com',
   logoURL: 'http://ww4.sinaimg.cn/large/69c1d4acgw1ebfly5kjlij208202oglr.jpg',
   registryHost: 'r.cnpmjs.org',
+  // customReadmeFile: __dirname + '/web_readme.md',
+  customReadmeFile: '', // you can use your custom readme file instead the cnpm one
   customFooter: '', // you can add copyright and site total script html here
   npmClientName: 'cnpm', // use `${name} install package`
   packagePageContributorSearch: true, // package page contributor link to search, default is true

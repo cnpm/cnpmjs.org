@@ -63,13 +63,23 @@ var layout = fs.readFileSync(path.join(viewDir, 'layout.html'), 'utf8')
   .replace('{{logoURL}}', config.logoURL);
 fs.writeFileSync(layoutFile, layout);
 
+// custom web readme home page support
+var readmeFile = path.join(docDir, '_readme.md');
+var readmeContent;
+if (config.customReadmeFile) {
+  readmeContent = fs.readFileSync(config.customReadmeFile, 'utf8');
+} else {
+  readmeContent = fs.readFileSync(path.join(docDir, 'readme.md'), 'utf8');
+}
+fs.writeFileSync(readmeFile, readmeContent);
+
 app.use(markdown({
   baseUrl: '/',
   root: docDir,
   layout: layoutFile,
   titleHolder: '<%- locals.title %>',
   bodyHolder: '<%- locals.body %>',
-  indexName: 'readme'
+  indexName: '_readme'
 }));
 
 var locals = {
