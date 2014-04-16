@@ -16,6 +16,7 @@ results
 node_modules
 npm-debug.log
 public/dist/
+.dist
 config/config.js
 backup/*.json
 backup/*.gz

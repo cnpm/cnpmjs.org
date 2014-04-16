@@ -55,7 +55,7 @@ var config = {
     pass: 'cnpmjs_dev'
   },
   jsonLimit: '10mb', // max request json body size
-  uploadDir: path.join(root, 'public', 'dist'),
+  uploadDir: path.join(root, '.dist'),
   // qiniu cdn: http://www.qiniu.com/, it free for dev.
   qn: {
     accessKey: "iN7NgwM31j4-BZacMjPrOQBs34UG1maYCAQmhdCV",
