@@ -174,7 +174,6 @@ SyncModuleWorker.prototype.next = function *(concurrencyId) {
 
   that.log('[c#%d] [%s] synced success, %d versions: %s',
     concurrencyId, name, versions.length, versions.join(', '));
-  that.pushSuccess(name);
   yield *that._doneOne(concurrencyId, name, true);
 };
 
@@ -599,12 +598,14 @@ SyncModuleWorker.prototype._syncOneVersion = function *(versionIndex, sourcePack
     // get tarball
     var r = yield *urllib.request(downurl, options);
     var statusCode = r.status || -1;
-    if (statusCode === 404) {
-      shasum = sourcePackage.dist.shasum;
-      return yield afterUpload({
-        url: downurl
-      });
-    }
+    // https://github.com/cnpm/cnpmjs.org/issues/325
+    // if (statusCode === 404) {
+    //   shasum = sourcePackage.dist.shasum;
+    //   return yield *afterUpload({
+    //     url: downurl
+    //   });
+    // }
+
     if (statusCode !== 200) {
       var err = new Error('Download ' + downurl + ' fail, status: ' + statusCode);
       err.name = 'DownloadTarballError';
@@ -620,6 +621,13 @@ SyncModuleWorker.prototype._syncOneVersion = function *(versionIndex, sourcePack
     });
     var end = thunkify.event(rs);
     yield end(); // after end event emit
+
+    if (dataSize === 0) {
+      var err = new Error('Download ' + downurl + ' file size is zero');
+      err.name = 'DownloadTarballSizeZeroError';
+      err.data = sourcePackage;
+      throw err;
+    }
 
     // check shasum
     shasum = shasum.digest('hex');
@@ -638,7 +646,7 @@ SyncModuleWorker.prototype._syncOneVersion = function *(versionIndex, sourcePack
     };
     // upload to NFS
     var result = yield nfs.upload(filepath, options);
-    return yield afterUpload(result);
+    return yield *afterUpload(result);
   } finally {
     // remove tmp file whatever
     fs.unlink(filepath, utility.noop);
@@ -683,13 +691,13 @@ SyncModuleWorker.prototype._syncOneVersion = function *(versionIndex, sourcePack
     mod.package.dist = dist;
     var r = yield Module.add(mod);
 
-    that.log('    [%s:%s] done, insertId: %s, author: %s, version: %s, ' +
-    'size: %d, publish_time: %j, publish on cnpm: %s',
-    sourcePackage.name, versionIndex,
-    r.id,
-    author, mod.version, dataSize,
-    new Date(mod.publish_time),
-    that._publish);
+    that.log('    [%s:%s] done, insertId: %s, author: %s, version: %s, '
+      + 'size: %d, publish_time: %j, publish on cnpm: %s',
+      sourcePackage.name, versionIndex,
+      r.id,
+      author, mod.version, dataSize,
+      new Date(mod.publish_time),
+      that._publish);
 
     return r;
   }
