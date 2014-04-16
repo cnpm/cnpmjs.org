@@ -124,6 +124,16 @@ SyncModuleWorker.prototype.add = function (name) {
   this.log('    add dependencies: %s', name);
 };
 
+SyncModuleWorker.prototype._doneOne = function *(concurrencyId, name, success) {
+  if (success) {
+    this.pushSuccess(name);
+  } else {
+    this.pushFail(name);
+  }
+  delete this.syncingNames[name];
+  yield *this.next(concurrencyId);
+};
+
 SyncModuleWorker.prototype.next = function *(concurrencyId) {
   var name = this.names.shift();
   if (!name) {
@@ -138,20 +148,17 @@ SyncModuleWorker.prototype.next = function *(concurrencyId) {
     pkg = yield npm.get(name);
   } catch (err) {
     // if 404
-    if (err.res && err.res.statusCode === 404) {
-      that.pushSuccess(name);
-    } else {
-      that.pushFail(name);
+    if (!err.res || err.res.statusCode !== 404) {
+      var errMessage = err.name + ': ' + err.message;
+      that.log('[c#%s] [error] [%s] get package error: %s', concurrencyId, name, errMessage);
+      yield *that._doneOne(concurrencyId, name, false);
+      return;
     }
-    that.log('[error] [%s] get package error: %s', name, err.stack);
-    delete that.syncingNames[name];
-    yield *that.next(concurrencyId);
-    return;
   }
+
   if (!pkg) {
-    that.log('[error] [%s] get package error: package not exist', name);
-    delete that.syncingNames[name];
-    yield that.next(concurrencyId);
+    that.log('[c#%s] [error] [%s] get package error: package not exists', concurrencyId, name);
+    yield *that._doneOne(concurrencyId, name, true);
     return;
   }
 
@@ -160,17 +167,15 @@ SyncModuleWorker.prototype.next = function *(concurrencyId) {
   try {
     versions = yield that._sync(name, pkg);
   } catch (err) {
-    that.pushFail(name);
-    that.log('[error] [%s] sync error: %s', name, err.stack);
-    delete that.syncingNames[name];
-    yield *that.next(concurrencyId);
+    that.log('[c#%s] [error] [%s] sync error: %s', concurrencyId, name, err.stack);
+    yield *that._doneOne(concurrencyId, name, false);
     return;
   }
-  that.log('[%s] synced success, %d versions: %s',
-    name, versions.length, versions.join(', '));
+
+  that.log('[c#%d] [%s] synced success, %d versions: %s',
+    concurrencyId, name, versions.length, versions.join(', '));
   that.pushSuccess(name);
-  delete that.syncingNames[name];
-  yield that.next(concurrencyId);
+  yield *that._doneOne(concurrencyId, name, true);
 };
 
 function *_listStarUsers(modName) {

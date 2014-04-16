@@ -47,6 +47,13 @@ Status.prototype.start = function () {
   this.timer = setInterval(this.log.bind(this), 30000);
 };
 
+Status.prototype.stop = function () {
+  this.log(true);
+  clearInterval(this.timer);
+  this.timer = null;
+  this.started = false;
+};
+
 Status.init = function (options, worker) {
   var status = new Status(options);
   status.start();
@@ -65,9 +72,7 @@ Status.init = function (options, worker) {
   });
 
   worker.on('end', function () {
-    status.started = false;
-    status.log(true);
-    clearInterval(status.timer);
+    status.stop();
   });
 };
 
