@@ -124,6 +124,16 @@ SyncModuleWorker.prototype.add = function (name) {
   this.log('    add dependencies: %s', name);
 };
 
+SyncModuleWorker.prototype._doneOne = function *(concurrencyId, name, success) {
+  if (success) {
+    this.pushSuccess(name);
+  } else {
+    this.pushFail(name);
+  }
+  delete this.syncingNames[name];
+  yield *this.next(concurrencyId);
+};
+
 SyncModuleWorker.prototype.next = function *(concurrencyId) {
   var name = this.names.shift();
   if (!name) {
@@ -138,20 +148,17 @@ SyncModuleWorker.prototype.next = function *(concurrencyId) {
     pkg = yield npm.get(name);
   } catch (err) {
     // if 404
-    if (err.res && err.res.statusCode === 404) {
-      that.pushSuccess(name);
-    } else {
-      that.pushFail(name);
+    if (!err.res || err.res.statusCode !== 404) {
+      var errMessage = err.name + ': ' + err.message;
+      that.log('[c#%s] [error] [%s] get package error: %s', concurrencyId, name, errMessage);
+      yield *that._doneOne(concurrencyId, name, false);
+      return;
     }
-    that.log('[error] [%s] get package error: %s', name, err.stack);
-    delete that.syncingNames[name];
-    yield *that.next(concurrencyId);
-    return;
   }
+
   if (!pkg) {
-    that.log('[error] [%s] get package error: package not exist', name);
-    delete that.syncingNames[name];
-    yield that.next(concurrencyId);
+    that.log('[c#%s] [error] [%s] get package error: package not exists', concurrencyId, name);
+    yield *that._doneOne(concurrencyId, name, true);
     return;
   }
 
@@ -160,17 +167,14 @@ SyncModuleWorker.prototype.next = function *(concurrencyId) {
   try {
     versions = yield that._sync(name, pkg);
   } catch (err) {
-    that.pushFail(name);
-    that.log('[error] [%s] sync error: %s', name, err.stack);
-    delete that.syncingNames[name];
-    yield *that.next(concurrencyId);
+    that.log('[c#%s] [error] [%s] sync error: %s', concurrencyId, name, err.stack);
+    yield *that._doneOne(concurrencyId, name, false);
     return;
   }
-  that.log('[%s] synced success, %d versions: %s',
-    name, versions.length, versions.join(', '));
-  that.pushSuccess(name);
-  delete that.syncingNames[name];
-  yield that.next(concurrencyId);
+
+  that.log('[c#%d] [%s] synced success, %d versions: %s',
+    concurrencyId, name, versions.length, versions.join(', '));
+  yield *that._doneOne(concurrencyId, name, true);
 };
 
 function *_listStarUsers(modName) {
@@ -594,12 +598,14 @@ SyncModuleWorker.prototype._syncOneVersion = function *(versionIndex, sourcePack
     // get tarball
     var r = yield *urllib.request(downurl, options);
     var statusCode = r.status || -1;
-    if (statusCode === 404) {
-      shasum = sourcePackage.dist.shasum;
-      return yield afterUpload({
-        url: downurl
-      });
-    }
+    // https://github.com/cnpm/cnpmjs.org/issues/325
+    // if (statusCode === 404) {
+    //   shasum = sourcePackage.dist.shasum;
+    //   return yield *afterUpload({
+    //     url: downurl
+    //   });
+    // }
+
     if (statusCode !== 200) {
       var err = new Error('Download ' + downurl + ' fail, status: ' + statusCode);
       err.name = 'DownloadTarballError';
@@ -615,6 +621,13 @@ SyncModuleWorker.prototype._syncOneVersion = function *(versionIndex, sourcePack
     });
     var end = thunkify.event(rs);
     yield end(); // after end event emit
+
+    if (dataSize === 0) {
+      var err = new Error('Download ' + downurl + ' file size is zero');
+      err.name = 'DownloadTarballSizeZeroError';
+      err.data = sourcePackage;
+      throw err;
+    }
 
     // check shasum
     shasum = shasum.digest('hex');
@@ -633,7 +646,7 @@ SyncModuleWorker.prototype._syncOneVersion = function *(versionIndex, sourcePack
     };
     // upload to NFS
     var result = yield nfs.upload(filepath, options);
-    return yield afterUpload(result);
+    return yield *afterUpload(result);
   } finally {
     // remove tmp file whatever
     fs.unlink(filepath, utility.noop);
@@ -678,13 +691,13 @@ SyncModuleWorker.prototype._syncOneVersion = function *(versionIndex, sourcePack
     mod.package.dist = dist;
     var r = yield Module.add(mod);
 
-    that.log('    [%s:%s] done, insertId: %s, author: %s, version: %s, ' +
-    'size: %d, publish_time: %j, publish on cnpm: %s',
-    sourcePackage.name, versionIndex,
-    r.id,
-    author, mod.version, dataSize,
-    new Date(mod.publish_time),
-    that._publish);
+    that.log('    [%s:%s] done, insertId: %s, author: %s, version: %s, '
+      + 'size: %d, publish_time: %j, publish on cnpm: %s',
+      sourcePackage.name, versionIndex,
+      r.id,
+      author, mod.version, dataSize,
+      new Date(mod.publish_time),
+      that._publish);
 
     return r;
   }
