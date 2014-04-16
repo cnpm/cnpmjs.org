@@ -78,7 +78,7 @@ $ make test-cov
 $ make autod
 
 # start server
-$ node --harmony dispatch.js
+$ node --harmony_generators dispatch.js
 ```
 
 ## How to contribute
