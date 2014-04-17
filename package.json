@@ -10,6 +10,7 @@
     "stop": "./bin/nodejsctl stop"
   },
   "dependencies": {
+    "bytes": "0.3.0",
     "co": "3.0.5",
     "co-defer": "0.1.0",
     "co-gather": "0.0.1",

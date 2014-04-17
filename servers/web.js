@@ -1,4 +1,4 @@
-/*!
+/**!
  * cnpmjs.org - servers/web.js
  *
  * Copyright(c) cnpmjs.org and other contributors.
@@ -25,6 +25,7 @@ var markdown = require('koa-markdown');
 var session = require('../common/session');
 var opensearch = require('../middleware/opensearch');
 var notFound = require('../middleware/web_not_found');
+var staticCache = require('../middleware/static');
 var auth = require('../middleware/auth');
 var routes = require('../routes/web');
 var logger = require('../common/logger');
@@ -35,11 +36,9 @@ var app = koa();
 var rootdir = path.dirname(__dirname);
 
 app.use(middlewares.rt({headerName: 'X-ReadTime', timer: microtime}));
-app.use(middlewares.staticCache(path.join(__dirname, '..', 'public'), {
-  buffer: !config.debug,
-  maxAge: config.debug ? 0 : 60 * 60 * 24 * 7,
-  dir: path.join(rootdir, 'public')
-}));
+app.use(middlewares.rewrite('/favicon.ico', '/favicon.png'));
+app.use(staticCache);
+
 app.use(opensearch);
 app.keys = ['todokey', config.sessionSecret];
 app.outputErrors = true;

@@ -14,6 +14,7 @@
  * Module dependencies.
  */
 
+var bytes = require('bytes');
 var giturl = require('giturl');
 var moment = require('moment');
 var eventproxy = require('eventproxy');
@@ -107,6 +108,10 @@ exports.display = function *(next) {
   setDownloadURL(pkg, this, config.registryHost);
 
   pkg.dependents = dependents;
+
+  if (pkg.dist) {
+    pkg.dist.size = bytes(pkg.dist.size || 0);
+  }
 
   yield this.render('package', {
     title: 'Package - ' + pkg.name,
