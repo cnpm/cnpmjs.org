@@ -25,11 +25,12 @@ var logger = require('../common/logger');
 var config = require('../config');
 var session = require('../common/session');
 var auth = require('../middleware/auth');
+var staticCache = require('../middleware/static');
 var notFound = require('../middleware/registry_not_found');
 
 app.use(middlewares.rt({headerName: 'X-ReadTime', timer: microtime}));
-
-app.use(middlewares.rewrite('/favicon.ico', '/public/favicon.ico'));
+app.use(middlewares.rewrite('/favicon.ico', '/favicon.png'));
+app.use(staticCache);
 
 app.keys = ['todokey', config.sessionSecret];
 app.outputErrors = true;
