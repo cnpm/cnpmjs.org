@@ -1,4 +1,20 @@
 
+0.4.2 / 2014-04-17
+==================
+
+ * sync interval config
+ * fix fav ico and show pkg size on pkg info page. fix #318
+ * sync work sync one done must wait for a defer.setImmediate. fix #328
+ * bump dep versions
+ * if download tarball 404, throw err better than ignore it. fixed #325
+ * refator sync
+ * hotfix, close #321
+ * hotfix, close #319
+ * support custom web home page
+ * npm get short only can read from cnpm now
+ * if using reverted proxy like nginx, only binding on local host
+ * fix redis detect logic
+
 0.4.1 / 2014-04-10
 ==================
 
