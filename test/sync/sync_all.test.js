@@ -25,13 +25,14 @@ describe('sync/sync_all.test.js', function () {
     afterEach(mm.restore);
 
     it('should sync first time ok', function *() {
-      mm.data(Npm, 'getShort', ['mk2testmodule']);
+      mm.data(Npm, 'getShort', ['mk2testmodule', 'mk2testmodule-not-exists']);
       mm.data(Total, 'getTotalInfo', {last_sync_time: 0});
       var data = yield sync;
-      data.successes.should.eql(['mk2testmodule']);
+      data.successes.should.eql(['mk2testmodule', 'mk2testmodule-not-exists']);
       mm.restore();
       var result = yield Total.getTotalInfo();
-      result.last_sync_module.should.equal('mk2testmodule');
+      should.exist(result);
+      result.last_sync_module.should.equal('mk2testmodule-not-exists');
     });
 
     it('should sync common ok', function *() {

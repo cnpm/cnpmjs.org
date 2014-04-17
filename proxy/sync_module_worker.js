@@ -17,6 +17,7 @@
 
 var co = require('co');
 var gather = require('co-gather');
+var defer = require('co-defer');
 var thunkify = require('thunkify-wrap');
 var debug = require('debug')('cnpmjs.org:proxy:sync_module_worker');
 var EventEmitter = require('events').EventEmitter;
@@ -42,16 +43,12 @@ var USER_AGENT = 'sync.cnpmjs.org/' + config.version + ' ' + urllib.USER_AGENT;
 function SyncModuleWorker(options) {
   EventEmitter.call(this);
   this._logId = options.logId;
-  this.startName = options.name;
   if (!Array.isArray(options.name)) {
     options.name = [options.name];
   }
 
-  this.names = options.name;
-  // for (var i = 0; i < this.names.length; i++) {
-  //   // ensure package name is lower case
-  //   this.names[i] = this.names[i].toLowerCase();
-  // }
+  this.names = options.name || [];
+  this.startName = this.names[0];
 
   this.username = options.username;
   this.concurrency = options.concurrency || 1;
@@ -131,13 +128,18 @@ SyncModuleWorker.prototype._doneOne = function *(concurrencyId, name, success) {
     this.pushFail(name);
   }
   delete this.syncingNames[name];
-  yield *this.next(concurrencyId);
+  var that = this;
+  // relase the stack: https://github.com/cnpm/cnpmjs.org/issues/328
+  defer.setImmediate(function *() {
+    that.log('[c#%s] setImmediate after, %s done, start next...', concurrencyId, name);
+    yield *that.next(concurrencyId);
+  });
 };
 
 SyncModuleWorker.prototype.next = function *(concurrencyId) {
   var name = this.names.shift();
   if (!name) {
-    return process.nextTick(this.finish.bind(this));
+    return setImmediate(this.finish.bind(this));
   }
 
   var that = this;
