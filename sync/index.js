@@ -14,15 +14,15 @@
  * Module dependencies.
  */
 
-var config = require('../config');
+var debug = require('debug')('cnpmjs.org:sync:index');
+var co = require('co');
 var ms = require('ms');
-var mail = require('../common/mail');
 var util = require('util');
 var utility = require('utility');
-var debug = require('debug')('cnpmjs.org:sync:index');
+var config = require('../config');
+var mail = require('../common/mail');
 var Total = require('../proxy/total');
 var logger = require('../common/logger');
-var co = require('co');
 
 var sync = null;
 
@@ -73,7 +73,7 @@ var handleSync = co(function *() {
 
 if (sync) {
   handleSync();
-  setInterval(handleSync, ms('30m'));
+  setInterval(handleSync, ms(config.syncInterval));
 }
 
 function sendMailToAdmin(err, result, syncTime) {

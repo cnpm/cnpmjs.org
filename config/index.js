@@ -96,6 +96,7 @@ var config = {
   backupFilePrefix: '/cnpm/backup/', // backup filepath prefix
   syncModel: 'none', // 'none', 'all', 'exist'
   syncConcurrency: 1,
+  syncInterval: '10m', // sync interval, default is 10 minutes
   maxDependencies: 200, // max handle number of package.json `dependencies` property
 
   limit: {
