@@ -690,6 +690,7 @@ describe('controllers/registry/module.test.js', function () {
       request(app)
       .put('/testputmodule/newtag')
       .set('content-type', 'application/json')
+      .set('authorization', baseauth)
       .send('"0.1.9"')
       .expect(201, done);
     });
@@ -698,6 +699,7 @@ describe('controllers/registry/module.test.js', function () {
       request(app)
       .put('/testputmodule/newtag')
       .set('content-type', 'application/json')
+      .set('authorization', baseauth)
       .send('"0.1.9"')
       .expect(201, done);
     });
@@ -706,6 +708,7 @@ describe('controllers/registry/module.test.js', function () {
       request(app)
       .put('/testputmodule/newtag')
       .set('content-type', 'application/json')
+      .set('authorization', baseauth)
       .send('"hello"')
       .expect(403)
       .expect({
@@ -718,11 +721,25 @@ describe('controllers/registry/module.test.js', function () {
       request(app)
       .put('/testputmodule/newtag')
       .set('content-type', 'application/json')
+      .set('authorization', baseauth)
       .send('"5.0.0"')
       .expect(403)
       .expect({
         error: 'forbidden',
         reason: 'setting tag newtag to unknown version: 5.0.0: testputmodule/newtag'
+      }, done);
+    });
+
+    it('should tag permission 403', function (done) {
+      request(app)
+      .put('/testputmodule/newtag')
+      .set('content-type', 'application/json')
+      .set('authorization', baseauthOther)
+      .send('"0.1.9"')
+      .expect(403)
+      .expect({
+        error: 'forbidden',
+        reason: 'no permission to modify testputmodule'
       }, done);
     });
   });
