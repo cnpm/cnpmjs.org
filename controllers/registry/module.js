@@ -943,7 +943,7 @@ exports.listAllModuleNames = function *() {
 exports.updateTag = function *() {
   var version = this.request.body;
   var tag = this.params.tag;
-  var name =this.params.name;
+  var name = this.params.name;
 
   if (!version) {
     this.status = 400;
