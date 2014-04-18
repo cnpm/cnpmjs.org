@@ -18,6 +18,7 @@
 var debug = require('debug')('cnpmjs.org:controllers:registry:module');
 var path = require('path');
 var fs = require('fs');
+var util = require('util');
 var crypto = require('crypto');
 var utility = require('utility');
 var coRead = require('co-read');
@@ -937,4 +938,48 @@ exports.listAllModuleNames = function *() {
   this.body = (yield Module.listShort()).map(function (m) {
     return m.name;
   });
+};
+
+exports.updateTag = function *() {
+  var version = this.request.body;
+  var tag = this.params.tag;
+  var name = this.params.name;
+
+  if (!version) {
+    this.status = 400;
+    this.body = {
+      error: 'version_missed',
+      reason: 'version not found'
+    };
+    return;
+  }
+
+  if (!semver.valid(version)) {
+    this.status = 403;
+    var reason = util.format('setting tag %s to invalid version: %s: %s/%s',
+      tag, version, name, tag);
+    this.body = {
+      error: 'forbidden',
+      reason: reason
+    };
+    return;
+  }
+
+  var mod = yield Module.get(name, version);
+  if (!mod) {
+    this.status = 403;
+    var reason = util.format('setting tag %s to unknown version: %s: %s/%s',
+      tag, version, name, tag);
+    this.body = {
+      error: 'forbidden',
+      reason: reason
+    };
+    return;
+  }
+
+  yield Module.addTag(name, tag, version);
+  this.status = 201;
+  this.body = {
+    ok: true
+  };
 };

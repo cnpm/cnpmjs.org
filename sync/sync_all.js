@@ -24,7 +24,6 @@ var Npm = require('../proxy/npm');
 var Total = require('../proxy/total');
 var SyncModuleWorker = require('../proxy/sync_module_worker');
 var Module = require('../proxy/module');
-var co = require('co');
 var thunkify = require('thunkify-wrap');
 
 function subtract(subtracter, minuend) {
