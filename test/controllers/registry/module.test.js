@@ -685,7 +685,49 @@ describe('controllers/registry/module.test.js', function () {
     });
   });
 
-  describe('DELETE /:name/-rev/:rev', function (done) {
+  describe('PUT /:name/:tag', function () {
+    it('should create new tag ok', function (done) {
+      request(app)
+      .put('/testputmodule/newtag')
+      .set('content-type', 'application/json')
+      .send('"0.1.9"')
+      .expect(201, done);
+    });
+
+    it('should override exist tag ok', function (done) {
+      request(app)
+      .put('/testputmodule/newtag')
+      .set('content-type', 'application/json')
+      .send('"0.1.9"')
+      .expect(201, done);
+    });
+
+    it('should tag invalid version 403', function (done) {
+      request(app)
+      .put('/testputmodule/newtag')
+      .set('content-type', 'application/json')
+      .send('"hello"')
+      .expect(403)
+      .expect({
+        error: 'forbidden',
+        reason: 'setting tag newtag to invalid version: hello: testputmodule/newtag'
+      }, done);
+    });
+
+    it('should tag not eixst version 403', function (done) {
+      request(app)
+      .put('/testputmodule/newtag')
+      .set('content-type', 'application/json')
+      .send('"5.0.0"')
+      .expect(403)
+      .expect({
+        error: 'forbidden',
+        reason: 'setting tag newtag to unknown version: 5.0.0: testputmodule/newtag'
+      }, done);
+    });
+  });
+
+  describe('DELETE /:name/-rev/:rev', function () {
     var baseauth = 'Basic ' + new Buffer('cnpmjstest10:cnpmjstest10').toString('base64');
     var baseauthOther = 'Basic ' + new Buffer('cnpmjstest101:cnpmjstest101').toString('base64');
     var lastRev;

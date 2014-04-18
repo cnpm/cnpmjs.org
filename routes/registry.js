@@ -45,6 +45,8 @@ function routes(app) {
   app.put('/:name/sync', sync.sync);
   app.get('/:name/sync/log/:id', sync.getSyncLog);
 
+  app.put('/:name/:tag', mod.updateTag);
+
   // need limit by ip
   app.get('/:name/download/:filename', limit, mod.download);
 
