@@ -1,4 +1,13 @@
 
+0.4.3 / 2014-04-18 
+==================
+
+  * Merge pull request #334 from cnpm/fix-permission
+  * add permission check to /:name/:tag
+  * Merge pull request #333 from cnpm/issue332-tag
+  * fix space
+  * add put /:name/:tag, close #332
+
 0.4.2 / 2014-04-17
 ==================
 
