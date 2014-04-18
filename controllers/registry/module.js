@@ -977,6 +977,16 @@ exports.updateTag = function *() {
     return;
   }
 
+  // check permission
+  if (!common.isMaintainer(this.user, mod.package.maintainers)) {
+    this.status = 403;
+    this.body = {
+      error: 'forbidden',
+      reason: 'no permission to modify ' + name
+    };
+    return;
+  }
+
   yield Module.addTag(name, tag, version);
   this.status = 201;
   this.body = {
