@@ -107,7 +107,8 @@ var config = {
     whiteList: [],
     blackList: [],
     message: 'request frequency limited, any question, please contact fengmk2@gmail.com',
-  }
+  },
+  enableCompress: false, // enable gzip response or not
 };
 
 // load config/config.js, everything in config.js will cover the same key in index.js

@@ -48,7 +48,10 @@ app.use(middlewares.bodyParser());
 app.use(auth());
 app.use(notFound);
 
-app.use(middlewares.compress({threshold: 150}));
+if (config.enableCompress) {
+  app.use(middlewares.compress({threshold: 150}));
+}
+
 app.use(middlewares.conditional());
 app.use(middlewares.etag());
 
