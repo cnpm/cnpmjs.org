@@ -37,16 +37,9 @@ var FILE_RE = /^<a[^>]+>([^<]+)<\/a>\s+(\d+\-\w+\-\d+ \d+\:\d+)\s+([\-\d]+)/;
 
 module.exports = sync;
 
-function sync(name, callback) {
-  if (typeof name === 'function') {
-    // sync(callback)
-    callback = name;
-    name = '/';
-  }
-
-  co(function* () {
-    yield* syncDir(name);
-  })(callback);
+function* sync(name) {
+  name = name || '/';
+  yield* syncDir(name);
 }
 
 function* syncDir(fullname, info) {
@@ -63,7 +56,7 @@ function* syncDir(fullname, info) {
     }
   }
 
-  debug('sync remote:%s got %d new items, %d dirs, %d files to sync',
+  logger.info('sync remote:%s got %d new items, %d dirs, %d files to sync',
     fullname, news.length, dirs.length, files.length);
 
   for (var i = 0; i < files.length; i++) {
@@ -162,7 +155,7 @@ function* syncFile(info) {
 function* listdir(fullname) {
   var url = disturl + fullname;
   var result = yield* urllib.request(url, {
-    timeout: 30000,
+    timeout: 60000,
   });
   debug('listdir %s got %s, %j', url, result.status, result.headers);
   var html = result.data && result.data.toString() || '';

@@ -16,11 +16,9 @@
 
 var debug = require('debug');
 debug.enable('cnpmjs.org*');
+var co = require('co');
 var syncdist = require('../sync/sync_dist');
 
-syncdist('/v0.10.28/', function (err) {
-  if (err) {
-    throw err;
-  }
-  console.log('sync done');
-});
+co(function* () {
+  yield* syncdist('/v0.10.28/');
+})();

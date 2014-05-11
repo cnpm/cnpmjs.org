@@ -23,6 +23,7 @@ var config = require('../config');
 var mail = require('../common/mail');
 var Total = require('../proxy/total');
 var logger = require('../common/logger');
+var startSyncDist = require('./sync_dist');
 
 var sync = null;
 
@@ -74,6 +75,29 @@ var handleSync = co(function *() {
 if (sync) {
   handleSync();
   setInterval(handleSync, ms(config.syncInterval));
+}
+
+var syncingDist = false;
+var syncDist = co(function* syncDist() {
+  if (syncingDist) {
+    return;
+  }
+  syncingDist = true;
+  logger.info('Start syncing dist...');
+  try {
+    yield * startSyncDist();
+  } catch (err) {
+    logger.warn('Sync dist error: %s', err.stack);
+    sendMailToAdmin(err, null, new Date());
+  }
+  syncingDist = false;
+});
+
+if (config.syncDist) {
+  syncDist();
+  setInterval(syncDist, ms(config.syncInterval));
+} else {
+  logger.info('sync dist disable');
 }
 
 function sendMailToAdmin(err, result, syncTime) {
