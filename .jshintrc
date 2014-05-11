@@ -58,7 +58,7 @@
     "shadow"        : true,      // true: Allows re-define variables later in code e.g. `var x=1; x=2;`
     "sub"           : false,     // true: Tolerate using `[]` notation when it can still be expressed in dot notation
     "supernew"      : false,     // true: Tolerate `new function () { ... };` and `new Object;`
-    "validthis"     : false,     // true: Tolerate using this in a non-constructor function
+    "validthis"     : true,      // true: Tolerate using this in a non-constructor function
 
     // Environments
     "browser"       : true,     // Web Browser (window, document, etc)

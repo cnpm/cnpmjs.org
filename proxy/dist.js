@@ -14,8 +14,9 @@
  * Module dependencies.
  */
 
-var mysql = require('../common/mysql');
+var path = require('path');
 var multiline = require('multiline');
+var mysql = require('../common/mysql');
 
 var SAVE_FILE_SQL = multiline(function () {;/*
   INSERT INTO
@@ -50,7 +51,7 @@ var SAVE_DIR_SQL = multiline(function () {;/*
 
 exports.savedir = function* (info) {
   return yield mysql.query(SAVE_DIR_SQL, [
-    info.name, info.parent, info.date, info.size, info.url, info.sha1
+    info.name, info.parent, info.date
   ]);
 };
 
@@ -68,4 +69,14 @@ exports.listdir = function* (name) {
     mysql.query(LIST_FILES_SQL, [name]),
   ];
   return rs[0].concat(rs[1]);
+};
+
+var GET_FILE_SQL = multiline(function () {;/*
+  SELECT name, parent, date, url, size, sha1 FROM dist_file WHERE parent = ? AND name = ?;
+*/});
+
+exports.getfile = function* (fullname) {
+  var name = path.basename(fullname);
+  var parent = path.dirname(fullname) + '/';
+  return yield mysql.queryOne(GET_FILE_SQL, [parent, name]);
 };

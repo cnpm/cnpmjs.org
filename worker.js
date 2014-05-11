@@ -24,7 +24,7 @@ var web = require('./servers/web');
 registry.listen(config.registryPort, config.bindingHost);
 web.listen(config.webPort, config.bindingHost);
 
-console.log('[%s] [worker:%d] Server started, registry server listen at %s:%d, web listen at %s%d, cluster: %s',
+console.log('[%s] [worker:%d] Server started, registry server listen at %s:%d, web listen at %s:%d, cluster: %s',
   new Date(), process.pid,
   config.bindingHost, config.registryPort,
   config.bindingHost, config.webPort,

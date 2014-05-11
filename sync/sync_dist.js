@@ -28,7 +28,7 @@ var config = require('../config');
 var nfs = require('../common/nfs');
 var logger = require('../common/logger');
 
-var disturl = 'http://nodejs.org/dist';
+var disturl = config.disturl;
 var USER_AGENT = 'distsync.cnpmjs.org/' + config.version + ' ' + urllib.USER_AGENT;
 
 // <a href="latest/">latest/</a>                                            02-May-2014 14:45                   -
@@ -86,7 +86,7 @@ function* syncDir(fullname, info) {
 
 function* syncFile(info) {
   var name = info.parent + info.name;
-  name = name.replace(/\//g, '_'); // make sure no parent dir
+  name = process.pid + name.replace(/\//g, '_'); // make sure no parent dir
   var downurl = disturl + info.parent + info.name;
   var filepath = common.getTarballFilepath(name);
   var ws = fs.createWriteStream(filepath);
@@ -159,8 +159,8 @@ function* syncFile(info) {
   yield* Dist.savefile(info);
 }
 
-function* listdir(name) {
-  var url = disturl + name;
+function* listdir(fullname) {
+  var url = disturl + fullname;
   var result = yield* urllib.request(url, {
     timeout: 30000,
   });
@@ -173,24 +173,29 @@ function* listdir(name) {
     if (!m) {
       continue;
     }
+    var itemName = m[1].replace(/^\/+/, '');
+    if (!itemName) {
+      continue;
+    }
+
     items.push({
-      name: m[1],
+      name: itemName, // 'SHASUMS.txt', 'x64/'
       date: m[2],
       size: m[3] === '-' ? '-' : parseInt(m[3]),
       type: m[3] === '-' ? 'dir' : 'file',
-      parent: name,
+      parent: fullname, // '/', '/v0.10.28/'
     });
   }
   return items;
 }
 
-function* listdiff(name) {
-  var items = yield* listdir(name);
+function* listdiff(fullname) {
+  var items = yield* listdir(fullname);
   if (items.length === 0) {
     return items;
   }
-  var exists = yield* Dist.listdir(name);
-  debug('listdiff %s got %s exists items', name, exists.length);
+  var exists = yield* Dist.listdir(fullname);
+  debug('listdiff %s got %s exists items', fullname, exists.length);
   var map = {};
   for (var i = 0; i < exists.length; i++) {
     var item = exists[i];
