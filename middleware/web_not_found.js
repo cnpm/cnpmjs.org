@@ -14,14 +14,17 @@
  * Module dependencies.
  */
 
+var debug = require('debug')('cnpmjs.org:middleware:web_not_found');
+
 module.exports = function *notFound(next) {
   yield *next;
 
-  if (this.status) {
+  if (this.status && this.status !== 404) {
     return;
   }
 
   var m = /^\/([\w\-\_\.]+)\/?$/.exec(this.url);
+  debug('%s match %j', this.url, m);
   if (m) {
     return this.redirect('/package/' + m[1]);
   }

@@ -18,7 +18,6 @@
 var path = require('path');
 var http = require('http');
 var fs = require('fs');
-var microtime = require('microtime');
 var koa = require('koa');
 var middlewares = require('koa-middlewares');
 var markdown = require('koa-markdown');
@@ -35,7 +34,7 @@ var app = koa();
 
 var rootdir = path.dirname(__dirname);
 
-app.use(middlewares.rt({headerName: 'X-ReadTime', timer: microtime}));
+app.use(middlewares.rt({headerName: 'X-ReadTime'}));
 app.use(middlewares.rewrite('/favicon.ico', '/favicon.png'));
 app.use(staticCache);
 

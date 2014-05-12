@@ -113,7 +113,7 @@ describe('controllers/registry/module.test.js', function () {
       request(app)
       .get('/mk2testmodule')
       .set('accept-encoding', 'gzip')
-      .expect('content-encoding', 'gzip')
+      // .expect('content-encoding', 'gzip')
       .expect(200, function (err, res) {
         // console.log(res.headers)
         should.not.exist(err);
@@ -399,7 +399,7 @@ describe('controllers/registry/module.test.js', function () {
     it('should upload tarball fail 404 when rev wrong', function (done) {
       var body = fs.readFileSync(path.join(fixtures, 'testputmodule-0.1.9.tgz'));
       request(app)
-      .put('/' + pkg.name + '/-/' + pkg.name + '-0.1.9.tgz/-rev/' + lastRev + '1')
+      .put('/' + pkg.name + '/-/' + pkg.name + '-0.1.9.tgz/-rev/' + '1231231')
       .set('authorization', baseauth)
       .set('content-type', 'application/octet-stream')
       .set('content-length', '' + body.length)

@@ -14,10 +14,59 @@
  * Module dependencies.
  */
 
+var debug = require('debug')('cnpmjs.org:controllers:web:dist');
+var mime = require('mime');
+var Dist = require('../../proxy/dist');
 var config = require('../../config');
+var downloadAsReadStream = require('../utils').downloadAsReadStream;
 
-exports.redirect = function *(next) {
+function padding(max, current, pad) {
+  pad = pad || ' ';
+  var left = max - current;
+  var str = '';
+  for (var i = 0; i < left; i++) {
+    str += pad;
+  }
+  return str;
+}
+
+exports.list = function* (next) {
   var params = this.params;
-  var url = config.disturl + (params[0] || '/');
-  this.redirect(url);
+  var url = params[0] || '/';
+  var isDir = url[url.length - 1] === '/';
+  if (!isDir) {
+    return yield* download.call(this, next);
+  }
+
+  var items = yield* Dist.listdir(url);
+  yield this.render('dist', {
+    title: 'Mirror index of ' + config.disturl + url,
+    disturl: config.disturl,
+    dirname: url,
+    items: items,
+    padding: padding
+  });
 };
+
+ function* download(next) {
+  var fullname = this.params[0];
+  var info = yield* Dist.getfile(fullname);
+  debug('download %s got %j', fullname, info);
+  if (!info || !info.url) {
+    return yield* next;
+  }
+
+  if (info.url.indexOf('http') === 0) {
+    return this.redirect(info.url);
+  }
+
+  // download it from nfs
+  if (typeof info.size === 'number') {
+    this.length = info.size;
+  }
+  this.type = mime.lookup(info.url);
+  this.attachment = info.name;
+  this.etag = info.sha1;
+
+  this.body = yield* downloadAsReadStream(info.url);
+}

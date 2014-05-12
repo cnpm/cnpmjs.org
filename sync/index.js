@@ -23,6 +23,7 @@ var config = require('../config');
 var mail = require('../common/mail');
 var Total = require('../proxy/total');
 var logger = require('../common/logger');
+var startSyncDist = require('./sync_dist');
 
 var sync = null;
 
@@ -76,6 +77,30 @@ if (sync) {
   setInterval(handleSync, ms(config.syncInterval));
 }
 
+var syncingDist = false;
+var syncDist = co(function* syncDist() {
+  if (syncingDist) {
+    return;
+  }
+  syncingDist = true;
+  logger.info('Start syncing dist...');
+  try {
+    yield * startSyncDist();
+  } catch (err) {
+    err.message += ' (sync dist error)';
+    logger.warn('Sync dist error: %s: %s\n%s', err.name, err.message, err.stack);
+    sendMailToAdmin(err, null, new Date());
+  }
+  syncingDist = false;
+});
+
+if (config.syncDist) {
+  syncDist();
+  setInterval(syncDist, ms(config.syncInterval));
+} else {
+  logger.info('sync dist disable');
+}
+
 function sendMailToAdmin(err, result, syncTime) {
   result = result || {};
   var to = [];
@@ -91,7 +116,7 @@ function sendMailToAdmin(err, result, syncTime) {
     subject = 'Sync Error';
     type = 'error';
     html = util.format('Sync packages from official registry failed.\n' +
-      'Start sync time is %s.\nError message is %s.', syncTime, err.stack);
+      'Start sync time is %s.\nError message is %s: %s\n%s.', syncTime, err.name, err.message, err.stack);
   } else if (result.fails && result.fails.length) {
     subject = 'Sync Finished But Some Packages Failed';
     type = 'warn';

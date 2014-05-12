@@ -76,7 +76,8 @@ var config = {
     debug: false
   },
 
-  disturl: 'http://dist.u.qiniudn.com',
+  disturl: 'http://nodejs.org/dist',
+  syncDist: false,
   logoURL: 'http://ww4.sinaimg.cn/large/69c1d4acgw1ebfly5kjlij208202oglr.jpg',
   registryHost: 'r.cnpmjs.org',
   // customReadmeFile: __dirname + '/web_readme.md',

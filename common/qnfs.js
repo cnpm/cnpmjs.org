@@ -16,10 +16,11 @@
 
 var thunkify = require('thunkify-wrap');
 var qn = require('qn');
+var fs = require('fs');
 var config = require('../config');
 var client = qn.create(config.qn);
 
-thunkify(client, ['delete', 'uploadFile', 'upload']);
+thunkify(client, ['delete', 'uploadFile', 'upload', 'download']);
 
 exports._client = client;
 
@@ -60,6 +61,14 @@ exports.uploadBuffer = function *(buf, options) {
 
 exports.url = function (key) {
   return client.resourceURL(key);
+};
+
+exports.download = function* (key, filepath, options) {
+  var writeStream = fs.createWriteStream(filepath);
+  yield client.download(key, {
+    timeout: options.timeout,
+    writeStream: writeStream
+  });
 };
 
 exports.remove = function *(key) {

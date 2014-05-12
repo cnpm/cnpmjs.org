@@ -15,13 +15,12 @@
  * Module dependencies.
  */
 
-var microtime = require('microtime');
 var Total = require('../proxy/total');
 var Download = require('./download');
 var version = require('../package.json').version;
 var config = require('../config');
 
-var startTime = '' + microtime.now();
+var startTime = '' + Date.now();
 
 exports.show = function *() {
   var r = yield [Total.get(), Download.total()];

@@ -37,6 +37,7 @@ var SyncModuleWorker = require('../../proxy/sync_module_worker');
 var logger = require('../../common/logger');
 var ModuleDeps = require('../../proxy/module_deps');
 var ModuleStar = require('../../proxy/module_star');
+var downloadAsReadStream = require('../utils').downloadAsReadStream;
 
 /**
  * show all version of a module
@@ -218,8 +219,6 @@ exports.get = function *(next) {
 
 var _downloads = {};
 
-var DOWNLOAD_TIMEOUT = ms('10m');
-
 exports.download = function *(next) {
   var name = this.params.name;
   var filename = this.params.filename;
@@ -259,28 +258,13 @@ exports.download = function *(next) {
   _downloads[name] = (_downloads[name] || 0) + 1;
 
   if (typeof dist.size === 'number') {
-    this.set('Content-Length', dist.size);
+    this.length = dist.size;
   }
-  this.set('Content-Type', mime.lookup(dist.key));
-  this.set('Content-Disposition', 'attachment; filename="' + filename + '"');
-  this.set('ETag', dist.shasum);
+  this.type = mime.lookup(dist.key);
+  this.attachment = filename;
+  this.etag = dist.shasum;
 
-  // use download file api
-  var tmpPath = path.join(config.uploadDir,
-    utility.randomString() + dist.key.replace(/\//g, '-'));
-  function cleanup() {
-    fs.unlink(tmpPath, utility.noop);
-  }
-  try {
-    yield nfs.download(dist.key, tmpPath, {timeout: DOWNLOAD_TIMEOUT});
-  } catch (err) {
-    cleanup();
-    this.throw(err);
-  }
-  var tarball = fs.createReadStream(tmpPath);
-  tarball.once('error', cleanup);
-  tarball.once('end', cleanup);
-  this.body = tarball;
+  this.body = yield* downloadAsReadStream(dist.key);
 };
 
 setInterval(function () {

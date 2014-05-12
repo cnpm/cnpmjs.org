@@ -95,7 +95,7 @@ describe('controllers/web/package.test.js', function () {
       request(app)
       .get('/package/mk2testmodule')
       .expect(200)
-      .expect('content-encoding', 'gzip')
+      // .expect('content-encoding', 'gzip')
       .expect('content-type', 'text/html; charset=utf-8')
       .expect(/<div id="package">/)
       .expect(/<th>Maintainers<\/th>/)
