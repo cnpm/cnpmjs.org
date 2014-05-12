@@ -87,7 +87,8 @@ var syncDist = co(function* syncDist() {
   try {
     yield * startSyncDist();
   } catch (err) {
-    logger.warn('Sync dist error: %s', err.stack);
+    err.message += ' (sync dist error)';
+    logger.warn('Sync dist error: %s: %s\n%s', err.name, err.message, err.stack);
     sendMailToAdmin(err, null, new Date());
   }
   syncingDist = false;
@@ -115,7 +116,7 @@ function sendMailToAdmin(err, result, syncTime) {
     subject = 'Sync Error';
     type = 'error';
     html = util.format('Sync packages from official registry failed.\n' +
-      'Start sync time is %s.\nError message is %s.', syncTime, err.stack);
+      'Start sync time is %s.\nError message is %s: %s\n%s.', syncTime, err.name, err.message, err.stack);
   } else if (result.fails && result.fails.length) {
     subject = 'Sync Finished But Some Packages Failed';
     type = 'warn';
