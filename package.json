@@ -16,7 +16,7 @@
     "co-gather": "0.0.1",
     "co-read": "0.0.2",
     "co-redis": "1.1.0",
-    "co-urllib": "0.2.1",
+    "co-urllib": "0.2.2",
     "co-write": "0.3.0",
     "copy-to": "1.0.1",
     "debug": "0.8.1",
