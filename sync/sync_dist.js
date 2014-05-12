@@ -171,6 +171,11 @@ function* listdir(fullname) {
       continue;
     }
 
+    // filter /nightlies/*
+    if (itemName.indexOf('nightlies/') === 0) {
+      continue;
+    }
+
     items.push({
       name: itemName, // 'SHASUMS.txt', 'x64/'
       date: m[2],
