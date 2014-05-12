@@ -258,11 +258,11 @@ exports.download = function *(next) {
   _downloads[name] = (_downloads[name] || 0) + 1;
 
   if (typeof dist.size === 'number') {
-    this.set('Content-Length', dist.size);
+    this.length = dist.size;
   }
-  this.set('Content-Type', mime.lookup(dist.key));
-  this.set('Content-Disposition', 'attachment; filename="' + filename + '"');
-  this.set('ETag', dist.shasum);
+  this.type = mime.lookup(dist.key);
+  this.attachment = filename;
+  this.etag = dist.shasum;
 
   this.body = yield* downloadAsReadStream(dist.key);
 };

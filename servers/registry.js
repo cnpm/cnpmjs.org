@@ -18,7 +18,6 @@
 var koa = require('koa');
 var app = module.exports = koa();
 var http = require('http');
-var microtime = require('microtime');
 var middlewares = require('koa-middlewares');
 var routes = require('../routes/registry');
 var logger = require('../common/logger');
@@ -28,7 +27,7 @@ var auth = require('../middleware/auth');
 var staticCache = require('../middleware/static');
 var notFound = require('../middleware/registry_not_found');
 
-app.use(middlewares.rt({headerName: 'X-ReadTime', timer: microtime}));
+app.use(middlewares.rt({headerName: 'X-ReadTime'}));
 app.use(middlewares.rewrite('/favicon.ico', '/favicon.png'));
 app.use(staticCache);
 
