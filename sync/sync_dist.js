@@ -43,7 +43,7 @@ function* sync(name) {
 }
 
 function* syncDir(fullname, info) {
-  var news = yield* listdiff(fullname);
+  var news = yield* sync.listdiff(fullname);
   var files = [];
   var dirs = [];
 
@@ -187,7 +187,7 @@ function* listdir(fullname) {
   return items;
 }
 
-function* listdiff(fullname) {
+sync.listdiff = function* listdiff(fullname) {
   var items = yield* listdir(fullname);
   if (items.length === 0) {
     return items;
@@ -203,11 +203,17 @@ function* listdiff(fullname) {
   for (var i = 0; i < items.length; i++) {
     var item = items[i];
     var exist = map[item.name];
-    if (!exist || exist.date !== item.date || exist.size !== item.size) {
+    if (!exist || exist.date !== item.date) {
       news.push(item);
-    } else {
-      debug('skip %s', item.name);
+      continue;
     }
+
+    if (item.size !== '-' && item.size !== exist.size) {
+      news.push(item);
+      continue;
+    }
+
+    debug('skip %s', item.name);
   }
   return news;
-}
+};

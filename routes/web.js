@@ -36,7 +36,7 @@ function routes(app) {
 
   app.get('/_list/search/search', pkg.rangeSearch);
 
-  app.get(/^\/dist(\/.+)?/, dist.list);
+  app.get(/^\/dist(\/.*)?/, dist.list);
 }
 
 module.exports = routes;

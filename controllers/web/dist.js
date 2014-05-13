@@ -32,7 +32,12 @@ function padding(max, current, pad) {
 
 exports.list = function* (next) {
   var params = this.params;
-  var url = params[0] || '/';
+  var url = params[0];
+  if (!url) {
+    // GET /dist => /dist/
+    return this.redirect('/dist/');
+  }
+
   var isDir = url[url.length - 1] === '/';
   if (!isDir) {
     return yield* download.call(this, next);

@@ -33,18 +33,14 @@ describe('controllers/web/dist.test.js', function () {
   afterEach(mm.restore);
 
   describe('GET /dist/*', function (done) {
-    it('should GET /dist show file list', function (done) {
-      done = pedding(2, done);
-
+    it('should GET /dist redirect to /dist/', function (done) {
       request(app)
       .get('/dist')
-      .expect('Content-Type', 'text/html; charset=utf-8')
-      .expect(200, function (err, res) {
-        should.not.exist(err);
-        res.text.should.include('<title>Mirror index of http://nodejs.org/dist/</title>');
-        done();
-      });
+      .expect(302)
+      .expect('Location', '/dist/', done);
+    });
 
+    it('should GET /dist/ show file list', function (done) {
       request(app)
       .get('/dist/')
       .expect('Content-Type', 'text/html; charset=utf-8')
@@ -74,9 +70,29 @@ describe('controllers/web/dist.test.js', function () {
         done();
       });
     });
+
+    it('should list files and dirs', function (done) {
+      mm(Dist, 'listdir', function* () {
+        return [
+          {name: 'npm/', date: '02-May-2014 00:54'},
+          {name: 'npm-versions.txt', size: 1676, date: '02-May-2014 00:54'},
+        ];
+      });
+      request(app)
+      .get('/dist/')
+      .expect('Content-Type', 'text/html; charset=utf-8')
+      .expect(200, function (err, res) {
+        should.not.exist(err);
+        res.text.should.include('<title>Mirror index of http://nodejs.org/dist/</title>');
+        res.text.should.include('<h1>Mirror index of <a target="_blank" href="http://nodejs.org/dist/">http://nodejs.org/dist/</a></h1>');
+        res.text.should.include('<a href="npm/">npm/</a>                                              02-May-2014 00:54                   -\n');
+        res.text.should.include('<a href="npm-versions.txt">npm-versions.txt</a>                                  02-May-2014 00:54                1676\n');
+        done();
+      });
+    });
   });
 
-  describe('GET /dist files', function () {
+  describe('GET /dist/ files', function () {
     it('should redirect to nfs url', function (done) {
       mm(Dist, 'getfile', function* () {
         return {
@@ -89,6 +105,21 @@ describe('controllers/web/dist.test.js', function () {
       .get('/dist/v0.10.28/SHASUMS.txt')
       .expect(302)
       .expect('Location', 'http://mock.com/dist/v0.10.28/SHASUMS.txt', done);
+    });
+
+    it('should GET /dist/npm-versions.txt redirect to nfs url', function (done) {
+      mm(Dist, 'getfile', function* (fullname) {
+        fullname.should.equal('/npm-versions.txt');
+        return {
+          name: 'npm-versions.txt', size: 1024, date: '02-May-2014 00:54',
+          url: 'http://mock.com/dist/npm-versions.txt'
+        };
+      });
+
+      request(app)
+      .get('/dist/npm-versions.txt')
+      .expect(302)
+      .expect('Location', 'http://mock.com/dist/npm-versions.txt', done);
     });
 
     it('should download nfs file and send it', function (done) {

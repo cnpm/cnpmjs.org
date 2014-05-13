@@ -77,6 +77,9 @@ var GET_FILE_SQL = multiline(function () {;/*
 
 exports.getfile = function* (fullname) {
   var name = path.basename(fullname);
-  var parent = path.dirname(fullname) + '/';
+  var parent = path.dirname(fullname);
+  if (parent !== '/') {
+    parent += '/';
+  }
   return yield mysql.queryOne(GET_FILE_SQL, [parent, name]);
 };
