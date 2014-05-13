@@ -1,4 +1,15 @@
 
+0.5.0 / 2014-05-13
+==================
+
+ * filter /nightlies/*
+ * use koa setter instead of set()
+ * add more info on error email
+ * add sync dist to sync/index.js
+ * show dist page
+ * sync dist file and save it to database
+ * disable gzip before #335 has fix
+
 0.4.3 / 2014-04-18 
 ==================
 

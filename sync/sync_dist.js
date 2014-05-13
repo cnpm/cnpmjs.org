@@ -98,7 +98,7 @@ function* syncFile(info) {
     // get tarball
     var r = yield *urllib.request(downurl, options);
     var statusCode = r.status || -1;
-    debug('download %s got status %s', downurl, statusCode);
+    logger.info('download %s got status %s, headers: %j', downurl, statusCode, r.headers);
     if (statusCode !== 200) {
       var err = new Error('Download ' + downurl + ' fail, status: ' + statusCode);
       err.name = 'DownloadDistFileError';
@@ -136,7 +136,7 @@ function* syncFile(info) {
     };
 
     // upload to NFS
-    debug('uploading %s to nfs:%s', filepath, args.key);
+    logger.info('uploading %s to nfs:%s', filepath, args.key);
     var result = yield nfs.upload(filepath, args);
     info.url = result.url || result.key;
     info.sha1 = shasum;
