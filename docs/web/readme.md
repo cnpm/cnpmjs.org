@@ -6,6 +6,7 @@ So `cnpm` is meaning: **Company npm**.
 
 * Our public registry: [r.cnpmjs.org](http://r.cnpmjs.org), syncing from [registry.npmjs.org](http://registry.npmjs.org)
 * Current [cnpmjs.org](/) version: <span id="app-version"></span>
+* Mirror of [nodejs.org/dist](http://nodejs.org/dist): http://cnpmjs.org/dist
 
 <table class="downloads">
   <tbody>
@@ -115,13 +116,13 @@ Or you can alias NPM to use it:
 ```bash
 alias cnpm="npm --registry=http://r.cnpmjs.org \
 --cache=$HOME/.npm/.cache/cnpm \
---disturl=http://dist.cnpmjs.org \
+--disturl=http://cnpmjs.org/dist \
 --userconfig=$HOME/.cnpmrc"
 
 #Or alias it in .bashrc or .zshrc
 $ echo '\n#alias for cnpm\nalias cnpm="npm --registry=http://r.cnpmjs.org \
   --cache=$HOME/.npm/.cache/cnpm \
-  --disturl=http://dist.cnpmjs.org \
+  --disturl=http://cnpmjs.org/dist \
   --userconfig=$HOME/.cnpmrc"' >> ~/.zshrc && source ~/.zshrc
 ```
 
