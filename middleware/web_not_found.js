@@ -26,8 +26,18 @@ module.exports = function *notFound(next) {
     return this.redirect('/package/' + m[1]);
   }
 
+  // package not found
+  m = /\/package\/([\w\-\_\.]+)\/?$/.exec(this.url);
+  if (m) {
+    var name = m[1];
+    this.status = 404;
+    yield* this.render('404', {
+      title: 'Package - ' + name,
+      name: name
+    });
+    return;
+  }
+
   this.status = 404;
-  this.type = 'text/html';
-  this.charset = 'utf-8';
   this.body = 'Cannot GET ' + this.path;
 };
