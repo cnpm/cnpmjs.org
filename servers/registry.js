@@ -32,7 +32,6 @@ app.use(middlewares.rewrite('/favicon.ico', '/favicon.png'));
 app.use(staticCache);
 
 app.keys = ['todokey', config.sessionSecret];
-app.outputErrors = true;
 app.proxy = true;
 app.use(session);
 app.use(middlewares.bodyParser({jsonLimit: config.jsonLimit}));

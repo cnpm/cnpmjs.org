@@ -40,7 +40,6 @@ app.use(staticCache);
 
 app.use(opensearch);
 app.keys = ['todokey', config.sessionSecret];
-app.outputErrors = true;
 app.proxy = true;
 app.use(session);
 app.use(middlewares.bodyParser());
