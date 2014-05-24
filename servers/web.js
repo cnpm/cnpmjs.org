@@ -86,7 +86,7 @@ var locals = {
   config: config
 };
 
-middlewares.render(app, {
+middlewares.ejs(app, {
   root: viewDir,
   viewExt: 'html',
   layout: '_layout',
