@@ -36,17 +36,17 @@
     "moment": "2.6.0",
     "ms": "0.6.2",
     "multiline": "0.3.4",
-    "mysql": "2.2.0",
-    "nodemailer": "0.6.3",
-    "qn": "0.2.1",
+    "mysql": "2.3.0",
+    "nodemailer": "0.6.5",
+    "qn": "0.2.2",
     "ready": "0.1.1",
-    "redis": "0.10.1",
+    "redis": "0.10.3",
     "semver": "2.3.0",
     "thunkify-wrap": "0.1.1",
     "utility": "0.1.13"
   },
   "devDependencies": {
-    "autod": ">=0.0.13",
+    "autod": "~0.2.0",
     "chunkstream": "0.0.1",
     "co-mocha": "0.0.2",
     "contributors": "*",
@@ -56,8 +56,8 @@
     "mm": "0.2.1",
     "mocha": "*",
     "pedding": "0.0.3",
-    "should": "3.3.1",
-    "supertest": "0.12.1"
+    "should": "3.3.2",
+    "supertest": "0.13.0"
   },
   "homepage": "https://github.com/cnpm/cnpmjs.org",
   "repository": {
