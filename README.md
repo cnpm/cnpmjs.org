@@ -1,9 +1,9 @@
 cnpmjs.org
 =======
 
-[![Build Status](https://secure.travis-ci.org/cnpm/cnpmjs.org.png)](http://travis-ci.org/cnpm/cnpmjs.org) [![Dependency Status](https://gemnasium.com/cnpm/cnpmjs.org.png)](https://gemnasium.com/cnpm/cnpmjs.org)
+[![Build Status](https://secure.travis-ci.org/cnpm/cnpmjs.org.svg)](http://travis-ci.org/cnpm/cnpmjs.org) [![Dependency Status](https://gemnasium.com/cnpm/cnpmjs.org.svg)](https://gemnasium.com/cnpm/cnpmjs.org)
 
-[![NPM](https://nodei.co/npm/cnpmjs.org.png?downloads=true&stars=true)](https://nodei.co/npm/cnpmjs.org/)
+[![NPM](https://nodei.co/npm/cnpmjs.org.svg?downloads=true&stars=true)](https://nodei.co/npm/cnpmjs.org/)
 
 ![logo](https://raw.github.com/cnpm/cnpmjs.org/master/logo.png)
 
