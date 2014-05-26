@@ -42,7 +42,7 @@
     "ready": "0.1.1",
     "redis": "0.10.3",
     "semver": "2.3.0",
-    "thunkify-wrap": "0.1.1",
+    "thunkify-wrap": "0.1.2",
     "utility": "0.1.13"
   },
   "devDependencies": {
