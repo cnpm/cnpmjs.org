@@ -87,10 +87,12 @@ CREATE TABLE `tag` (
  `version` varchar(30) NOT NULL COMMENT 'module version',
  `module_id` bigint(20) unsigned NOT NULL COMMENT 'module id',
  PRIMARY KEY (`id`),
- UNIQUE KEY `name` (`name`, `tag`)
+ UNIQUE KEY `name` (`name`, `tag`),
+ KEY `gmt_modified` (`gmt_modified`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='module tag';
 -- ALTER TABLE  `tag` ADD  `module_id` BIGINT( 20 ) UNSIGNED NOT NULL;
 -- ALTER TABLE  `tag` CHANGE  `name`  `name` VARCHAR( 100 ) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL COMMENT  'module name';
+-- ALTER TABLE `tag` ADD KEY `gmt_modified` (`gmt_modified`);
 
 CREATE TABLE `total` (
  `name` varchar(100) NOT NULL COMMENT 'total name',

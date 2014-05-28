@@ -557,6 +557,8 @@ describe('controllers/registry/module.test.js', function () {
       request(app)
       .get('/-/all/since?stale=update_after&startkey=0')
       .expect(200, function (err, res) {
+        should.not.exist(err);
+        should.exist(res.body);
         res.body.should.be.an.Object;
         res.body._updated.should.be.a.Number;
         var keys = Object.keys(res.body);
@@ -569,6 +571,8 @@ describe('controllers/registry/module.test.js', function () {
       request(app)
       .get('/-/all/since?stale=update_after&startkey=' + (Date.now() * 2))
       .expect(200, function (err, res) {
+        should.not.exist(err);
+        should.exist(res.body);
         res.body.should.be.an.Object;
         res.body._updated.should.be.a.Number;
         res.body.should.eql({

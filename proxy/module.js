@@ -433,38 +433,16 @@ exports.listByName = function (name, callback) {
   });
 };
 
-var LIST_SINCE_SQLS = [];
-LIST_SINCE_SQLS.push(multiline(function () {;/*
-  SELECT
-    module_id
-  FROM
-    tag
-  WHERE
-    tag="latest" AND gmt_modified>?;
-*/}));
-LIST_SINCE_SQLS.push(multiline(function () {;/*
+var LIST_SINCE_SQL = multiline(function () {;/*
   SELECT
     distinct(name)
   FROM
-    module
+    tag
   WHERE
-    id IN (?);
-*/}));
+    gmt_modified > ?;
+*/});
 exports.listSince = function (start, callback) {
-  var ep = eventproxy.create();
-  ep.fail(callback);
-  mysql.query(LIST_SINCE_SQLS[0], [new Date(start)], ep.done(function (rows) {
-    if (!rows || rows.length === 0) {
-      return callback(null, []);
-    }
-    ep.emit('ids', rows.map(function (r) {
-      return r.module_id;
-    }));
-  }));
-
-  ep.once('ids', function (ids) {
-    mysql.query(LIST_SINCE_SQLS[1], [ids], callback);
-  });
+  mysql.query(LIST_SINCE_SQL, [new Date(start)], callback);
 };
 
 var LIST_ALL_NAME_SQL = multiline(function () {;/*
