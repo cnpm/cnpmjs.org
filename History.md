@@ -1,4 +1,17 @@
 
+0.5.1 / 2014-05-28
+==================
+
+ * fix attack on /-/all/since?stale=update_after&startkey=2 close #336
+ * bump thunkify-wrap
+ * bump koa-middlewares
+ * remove outputError
+ * bump dependencies
+ * use svg badge
+ * add package/notfound page
+ * add dist mirror link to home page
+ * fix sync listdiff and add more test cases
+
 0.5.0 / 2014-05-13
 ==================
 
