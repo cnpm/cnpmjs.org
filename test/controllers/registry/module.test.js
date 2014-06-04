@@ -79,7 +79,7 @@ describe('controllers/registry/module.test.js', function () {
     it('should return module info and etag', function (done) {
       request(app)
       .get('/mk2testmodule')
-      .expect('content-type', 'application/json')
+      .expect('content-type', 'application/json; charset=utf-8')
       .expect(200, function (err, res) {
         should.not.exist(err);
         // should have etag
@@ -98,7 +98,7 @@ describe('controllers/registry/module.test.js', function () {
           'license');
         res.body.name.should.equal('mk2testmodule');
         res.body.versions[Object.keys(res.body.versions)[0]]
-          .dist.tarball.should.include('/mk2testmodule/download');
+          .dist.tarball.should.containEql('/mk2testmodule/download');
         res.body.time.should.have.property('modified');
         res.body.time.modified.should.be.a.String;
         res.body.time.should.have.property('created');
@@ -131,7 +131,7 @@ describe('controllers/registry/module.test.js', function () {
           'license');
         res.body.name.should.equal('mk2testmodule');
         res.body.versions[Object.keys(res.body.versions)[0]]
-          .dist.tarball.should.include('/mk2testmodule/download');
+          .dist.tarball.should.containEql('/mk2testmodule/download');
         should.not.exist(res.headers['set-cookie']);
         done();
       });
@@ -172,7 +172,7 @@ describe('controllers/registry/module.test.js', function () {
         body.name.should.equal('mk2testmodule');
         body.version.should.equal('0.0.1');
         body._id.should.equal('mk2testmodule@0.0.1');
-        body.dist.tarball.should.include('/mk2testmodule/download/mk2testmodule-0.0.1.tgz');
+        body.dist.tarball.should.containEql('/mk2testmodule/download/mk2testmodule-0.0.1.tgz');
         done();
       });
     });
@@ -189,7 +189,7 @@ describe('controllers/registry/module.test.js', function () {
         }]
       })
       .set('authorization', baseauth)
-      .expect('content-type', 'application/json', done);
+      .expect('content-type', 'application/json; charset=utf-8', done);
     });
 
     it('should add new maintainers', function (done) {
@@ -206,7 +206,7 @@ describe('controllers/registry/module.test.js', function () {
       })
       .set('authorization', baseauth)
       .expect(201)
-      .expect('content-type', 'application/json', done);
+      .expect('content-type', 'application/json; charset=utf-8', done);
     });
 
     it('should add again new maintainers', function (done) {
@@ -223,7 +223,7 @@ describe('controllers/registry/module.test.js', function () {
       })
       .set('authorization', baseauth)
       .expect(201)
-      .expect('content-type', 'application/json', done);
+      .expect('content-type', 'application/json; charset=utf-8', done);
     });
 
     it('should rm maintainers', function (done) {
@@ -237,7 +237,7 @@ describe('controllers/registry/module.test.js', function () {
       })
       .set('authorization', baseauth)
       .expect(201)
-      .expect('content-type', 'application/json', done);
+      .expect('content-type', 'application/json; charset=utf-8', done);
     });
 
     it('should rm again maintainers', function (done) {
@@ -251,7 +251,7 @@ describe('controllers/registry/module.test.js', function () {
       })
       .set('authorization', baseauth)
       .expect(201)
-      .expect('content-type', 'application/json', done);
+      .expect('content-type', 'application/json; charset=utf-8', done);
     });
   });
 
@@ -479,7 +479,7 @@ describe('controllers/registry/module.test.js', function () {
         should.not.exist(err);
         res.body.name.should.equal('testputmodule');
         res.body.version.should.equal('0.1.9');
-        res.body.dist.tarball.should.include('/testputmodule/download/testputmodule-0.1.9.tgz');
+        res.body.dist.tarball.should.containEql('/testputmodule/download/testputmodule-0.1.9.tgz');
         done();
       });
     });

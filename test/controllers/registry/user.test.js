@@ -167,7 +167,7 @@ describe('controllers/registry/user.test.js', function () {
       }, function (err, res) {
         should.not.exist(err);
         should.exist(res.headers['set-cookie']);
-        res.headers['set-cookie'].join(';').should.include('AuthSession=');
+        res.headers['set-cookie'].join(';').should.containEql('AuthSession=');
         done();
       });
     });

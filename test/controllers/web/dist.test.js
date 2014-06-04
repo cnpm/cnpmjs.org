@@ -46,7 +46,7 @@ describe('controllers/web/dist.test.js', function () {
       .expect('Content-Type', 'text/html; charset=utf-8')
       .expect(200, function (err, res) {
         should.not.exist(err);
-        res.text.should.include('<title>Mirror index of http://nodejs.org/dist/</title>');
+        res.text.should.containEql('<title>Mirror index of http://nodejs.org/dist/</title>');
         done();
       });
     });
@@ -63,10 +63,10 @@ describe('controllers/web/dist.test.js', function () {
       .expect('Content-Type', 'text/html; charset=utf-8')
       .expect(200, function (err, res) {
         should.not.exist(err);
-        res.text.should.include('<title>Mirror index of http://nodejs.org/dist/v1.0.0/</title>');
-        res.text.should.include('<h1>Mirror index of <a target="_blank" href="http://nodejs.org/dist/v1.0.0/">http://nodejs.org/dist/v1.0.0/</a></h1>');
-        res.text.should.include('<a href="ooxx/">ooxx/</a>                                             02-May-2014 00:54                   -\n');
-        res.text.should.include('<a href="foo.txt">foo.txt</a>                                           02-May-2014 00:54                1024\n');
+        res.text.should.containEql('<title>Mirror index of http://nodejs.org/dist/v1.0.0/</title>');
+        res.text.should.containEql('<h1>Mirror index of <a target="_blank" href="http://nodejs.org/dist/v1.0.0/">http://nodejs.org/dist/v1.0.0/</a></h1>');
+        res.text.should.containEql('<a href="ooxx/">ooxx/</a>                                             02-May-2014 00:54                   -\n');
+        res.text.should.containEql('<a href="foo.txt">foo.txt</a>                                           02-May-2014 00:54                1024\n');
         done();
       });
     });
@@ -83,10 +83,10 @@ describe('controllers/web/dist.test.js', function () {
       .expect('Content-Type', 'text/html; charset=utf-8')
       .expect(200, function (err, res) {
         should.not.exist(err);
-        res.text.should.include('<title>Mirror index of http://nodejs.org/dist/</title>');
-        res.text.should.include('<h1>Mirror index of <a target="_blank" href="http://nodejs.org/dist/">http://nodejs.org/dist/</a></h1>');
-        res.text.should.include('<a href="npm/">npm/</a>                                              02-May-2014 00:54                   -\n');
-        res.text.should.include('<a href="npm-versions.txt">npm-versions.txt</a>                                  02-May-2014 00:54                1676\n');
+        res.text.should.containEql('<title>Mirror index of http://nodejs.org/dist/</title>');
+        res.text.should.containEql('<h1>Mirror index of <a target="_blank" href="http://nodejs.org/dist/">http://nodejs.org/dist/</a></h1>');
+        res.text.should.containEql('<a href="npm/">npm/</a>                                              02-May-2014 00:54                   -\n');
+        res.text.should.containEql('<a href="npm-versions.txt">npm-versions.txt</a>                                  02-May-2014 00:54                1676\n');
         done();
       });
     });

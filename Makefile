@@ -23,6 +23,7 @@ test: install pretest
 		--reporter $(REPORTER) \
 		--timeout $(TIMEOUT) \
 		--require should \
+		--require should-http \
 		--require co-mocha \
 		--require ./test/init.js \
 		$(MOCHA_OPTS) \

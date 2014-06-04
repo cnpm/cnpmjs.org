@@ -51,7 +51,7 @@ describe('controllers/web/package.test.js', function () {
     it('should search with "m"', function (done) {
       request(app)
       .get('/_list/search/search?startkey="m"&limit=2')
-      .expect('content-type', 'application/json')
+      .expect('content-type', 'application/json; charset=utf-8')
       .expect(200, function (err, res) {
         should.not.exist(err);
         res.body.should.have.keys('rows');
@@ -102,7 +102,7 @@ describe('controllers/web/package.test.js', function () {
       .expect(/<th>Version<\/th>/, function (err, res) {
         should.not.exist(err);
         res.should.have.header('etag');
-        res.text.should.include('<meta charset="utf-8">');
+        res.text.should.containEql('<meta charset="utf-8">');
         done();
       });
     });
