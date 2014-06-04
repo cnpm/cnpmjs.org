@@ -18,3 +18,4 @@ coverage/
 .jshintignore
 .DS_Store
 config/web_readme.md
+.dist/
