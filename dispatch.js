@@ -24,6 +24,18 @@ var childProcess = require('child_process');
 var syncPath = path.join(__dirname, 'sync');
 
 if (config.enableCluster) {
+  forkWorker();
+  if (config.syncModel !== 'none') {
+    forkSyncer();
+  }
+} else {
+  require(workerPath);
+  if (config.syncModel !== 'none') {
+    require(syncPath);
+  }
+}
+
+function forkWorker() {
   cluster.setupMaster({
     exec: workerPath
   });
@@ -50,9 +62,16 @@ if (config.enableCluster) {
   for (var i = 0; i < config.numCPUs; i++) {
     cluster.fork();
   }
+}
 
-  childProcess.fork(syncPath);
-} else {
-  require(workerPath);
-  require(syncPath);
+function forkSyncer() {
+  var syncer = childProcess.fork(syncPath);
+  syncer.on('exit', function (code, signal) {
+    var err = new Error(util.format('syncer %s died (code: %s, signal: %s, stdout: %s, stderr: %s)',
+      syncer.pid, code, signal, syncer.stdout, syncer.stderr));
+    err.name = 'SyncerWorkerDiedError';
+    console.error('[%s] [master:%s] syncer exit: %s: %s',
+      Date(), process.pid, err.name, err.message);
+    setTimeout(forkSyncer, 1000);
+  });
 }
