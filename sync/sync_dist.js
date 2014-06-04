@@ -238,7 +238,7 @@ sync.listdiff = function* (fullname) {
 };
 
 function* syncPhantomjsDir() {
-  var fullname = 'phantomjs/';
+  var fullname = '/phantomjs/';
   var files = yield* sync.listPhantomjsDiff(fullname);
 
   logger.info('sync remote:%s got %d files to sync',

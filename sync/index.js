@@ -23,7 +23,7 @@ var config = require('../config');
 var mail = require('../common/mail');
 var Total = require('../proxy/total');
 var logger = require('../common/logger');
-var syncDist = require('./sync_dist');
+var syncDistWorker = require('./sync_dist');
 
 var sync = null;
 
@@ -85,8 +85,8 @@ var syncDist = co(function* syncDist() {
   syncingDist = true;
   logger.info('Start syncing dist...');
   try {
-    yield* syncDist();
-    yield* syncDist.syncPhantomjsDir();
+    yield* syncDistWorker();
+    yield* syncDistWorker.syncPhantomjsDir();
   } catch (err) {
     err.message += ' (sync dist error)';
     logger.warn('Sync dist error: %s: %s\n%s', err.name, err.message, err.stack);
