@@ -29,7 +29,7 @@ test: install pretest
 		$(MOCHA_OPTS) \
 		$(TESTS)
 
-test-cov cov: install
+test-cov cov: install pretest
 	@NODE_ENV=test node --harmony \
 		node_modules/.bin/istanbul cover --preserve-comments \
 		./node_modules/.bin/_mocha \
@@ -37,6 +37,7 @@ test-cov cov: install
 		--reporter $(REPORTER) \
 		--timeout $(TIMEOUT) \
 		--require should \
+		--require should-http \
 		--require co-mocha \
 		--require ./test/init.js \
 		$(MOCHA_OPTS) \
