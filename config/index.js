@@ -59,10 +59,14 @@ var config = {
   uploadDir: path.join(root, '.dist'),
   // qiniu cdn: http://www.qiniu.com/, it free for dev.
   qn: {
-    accessKey: "iN7NgwM31j4-BZacMjPrOQBs34UG1maYCAQmhdCV",
-    secretKey: "6QTOr2Jg1gcZEWDQXKOGZh5PziC2MCV5KsntT70j",
-    bucket: "qtestbucket",
-    domain: "http://qtestbucket.qiniudn.com"
+    // accessKey: "iN7NgwM31j4-BZacMjPrOQBs34UG1maYCAQmhdCV",
+    // secretKey: "6QTOr2Jg1gcZEWDQXKOGZh5PziC2MCV5KsntT70j",
+    // bucket: "qtestbucket",
+    // domain: "http://qtestbucket.qiniudn.com",
+    accessKey: "5UyUq-l6jsWqZMU6tuQ85Msehrs3Dr58G-mCZ9rE",
+    secretKey: "YaRsPKiYm4nGUt8mdz2QxeV5Q_yaUzVxagRuWTfM",
+    bucket: "qiniu-sdk-test",
+    domain: "http://qiniu-sdk-test.qiniudn.com",
   },
 
   mail: {

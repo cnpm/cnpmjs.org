@@ -44,6 +44,14 @@ exports.list = function* (next) {
   }
 
   var items = yield* Dist.listdir(url);
+  if (url === '/') {
+    // phantomjs/
+    items.push({
+      name: 'phantomjs/',
+      date: '',
+    });
+  }
+
   yield this.render('dist', {
     title: 'Mirror index of ' + config.disturl + url,
     disturl: config.disturl,

@@ -20,5 +20,6 @@ var co = require('co');
 var syncdist = require('../sync/sync_dist');
 
 co(function* () {
-  yield* syncdist('/v0.10.28/');
+  // yield* syncdist('/v0.10.28/');
+  yield* syncdist.syncPhantomjsDir();
 })();

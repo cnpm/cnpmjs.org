@@ -22,6 +22,8 @@ var bytes = require('bytes');
 var crypto = require('crypto');
 var utility = require('utility');
 var thunkify = require('thunkify-wrap');
+var cheerio = require('cheerio');
+var urlResolve = require('url').resolve;
 var common = require('../lib/common');
 var Dist = require('../proxy/dist');
 var config = require('../config');
@@ -30,10 +32,6 @@ var logger = require('../common/logger');
 
 var disturl = config.disturl;
 var USER_AGENT = 'distsync.cnpmjs.org/' + config.version + ' ' + urllib.USER_AGENT;
-
-// <a href="latest/">latest/</a>                                            02-May-2014 14:45                   -
-// <a href="node-v0.4.10.tar.gz">node-v0.4.10.tar.gz</a>                                26-Aug-2011 16:22            12410018
-var FILE_RE = /^<a[^>]+>([^<]+)<\/a>\s+(\d+\-\w+\-\d+ \d+\:\d+)\s+([\-\d]+)/;
 
 module.exports = sync;
 
@@ -80,7 +78,12 @@ function* syncDir(fullname, info) {
 function* syncFile(info) {
   var name = info.parent + info.name;
   name = process.pid + name.replace(/\//g, '_'); // make sure no parent dir
+  var isPhantomjsURL = false;
   var downurl = disturl + info.parent + info.name;
+  if (info.downloadURL) {
+    downurl = info.downloadURL;
+    isPhantomjsURL = true;
+  }
   var filepath = common.getTarballFilepath(name);
   var ws = fs.createWriteStream(filepath);
 
@@ -94,11 +97,13 @@ function* syncFile(info) {
   };
 
   try {
-    logger.info('downloading %s %s to %s', bytes(info.size), downurl, filepath);
+    logger.info('downloading %s %s to %s, isPhantomjsURL: %s',
+      bytes(info.size), downurl, filepath, isPhantomjsURL);
     // get tarball
     var r = yield *urllib.request(downurl, options);
     var statusCode = r.status || -1;
-    logger.info('download %s got status %s, headers: %j', downurl, statusCode, r.headers);
+    logger.info('download %s got status %s, headers: %j',
+      downurl, statusCode, r.headers);
     if (statusCode !== 200) {
       var err = new Error('Download ' + downurl + ' fail, status: ' + statusCode);
       err.name = 'DownloadDistFileError';
@@ -121,7 +126,17 @@ function* syncFile(info) {
       throw err;
     }
 
-    if (dataSize !== info.size) {
+    if (isPhantomjsURL) {
+      debug('real size: %s, expect size: %s', dataSize, info.size);
+      if (dataSize < info.size) {
+        // phantomjs download page only show `6.7 MB`
+        var err = new Error('Download ' + downurl + ' file size is '
+          + dataSize + ' not match ' + info.size);
+        err.name = 'DownloadDistFileSizeError';
+        throw err;
+      }
+      info.size = dataSize;
+    } else if (dataSize !== info.size) {
       var err = new Error('Download ' + downurl + ' file size is '
         + dataSize + ' not match ' + info.size);
       err.name = 'DownloadDistFileSizeError';
@@ -151,6 +166,10 @@ function* syncFile(info) {
   logger.info('Sync dist file: %j done', info);
   yield* Dist.savefile(info);
 }
+
+// <a href="latest/">latest/</a>                                            02-May-2014 14:45                   -
+// <a href="node-v0.4.10.tar.gz">node-v0.4.10.tar.gz</a>                                26-Aug-2011 16:22            12410018
+var FILE_RE = /^<a[^>]+>([^<]+)<\/a>\s+(\d+\-\w+\-\d+ \d+\:\d+)\s+([\-\d]+)/;
 
 function* listdir(fullname) {
   var url = disturl + fullname;
@@ -187,7 +206,7 @@ function* listdir(fullname) {
   return items;
 }
 
-sync.listdiff = function* listdiff(fullname) {
+sync.listdiff = function* (fullname) {
   var items = yield* listdir(fullname);
   if (items.length === 0) {
     return items;
@@ -212,6 +231,108 @@ sync.listdiff = function* listdiff(fullname) {
       news.push(item);
       continue;
     }
+
+    debug('skip %s', item.name);
+  }
+  return news;
+};
+
+function* syncPhantomjsDir() {
+  var fullname = 'phantomjs/';
+  var files = yield* sync.listPhantomjsDiff(fullname);
+
+  logger.info('sync remote:%s got %d files to sync',
+    fullname, files.length);
+
+  for (var i = 0; i < files.length; i++) {
+    yield* syncFile(files[i]);
+  }
+
+  logger.info('SyncPhantomjsDir %s finished, %d files',
+    fullname, files.length);
+}
+sync.syncPhantomjsDir = syncPhantomjsDir;
+
+// <tr class="iterable-item" id="download-301626">
+//   <td class="name"><a class="execute" href="/ariya/phantomjs/downloads/phantomjs-1.9.7-windows.zip">phantomjs-1.9.7-windows.zip</a></td>
+//   <td class="size">6.7 MB</td>
+//   <td class="uploaded-by"><a href="/Vitallium">Vitallium</a></td>
+//   <td class="count">122956</td>
+//   <td class="date">
+//     <div>
+//       <time datetime="2014-01-27T18:29:53.706942" data-title="true">2014-01-27</time>
+//     </div>
+//   </td>
+//   <td class="delete">
+//
+//   </td>
+// </tr>
+
+function* listPhantomjsDir(fullname) {
+  var url = 'https://bitbucket.org/ariya/phantomjs/downloads';
+  var result = yield* urllib.request(url, {
+    timeout: 60000,
+  });
+  debug('listPhantomjsDir %s got %s, %j', url, result.status, result.headers);
+  var html = result.data && result.data.toString() || '';
+  var $ = cheerio.load(html);
+  var items = [];
+  $('tr.iterable-item').each(function (i, el) {
+    var $el = $(this);
+    var $link = $el.find('.name a');
+    var name = $link.text();
+    var downloadURL = $link.attr('href');
+    if (!name || !downloadURL || !/\.(zip|bz2|gz)$/.test(downloadURL)) {
+      return;
+    }
+    downloadURL = urlResolve(url, downloadURL);
+    var size = parseInt(bytes($el.find('.size').text().toLowerCase().replace(/\s/g, '')));
+    if (size > 1024 * 1024) {
+      size -= 1024 * 1024;
+    } else if (size > 1024) {
+      size -= 1024;
+    } else {
+      size -= 10;
+    }
+    var date = $el.find('.date time').text();
+    items.push({
+      name: name, // 'SHASUMS.txt', 'x64/'
+      date: date,
+      size: size,
+      type: 'file',
+      parent: fullname,
+      downloadURL: downloadURL,
+    });
+  });
+  return items;
+}
+sync.listPhantomjsDir = listPhantomjsDir;
+
+sync.listPhantomjsDiff = function* (fullname) {
+  var items = yield* listPhantomjsDir(fullname);
+  if (items.length === 0) {
+    return items;
+  }
+  var exists = yield* Dist.listdir(fullname);
+  debug('listdiff %s got %s exists items', fullname, exists.length);
+  var map = {};
+  for (var i = 0; i < exists.length; i++) {
+    var item = exists[i];
+    map[item.name] = item;
+  }
+  var news = [];
+  for (var i = 0; i < items.length; i++) {
+    var item = items[i];
+    var exist = map[item.name];
+    if (!exist || exist.date !== item.date) {
+      news.push(item);
+      continue;
+    }
+
+    // if (item.size !== exist.size) {
+    //   news.push(item);
+    //   continue;
+    // }
 
     debug('skip %s', item.name);
   }

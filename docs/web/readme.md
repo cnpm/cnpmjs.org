@@ -6,7 +6,8 @@ So `cnpm` is meaning: **Company npm**.
 
 * Our public registry: [r.cnpmjs.org](http://r.cnpmjs.org), syncing from [registry.npmjs.org](http://registry.npmjs.org)
 * Current [cnpmjs.org](/) version: <span id="app-version"></span>
-* Mirror of [nodejs.org/dist](http://nodejs.org/dist): http://cnpmjs.org/dist
+* Mirror of [nodejs.org/dist](http://nodejs.org/dist): [/dist mirror](/dist)
+* Mirror of [phantomjs downloads](https://bitbucket.org/ariya/phantomjs/downloads): [phantomjs mirror](/dist/phantomjs/)
 
 <table class="downloads">
   <tbody>

@@ -23,6 +23,16 @@ var distsync = require('../../sync/sync_dist');
 describe('sync/sync_dist.test.js', function () {
   afterEach(mm.restore);
 
+  describe('listPhantomjsDir()', function () {
+    it('should list all phantomjs download infos', function* () {
+      var items = yield* distsync.listPhantomjsDir('/phantomjs');
+      items.length.should.above(1);
+      items.forEach(function (item) {
+        item.should.have.keys('name', 'date', 'size', 'type', 'parent', 'downloadURL');
+      });
+    });
+  });
+
   describe('listdiff()', function () {
     it('should got all news', function* () {
       mm(urllib, 'request', function* () {
