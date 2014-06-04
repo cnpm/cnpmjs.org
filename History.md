@@ -1,4 +1,11 @@
 
+0.5.2 / 2014-06-04
+==================
+
+ * sync hotfix
+ * sync phantomjs downloads pkg. close #348
+ * add restart, fixed #346
+
 0.5.1 / 2014-05-28
 ==================
 
