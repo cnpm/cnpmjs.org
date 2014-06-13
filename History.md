@@ -1,4 +1,13 @@
 
+0.5.3 / 2014-06-13
+==================
+
+  * fix sync response 204
+  * add links in History.md
+  * bump koa
+  * fix test-cov
+  * bump koa and should
+
 0.5.2 / 2014-06-04
 ==================
 
@@ -30,7 +39,7 @@
  * sync dist file and save it to database
  * disable gzip before [#335](https://github.com/cnpm/cnpmjs.org/issues/335) has fix
 
-0.4.3 / 2014-04-18 
+0.4.3 / 2014-04-18
 ==================
 
   * Merge pull request [#334](https://github.com/cnpm/cnpmjs.org/issues/334) from cnpm/fix-permission
@@ -91,7 +100,7 @@
  * web page only list cnpm registry related info
  * use generator in qnfs
 
-0.3.11 / 2014-03-20 
+0.3.11 / 2014-03-20
 ==================
 
   * use common.isMaintainer, fixed [#283](https://github.com/cnpm/cnpmjs.org/issues/283)
@@ -102,7 +111,7 @@
   * use multiline to refactor sqls
   * ignore contributors
 
-0.3.10 / 2014-03-16 
+0.3.10 / 2014-03-16
 ==================
 
   * Only /_session request send the authSession. fixed [#223](https://github.com/cnpm/cnpmjs.org/issues/223)
@@ -116,7 +125,7 @@
   * use defer session
   * Support npm owner|author add [name] [pkg]. fixed [#271](https://github.com/cnpm/cnpmjs.org/issues/271)
 
-0.3.9 / 2014-03-14 
+0.3.9 / 2014-03-14
 ==================
 
   * custom user-agent
@@ -125,12 +134,12 @@
   * add config.redis check
   * add koa-limit, fixed [#267](https://github.com/cnpm/cnpmjs.org/issues/267)
 
-0.3.8 / 2014-03-11 
+0.3.8 / 2014-03-11
 ==================
 
   * update middlewares, fixed missing charset bug [#264](https://github.com/cnpm/cnpmjs.org/issues/264)
 
-0.3.7 / 2014-03-11 
+0.3.7 / 2014-03-11
 ==================
 
   * show worker die date time
@@ -147,7 +156,7 @@
   * change function to generator
   * need node >= v0.11.9
 
-0.3.6 / 2014-03-06 
+0.3.6 / 2014-03-06
 ==================
 
   * install missing package should sync it from source npm. fixed [#252](https://github.com/cnpm/cnpmjs.org/issues/252)
@@ -157,14 +166,14 @@
   * use `yield* next` instead of `yield next`
   * replace dist.u.qiniudn.com with cnpmjs.org/dist
 
-0.3.5 / 2014-03-05 
+0.3.5 / 2014-03-05
 ==================
 
   * redirect /dist/xxx.tgz => http://dist.u.qiniudn.com/xxx.tgz fixed [#249](https://github.com/cnpm/cnpmjs.org/issues/249)
   * redirect /name to /package/name when /name is 404. fixed [#245](https://github.com/cnpm/cnpmjs.org/issues/245)
   * Add missing properies and sync missing star users. fixed [#235](https://github.com/cnpm/cnpmjs.org/issues/235)
 
-0.3.4 / 2014-03-04 
+0.3.4 / 2014-03-04
 ==================
 
   * add cov
@@ -174,7 +183,7 @@
   * default readme to null, fixed [#233](https://github.com/cnpm/cnpmjs.org/issues/233)
   * remove readme in versions
 
-0.3.3 / 2014-02-28 
+0.3.3 / 2014-02-28
 ==================
 
   * Merge pull request [#232](https://github.com/cnpm/cnpmjs.org/issues/232) from cnpm/host-hotfix
@@ -182,7 +191,7 @@
   * Merge pull request [#231](https://github.com/cnpm/cnpmjs.org/issues/231) from cnpm/bug-fix
   * fix deps display bug[#230](https://github.com/cnpm/cnpmjs.org/issues/230) and nsf.url TypeError[#229](https://github.com/cnpm/cnpmjs.org/issues/229)
 
-0.3.2 / 2014-02-28 
+0.3.2 / 2014-02-28
 ==================
 
   * update koa-sess and koa-redis
@@ -190,13 +199,13 @@
   * remove nfs.downloadStream first, fix tmppath error
   * fix fengmk2/giturl[#1](https://github.com/cnpm/cnpmjs.org/issues/1) bug
 
-0.3.1 / 2014-02-27 
+0.3.1 / 2014-02-27
 ==================
 
   * add etag fixed [#224](https://github.com/cnpm/cnpmjs.org/issues/224)
   * travis ci install on source npm
 
-0.3.0 / 2014-02-27 
+0.3.0 / 2014-02-27
 ==================
 
   * fix typo and dont sync not exists pkgs
@@ -230,39 +239,39 @@
   * override json limit to default 10mb. fixed [#209](https://github.com/cnpm/cnpmjs.org/issues/209)
   * fix [#210](https://github.com/cnpm/cnpmjs.org/issues/210) addPackageAndDist package version detect bug
 
-0.2.27 / 2014-02-19 
+0.2.27 / 2014-02-19
 ==================
 
   * support json result in search, fixed [#189](https://github.com/cnpm/cnpmjs.org/issues/189)
 
-0.2.26 / 2014-02-19 
+0.2.26 / 2014-02-19
 ==================
 
   * npm publish also need to add deps
 
-0.2.25 / 2014-02-19 
+0.2.25 / 2014-02-19
 ==================
 
   * max handle number of package.json `dependencies` property
   * Dependents support. fixed [#190](https://github.com/cnpm/cnpmjs.org/issues/190)
 
-0.2.24 / 2014-02-13 
+0.2.24 / 2014-02-13
 ==================
 
   * fix if delete all the versions
   * refactor remove module, fixed [#186](https://github.com/cnpm/cnpmjs.org/issues/186)
 
-0.2.23 / 2014-01-26 
+0.2.23 / 2014-01-26
 ==================
 
   * system admin can add, publish, remove the packages. fixed [#176](https://github.com/cnpm/cnpmjs.org/issues/176)
 
-0.2.22 / 2014-01-26 
+0.2.22 / 2014-01-26
 ==================
 
   * add keyword and search support keyword. [#181](https://github.com/cnpm/cnpmjs.org/issues/181)
 
-0.2.21 / 2014-01-24 
+0.2.21 / 2014-01-24
 ==================
 
   * refactor code styles on package.html
@@ -270,67 +279,67 @@
   * Show registry server error response. fixed [#178](https://github.com/cnpm/cnpmjs.org/issues/178)
   * nav-tabs for package.html (@4simple)
 
-0.2.20 / 2014-01-23 
+0.2.20 / 2014-01-23
 ==================
 
   * hotfix sync missing dependencies and readmes
   * fix sync readme error, fixed [#174](https://github.com/cnpm/cnpmjs.org/issues/174)
   * add updateReadme in module
 
-0.2.19 / 2014-01-22 
+0.2.19 / 2014-01-22
 ==================
 
   * npm install no need to check authorization header. fixed [#171](https://github.com/cnpm/cnpmjs.org/issues/171)
 
-0.2.18 / 2014-01-20 
+0.2.18 / 2014-01-20
 ==================
 
   * Support gitlab git url to display and click. fixed [#160](https://github.com/cnpm/cnpmjs.org/issues/160)
   * fix redis crash
 
-0.2.17 / 2014-01-17 
+0.2.17 / 2014-01-17
 ==================
 
   * custom logo url
   * hotfix layout bug
 
-0.2.16 / 2014-01-16 
+0.2.16 / 2014-01-16
 ==================
 
   * fix publish-time bug
 
-0.2.15 / 2014-01-16 
+0.2.15 / 2014-01-16
 ==================
 
   * add publish_time to debug
 
-0.2.14 / 2014-01-16 
+0.2.14 / 2014-01-16
 ==================
 
   * add make autod
   * update publish_time, fixed [#163](https://github.com/cnpm/cnpmjs.org/issues/163)
 
-0.2.13 / 2014-01-15 
+0.2.13 / 2014-01-15
 ==================
 
   * markdown tmpl not support footer, need to wrap on app start
 
-0.2.12 / 2014-01-15 
+0.2.12 / 2014-01-15
 ==================
 
   * add footer and npm client name customable
 
-0.2.11 / 2014-01-15 
+0.2.11 / 2014-01-15
 ==================
 
   * package page contributor link to search, default is true
 
-0.2.10 / 2014-01-14 
+0.2.10 / 2014-01-14
 ==================
 
   * fix [#155](https://github.com/cnpm/cnpmjs.org/issues/155) Content-Disposition wrong.
 
-0.2.9 / 2014-01-14 
+0.2.9 / 2014-01-14
 ==================
 
   * support startkey=c and startkey="c"
@@ -338,41 +347,41 @@
   * fix fork me image link
   * support sync by query.name
 
-0.2.8 / 2014-01-14 
+0.2.8 / 2014-01-14
 ==================
 
   * dont show err stack on test env
   * add download link for package page
 
-0.2.7 / 2014-01-13 
+0.2.7 / 2014-01-13
 ==================
 
   * add shasum when nfs.upload and hfs.uploadBuffer, fixed [#148](https://github.com/cnpm/cnpmjs.org/issues/148)
 
-0.2.6 / 2014-01-13 
+0.2.6 / 2014-01-13
 ==================
 
   * support custom session store, fixed [#146](https://github.com/cnpm/cnpmjs.org/issues/146)
 
-0.2.5 / 2014-01-13 
+0.2.5 / 2014-01-13
 ==================
 
   * add download timeout and unit test
   * use downloadStream() first
   * nfs download to a writeable stream.
 
-0.2.4 / 2014-01-10 
+0.2.4 / 2014-01-10
 ==================
 
   * set main script to  index.js, fixed [#142](https://github.com/cnpm/cnpmjs.org/issues/142)
 
-0.2.3 / 2014-01-10 
+0.2.3 / 2014-01-10
 ==================
 
   * Dont show sync button on private package
   * Sync package as publish with no deps. fixed [#138](https://github.com/cnpm/cnpmjs.org/issues/138)
 
-0.2.2 / 2014-01-10 
+0.2.2 / 2014-01-10
 ==================
 
   * keep compatibility
@@ -388,7 +397,7 @@
   * add toString and constructor to test admin
   * fix [#119](https://github.com/cnpm/cnpmjs.org/issues/119) hasOwnProperty check admin bug.
 
-0.2.0 / 2013-12-27 
+0.2.0 / 2013-12-27
 ==================
 
   * remove to lower case
