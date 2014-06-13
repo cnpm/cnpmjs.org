@@ -262,7 +262,7 @@ SyncModuleWorker.prototype._sync = function *(name, pkg) {
     var maintainers = p.maintainers || [];
     if (maintainers && !Array.isArray(maintainers)) {
       // http://r.cnpmjs.org/jasmine-node
-      // TODO: "maintainers": "Martin HĂ¤ger <martin.haeger@gmail.com>",
+      // TODO: "maintainers": "Martin H膫陇ger <martin.haeger@gmail.com>",
       maintainers = [maintainers];
     }
 
@@ -711,7 +711,8 @@ SyncModuleWorker.sync = function *(name, username, options) {
   if (!pkg || !pkg._rev) {
     return {
       ok: false,
-      pkg: pkg
+      pkg: pkg,
+      statusCode: 404
     };
   }
   var result = yield Log.create({name: name, username: username});

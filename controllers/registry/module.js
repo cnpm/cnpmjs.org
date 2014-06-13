@@ -84,8 +84,8 @@ exports.show = function *(next) {
       return;
     }
     var result = yield SyncModuleWorker.sync(name, 'sync-by-install');
-    this.status = result.ok ? 200 : (result.statusCode || 500);
     this.body = result.pkg;
+    this.status = result.ok ? 200 : (result.statusCode || 500);
     return;
   }
 
