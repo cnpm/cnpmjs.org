@@ -216,6 +216,7 @@ SyncModuleWorker.prototype._sync = function *(name, pkg) {
 
   hasModules = moduleRows.length > 0;
   var map = {};
+  var localVersionNames = [];
   for (var i = 0; i < moduleRows.length; i++) {
     var r = moduleRows[i];
     if (!r.package || !r.package.dist) {
@@ -225,7 +226,7 @@ SyncModuleWorker.prototype._sync = function *(name, pkg) {
 
     if (r.package && r.package._publish_on_cnpm) {
       // publish on cnpm, dont sync this version package
-      that.log('  [%s] publish on local cnpm, don\'t sync', name);
+      that.log('  [%s] publish on local cnpm registry, don\'t sync', name);
       return [];
     }
 
@@ -236,6 +237,7 @@ SyncModuleWorker.prototype._sync = function *(name, pkg) {
       map.latest = r;
     }
     map[r.version] = r;
+    localVersionNames.push(r.version);
   }
 
   var tags = {};
@@ -285,11 +287,8 @@ SyncModuleWorker.prototype._sync = function *(name, pkg) {
 
   var times = pkg.time || {};
   pkg.versions = pkg.versions || {};
-  var versionNames = Object.keys(times);
-  if (versionNames.length === 0) {
-    versionNames = Object.keys(pkg.versions);
-  }
-  if (versionNames.length === 0) {
+  var remoteVersionNames = Object.keys(pkg.versions);
+  if (remoteVersionNames.length === 0) {
     that.log('  [%s] no times and no versions, hasModules: %s', name, hasModules);
     if (!hasModules) {
       // save a next module
@@ -323,9 +322,12 @@ SyncModuleWorker.prototype._sync = function *(name, pkg) {
     }
   }
 
-  var versions = [];
-  for (var i = 0; i < versionNames.length; i++) {
-    var v = versionNames[i];
+  var remoteVersionNameMap = {};
+
+  // find out missing versions
+  for (var i = 0; i < remoteVersionNames.length; i++) {
+    var v = remoteVersionNames[i];
+    remoteVersionNameMap[v] = v;
     var exists = map[v] || {};
     var version = pkg.versions[v];
     if (!version || !version.dist || !version.dist.tarball) {
@@ -370,9 +372,19 @@ SyncModuleWorker.prototype._sync = function *(name, pkg) {
         continue;
       }
     }
-    versions.push(version);
+    missingVersions.push(version);
   }
 
+  // find out deleted versions
+  var deletedVersionNames = [];
+  for (var i = 0; i < localVersionNames.length; i++) {
+    var v = localVersionNames[i];
+    if (!remoteVersionNameMap[v]) {
+      deletedVersionNames.push(v);
+    }
+  }
+
+  // find out missing tags
   var sourceTags = pkg['dist-tags'] || {};
   for (var t in sourceTags) {
     var sourceTagVersion = sourceTags[t];
@@ -380,18 +392,25 @@ SyncModuleWorker.prototype._sync = function *(name, pkg) {
       missingTags.push([t, sourceTagVersion]);
     }
   }
-
-  if (versions.length === 0) {
-    that.log('  [%s] all versions are exists', name);
-  } else {
-    versions.sort(function (a, b) {
-      return a.publish_time - b.publish_time;
-    });
-    that.log('  [%s] %d versions need to sync', name, versions.length);
+  // find out deleted tags
+  var deletedTags = [];
+  for (var t in tags) {
+    if (!sourceTags[t]) {
+      // not in remote tags, delete it from local registry
+      deletedTags.push(t);
+    }
   }
 
-  missingVersions = versions;
-  var versionNames = [];
+  if (missingVersions.length === 0) {
+    that.log('  [%s] all versions are exists', name);
+  } else {
+    missingVersions.sort(function (a, b) {
+      return a.publish_time - b.publish_time;
+    });
+    that.log('  [%s] %d versions need to sync', name, missingVersions.length);
+  }
+
+  var syncedVersionNames = [];
   var syncIndex = 0;
 
   // sync missing versions
@@ -403,10 +422,24 @@ SyncModuleWorker.prototype._sync = function *(name, pkg) {
     }
     try {
       var result = yield that._syncOneVersion(index, syncModule);
-      versionNames.push(syncModule.version);
+      syncedVersionNames.push(syncModule.version);
     } catch (err) {
-      that.log('    [%s:%d] error, version: %s, %s: %s',
+      that.log('    [%s:%d] sync error, version: %s, %s: %s',
         syncModule.name, index, syncModule.version, err.name, err.message);
+    }
+  }
+
+
+  if (deletedVersionNames.length === 0) {
+    that.log('  [%s] no versions need to deleted', name);
+  } else {
+    that.log('  [%s] %d versions: %j need to deleted',
+      name, deletedVersionNames.length, deletedVersionNames);
+
+    try {
+      yield Module.removeByNameAndVersions(name, deletedVersionNames);
+    } catch (err) {
+      that.log('    [%s] delete error, %s: %s', name, err.name, err.message);
     }
   }
 
@@ -435,6 +468,12 @@ SyncModuleWorker.prototype._sync = function *(name, pkg) {
 
   // sync missing tags
   function *syncTag() {
+    if (deletedTags.length > 0) {
+      yield* Module.removeTagsByNames(name, deletedTags);
+      that.log('  [%s] deleted %d tags: %j',
+        name, deletedTags.length, deletedTags);
+    }
+
     if (missingTags.length === 0) {
       return;
     }
@@ -537,7 +576,7 @@ SyncModuleWorker.prototype._sync = function *(name, pkg) {
   }
 
   yield [syncDes(), syncTag(), syncReadme(), syncMissingStarUsers(), syncMissingUsers()];
-  return versionNames;
+  return syncedVersionNames;
 };
 
 SyncModuleWorker.prototype._syncOneVersion = function *(versionIndex, sourcePackage) {

@@ -350,10 +350,15 @@ var DELETE_TAGS_BY_IDS_SQL = multiline(function () {;/*
   DELETE FROM
     tag
   WHERE
-    id in (?);
+    id IN (?);
 */});
 exports.removeTagsByIds = function (ids, callback) {
   mysql.query(DELETE_TAGS_BY_IDS_SQL, [ids], callback);
+};
+
+var DELETE_TAGS_BY_NAMES_SQL = 'DELETE FROM tag WHERE name=? AND tag IN (?);';
+exports.removeTagsByNames = function* (moduleName, tagNames) {
+  return yield mysql.query(DELETE_TAGS_BY_NAMES_SQL, [moduleName, tagNames]);
 };
 
 var SELECT_ALL_TAGS_SQL = multiline(function () {;/*
