@@ -14,12 +14,14 @@
  * Module dependencies.
  */
 
+var debug = require('debug');
+debug.enable('cnpmjs.org*');
 var SyncModuleWorker = require('../proxy/sync_module_worker');
 var mysql = require('../common/mysql');
 var Log = require('../proxy/module_log');
 var config = require('../config');
 
-config.sourceNpmRegistry = 'http://r.cnpmjs.org';
+config.sourceNpmRegistry = 'http://registry.npm.taobao.org';
 
 var names = process.argv[2] || 'byte';
 names = names.split(',');
