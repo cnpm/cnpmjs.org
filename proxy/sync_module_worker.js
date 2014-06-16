@@ -836,7 +836,7 @@ SyncModuleWorker.sync = function* (name, username, options) {
     pkg = null;
   }
 
-  if (!pkg || !pkg._rev) {
+  if (!pkg || !pkg._id) {
     return {
       ok: false,
       pkg: pkg,
