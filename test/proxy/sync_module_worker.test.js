@@ -64,6 +64,18 @@ describe('proxy/sync_module_worker.test.js', function () {
     worker.on('end', done);
   });
 
+  it('should sync unpublished module by name', function* () {
+    var result = yield* SyncModuleWorker.sync('tnpm', 'fengmk2');
+    result.ok.should.equal(true);
+    result.should.have.property('logId');
+  });
+
+  it('should not sync not exists module', function* () {
+    var result = yield* SyncModuleWorker.sync('tnpm-not-exists', 'fengmk2');
+    result.ok.should.equal(false);
+    result.should.not.have.property('logId');
+  });
+
   it('should sync unpublished info', function (done) {
     var worker = new SyncModuleWorker({
       name: ['tnpm'],
