@@ -19,7 +19,7 @@ var config = require('../config');
 
 var USER_AGENT = 'cnpmjs.org/' + config.version + ' ' + urllib.USER_AGENT;
 
-function *request(url, options) {
+function* request(url, options) {
   options = options || {};
   options.dataType = options.dataType || 'json';
   options.timeout = options.timeout || 120000;
@@ -30,7 +30,7 @@ function *request(url, options) {
   url = registry + url;
   var r;
   try {
-    r = yield *urllib.request(url, options);
+    r = yield* urllib.request(url, options);
   } catch (err) {
     var statusCode = err.status || -1;
     var data = err.data || '[empty]';
@@ -42,6 +42,8 @@ function *request(url, options) {
   }
   return r;
 }
+
+exports.request = request;
 
 exports.getUser = function *(name) {
   var url = '/-/user/org.couchdb.user:' + name;

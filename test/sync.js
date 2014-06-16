@@ -21,7 +21,7 @@ var mysql = require('../common/mysql');
 var Log = require('../proxy/module_log');
 var config = require('../config');
 
-config.sourceNpmRegistry = 'http://registry.npm.taobao.org';
+config.sourceNpmRegistry = 'http://registry.npmjs.org';
 
 var names = process.argv[2] || 'byte';
 names = names.split(',');

@@ -28,6 +28,7 @@ var crypto = require('crypto');
 var urllib = require('co-urllib');
 var utility = require('utility');
 var ms = require('ms');
+var urlparse = require('url').parse;
 var nfs = require('../common/nfs');
 var npm = require('./npm');
 var common = require('../lib/common');
@@ -37,6 +38,7 @@ var Log = require('./module_log');
 var config = require('../config');
 var ModuleStar = require('./module_star');
 var User = require('./user');
+var ModuleUnpublished = require('./module_unpublished');
 
 var USER_AGENT = 'sync.cnpmjs.org/' + config.version + ' ' + urllib.USER_AGENT;
 
@@ -121,7 +123,7 @@ SyncModuleWorker.prototype.add = function (name) {
   this.log('    add dependencies: %s', name);
 };
 
-SyncModuleWorker.prototype._doneOne = function *(concurrencyId, name, success) {
+SyncModuleWorker.prototype._doneOne = function* (concurrencyId, name, success) {
   if (success) {
     this.pushSuccess(name);
   } else {
@@ -144,39 +146,66 @@ SyncModuleWorker.prototype.next = function *(concurrencyId) {
 
   var that = this;
   that.syncingNames[name] = true;
-  var pkg;
+  var pkg = null;
+  var status = 0;
   // get from npm
   try {
-    pkg = yield npm.get(name);
+    var result = yield npm.request('/' + name);
+    pkg = result.data;
+    status = result.status;
   } catch (err) {
     // if 404
     if (!err.res || err.res.statusCode !== 404) {
       var errMessage = err.name + ': ' + err.message;
-      that.log('[c#%s] [error] [%s] get package error: %s', concurrencyId, name, errMessage);
+      that.log('[c#%s] [error] [%s] get package error: %s, status: %s',
+        concurrencyId, name, errMessage, status);
       yield *that._doneOne(concurrencyId, name, false);
       return;
     }
   }
 
+  var unpublishedInfo = null;
+  if (status === 404) {
+    // check if it's unpublished
+    if (pkg.time && pkg.time.unpublished && pkg.time.unpublished.time) {
+      unpublishedInfo = pkg.time.unpublished;
+    } else {
+      pkg = null;
+    }
+  }
+
   if (!pkg) {
-    that.log('[c#%s] [error] [%s] get package error: package not exists', concurrencyId, name);
-    yield *that._doneOne(concurrencyId, name, true);
+    that.log('[c#%s] [error] [%s] get package error: package not exists, status: %s',
+      concurrencyId, name, status);
+    yield* that._doneOne(concurrencyId, name, true);
     return;
   }
 
-  that.log('[c#%d] [%s] start...', concurrencyId, name);
+  that.log('[c#%d] [%s] pkg status: %d, start...', concurrencyId, name, status);
+
+  if (unpublishedInfo) {
+    try {
+      yield* that._unpublished(name, unpublishedInfo);
+    } catch (err) {
+      that.log('[c#%s] [error] [%s] sync error: %s', concurrencyId, name, err.stack);
+      yield* that._doneOne(concurrencyId, name, false);
+      return;
+    }
+    return yield* that._doneOne(concurrencyId, name, true);
+  }
+
   var versions;
   try {
-    versions = yield that._sync(name, pkg);
+    versions = yield* that._sync(name, pkg);
   } catch (err) {
     that.log('[c#%s] [error] [%s] sync error: %s', concurrencyId, name, err.stack);
-    yield *that._doneOne(concurrencyId, name, false);
+    yield* that._doneOne(concurrencyId, name, false);
     return;
   }
 
   that.log('[c#%d] [%s] synced success, %d versions: %s',
     concurrencyId, name, versions.length, versions.join(', '));
-  yield *that._doneOne(concurrencyId, name, true);
+  yield* that._doneOne(concurrencyId, name, true);
 };
 
 function *_listStarUsers(modName) {
@@ -200,7 +229,61 @@ function *_saveNpmUser(username) {
   yield User.saveNpmUser(user);
 }
 
-SyncModuleWorker.prototype._sync = function *(name, pkg) {
+SyncModuleWorker.prototype._unpublished = function* (name, unpublishedInfo) {
+  var mods = yield Module.listByName(name);
+  this.log('  [%s] start unpublished %d versions from local cnpm registry',
+    name, mods.length);
+  if (this._isLocalModule(mods)) {
+    // publish on cnpm, dont sync this version package
+    this.log('  [%s] publish on local cnpm registry, don\'t sync', name);
+    return [];
+  }
+
+  var r = yield* ModuleUnpublished.add(name, unpublishedInfo);
+  this.log('    [%s] save unpublished info: %j to row#%s',
+    name, unpublishedInfo, r.insertId);
+  if (mods.length === 0) {
+    return;
+  }
+  yield [Module.removeByName(name), Module.removeTags(name)];
+  var keys = [];
+  for (var i = 0; i < mods.length; i++) {
+    var row = mods[i];
+    var dist = row.package.dist;
+    var key = dist.key;
+    if (!key) {
+      key = urlparse(dist.tarball).pathname;
+    }
+    key && keys.push(key);
+  }
+
+  if (keys.length === 0) {
+    return;
+  }
+
+  try {
+    yield keys.map(function (key) {
+      return nfs.remove(key);
+    });
+  } catch (err) {
+    // ignore error here
+    this.log('    [%s] delete nfs files: %j error: %s: %s',
+      name, keys, err.name, err.message);
+  }
+  this.log('    [%s] delete nfs files: %j success', name, keys);
+};
+
+SyncModuleWorker.prototype._isLocalModule = function (mods) {
+  for (var i = 0; i < mods.length; i++) {
+    var r = mods[i];
+    if (r.package && r.package._publish_on_cnpm) {
+      return true;
+    }
+  }
+  return false;
+};
+
+SyncModuleWorker.prototype._sync = function* (name, pkg) {
   var username = this.username;
   var that = this;
 
@@ -214,6 +297,12 @@ SyncModuleWorker.prototype._sync = function *(name, pkg) {
   var tagRows = result[1];
   var existsStarUsers = result[2];
 
+  if (that._isLocalModule(moduleRows)) {
+    // publish on cnpm, dont sync this version package
+    that.log('  [%s] publish on local cnpm registry, don\'t sync', name);
+    return [];
+  }
+
   hasModules = moduleRows.length > 0;
   var map = {};
   var localVersionNames = [];
@@ -222,12 +311,6 @@ SyncModuleWorker.prototype._sync = function *(name, pkg) {
     if (!r.package || !r.package.dist) {
       // package json parse error
       continue;
-    }
-
-    if (r.package && r.package._publish_on_cnpm) {
-      // publish on cnpm, dont sync this version package
-      that.log('  [%s] publish on local cnpm registry, don\'t sync', name);
-      return [];
     }
 
     if (r.version === 'next') {
@@ -744,7 +827,7 @@ SyncModuleWorker.prototype._syncOneVersion = function *(versionIndex, sourcePack
   }
 };
 
-SyncModuleWorker.sync = function *(name, username, options) {
+SyncModuleWorker.sync = function* (name, username, options) {
   options = options || {};
   var pkg = yield npm.get(name);
   if (!pkg || !pkg._rev) {

@@ -37,14 +37,15 @@ var SyncModuleWorker = require('../../proxy/sync_module_worker');
 var logger = require('../../common/logger');
 var ModuleDeps = require('../../proxy/module_deps');
 var ModuleStar = require('../../proxy/module_star');
+var ModuleUnpublished = require('../../proxy/module_unpublished');
 var downloadAsReadStream = require('../utils').downloadAsReadStream;
 
 /**
  * show all version of a module
  */
-exports.show = function *(next) {
+exports.show = function* (next) {
   var name = this.params.name;
-  var modifiedTime = yield *Module.getLastModified(name);
+  var modifiedTime = yield* Module.getLastModified(name);
   debug('show %s, last modified: %s', name, modifiedTime);
   if (modifiedTime) {
     // use modifiedTime as etag
@@ -72,6 +73,26 @@ exports.show = function *(next) {
     userMap[users[i]] = true;
   }
   users = userMap;
+
+  if (rows.length === 0) {
+    // check if unpublished
+    var unpublishedInfo = yield* ModuleUnpublished.get(name);
+    debug('unpublished %j', unpublishedInfo);
+    if (unpublishedInfo) {
+      this.status = 404;
+      this.body = {
+        _id: name,
+        name: name,
+        time: {
+          modified: unpublishedInfo.package.time,
+          unpublished: unpublishedInfo.package,
+        },
+        _attachments: {}
+      };
+      return;
+    }
+  }
+
   // if module not exist in this registry,
   // sync the module backend and return package info from official registry
   if (rows.length === 0) {
@@ -849,16 +870,24 @@ exports.removeAll = function *(next) {
   yield [Module.removeByName(name), Module.removeTags(name)];
   var keys = [];
   for (var i = 0; i < mods.length; i++) {
-    var key = urlparse(mods[i].dist_tarball).path;
+    var row = mods[i];
+    var dist = row.package.dist;
+    var key = dist.key;
+    if (!key) {
+      key = urlparse(dist.tarball).pathname;
+    }
     key && keys.push(key);
   }
-  try {
-    yield keys.map(function (key) {
-      return nfs.remove(key);
-    });
-  } catch (err) {
-    // ignore error here
+  if (keys.length > 0) {
+    try {
+      yield keys.map(function (key) {
+        return nfs.remove(key);
+      });
+    } catch (err) {
+      // ignore error here
+    }
   }
+
   this.body = { ok: true };
 };
 
