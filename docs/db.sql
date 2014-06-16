@@ -94,6 +94,17 @@ CREATE TABLE `tag` (
 -- ALTER TABLE  `tag` CHANGE  `name`  `name` VARCHAR( 100 ) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL COMMENT  'module name';
 -- ALTER TABLE `tag` ADD KEY `gmt_modified` (`gmt_modified`);
 
+CREATE TABLE `module_unpublished` (
+ `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'primary key',
+ `gmt_create` datetime NOT NULL COMMENT 'create time',
+ `gmt_modified` datetime NOT NULL COMMENT 'modified time',
+ `name` varchar(100) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL COMMENT 'module name',
+ `package` longtext CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'base info: tags, time, maintainers, description, versions',
+ PRIMARY KEY (`id`),
+ UNIQUE KEY `name` (`name`),
+ KEY `gmt_modified` (`gmt_modified`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='module unpublished info';
+
 CREATE TABLE `total` (
  `name` varchar(100) NOT NULL COMMENT 'total name',
  `gmt_modified` datetime NOT NULL COMMENT 'modified time',

@@ -27,6 +27,7 @@ var Module = require('../../../proxy/module');
 var Npm = require('../../../proxy/npm');
 var controller = require('../../../controllers/registry/module');
 var ModuleDeps = require('../../../proxy/module_deps');
+var SyncModuleWorker = require('../../../proxy/sync_module_worker');
 
 var fixtures = path.join(path.dirname(path.dirname(__dirname)), 'fixtures');
 
@@ -68,6 +69,77 @@ describe('controllers/registry/module.test.js', function () {
       .end(function (err, res) {
         should.not.exist(err);
         res.body.should.have.keys('ok', 'log');
+        done();
+      });
+    });
+  });
+
+  describe('GET /:name unpublished', function () {
+    before(function (done) {
+      var worker = new SyncModuleWorker({
+        name: ['tnpm'],
+        username: 'fengmk2'
+      });
+
+      worker.start();
+      worker.on('end', function () {
+        var names = worker.successes.concat(worker.fails);
+        names.sort();
+        names.should.eql(['tnpm']);
+        done();
+      });
+    });
+
+    it('should show unpublished info', function (done) {
+      request(app)
+      .get('/tnpm')
+      .expect('content-type', 'application/json; charset=utf-8')
+      .expect(404, function (err, res) {
+        should.not.exist(err);
+        res.body.should.eql({
+          _id: 'tnpm',
+         name: 'tnpm',
+         time: {
+           modified: '2014-06-05T01:33:59.668Z',
+           unpublished:
+          { name: 'fengmk2',
+           time: '2014-06-05T01:33:59.668Z',
+           tags: { latest: '0.3.10' },
+           maintainers:
+           [ { name: 'fengmk2', email: 'fengmk2@gmail.com' },
+            { name: 'dead_horse', email: 'dead_horse@qq.com' } ],
+           description: 'npm client for alibaba private npm registry',
+           versions:
+           [ '0.0.1',
+            '0.0.2',
+            '0.0.3',
+            '0.0.4',
+            '0.1.0',
+            '0.1.1',
+            '0.1.2',
+            '0.1.3',
+            '0.1.4',
+            '0.1.5',
+            '0.1.8',
+            '0.1.9',
+            '0.2.0',
+            '0.2.1',
+            '0.2.2',
+            '0.2.3',
+            '0.2.4',
+            '0.3.0',
+            '0.3.1',
+            '0.3.2',
+            '0.3.3',
+            '0.3.4',
+            '0.3.5',
+            '0.3.6',
+            '0.3.7',
+            '0.3.8',
+            '0.3.9',
+            '0.3.10' ] } },
+          _attachments: {}
+        });
         done();
       });
     });

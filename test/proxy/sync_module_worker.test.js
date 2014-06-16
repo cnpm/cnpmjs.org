@@ -63,4 +63,19 @@ describe('proxy/sync_module_worker.test.js', function () {
     worker.start();
     worker.on('end', done);
   });
+
+  it('should sync unpublished info', function (done) {
+    var worker = new SyncModuleWorker({
+      name: ['tnpm'],
+      username: 'fengmk2'
+    });
+
+    worker.start();
+    worker.on('end', function () {
+      var names = worker.successes.concat(worker.fails);
+      names.sort();
+      names.should.eql(['tnpm']);
+      done();
+    });
+  });
 });
