@@ -1,4 +1,10 @@
 
+0.6.0 / 2014-06-16
+==================
+
+ * sync unpublished info. close #353
+ * Delete not exists versions on sync worker. #353
+
 0.5.3 / 2014-06-13
 ==================
 
