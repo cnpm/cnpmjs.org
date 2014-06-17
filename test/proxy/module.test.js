@@ -167,4 +167,10 @@ describe('proxy/module.test.js', function () {
       });
     });
   });
+
+  describe('removeTagsByNames()', function () {
+    it('should work', function* () {
+      yield* Module.removeTagsByNames('foo', ['latest', '1.0']);
+    });
+  });
 });

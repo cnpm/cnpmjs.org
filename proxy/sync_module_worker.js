@@ -550,7 +550,7 @@ SyncModuleWorker.prototype._sync = function* (name, pkg) {
   }
 
   // sync missing tags
-  function *syncTag() {
+  function* syncTag() {
     if (deletedTags.length > 0) {
       yield* Module.removeTagsByNames(name, deletedTags);
       that.log('  [%s] deleted %d tags: %j',
