@@ -1,4 +1,11 @@
 
+0.6.1 / 2014-06-18
+==================
+
+ * hot fix removeTagsByNames()
+ * fix _rev not exists
+ * sync unpublished on GET /sync/:name
+
 0.6.0 / 2014-06-16
 ==================
 

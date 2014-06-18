@@ -90,7 +90,9 @@ var syncDist = co(function* syncDist() {
   } catch (err) {
     err.message += ' (sync dist error)';
     logger.warn('Sync dist error: %s: %s\n%s', err.name, err.message, err.stack);
-    sendMailToAdmin(err, null, new Date());
+    if (config.noticeSyncDistError) {
+      sendMailToAdmin(err, null, new Date());
+    }
   }
   syncingDist = false;
 });

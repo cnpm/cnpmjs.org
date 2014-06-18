@@ -80,6 +80,7 @@ var config = {
     debug: false
   },
 
+  noticeSyncDistError: true,
   disturl: 'http://nodejs.org/dist',
   syncDist: false,
   logoURL: 'http://ww4.sinaimg.cn/large/69c1d4acgw1ebfly5kjlij208202oglr.jpg',
