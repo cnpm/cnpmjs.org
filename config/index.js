@@ -83,7 +83,7 @@ var config = {
   noticeSyncDistError: true,
   disturl: 'http://nodejs.org/dist',
   syncDist: false,
-  logoURL: 'http://ww4.sinaimg.cn/large/69c1d4acgw1ebfly5kjlij208202oglr.jpg',
+  logoURL: '//ww4.sinaimg.cn/large/69c1d4acgw1ebfly5kjlij208202oglr.jpg',
   registryHost: 'r.cnpmjs.org',
   // customReadmeFile: __dirname + '/web_readme.md',
   customReadmeFile: '', // you can use your custom readme file instead the cnpm one
