@@ -29,10 +29,14 @@ exports.get = function* (name) {
     if (maintainers && maintainers.length > 0) {
       users = maintainers;
     }
+    return users.map(function (user) {
+      return user.name;
+    });
+  } else {
+    return users.map(function (row) {
+      return row.user;
+    });
   }
-  return users.map(function (row) {
-    return row.user;
-  });
 };
 
 var ADD_SQL = 'INSERT INTO module_maintainer(name, user, gmt_create) \

@@ -366,7 +366,7 @@ exports.upload = function *(next) {
 
   var isMaintainer = yield* packageService.isMaintainer(name, username);
 
-  if (!isMaintainer && !this.user.isAdmin) {
+  if (!isMaintainer) {
     this.status = 403;
     this.body = {
       error: 'forbidden user',
@@ -474,10 +474,9 @@ exports.updateLatest = function *(next) {
     debug('can not get nextMod');
     return yield* next;
   }
-
-  var isMaintainer = yield* packageService.isMaintainer(name, username);
-
-  if (!isMaintainer && !this.user.isAdmin) {
+  // TODO: old publish flow, we will delete it in the next version
+  // so dont change the old logic
+  if (!common.isMaintainer(this.user, nextMod.package.maintainers)) {
     this.status = 403;
     this.body = {
       error: 'forbidden user',
@@ -561,22 +560,23 @@ exports.addPackageAndDist = function *(next) {
     tags.push([t, distTags[t]]);
   }
 
-  debug('addPackageAndDist %s:%s, attachment size: %s', name, version, attachment.length);
+  debug('%s addPackageAndDist %s:%s, attachment size: %s, maintainers: %j',
+    username, name, version, attachment.length, versionPackage.maintainers);
 
   var exists = yield Module.get(name, version);
   var shasum;
   if (exists) {
-    this.status = 409;
+    this.status = 403;
     this.body = {
-      error: 'conflict',
-      reason: 'Document update conflict.'
+      error: 'forbidden',
+      reason: 'cannot modify pre-existing version: ' + version
     };
     return;
   }
 
   // check maintainers
   var isMaintainer = yield* packageService.isMaintainer(name, username);
-  if (!isMaintainer && !this.user.isAdmin) {
+  if (!isMaintainer) {
     this.status = 403;
     this.body = {
       error: 'forbidden user',
@@ -796,6 +796,7 @@ exports.removeWithVersions = function* (next) {
 
   // step2: check permission
   var isMaintainer = yield* packageService.isMaintainer(name, username);
+  // admin can delete the module
   if (!isMaintainer && !this.user.isAdmin) {
     this.status = 403;
     this.body = {
@@ -908,7 +909,7 @@ exports.removeAll = function *(next) {
   }
 
   var isMaintainer = yield* packageService.isMaintainer(name, username);
-
+  // admin can delete the module
   if (!isMaintainer && !this.user.isAdmin) {
     this.status = 403;
     this.body = {
@@ -1004,10 +1005,12 @@ exports.listAllModuleNames = function *() {
   });
 };
 
-exports.updateTag = function *() {
+// PUT /:name/:tag
+exports.updateTag = function* () {
   var version = this.request.body;
   var tag = this.params.tag;
   var name = this.params.name;
+  debug('updateTag: %s %s to %s', name, version, tag);
 
   if (!version) {
     this.status = 400;
@@ -1042,11 +1045,12 @@ exports.updateTag = function *() {
   }
 
   // check permission
-  if (!common.isMaintainer(this.user, mod.package.maintainers)) {
+  var isMaintainer = yield* packageService.isMaintainer(name, this.user.name);
+  if (!isMaintainer) {
     this.status = 403;
     this.body = {
-      error: 'forbidden',
-      reason: 'no permission to modify ' + name
+      error: 'forbidden user',
+      reason: this.user.name + ' not authorized to modify ' + name
     };
     return;
   }

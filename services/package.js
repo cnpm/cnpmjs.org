@@ -28,7 +28,8 @@ exports.updateMaintainers = function* (name, usernames) {
 exports.isMaintainer = function* (name, username) {
   var maintainers = yield* ModuleMaintainer.get(name);
   if (maintainers.length === 0) {
-    return false;
+    // no maintainers, meaning this module is free for everyone
+    return true;
   }
   return maintainers.indexOf(username) >= 0;
 };

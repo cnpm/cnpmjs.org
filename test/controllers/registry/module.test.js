@@ -38,6 +38,8 @@ describe('controllers/registry/module.test.js', function () {
   before(function (done) {
     app.listen(0, function () {
       var pkg = require(path.join(fixtures, 'package_and_tgz.json'));
+      pkg.maintainers[0].name = 'cnpmjstest10';
+      pkg.versions['0.0.1'].maintainers[0].name = 'cnpmjstest10';
       request(app)
       .put('/' + pkg.name)
       .set('authorization', baseauth)
@@ -378,7 +380,7 @@ describe('controllers/registry/module.test.js', function () {
     });
   });
 
-  describe('PUT /:name', function () {
+  describe('PUT /:name old publish flow', function () {
     var pkg = {
       name: 'testputmodule',
       description: 'test put module',
@@ -626,16 +628,16 @@ describe('controllers/registry/module.test.js', function () {
           res.body.should.have.keys('ok', 'rev');
           res.body.ok.should.equal(true);
 
-          // upload again should 409
+          // upload again should 403
           request(app)
           .put('/' + pkg.name)
           .set('authorization', baseauth)
           .send(pkg)
-          .expect(409, function (err, res) {
+          .expect(403, function (err, res) {
             should.not.exist(err);
             res.body.should.eql({
-              error: 'conflict',
-              reason: 'Document update conflict.'
+              error: 'forbidden',
+              reason: 'cannot modify pre-existing version: 0.0.1'
             });
             done();
           });
@@ -811,61 +813,62 @@ describe('controllers/registry/module.test.js', function () {
     });
   });
 
-  describe('PUT /:name/:tag', function () {
+  describe('PUT /:name/:tag updateTag()', function () {
     it('should create new tag ok', function (done) {
       request(app)
-      .put('/testputmodule/newtag')
+      .put('/mk2testmodule/newtag')
       .set('content-type', 'application/json')
       .set('authorization', baseauth)
-      .send('"0.1.9"')
-      .expect(201, done);
+      .send('"0.0.1"')
+      .expect(201)
+      .expect({"ok":true}, done);
     });
 
     it('should override exist tag ok', function (done) {
       request(app)
-      .put('/testputmodule/newtag')
+      .put('/mk2testmodule/newtag')
       .set('content-type', 'application/json')
       .set('authorization', baseauth)
-      .send('"0.1.9"')
+      .send('"0.0.1"')
       .expect(201, done);
     });
 
     it('should tag invalid version 403', function (done) {
       request(app)
-      .put('/testputmodule/newtag')
+      .put('/mk2testmodule/newtag')
       .set('content-type', 'application/json')
       .set('authorization', baseauth)
       .send('"hello"')
       .expect(403)
       .expect({
         error: 'forbidden',
-        reason: 'setting tag newtag to invalid version: hello: testputmodule/newtag'
+        reason: 'setting tag newtag to invalid version: hello: mk2testmodule/newtag'
       }, done);
     });
 
     it('should tag not eixst version 403', function (done) {
       request(app)
-      .put('/testputmodule/newtag')
+      .put('/mk2testmodule/newtag')
       .set('content-type', 'application/json')
       .set('authorization', baseauth)
       .send('"5.0.0"')
       .expect(403)
       .expect({
         error: 'forbidden',
-        reason: 'setting tag newtag to unknown version: 5.0.0: testputmodule/newtag'
+        reason: 'setting tag newtag to unknown version: 5.0.0: mk2testmodule/newtag'
       }, done);
     });
 
-    it('should tag permission 403', function (done) {
+    it('should not maintainer tag return no permission 403', function (done) {
       request(app)
-      .put('/testputmodule/newtag')
+      .put('/mk2testmodule/newtag')
       .set('content-type', 'application/json')
       .set('authorization', baseauthOther)
-      .send('"0.1.9"')
+      .send('"0.0.1"')
       .expect(403)
       .expect({
-        error: 'forbidden',
-        reason: 'no permission to modify testputmodule'
+        error: 'forbidden user',
+        reason: 'cnpmjstest101 not authorized to modify mk2testmodule'
       }, done);
     });
   });
