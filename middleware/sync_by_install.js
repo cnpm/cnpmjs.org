@@ -20,21 +20,22 @@ var config = require('../config');
  * this.allowSync  -  allow sync triggle by cnpm install
  */
 
-module.exports = function *syncByInstall(next) {
+module.exports = function* syncByInstall(next) {
   if (!config.syncByInstall || !config.enablePrivate) {
     // only config.enablePrivate should enable sync on install
-    return yield *next;
+    return yield* next;
   }
   // request not by node, consider it request from web
   var ua = this.get('user-agent');
   if (!ua || ua.indexOf('node') < 0) {
-    return yield *next;
+    return yield* next;
   }
 
+  // if request with `/xxx?write=true`, meaning the read request using for write
   if (this.query.write) {
-    return yield *next;
+    return yield* next;
   }
 
   this.allowSync = true;
-  yield *next;
+  yield* next;
 };

@@ -261,7 +261,7 @@ describe('controllers/registry/module.test.js', function () {
         }]
       })
       .set('authorization', baseauth)
-      .expect('content-type', 'application/json; charset=utf-8', done);
+      .expect({"ok":true,"id":"mk2testmodule","rev":"1"}, done);
     });
 
     it('should add new maintainers', function (done) {
@@ -323,7 +323,58 @@ describe('controllers/registry/module.test.js', function () {
       })
       .set('authorization', baseauth)
       .expect(201)
+      .expect({
+        id: 'mk2testmodule',
+        rev: '1',
+        ok: true
+      }, done);
+    });
+
+    it('should rm all maintainers forbidden 403', function (done) {
+      request(app)
+      .put('/mk2testmodule/-rev/1')
+      .send({
+        maintainers: []
+      })
+      .set('authorization', baseauth)
+      .expect(403)
+      .expect({error: 'invalid operation', reason: 'Can not remove all maintainers'})
       .expect('content-type', 'application/json; charset=utf-8', done);
+    });
+
+    it('should 403 when not maintainer update in private mode', function (done) {
+      request(app)
+      .put('/mk2testmodule/-rev/1')
+      .send({
+        maintainers: [{
+          name: 'cnpmjstest10',
+          email: 'cnpmjstest10@cnpmjs.org'
+        }]
+      })
+      .set('authorization', baseauthOther)
+      .expect(403)
+      .expect({
+        error: 'no_perms',
+        reason: 'Private mode enable, only admin can publish this module'
+      }, done);
+    });
+
+    it('should 403 when not maintainer update in public mode', function (done) {
+      mm(config, 'enablePrivate', false);
+      request(app)
+      .put('/mk2testmodule/-rev/1')
+      .send({
+        maintainers: [{
+          name: 'cnpmjstest10',
+          email: 'cnpmjstest10@cnpmjs.org'
+        }]
+      })
+      .set('authorization', baseauthOther)
+      .expect(403)
+      .expect({
+        error: 'forbidden user',
+        reason: 'cnpmjstest101 not authorized to modify mk2testmodule'
+      }, done);
     });
   });
 
@@ -667,7 +718,7 @@ describe('controllers/registry/module.test.js', function () {
     });
   });
 
-  describe('PUT /:name/-rev/:rev', function () {
+  describe('PUT /:name/-rev/:rev removeWithVersions', function () {
     var baseauth = 'Basic ' + new Buffer('cnpmjstest10:cnpmjstest10').toString('base64');
     var baseauthOther = 'Basic ' + new Buffer('cnpmjstest101:cnpmjstest101').toString('base64');
     var lastRev;
@@ -705,7 +756,7 @@ describe('controllers/registry/module.test.js', function () {
       .expect(201, done);
     });
 
-    it('should remove version ok', function (done) {
+    it('should remove all version ok', function (done) {
       //do not really remove it here
       mm.empty(Module, 'removeByNameAndVersions');
       mm.empty(Module, 'removeTagsByIds');
@@ -713,8 +764,7 @@ describe('controllers/registry/module.test.js', function () {
       .put('/testputmodule/-rev/' + lastRev)
       .set('authorization', baseauth)
       .send({
-        versions: {
-        }
+        versions: {}
       })
       .expect(201, done);
     });

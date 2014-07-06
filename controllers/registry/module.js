@@ -38,6 +38,7 @@ var logger = require('../../common/logger');
 var ModuleDeps = require('../../proxy/module_deps');
 var ModuleStar = require('../../proxy/module_star');
 var ModuleUnpublished = require('../../proxy/module_unpublished');
+var packageService = require('../../services/package');
 var downloadAsReadStream = require('../utils').downloadAsReadStream;
 
 /**
@@ -68,6 +69,10 @@ exports.show = function* (next) {
   var tags = r[0];
   var rows = r[1];
   var users = r[2];
+
+  debug('show %s got %d rows, %d tags, %d star users',
+    name, rows.length, tags.length, users.length);
+
   var userMap = {};
   for (var i = 0; i < users.length; i++) {
     userMap[users[i]] = true;
@@ -77,7 +82,7 @@ exports.show = function* (next) {
   if (rows.length === 0) {
     // check if unpublished
     var unpublishedInfo = yield* ModuleUnpublished.get(name);
-    debug('unpublished %j', unpublishedInfo);
+    debug('show unpublished %j', unpublishedInfo);
     if (unpublishedInfo) {
       this.status = 404;
       this.body = {
@@ -172,6 +177,12 @@ exports.show = function* (next) {
   }
 
   var pkg = latestMod.package;
+
+  if (tags.length === 0 && pkg.version !== 'next') {
+    // some sync error reason, will cause tags missing
+    // set latest tag at least
+    distTags.latest = pkg.version;
+  }
 
   var info = {
     _id: name,
@@ -348,15 +359,18 @@ exports.upload = function *(next) {
 
   debug('%s: upload %s, file size: %d', username, this.url, length);
   var mod = yield Module.getById(id);
-  if (!mod) {
+  if (!mod || mod.name !== name) {
     debug('can not get this module');
     return yield* next;
   }
-  if (!common.isMaintainer(this.user, mod.package.maintainers) || mod.name !== name) {
+
+  var isMaintainer = yield* packageService.isMaintainer(name, username);
+
+  if (!isMaintainer && !this.user.isAdmin) {
     this.status = 403;
     this.body = {
-      error: 'no_perms',
-      reason: 'Current user can not publish this module'
+      error: 'forbidden user',
+      reason: username + ' not authorized to modify ' + name
     };
     return;
   }
@@ -460,11 +474,14 @@ exports.updateLatest = function *(next) {
     debug('can not get nextMod');
     return yield* next;
   }
-  if (!common.isMaintainer(this.user, nextMod.package.maintainers)) {
-    this.status = 401;
+
+  var isMaintainer = yield* packageService.isMaintainer(name, username);
+
+  if (!isMaintainer && !this.user.isAdmin) {
+    this.status = 403;
     this.body = {
-      error: 'noperms',
-      reason: 'Current user can not publish this module'
+      error: 'forbidden user',
+      reason: username + ' not authorized to modify ' + name
     };
     return;
   }
@@ -546,7 +563,6 @@ exports.addPackageAndDist = function *(next) {
 
   debug('addPackageAndDist %s:%s, attachment size: %s', name, version, attachment.length);
 
-
   var exists = yield Module.get(name, version);
   var shasum;
   if (exists) {
@@ -554,6 +570,17 @@ exports.addPackageAndDist = function *(next) {
     this.body = {
       error: 'conflict',
       reason: 'Document update conflict.'
+    };
+    return;
+  }
+
+  // check maintainers
+  var isMaintainer = yield* packageService.isMaintainer(name, username);
+  if (!isMaintainer && !this.user.isAdmin) {
+    this.status = 403;
+    this.body = {
+      error: 'forbidden user',
+      reason: username + ' not authorized to modify ' + name
     };
     return;
   }
@@ -566,7 +593,8 @@ exports.addPackageAndDist = function *(next) {
     this.status = 403;
     this.body = {
       error: 'size_wrong',
-      reason: 'Attachment size ' + attachment.length + ' not match download size ' + tarballBuffer.length,
+      reason: 'Attachment size ' + attachment.length
+        + ' not match download size ' + tarballBuffer.length,
     };
     return;
   }
@@ -622,6 +650,10 @@ exports.addPackageAndDist = function *(next) {
   };
 };
 
+// old flows: NEED TO be deleted
+// 1. add()
+// 2. upload()
+// 3. updateLatest()
 exports.add = function *(next) {
   var username = this.user.name;
   var name = this.params.name;
@@ -694,69 +726,81 @@ exports.add = function *(next) {
   };
 };
 
-exports.updateOrRemove = function *(next) {
-  debug('updateOrRemove module %s, %j', this.params.name, this.request.body);
+// PUT /:name/-rev/:rev
+exports.updateOrRemove = function* (next) {
+  debug('updateOrRemove module %s, %s, %j', this.url, this.params.name, this.request.body);
   var body = this.request.body;
   if (body.versions) {
-    yield *exports.removeWithVersions.call(this, next);
-  } else if (body.maintainers && body.maintainers.length > 0) {
-    yield *exports.updateMaintainers.call(this, next);
+    yield* exports.removeWithVersions.call(this, next);
+  } else if (body.maintainers) {
+    yield* exports.updateMaintainers.call(this, next);
   } else {
-    yield *next;
+    yield* next;
   }
 };
 
-exports.updateMaintainers = function *(next) {
+exports.updateMaintainers = function* (next) {
   var name = this.params.name;
   var body = this.request.body;
   debug('updateMaintainers module %s, %j', name, body);
 
-  var latestMod = yield Module.getLatest(name);
+  var isMaintainer = yield* packageService.isMaintainer(name, this.user.name);
 
-  if (!latestMod || !latestMod.package) {
-    return yield *next;
-  }
-  if (!common.isMaintainer(this.user, latestMod.package.maintainers)) {
+  if (!isMaintainer && !this.user.isAdmin) {
     this.status = 403;
     this.body = {
-      error: 'no_perms',
-      reason: 'Current user can not publish this module'
+      error: 'forbidden user',
+      reason: this.user.name + ' not authorized to modify ' + name
     };
     return;
   }
 
-  var r = yield *Module.updateMaintainers(latestMod.id, body.maintainers);
+  var usernames = body.maintainers.map(function (user) {
+    return user.name;
+  });
+
+  if (usernames.length === 0) {
+    this.status = 403;
+    this.body = {
+      error: 'invalid operation',
+      reason: 'Can not remove all maintainers'
+    };
+    return;
+  }
+
+  var r = yield *packageService.updateMaintainers(name, usernames);
   debug('result: %j', r);
 
   this.status = 201;
   this.body = {
     ok: true,
     id: name,
-    rev: String(latestMod.id),
+    rev: this.params.rev,
   };
 };
 
-exports.removeWithVersions = function *(next) {
-  debug('removeWithVersions module %s, with info %j', this.params.name, this.request.body);
+exports.removeWithVersions = function* (next) {
+  // debug('removeWithVersions module %s, with info %j', this.params.name, this.request.body);
   var username = this.user.name;
   var name = this.params.name;
+  // left versions
   var versions = this.request.body.versions || {};
 
-  debug('removeWithVersions module %s, with versions %j', name, Object.keys(versions));
+  debug('removeWithVersions module %s, left versions %j', name, Object.keys(versions));
 
   // step1: list all the versions
   var mods = yield Module.listByName(name);
   if (!mods || !mods.length) {
-    return yield *next;
+    return yield* next;
   }
 
   // step2: check permission
-  var firstMod = mods[0];
-  if (!common.isMaintainer(this.user, firstMod.package.maintainers) || firstMod.name !== name) {
+  var isMaintainer = yield* packageService.isMaintainer(name, username);
+  if (!isMaintainer && !this.user.isAdmin) {
     this.status = 403;
     this.body = {
-      error: 'no_perms',
-      reason: 'Current user can not update this module'
+      error: 'forbidden user',
+      reason: username + ' not authorized to modify ' + name
     };
     return;
   }
@@ -816,11 +860,14 @@ exports.removeWithVersions = function *(next) {
   } else {
     debug('no tag need to be remove');
   }
+  // step 7: update last modified, make sure etag change
+  yield* Module.updateLastModified(name);
+
   this.status = 201;
   this.body = { ok: true };
 };
 
-exports.removeTar = function *(next) {
+exports.removeTar = function* (next) {
   debug('remove tarball with filename: %s, id: %s', this.params.filename, this.params.rev);
   var id = Number(this.params.rev);
   var filename = this.params.filename;
@@ -828,15 +875,17 @@ exports.removeTar = function *(next) {
   var username = this.user.name;
 
   var mod = yield Module.getById(id);
-  if (!mod) {
+  if (!mod || mod.name !== name) {
     return yield* next;
   }
 
-  if (!common.isMaintainer(this.user, mod.package.maintainers) || mod.name !== name) {
+  var isMaintainer = yield* packageService.isMaintainer(name, username);
+
+  if (!isMaintainer && !this.user.isAdmin) {
     this.status = 403;
     this.body = {
-      error: 'no_perms',
-      reason: 'Current user can not delete this tarball'
+      error: 'forbidden user',
+      reason: username + ' not authorized to modify ' + name
     };
     return;
   }
@@ -848,8 +897,8 @@ exports.removeTar = function *(next) {
 
 exports.removeAll = function *(next) {
   debug('remove all the module with name: %s, id: %s', this.params.name, this.params.rev);
-  // var id = Number(this.params.rev);
   var name = this.params.name;
+  var username = this.user.name;
 
   var mods = yield Module.listByName(name);
   debug('removeAll module %s: %d', name, mods.length);
@@ -858,11 +907,13 @@ exports.removeAll = function *(next) {
     return yield* next;
   }
 
-  if (!common.isMaintainer(this.user, mod.package.maintainers) || mod.name !== name) {
+  var isMaintainer = yield* packageService.isMaintainer(name, username);
+
+  if (!isMaintainer && !this.user.isAdmin) {
     this.status = 403;
     this.body = {
-      error: 'no_perms',
-      reason: 'Current user can not delete this tarball'
+      error: 'forbidden user',
+      reason: username + ' not authorized to modify ' + name
     };
     return;
   }

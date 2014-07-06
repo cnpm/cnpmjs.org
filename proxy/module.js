@@ -653,13 +653,6 @@ exports.search = function (word, options, callback) {
 
 thunkify(exports);
 
-exports.updateMaintainers = function *(id, maintainers) {
-  var mod = yield exports.getById(id);
-  mod.package.maintainers = maintainers;
-  var pkg = stringifyPackage(mod.package);
-  return yield mysql.query(UPDATE_PACKAGE_SQL, [pkg, id]);
-};
-
 var GET_LAST_MODIFIED_MODULE_SQL = multiline(function () {;/*
   SELECT
     id, gmt_modified
@@ -668,11 +661,20 @@ var GET_LAST_MODIFIED_MODULE_SQL = multiline(function () {;/*
   WHERE
     name=?
   ORDER BY
-    gmt_modified DESC;
+    gmt_modified DESC
+  LIMIT 1;
 */});
-exports.getLastModified = function *(name) {
+exports.getLastModified = function* (name) {
   var row = yield mysql.queryOne(GET_LAST_MODIFIED_MODULE_SQL, [name]);
   return row && row.gmt_modified;
+};
+
+var UPDATE_LAST_MODIFIED_SQL = 'UPDATE module SET gmt_modified=now() WHERE id=?;';
+exports.updateLastModified = function* (name) {
+  var row = yield mysql.queryOne(GET_LAST_MODIFIED_MODULE_SQL, [name]);
+  if (row) {
+    yield mysql.query(UPDATE_LAST_MODIFIED_SQL, [row.id]);
+  }
 };
 
 var DELETE_TAGS_BY_NAMES_SQL = 'DELETE FROM tag WHERE name=? AND tag IN (?);';
