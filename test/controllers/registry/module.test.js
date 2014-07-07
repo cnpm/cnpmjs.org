@@ -21,6 +21,7 @@ var thunkify = require('thunkify-wrap');
 var should = require('should');
 var request = require('supertest');
 var mm = require('mm');
+var pedding = require('pedding');
 var config = require('../../../config');
 var app = require('../../../servers/registry');
 var Module = require('../../../proxy/module');
@@ -37,7 +38,10 @@ describe('controllers/registry/module.test.js', function () {
 
   before(function (done) {
     app.listen(0, function () {
+      // name: mk2testmodule
       var pkg = require(path.join(fixtures, 'package_and_tgz.json'));
+      pkg.maintainers[0].name = 'cnpmjstest10';
+      pkg.versions['0.0.1'].maintainers[0].name = 'cnpmjstest10';
       request(app)
       .put('/' + pkg.name)
       .set('authorization', baseauth)
@@ -250,7 +254,7 @@ describe('controllers/registry/module.test.js', function () {
     });
   });
 
-  describe('PUT /:name/-rev/id update maintainers', function () {
+  describe('PUT /:name/-rev/id updateMaintainers()', function () {
     before(function (done) {
       request(app)
       .put('/mk2testmodule/-rev/1')
@@ -261,7 +265,7 @@ describe('controllers/registry/module.test.js', function () {
         }]
       })
       .set('authorization', baseauth)
-      .expect('content-type', 'application/json; charset=utf-8', done);
+      .expect({"ok":true,"id":"mk2testmodule","rev":"1"}, done);
     });
 
     it('should add new maintainers', function (done) {
@@ -272,13 +276,52 @@ describe('controllers/registry/module.test.js', function () {
           name: 'cnpmjstest10',
           email: 'cnpmjstest10@cnpmjs.org'
         }, {
-          name: 'fengmk2',
+          name: 'cnpmjstest101',
           email: 'fengmk2@cnpmjs.org'
         }]
       })
       .set('authorization', baseauth)
       .expect(201)
-      .expect('content-type', 'application/json; charset=utf-8', done);
+      .expect({
+        ok: true, id: 'mk2testmodule', rev: '1'
+      }, function (err) {
+        should.not.exist(err);
+        done = pedding(2, done);
+        // check maintainers update
+        request(app)
+        .get('/mk2testmodule')
+        .expect(200, function (err, res) {
+          should.not.exist(err);
+          var pkg = res.body;
+          pkg.maintainers.should.length(2);
+          pkg.maintainers.should.eql(pkg.versions['0.0.1'].maintainers);
+          pkg.maintainers.sort(function (a, b) {
+            return a.name > b.name ? 1 : -1;
+          });
+          pkg.maintainers.should.eql([
+            { name: 'cnpmjstest10', email: 'fengmk2@gmail.com' },
+            { name: 'cnpmjstest101', email: 'fengmk2@gmail.com' },
+          ]);
+          done();
+        });
+
+        // /pkg/0.0.1
+        request(app)
+        .get('/mk2testmodule/0.0.1')
+        .expect(200, function (err, res) {
+          should.not.exist(err);
+          var pkg = res.body;
+          pkg.maintainers.should.length(2);
+          pkg.maintainers.sort(function (a, b) {
+            return a.name > b.name ? 1 : -1;
+          });
+          pkg.maintainers.should.eql([
+            { name: 'cnpmjstest10', email: 'fengmk2@gmail.com' },
+            { name: 'cnpmjstest101', email: 'fengmk2@gmail.com' },
+          ]);
+          done();
+        });
+      });
     });
 
     it('should add again new maintainers', function (done) {
@@ -323,11 +366,62 @@ describe('controllers/registry/module.test.js', function () {
       })
       .set('authorization', baseauth)
       .expect(201)
+      .expect({
+        id: 'mk2testmodule',
+        rev: '1',
+        ok: true
+      }, done);
+    });
+
+    it('should rm all maintainers forbidden 403', function (done) {
+      request(app)
+      .put('/mk2testmodule/-rev/1')
+      .send({
+        maintainers: []
+      })
+      .set('authorization', baseauth)
+      .expect(403)
+      .expect({error: 'invalid operation', reason: 'Can not remove all maintainers'})
       .expect('content-type', 'application/json; charset=utf-8', done);
+    });
+
+    it('should 403 when not maintainer update in private mode', function (done) {
+      request(app)
+      .put('/mk2testmodule/-rev/1')
+      .send({
+        maintainers: [{
+          name: 'cnpmjstest10',
+          email: 'cnpmjstest10@cnpmjs.org'
+        }]
+      })
+      .set('authorization', baseauthOther)
+      .expect(403)
+      .expect({
+        error: 'no_perms',
+        reason: 'Private mode enable, only admin can publish this module'
+      }, done);
+    });
+
+    it('should 403 when not maintainer update in public mode', function (done) {
+      mm(config, 'enablePrivate', false);
+      request(app)
+      .put('/mk2testmodule/-rev/1')
+      .send({
+        maintainers: [{
+          name: 'cnpmjstest10',
+          email: 'cnpmjstest10@cnpmjs.org'
+        }]
+      })
+      .set('authorization', baseauthOther)
+      .expect(403)
+      .expect({
+        error: 'forbidden user',
+        reason: 'cnpmjstest101 not authorized to modify mk2testmodule'
+      }, done);
     });
   });
 
-  describe('PUT /:name', function () {
+  describe('PUT /:name old publish flow', function () {
     var pkg = {
       name: 'testputmodule',
       description: 'test put module',
@@ -575,16 +669,16 @@ describe('controllers/registry/module.test.js', function () {
           res.body.should.have.keys('ok', 'rev');
           res.body.ok.should.equal(true);
 
-          // upload again should 409
+          // upload again should 403
           request(app)
           .put('/' + pkg.name)
           .set('authorization', baseauth)
           .send(pkg)
-          .expect(409, function (err, res) {
+          .expect(403, function (err, res) {
             should.not.exist(err);
             res.body.should.eql({
-              error: 'conflict',
-              reason: 'Document update conflict.'
+              error: 'forbidden',
+              reason: 'cannot modify pre-existing version: 0.0.1'
             });
             done();
           });
@@ -667,7 +761,7 @@ describe('controllers/registry/module.test.js', function () {
     });
   });
 
-  describe('PUT /:name/-rev/:rev', function () {
+  describe('PUT /:name/-rev/:rev removeWithVersions', function () {
     var baseauth = 'Basic ' + new Buffer('cnpmjstest10:cnpmjstest10').toString('base64');
     var baseauthOther = 'Basic ' + new Buffer('cnpmjstest101:cnpmjstest101').toString('base64');
     var lastRev;
@@ -705,7 +799,7 @@ describe('controllers/registry/module.test.js', function () {
       .expect(201, done);
     });
 
-    it('should remove version ok', function (done) {
+    it('should remove all version ok', function (done) {
       //do not really remove it here
       mm.empty(Module, 'removeByNameAndVersions');
       mm.empty(Module, 'removeTagsByIds');
@@ -713,8 +807,7 @@ describe('controllers/registry/module.test.js', function () {
       .put('/testputmodule/-rev/' + lastRev)
       .set('authorization', baseauth)
       .send({
-        versions: {
-        }
+        versions: {}
       })
       .expect(201, done);
     });
@@ -761,61 +854,62 @@ describe('controllers/registry/module.test.js', function () {
     });
   });
 
-  describe('PUT /:name/:tag', function () {
+  describe('PUT /:name/:tag updateTag()', function () {
     it('should create new tag ok', function (done) {
       request(app)
-      .put('/testputmodule/newtag')
+      .put('/mk2testmodule/newtag')
       .set('content-type', 'application/json')
       .set('authorization', baseauth)
-      .send('"0.1.9"')
-      .expect(201, done);
+      .send('"0.0.1"')
+      .expect(201)
+      .expect({"ok":true}, done);
     });
 
     it('should override exist tag ok', function (done) {
       request(app)
-      .put('/testputmodule/newtag')
+      .put('/mk2testmodule/newtag')
       .set('content-type', 'application/json')
       .set('authorization', baseauth)
-      .send('"0.1.9"')
+      .send('"0.0.1"')
       .expect(201, done);
     });
 
     it('should tag invalid version 403', function (done) {
       request(app)
-      .put('/testputmodule/newtag')
+      .put('/mk2testmodule/newtag')
       .set('content-type', 'application/json')
       .set('authorization', baseauth)
       .send('"hello"')
       .expect(403)
       .expect({
         error: 'forbidden',
-        reason: 'setting tag newtag to invalid version: hello: testputmodule/newtag'
+        reason: 'setting tag newtag to invalid version: hello: mk2testmodule/newtag'
       }, done);
     });
 
     it('should tag not eixst version 403', function (done) {
       request(app)
-      .put('/testputmodule/newtag')
+      .put('/mk2testmodule/newtag')
       .set('content-type', 'application/json')
       .set('authorization', baseauth)
       .send('"5.0.0"')
       .expect(403)
       .expect({
         error: 'forbidden',
-        reason: 'setting tag newtag to unknown version: 5.0.0: testputmodule/newtag'
+        reason: 'setting tag newtag to unknown version: 5.0.0: mk2testmodule/newtag'
       }, done);
     });
 
-    it('should tag permission 403', function (done) {
+    it('should not maintainer tag return no permission 403', function (done) {
       request(app)
-      .put('/testputmodule/newtag')
+      .put('/mk2testmodule/newtag')
       .set('content-type', 'application/json')
       .set('authorization', baseauthOther)
-      .send('"0.1.9"')
+      .send('"0.0.1"')
       .expect(403)
       .expect({
-        error: 'forbidden',
-        reason: 'no permission to modify testputmodule'
+        error: 'forbidden user',
+        reason: 'cnpmjstest101 not authorized to modify mk2testmodule'
       }, done);
     });
   });

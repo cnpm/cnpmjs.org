@@ -1,5 +1,5 @@
 TESTS = $(shell ls -S `find test -type f -name "*.test.js" -print`)
-REPORTER = tap
+REPORTER = spec
 TIMEOUT = 30000
 MOCHA_OPTS =
 REGISTRY = --registry=http://registry.npm.taobao.org

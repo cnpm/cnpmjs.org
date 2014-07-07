@@ -18,10 +18,10 @@ var mysql = require('../common/mysql');
 var multiline = require('multiline');
 
 var ADD_SQL = multiline(function () {;/*
-  INSERT iNTO
-    module_star(name, user)
+  INSERT INTO
+    module_star(name, user, gmt_create)
   VALUES
-    (?, ?);
+    (?, ?, now());
 */});
 exports.add = function *add(name, user) {
   try {
