@@ -1,4 +1,14 @@
 
+0.7.0 / 2014-07-07
+==================
+
+ * use module_maintainers on GET /pakcage/:name page
+ * use new module_maintainers on GET /:name
+ * admin user should never publish to other user's packages. fix #363
+ * Add a new table for module-maintainers.
+ * gravatar use https
+ * support https
+
 0.6.1 / 2014-06-18
 ==================
 
