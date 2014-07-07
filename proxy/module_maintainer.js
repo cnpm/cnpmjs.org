@@ -22,21 +22,9 @@ var GET_MAINTANINERS_SQL = 'SELECT user FROM module_maintainer WHERE name = ?;';
 
 exports.get = function* (name) {
   var users = yield mysql.query(GET_MAINTANINERS_SQL, [name]);
-  // if not found maintainers, try to get from latest module package info
-  if (users.length === 0) {
-    var latestMod = yield Module.getLatest(name);
-    var maintainers = latestMod && latestMod.package && latestMod.package.maintainers;
-    if (maintainers && maintainers.length > 0) {
-      users = maintainers;
-    }
-    return users.map(function (user) {
-      return user.name;
-    });
-  } else {
-    return users.map(function (row) {
-      return row.user;
-    });
-  }
+  return users.map(function (row) {
+    return row.user;
+  });
 };
 
 var ADD_SQL = 'INSERT INTO module_maintainer(name, user, gmt_create) \

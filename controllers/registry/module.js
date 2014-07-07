@@ -43,6 +43,7 @@ var downloadAsReadStream = require('../utils').downloadAsReadStream;
 
 /**
  * show all version of a module
+ * GET /:name
  */
 exports.show = function* (next) {
   var name = this.params.name;
@@ -64,14 +65,16 @@ exports.show = function* (next) {
   var r = yield [
     Module.listTags(name),
     Module.listByName(name),
-    ModuleStar.listUsers(name)
+    ModuleStar.listUsers(name),
+    packageService.listMaintainers(name),
   ];
   var tags = r[0];
   var rows = r[1];
   var users = r[2];
+  var maintainers = r[3];
 
-  debug('show %s got %d rows, %d tags, %d star users',
-    name, rows.length, tags.length, users.length);
+  debug('show %s got %d rows, %d tags, %d star users, maintainers: %j',
+    name, rows.length, tags.length, users.length, maintainers);
 
   var userMap = {};
   for (var i = 0; i < users.length; i++) {
@@ -146,6 +149,10 @@ exports.show = function* (next) {
       readme = pkg.readme;
     }
     delete pkg.readme;
+    if (maintainers.length > 0) {
+      // TODO: need to use newer maintainers
+      pkg.maintainers = maintainers;
+    }
 
     if (!createdTime || t < createdTime) {
       createdTime = t;
@@ -211,6 +218,9 @@ exports.show = function* (next) {
 
 /**
  * get the special version or tag of a module
+ *
+ * GET /:name/:version
+ * GET /:name/:tag
  */
 exports.get = function *(next) {
   var name = this.params.name;
@@ -219,10 +229,18 @@ exports.get = function *(next) {
   var method = version ? 'get' : 'getByTag';
   var queryLabel = version ? version : tag;
 
-  var mod = yield Module[method](name, queryLabel);
+  var rs = yield [
+    Module[method](name, queryLabel),
+    packageService.listMaintainers(name),
+  ];
+  var mod = rs[0];
   if (mod) {
     common.setDownloadURL(mod.package, this);
     mod.package._cnpm_publish_time = mod.publish_time;
+    var maintainers = rs[1];
+    if (maintainers.length > 0) {
+      mod.package.maintainers = maintainers;
+    }
     this.body = mod.package;
     return;
   }

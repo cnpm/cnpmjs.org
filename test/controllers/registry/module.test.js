@@ -21,6 +21,7 @@ var thunkify = require('thunkify-wrap');
 var should = require('should');
 var request = require('supertest');
 var mm = require('mm');
+var pedding = require('pedding');
 var config = require('../../../config');
 var app = require('../../../servers/registry');
 var Module = require('../../../proxy/module');
@@ -37,6 +38,7 @@ describe('controllers/registry/module.test.js', function () {
 
   before(function (done) {
     app.listen(0, function () {
+      // name: mk2testmodule
       var pkg = require(path.join(fixtures, 'package_and_tgz.json'));
       pkg.maintainers[0].name = 'cnpmjstest10';
       pkg.versions['0.0.1'].maintainers[0].name = 'cnpmjstest10';
@@ -252,7 +254,7 @@ describe('controllers/registry/module.test.js', function () {
     });
   });
 
-  describe('PUT /:name/-rev/id update maintainers', function () {
+  describe('PUT /:name/-rev/id updateMaintainers()', function () {
     before(function (done) {
       request(app)
       .put('/mk2testmodule/-rev/1')
@@ -274,13 +276,52 @@ describe('controllers/registry/module.test.js', function () {
           name: 'cnpmjstest10',
           email: 'cnpmjstest10@cnpmjs.org'
         }, {
-          name: 'fengmk2',
+          name: 'cnpmjstest101',
           email: 'fengmk2@cnpmjs.org'
         }]
       })
       .set('authorization', baseauth)
       .expect(201)
-      .expect('content-type', 'application/json; charset=utf-8', done);
+      .expect({
+        ok: true, id: 'mk2testmodule', rev: '1'
+      }, function (err) {
+        should.not.exist(err);
+        done = pedding(2, done);
+        // check maintainers update
+        request(app)
+        .get('/mk2testmodule')
+        .expect(200, function (err, res) {
+          should.not.exist(err);
+          var pkg = res.body;
+          pkg.maintainers.should.length(2);
+          pkg.maintainers.should.eql(pkg.versions['0.0.1'].maintainers);
+          pkg.maintainers.sort(function (a, b) {
+            return a.name > b.name ? 1 : -1;
+          });
+          pkg.maintainers.should.eql([
+            { name: 'cnpmjstest10', email: 'fengmk2@gmail.com' },
+            { name: 'cnpmjstest101', email: 'fengmk2@gmail.com' },
+          ]);
+          done();
+        });
+
+        // /pkg/0.0.1
+        request(app)
+        .get('/mk2testmodule/0.0.1')
+        .expect(200, function (err, res) {
+          should.not.exist(err);
+          var pkg = res.body;
+          pkg.maintainers.should.length(2);
+          pkg.maintainers.sort(function (a, b) {
+            return a.name > b.name ? 1 : -1;
+          });
+          pkg.maintainers.should.eql([
+            { name: 'cnpmjstest10', email: 'fengmk2@gmail.com' },
+            { name: 'cnpmjstest101', email: 'fengmk2@gmail.com' },
+          ]);
+          done();
+        });
+      });
     });
 
     it('should add again new maintainers', function (done) {
