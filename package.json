@@ -21,6 +21,7 @@
     "co-write": "0.3.0",
     "copy-to": "1.0.1",
     "debug": "1.0.2",
+    "error-formater": "1.0.2",
     "eventproxy": "0.3.1",
     "giturl": "0.0.3",
     "graceful": "0.1.0",
@@ -29,10 +30,10 @@
     "koa": "0.8.1",
     "koa-limit": "1.0.2",
     "koa-markdown": "0.0.3",
-    "koa-middlewares": "1.0.0",
-    "logfilestream": "0.1.0",
+    "koa-middlewares": "1.1.0",
     "marked": "0.3.2",
     "mime": "1.2.11",
+    "mini-logger": "0.1.0",
     "mkdirp": "0.5.0",
     "moment": "2.7.0",
     "ms": "0.6.2",
@@ -44,7 +45,7 @@
     "redis": "0.10.3",
     "semver": "2.3.1",
     "thunkify-wrap": "0.1.2",
-    "utility": "0.1.14"
+    "utility": "0.1.16"
   },
   "devDependencies": {
     "autod": "~0.2.0",
@@ -56,7 +57,7 @@
     "jshint": "*",
     "mm": "0.2.1",
     "mocha": "*",
-    "pedding": "0.0.3",
+    "pedding": "1.0.0",
     "should": "4.0.4",
     "should-http": "0.0.1",
     "supertest": "0.13.0"
