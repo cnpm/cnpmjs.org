@@ -2,11 +2,11 @@ TESTS = $(shell ls -S `find test -type f -name "*.test.js" -print`)
 REPORTER = spec
 TIMEOUT = 30000
 MOCHA_OPTS =
-REGISTRY = --registry=http://registry.npm.taobao.org
+REGISTRY = --registry=https://registry.npm.taobao.org
 
 install:
 	@npm install $(REGISTRY) \
-		--disturl=http://dist.cnpmjs.org
+		--disturl=https://npm.taobao.org/dist
 
 jshint: install
 	@-./node_modules/.bin/jshint ./
@@ -19,7 +19,7 @@ pretest:
 
 test: install pretest
 	@NODE_ENV=test ./node_modules/.bin/mocha \
-		--harmony-generators \
+		--harmony \
 		--reporter $(REPORTER) \
 		--timeout $(TIMEOUT) \
 		--require should \

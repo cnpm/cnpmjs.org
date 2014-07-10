@@ -640,7 +640,7 @@ exports.addPackageAndDist = function *(next) {
 
   if (!distTags.latest) {
     // need to check if latest tag exists or not
-    var latest = yield Module.getByTag(name, version);
+    var latest = yield Module.getByTag(name, 'latest');
     if (!latest) {
       // auto add latest
       tags.push(['latest', tags[0][1]]);

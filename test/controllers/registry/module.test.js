@@ -727,6 +727,9 @@ describe('controllers/registry/module.test.js', function () {
       var pkg = JSON.parse(pkgJSON);
       pkg.name = 'publish-with-beta-tag';
       var version = Object.keys(pkg.versions)[0];
+      pkg.versions[version].maintainers = [
+        {name: 'cnpmjstest10', email: 'cnpmjstest10@gmail.com'}
+      ];
       pkg['dist-tags'] = {
         beta: version
       };
@@ -753,7 +756,35 @@ describe('controllers/registry/module.test.js', function () {
               beta: version,
               latest: version
             });
-            done();
+
+            // update new beta
+            pkg['dist-tags'] = {
+              beta: '10.10.1'
+            };
+            pkg.versions = {
+              '10.10.1': pkg.versions[version]
+            };
+            request(app)
+            .put('/' + pkg.name)
+            .set('authorization', baseauth)
+            .send(pkg)
+            .expect(201, function (err, res) {
+              should.not.exist(err);
+              res.body.should.have.keys('ok', 'rev');
+              res.body.ok.should.equal(true);
+              // should auto set latest
+              request(app)
+              .get('/' + pkg.name)
+              .expect(200, function (err, res) {
+                should.not.exist(err);
+                res.body['dist-tags'].should.eql({
+                  beta: '10.10.1',
+                  latest: version
+                });
+                done();
+              });
+            });
+
           });
         });
       });
