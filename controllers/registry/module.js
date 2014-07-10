@@ -47,9 +47,23 @@ var downloadAsReadStream = require('../utils').downloadAsReadStream;
  */
 exports.show = function* (next) {
   var name = this.params.name;
-  var modifiedTime = yield* Module.getLastModified(name);
-  debug('show %s, last modified: %s', name, modifiedTime);
+  var rs = yield [
+    Module.getLastModified(name),
+    Module.listTags(name)
+  ];
+  var modifiedTime = rs[0];
+  var tags = rs[1];
+  debug('show %s, last modified: %s, tags: %j', name, modifiedTime, tags);
   if (modifiedTime) {
+    // find out the latest modfied time
+    // because update tags only modfied tag, wont change module gmt_modified
+    for (var i = 0; i < tags.length; i++) {
+      var tag = tags[i];
+      if (tag.gmt_modified > modifiedTime) {
+        modifiedTime = tag.gmt_modified;
+      }
+    }
+
     // use modifiedTime as etag
     this.set('ETag', '"' + modifiedTime.getTime() + '"');
 
@@ -63,15 +77,13 @@ exports.show = function* (next) {
   }
 
   var r = yield [
-    Module.listTags(name),
     Module.listByName(name),
     ModuleStar.listUsers(name),
     packageService.listMaintainers(name),
   ];
-  var tags = r[0];
-  var rows = r[1];
-  var users = r[2];
-  var maintainers = r[3];
+  var rows = r[0];
+  var users = r[1];
+  var maintainers = r[2];
 
   debug('show %s got %d rows, %d tags, %d star users, maintainers: %j',
     name, rows.length, tags.length, users.length, maintainers);
@@ -578,8 +590,17 @@ exports.addPackageAndDist = function *(next) {
     tags.push([t, distTags[t]]);
   }
 
-  debug('%s addPackageAndDist %s:%s, attachment size: %s, maintainers: %j',
-    username, name, version, attachment.length, versionPackage.maintainers);
+  if (tags.length === 0) {
+    this.status = 400;
+    this.body = {
+      error: 'invalid',
+      reason: 'dist-tags should not be empty'
+    };
+    return;
+  }
+
+  debug('%s addPackageAndDist %s:%s, attachment size: %s, maintainers: %j, distTags: %j',
+    username, name, version, attachment.length, versionPackage.maintainers, distTags);
 
   var exists = yield Module.get(name, version);
   var shasum;
@@ -615,6 +636,16 @@ exports.addPackageAndDist = function *(next) {
         + ' not match download size ' + tarballBuffer.length,
     };
     return;
+  }
+
+  if (!distTags.latest) {
+    // need to check if latest tag exists or not
+    var latest = yield Module.getByTag(name, version);
+    if (!latest) {
+      // auto add latest
+      tags.push(['latest', tags[0][1]]);
+      debug('auto add latest tag: %j', tags);
+    }
   }
 
   shasum = crypto.createHash('sha1');

@@ -687,8 +687,10 @@ describe('controllers/registry/module.test.js', function () {
       });
     });
 
+    var pkgJSON = fs.readFileSync(path.join(fixtures, 'package_and_tgz.json'), 'utf8');
+
     it('should version_error when versions missing', function (done) {
-      var pkg = require(path.join(fixtures, 'package_and_tgz.json'));
+      var pkg = JSON.parse(pkgJSON);
       delete pkg.versions;
       request(app)
       .put('/' + pkg.name)
@@ -701,6 +703,59 @@ describe('controllers/registry/module.test.js', function () {
           reason: 'filename or version not found, filename: mk2testmodule-0.0.1.tgz, version: undefined'
         });
         done();
+      });
+    });
+
+    it('should 400 when dist-tags empty', function (done) {
+      var pkg = JSON.parse(pkgJSON);
+      pkg['dist-tags'] = {};
+      request(app)
+      .put('/' + pkg.name)
+      .set('authorization', baseauth)
+      .send(pkg)
+      .expect(400, function (err, res) {
+        should.not.exist(err);
+        res.body.should.eql({
+          error: 'invalid',
+          reason: 'dist-tags should not be empty'
+        });
+        done();
+      });
+    });
+
+    it('should publish with beta tag addPackageAndDist()', function (done) {
+      var pkg = JSON.parse(pkgJSON);
+      pkg.name = 'publish-with-beta-tag';
+      var version = Object.keys(pkg.versions)[0];
+      pkg['dist-tags'] = {
+        beta: version
+      };
+      request(app)
+      .del('/' + pkg.name + '/-rev/1')
+      .set('authorization', baseauth)
+      .end(function (err, res) {
+        should.not.exist(err);
+
+        request(app)
+        .put('/' + pkg.name)
+        .set('authorization', baseauth)
+        .send(pkg)
+        .expect(201, function (err, res) {
+          should.not.exist(err);
+          res.body.should.have.keys('ok', 'rev');
+          res.body.ok.should.equal(true);
+          // should auto set latest
+          request(app)
+          .get('/' + pkg.name)
+          .expect(200, function (err, res) {
+            should.not.exist(err);
+            res.body['dist-tags'].should.eql({
+              beta: version,
+              latest: version
+            });
+            done();
+          });
+        });
       });
     });
   });
