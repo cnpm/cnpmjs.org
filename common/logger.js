@@ -18,13 +18,15 @@
 var formater = require('error-formater');
 var Logger = require('mini-logger');
 var config = require('../config');
+var utility = require('utility');
 var mail = require('./mail');
+var util = require('util');
 
 var isTEST = process.env.NODE_ENV === 'test';
-var levels = ['info', 'warn', 'error'];
+var categories = ['sync_info', 'sync_error'];
 
-module.exports = Logger({
-  categories: levels,
+var logger = module.exports = Logger({
+  categories: categories,
   dir: config.logdir,
   duration: '1d',
   format: '[{category}.]YYYY-MM-DD[.log]',
@@ -42,3 +44,19 @@ function errorFormater(err) {
   mail.error(to, msg.json.name, msg.text);
   return msg.text;
 }
+
+logger.syncInfo = function () {
+  var args = [].slice.call(arguments);
+  if (typeof args[0] === 'string') {
+    args[0] = util.format('[%s][%s] ', utility.logDate(), process.pid) + args[0];
+  }
+  logger.sync_info.apply(logger, args);
+};
+
+logger.syncError =function () {
+  var args = [].slice.call(arguments);
+  if (typeof args[0] === 'string') {
+    args[0] = util.format('[%s][%s] ', utility.logDate(), process.pid) + args[0];
+  }
+  logger.sync_error.apply(logger, arguments);
+};

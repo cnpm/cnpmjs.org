@@ -54,7 +54,7 @@ function* syncDir(fullname, info) {
     }
   }
 
-  logger.info('sync remote:%s got %d new items, %d dirs, %d files to sync',
+  logger.syncInfo('sync remote:%s got %d new items, %d dirs, %d files to sync',
     fullname, news.length, dirs.length, files.length);
 
   for (var i = 0; i < files.length; i++) {
@@ -67,11 +67,11 @@ function* syncDir(fullname, info) {
   }
 
   if (info) {
-    logger.info('Save dir:%s %j to database', fullname, info);
+    logger.syncInfo('Save dir:%s %j to database', fullname, info);
     yield* Dist.savedir(info);
   }
 
-  logger.info('Sync %s finished, %d dirs, %d files',
+  logger.syncInfo('Sync %s finished, %d dirs, %d files',
     fullname, dirs.length, files.length);
 }
 
@@ -97,12 +97,12 @@ function* syncFile(info) {
   };
 
   try {
-    logger.info('downloading %s %s to %s, isPhantomjsURL: %s',
+    logger.syncInfo('downloading %s %s to %s, isPhantomjsURL: %s',
       bytes(info.size), downurl, filepath, isPhantomjsURL);
     // get tarball
     var r = yield *urllib.request(downurl, options);
     var statusCode = r.status || -1;
-    logger.info('download %s got status %s, headers: %j',
+    logger.syncInfo('download %s got status %s, headers: %j',
       downurl, statusCode, r.headers);
     if (statusCode !== 200) {
       var err = new Error('Download ' + downurl + ' fail, status: ' + statusCode);
@@ -151,19 +151,19 @@ function* syncFile(info) {
     };
 
     // upload to NFS
-    logger.info('uploading %s to nfs:%s', filepath, args.key);
+    logger.syncInfo('uploading %s to nfs:%s', filepath, args.key);
     var result = yield nfs.upload(filepath, args);
     info.url = result.url || result.key;
     info.sha1 = shasum;
 
-    logger.info('upload %s to nfs:%s with size:%d, sha1:%s',
+    logger.syncInfo('upload %s to nfs:%s with size:%d, sha1:%s',
       args.key, info.url, info.size, info.sha1);
   } finally {
     // remove tmp file whatever
     fs.unlink(filepath, utility.noop);
   }
 
-  logger.info('Sync dist file: %j done', info);
+  logger.syncInfo('Sync dist file: %j done', info);
   yield* Dist.savefile(info);
 }
 
@@ -241,14 +241,14 @@ function* syncPhantomjsDir() {
   var fullname = '/phantomjs/';
   var files = yield* sync.listPhantomjsDiff(fullname);
 
-  logger.info('sync remote:%s got %d files to sync',
+  logger.syncInfo('sync remote:%s got %d files to sync',
     fullname, files.length);
 
   for (var i = 0; i < files.length; i++) {
     yield* syncFile(files[i]);
   }
 
-  logger.info('SyncPhantomjsDir %s finished, %d files',
+  logger.syncInfo('SyncPhantomjsDir %s finished, %d files',
     fullname, files.length);
 }
 sync.syncPhantomjsDir = syncPhantomjsDir;

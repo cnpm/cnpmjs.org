@@ -61,11 +61,11 @@ var handleSync = co(function *() {
       var data = yield *sync();
     } catch (err) {
       error = err;
+      error.message += ' (sync package error)';
+      logger.syncError(error);
     }
-    if (config.debug) {
-      error && console.error(error.stack);
-      data && console.log(data);
-    } else {
+    data && logger.syncInfo(data);
+    if (!config.debug) {
       sendMailToAdmin(error, data, new Date());
     }
     syncing = false;
@@ -83,13 +83,13 @@ var syncDist = co(function* syncDist() {
     return;
   }
   syncingDist = true;
-  logger.info('Start syncing dist...');
+  logger.syncInfo('Start syncing dist...');
   try {
     yield* syncDistWorker();
     yield* syncDistWorker.syncPhantomjsDir();
   } catch (err) {
     err.message += ' (sync dist error)';
-    logger.warn('Sync dist error: %s: %s\n%s', err.name, err.message, err.stack);
+    logger.syncError(err);
     if (config.noticeSyncDistError) {
       sendMailToAdmin(err, null, new Date());
     }
@@ -101,7 +101,7 @@ if (config.syncDist) {
   syncDist();
   setInterval(syncDist, ms(config.syncInterval));
 } else {
-  logger.info('sync dist disable');
+  logger.syncInfo('sync dist disable');
 }
 
 function sendMailToAdmin(err, result, syncTime) {
@@ -135,10 +135,10 @@ function sendMailToAdmin(err, result, syncTime) {
       syncTime, result.successes.length, result.successes.slice(0, 10));
   }
   debug('send email with type: %s, subject: %s, html: %s', type, subject, html);
+  logger.syncInfo('send email with type: %s, subject: %s, html: %s', type, subject, html);
   if (type && type !== 'log') {
     mail[type](to, subject, html, function (err) {
       if (err) {
-        logger.info('send email with type: %s, subject: %s, html: %s', type, subject, html);
         logger.error(err);
       }
     });
