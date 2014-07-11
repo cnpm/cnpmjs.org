@@ -24,6 +24,7 @@ var isTEST = process.env.NODE_ENV === 'test';
 var levels = ['info', 'warn', 'error'];
 
 module.exports = Logger({
+  categories: levels,
   dir: config.logdir,
   duration: '1d',
   format: '[{category}.]YYYY-MM-DD[.log]',
