@@ -149,22 +149,21 @@ var UPDATE_SYNC_NUM_SQL = multiline(function () {;/*
   UPDATE
     total
   SET
-    sync_status = ?,
-    need_sync_num = ?,
-    success_sync_num = ?,
-    fail_sync_num = ?,
-    left_sync_num = ?,
-    last_sync_module = ?
+    ?
   WHERE
     name="total";
 */});
 exports.updateSyncNum = function (params, callback) {
-  var query = [
-    params.syncStatus, params.need || 0,
-    params.success || 0, params.fail || 0, params.left || 0,
-    params.lastSyncModule,
-  ];
-  mysql.query(UPDATE_SYNC_NUM_SQL, query, callback);
+  var arg = {
+    sync_status: params.syncStatus,
+    need_sync_num: params.need || 0,
+    success_sync_num: params.success || 0,
+    fail_sync_num: params.fail || 0,
+    left_sync_num: params.left || 0,
+    last_sync_module: params.lastSyncModule
+  };
+
+  mysql.query(UPDATE_SYNC_NUM_SQL, [arg], callback);
 };
 
 thunkify(exports);

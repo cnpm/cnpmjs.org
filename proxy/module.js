@@ -21,9 +21,6 @@ var config = require('../config');
 var mysql = require('../common/mysql');
 var multiline = require('multiline');
 
-var MODULE_COLUMNS = 'id, publish_time, gmt_create, gmt_modified, author, name, \
-  version, description, package, dist_tarball, dist_shasum, dist_size';
-
 var INSERT_MODULE_SQL = multiline(function () {;/*
   INSERT INTO
     module(gmt_create, gmt_modified, publish_time, author, name, version,
@@ -184,19 +181,7 @@ exports.updateReadme = function (id, readme, callback) {
   });
 };
 
-var UPDATE_DIST_SQL = multiline(function () {;/*
-  UPDATE
-    module
-  SET
-    publish_time=?,
-    version=?,
-    package=?,
-    dist_tarball=?,
-    dist_shasum=?,
-    dist_size=?
-  WHERE
-    id=?;
-*/});
+var UPDATE_DIST_SQL = 'UPDATE module SET ? WHERE id=?';
 exports.update = function (mod, callback) {
   var pkg;
   try {
@@ -205,8 +190,18 @@ exports.update = function (mod, callback) {
     return callback(e);
   }
   var dist = mod.package.dist;
+
+  var arg = {
+    publish_time: mod.publish_time,
+    version: mod.version,
+    package: pkg,
+    dist_tarball: dist.tarball,
+    dist_shasum: dist.shasum,
+    dist_size: dist.size
+  };
+
   mysql.query(UPDATE_DIST_SQL,
-    [mod.publish_time, mod.version, pkg, dist.tarball, dist.shasum, dist.size, mod.id],
+    [arg, mod.id],
   function (err, result) {
     if (err) {
       return callback(err);
