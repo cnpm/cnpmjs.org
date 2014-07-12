@@ -66,13 +66,7 @@ exports.auth = function (name, password, callback) {
 };
 
 
-var INSERT_USER_SQL = multiline(function () {;/*
-  INSERT INTO
-    user(rev, name, email, salt, password_sha,
-    ip, roles, gmt_create, gmt_modified)
-  VALUES
-    (?, ?, ?, ?, ?, ?, ?, now(), now());
-*/});
+var INSERT_USER_SQL = 'INSERT INTO user SET ?';
 exports.add = function (user, callback) {
   var roles = user.roles || [];
   try {
@@ -81,8 +75,22 @@ exports.add = function (user, callback) {
     roles = '[]';
   }
   var rev = '1-' + utility.md5(JSON.stringify(user));
-  var values = [rev, user.name, user.email, user.salt, user.password_sha, user.ip, roles];
-  mysql.query(INSERT_USER_SQL, values, function (err) {
+
+  var now = new Date();
+
+  var arg = {
+    rev: rev,
+    name: user.name,
+    email: user.email,
+    salt: user.salt,
+    password_sha: user.password_sha,
+    ip: user.ip,
+    roles: roles,
+    gmt_create: now,
+    gmt_modified: now
+  };
+
+  mysql.query(INSERT_USER_SQL, [arg], function (err) {
     callback(err, {rev: rev});
   });
 };
@@ -91,13 +99,7 @@ var UPDATE_USER_SQL = multiline(function () {;/*
   UPDATE
     user
   SET
-    rev=?,
-    email=?,
-    salt=?,
-    password_sha=?,
-    ip=?,
-    roles=?,
-    gmt_modified=now()
+    ?
   WHERE
     name=? AND rev=?;
 */});
@@ -119,8 +121,17 @@ exports.update = function (user, callback) {
     roles = '[]';
   }
 
-  var values = [newRev, user.email, user.salt, user.password_sha, user.ip, roles, user.name, rev];
-  mysql.query(UPDATE_USER_SQL, values, function (err, data) {
+  var arg = {
+    rev: newRev,
+    email: user.email,
+    salt: user.salt,
+    password_sha: user.password_sha,
+    ip: user.ip,
+    roles: roles,
+    gmt_modified: new Date()
+  };
+
+  mysql.query(UPDATE_USER_SQL, [arg, user.name, rev], function (err, data) {
     if (err) {
       return callback(err);
     }

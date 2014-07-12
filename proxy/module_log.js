@@ -16,16 +16,18 @@
 
 var thunkify = require('thunkify-wrap');
 var mysql = require('../common/mysql');
-var multiline = require('multiline');
 
-var INSERT_LOG_SQL = multiline(function () {;/*
-  INSERT INTO
-    module_log(gmt_create, gmt_modified, name, username, log)
-  VALUES
-    (now(), now(), ?, ?, "");
-*/});
+var INSERT_LOG_SQL = 'INSERT INTO module_log SET ?';
 exports.create = function (data, callback) {
-  mysql.query(INSERT_LOG_SQL, [data.name, data.username], function (err, result) {
+  var now = new Date();
+  var args = {
+    gmt_create: now,
+    gmt_modified: now,
+    name: data.name,
+    username: data.username,
+    log: ''
+  }
+  mysql.query(INSERT_LOG_SQL, [args], function (err, result) {
     if (err) {
       return callback(err);
     }
@@ -33,15 +35,7 @@ exports.create = function (data, callback) {
   });
 };
 
-var APPEND_SQL = multiline(function () {;/*
-  UPDATE
-    module_log
-  SET
-    log=CONCAT(log, ?),
-    gmt_modified=now()
-  WHERE
-    id=?;
-*/});
+var APPEND_SQL = 'UPDATE module_log SET log=CONCAT(log, ?), gmt_modified=now() WHERE id=?';
 exports.append = function (id, log, callback) {
   log = '\n' + log;
   mysql.query(APPEND_SQL, [log, id], function (err) {
@@ -49,14 +43,7 @@ exports.append = function (id, log, callback) {
   });
 };
 
-var SELECT_SQL = multiline(function () {;/*
-  SELECT
-    *
-  FROM
-    module_log
-  WHERE
-    id=?;
-*/});
+var SELECT_SQL = 'SELECT * FROM module_log WHERE id=?';
 exports.get = function (id, callback) {
   mysql.queryOne(SELECT_SQL, [id], callback);
 };
