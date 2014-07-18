@@ -373,107 +373,6 @@ setInterval(function () {
   next();
 }, 5000);
 
-exports.upload = function *(next) {
-  var length = Number(this.get('content-length')) || 0;
-  if (!length || !this.is('application/octet-stream')) {
-    debug('request length or type error');
-    return yield *next;
-  }
-  var username = this.user.name;
-  var name = this.params.name;
-  var id = Number(this.params.rev);
-  var filename = this.params.filename;
-  var version = filename.substring(name.length + 1);
-  version = version.replace(/\.tgz$/, '');
-  // save version on pkg upload
-
-  debug('%s: upload %s, file size: %d', username, this.url, length);
-  var mod = yield Module.getById(id);
-  if (!mod || mod.name !== name) {
-    debug('can not get this module');
-    return yield* next;
-  }
-
-  var isMaintainer = yield* packageService.isMaintainer(name, username);
-
-  if (!isMaintainer) {
-    this.status = 403;
-    this.body = {
-      error: 'forbidden user',
-      reason: username + ' not authorized to modify ' + name
-    };
-    return;
-  }
-
-  if (mod.version !== 'next') {
-    // rev wrong
-    this.status = 403;
-    this.body = {
-      error: 'rev_wrong',
-      reason: 'rev not match next module'
-    };
-    return;
-  }
-  var filepath = common.getTarballFilepath(filename);
-  var ws = fs.createWriteStream(filepath);
-  var shasum = crypto.createHash('sha1');
-  var dataSize = 0;
-
-  var buf;
-  while (buf = yield coRead(this.req)) {
-    shasum.update(buf);
-    dataSize += buf.length;
-    yield coWrite(ws, buf);
-  }
-  ws.end();
-  if (dataSize !== length) {
-    this.status = 403;
-    this.body = {
-      error: 'size_wrong',
-      reason: 'Header size ' + length + ' not match download size ' + dataSize,
-    };
-    return;
-  }
-  shasum = shasum.digest('hex');
-
-  var options = {
-    key: common.getCDNKey(name, filename),
-    size: length,
-    shasum: shasum
-  };
-  var result;
-  try {
-    result = yield nfs.upload(filepath, options);
-  } catch (err) {
-    fs.unlink(filepath, utility.noop);
-    this.throw(err);
-  }
-  fs.unlink(filepath, utility.noop);
-  var dist = {
-    shasum: shasum,
-    size: length
-  };
-
-  // if nfs upload return a key, record it
-  if (result.url) {
-    dist.tarball = result.url;
-  } else if (result.key) {
-    dist.key = result.key;
-    dist.tarball = result.key;
-  }
-
-  mod.package.dist = dist;
-  mod.package.version = version;
-  debug('%s module: save file to %s, size: %d, sha1: %s, dist: %j, version: %s',
-    id, filepath, length, shasum, dist, version);
-  var updateResult = yield Module.update(mod);
-  this.status = 201;
-  this.body = {
-    ok: true,
-    rev: String(updateResult.id)
-  };
-};
-
 function _addDepsRelations(pkg) {
   var dependencies = Object.keys(pkg.dependencies || {});
   if (dependencies.length > config.maxDependencies) {
@@ -486,79 +385,13 @@ function _addDepsRelations(pkg) {
   });
 }
 
-exports.updateLatest = function *(next) {
-  var username = this.user.name;
-  var name = this.params.name;
-  var version = semver.valid(this.params.version);
-  if (!version) {
-    this.status = 400;
-    this.body = {
-      error: 'Params Invalid',
-      reason: 'Invalid version: ' + this.params.version,
-    };
-    return;
-  }
-
-  var nextMod = yield Module.get(name, 'next');
-  if (!nextMod) {
-    debug('can not get nextMod');
-    return yield* next;
-  }
-  // TODO: old publish flow, we will delete it in the next version
-  // so dont change the old logic
-  if (!common.isMaintainer(this.user, nextMod.package.maintainers)) {
-    this.status = 403;
-    this.body = {
-      error: 'forbidden user',
-      reason: username + ' not authorized to modify ' + name
-    };
-    return;
-  }
-
-  // check version if not match pkg upload
-  if (nextMod.package.version !== version) {
-    this.status = 403;
-    this.body = {
-      error: 'version_wrong',
-      reason: 'version not match'
-    };
-    return;
-  }
-
-  var body = this.request.body;
-  nextMod.version = version;
-  nextMod.author = username;
-  body.dist = nextMod.package.dist;
-  body.maintainers = nextMod.package.maintainers;
-  if (!body.author) {
-    body.author = {
-      name: username,
-    };
-  }
-  body._publish_on_cnpm = true;
-  nextMod.package = body;
-  _addDepsRelations(body);
-
-  // reset publish time
-  nextMod.publish_time = Date.now();
-  debug('update %s:%s %j', nextMod.package.name, nextMod.package.version, nextMod.package.dist);
-  // change latest to version
-  try {
-    yield Module.update(nextMod);
-  } catch (err) {
-    debug('update nextMod %s error: %s', name, err);
-    return this.throw(err);
-  }
-  yield Module.addTag(name, 'latest', version);
-  nextMod.version = 'next';
-  var addResult = yield Module.add(nextMod);
-  this.status = 201;
-  this.body = {
-    ok: true,
-    rev: String(addResult.id)
-  };
-};
-
+// old flows:
+// 1. add()
+// 2. upload()
+// 3. updateLatest()
+//
+// new flows: only one request
+// PUT /:name
 exports.addPackageAndDist = function *(next) {
   // 'dist-tags': { latest: '0.0.2' },
   //  _attachments:
@@ -699,82 +532,6 @@ exports.addPackageAndDist = function *(next) {
   };
 };
 
-// old flows: NEED TO be deleted
-// 1. add()
-// 2. upload()
-// 3. updateLatest()
-exports.add = function *(next) {
-  var username = this.user.name;
-  var name = this.params.name;
-  var pkg = this.request.body || {};
-
-  if (!common.isMaintainer(this.user, pkg.maintainers)) {
-    this.status = 403;
-    this.body = {
-      error: 'no_perms',
-      reason: 'Current user can not publish this module'
-    };
-    return;
-  }
-
-  if (pkg._attachments && Object.keys(pkg._attachments).length > 0) {
-    return yield exports.addPackageAndDist.call(this, next);
-  }
-
-  var r = yield [Module.getLatest(name), Module.get(name, 'next')];
-  var latestMod = r[0];
-  var nextMod = r[1];
-
-  if (nextMod) {
-    nextMod.exists = true;
-  } else {
-    nextMod = {
-      name: name,
-      version: 'next',
-      author: username,
-      package: {
-        name: name,
-        version: 'next',
-        description: pkg.description,
-        readme: pkg.readme,
-        maintainers: pkg.maintainers,
-      }
-    };
-    debug('add next module: %s', name);
-    var result = yield Module.add(nextMod);
-    nextMod.id = result.id;
-  }
-
-  var maintainers = latestMod && latestMod.package.maintainers.length > 0 ?
-    latestMod.package.maintainers : nextMod.package.maintainers;
-
-  if (!common.isMaintainer(this.user, maintainers)) {
-    this.status = 403;
-    this.body = {
-      error: 'no_perms',
-      reason: 'Current user can not publish this module'
-    };
-    return;
-  }
-
-  debug('add %s rev: %s, version: %s', name, nextMod.id, nextMod.version);
-
-  if (latestMod || nextMod.version !== 'next') {
-    this.status = 409;
-    this.body = {
-      error: 'conflict',
-      reason: 'Document update conflict.'
-    };
-    return;
-  }
-  this.status = 201;
-  this.body = {
-    ok: true,
-    id: name,
-    rev: String(nextMod.id),
-  };
-};
-
 // PUT /:name/-rev/:rev
 exports.updateOrRemove = function* (next) {
   debug('updateOrRemove module %s, %s, %j', this.url, this.params.name, this.request.body);
@@ -829,16 +586,15 @@ exports.updateMaintainers = function* (next) {
 };
 
 exports.removeWithVersions = function* (next) {
-  // debug('removeWithVersions module %s, with info %j', this.params.name, this.request.body);
   var username = this.user.name;
   var name = this.params.name;
   // left versions
   var versions = this.request.body.versions || {};
 
-  debug('removeWithVersions module %s, left versions %j', name, Object.keys(versions));
-
   // step1: list all the versions
   var mods = yield Module.listByName(name);
+  debug('removeWithVersions module %s, left versions %j, %s mods',
+    name, Object.keys(versions), mods && mods.length);
   if (!mods || !mods.length) {
     return yield* next;
   }
@@ -924,6 +680,10 @@ exports.removeTar = function* (next) {
   var name = this.params.name;
   var username = this.user.name;
 
+  if (isNaN(id)) {
+    return yield* next;
+  }
+
   var mod = yield Module.getById(id);
   if (!mod || mod.name !== name) {
     return yield* next;
@@ -945,7 +705,7 @@ exports.removeTar = function* (next) {
   this.body = { ok: true };
 };
 
-exports.removeAll = function *(next) {
+exports.removeAll = function* (next) {
   debug('remove all the module with name: %s, id: %s', this.params.name, this.params.rev);
   var name = this.params.name;
   var username = this.user.name;

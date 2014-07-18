@@ -16,15 +16,22 @@
 
 var should = require('should');
 var request = require('supertest');
+var utils = require('../utils');
 var app = require('../../servers/web');
+var registry = require('../../servers/registry');
 
 describe('middleware/web_not_found.test.js', function () {
   before(function (done) {
-    app.listen(0, done);
-  });
+    // make sure mk2testmodule exists
+    var baseauth = 'Basic ' + new Buffer('cnpmjstest10:cnpmjstest10').toString('base64');
+    // name: mk2testmodule
+    var pkg = utils.getPackage('mk2testmodule');
 
-  after(function (done) {
-    app.close(done);
+    request(registry)
+    .put('/' + pkg.name)
+    .set('authorization', utils.adminAuth)
+    .send(pkg)
+    .end(done);
   });
 
   describe('web_not_found()', function () {

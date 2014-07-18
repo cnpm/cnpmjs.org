@@ -57,6 +57,7 @@ routes(app);
 
 app.on('error', function (err, ctx) {
   err.url = err.url || ctx.request.url;
+  console.log(err.stack)
   logger.error(err);
 });
 
