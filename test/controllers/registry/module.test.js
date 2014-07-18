@@ -29,22 +29,38 @@ var Npm = require('../../../proxy/npm');
 var controller = require('../../../controllers/registry/module');
 var ModuleDeps = require('../../../proxy/module_deps');
 var SyncModuleWorker = require('../../../proxy/sync_module_worker');
+var utils = require('../../utils');
 
 var fixtures = path.join(path.dirname(path.dirname(__dirname)), 'fixtures');
 
 describe('controllers/registry/module.test.js', function () {
-  var baseauth = 'Basic ' + new Buffer('cnpmjstest10:cnpmjstest10').toString('base64');
-  var baseauthOther = 'Basic ' + new Buffer('cnpmjstest101:cnpmjstest101').toString('base64');
-
   before(function (done) {
     app.listen(0, function () {
+      done = pedding(2, done);
       // name: mk2testmodule
-      var pkg = require(path.join(fixtures, 'package_and_tgz.json'));
-      pkg.maintainers[0].name = 'cnpmjstest10';
-      pkg.versions['0.0.1'].maintainers[0].name = 'cnpmjstest10';
+      var pkg = utils.getPackage('mk2testmodule', '0.0.1', utils.admin);
+
       request(app)
       .put('/' + pkg.name)
-      .set('authorization', baseauth)
+      .set('authorization', utils.adminAuth)
+      .send(pkg)
+      .expect(201, function (err) {
+        should.not.exist(err);
+        pkg = utils.getPackage('mk2testmodule', '0.0.2', utils.admin);
+        // publish 0.0.2
+        request(app)
+        .put('/' + pkg.name)
+        .set('authorization', utils.adminAuth)
+        .send(pkg)
+        .expect(201, done);
+      });
+
+      // testputmodule@0.1.9
+      var testpkg = utils.getPackage('testputmodule', '0.1.9', utils.admin);
+
+      request(app)
+      .put('/' + testpkg.name)
+      .set('authorization', utils.adminAuth)
       .send(pkg)
       .expect(201, done);
     });
@@ -58,7 +74,7 @@ describe('controllers/registry/module.test.js', function () {
       mm.data(Npm, 'get', require(path.join(fixtures, 'utility.json')));
       request(app)
       .put('/utility/sync')
-      .set('authorization', baseauth)
+      .set('authorization', utils.adminAuth)
       .end(function (err, res) {
         should.not.exist(err);
         res.body.should.have.keys('ok', 'logId');
@@ -264,7 +280,7 @@ describe('controllers/registry/module.test.js', function () {
           email: 'cnpmjstest10@cnpmjs.org'
         }]
       })
-      .set('authorization', baseauth)
+      .set('authorization', utils.adminAuth)
       .expect({"ok":true,"id":"mk2testmodule","rev":"1"}, done);
     });
 
@@ -280,7 +296,7 @@ describe('controllers/registry/module.test.js', function () {
           email: 'fengmk2@cnpmjs.org'
         }]
       })
-      .set('authorization', baseauth)
+      .set('authorization', utils.adminAuth)
       .expect(201)
       .expect({
         ok: true, id: 'mk2testmodule', rev: '1'
@@ -336,7 +352,7 @@ describe('controllers/registry/module.test.js', function () {
           email: 'fengmk2@cnpmjs.org'
         }]
       })
-      .set('authorization', baseauth)
+      .set('authorization', utils.adminAuth)
       .expect(201)
       .expect('content-type', 'application/json; charset=utf-8', done);
     });
@@ -350,7 +366,7 @@ describe('controllers/registry/module.test.js', function () {
           email: 'cnpmjstest10@cnpmjs.org'
         }]
       })
-      .set('authorization', baseauth)
+      .set('authorization', utils.adminAuth)
       .expect(201)
       .expect('content-type', 'application/json; charset=utf-8', done);
     });
@@ -364,7 +380,7 @@ describe('controllers/registry/module.test.js', function () {
           email: 'cnpmjstest10@cnpmjs.org'
         }]
       })
-      .set('authorization', baseauth)
+      .set('authorization', utils.adminAuth)
       .expect(201)
       .expect({
         id: 'mk2testmodule',
@@ -379,7 +395,7 @@ describe('controllers/registry/module.test.js', function () {
       .send({
         maintainers: []
       })
-      .set('authorization', baseauth)
+      .set('authorization', utils.adminAuth)
       .expect(403)
       .expect({error: 'invalid operation', reason: 'Can not remove all maintainers'})
       .expect('content-type', 'application/json; charset=utf-8', done);
@@ -394,7 +410,7 @@ describe('controllers/registry/module.test.js', function () {
           email: 'cnpmjstest10@cnpmjs.org'
         }]
       })
-      .set('authorization', baseauthOther)
+      .set('authorization', utils.otherUserAuth)
       .expect(403)
       .expect({
         error: 'no_perms',
@@ -412,7 +428,7 @@ describe('controllers/registry/module.test.js', function () {
           email: 'cnpmjstest10@cnpmjs.org'
         }]
       })
-      .set('authorization', baseauthOther)
+      .set('authorization', utils.otherUserAuth)
       .expect(403)
       .expect({
         error: 'forbidden user',
@@ -421,7 +437,7 @@ describe('controllers/registry/module.test.js', function () {
     });
   });
 
-  describe('PUT /:name old publish flow', function () {
+  describe('PUT /:name old publish flow (stop support)', function () {
     var pkg = {
       name: 'testputmodule',
       description: 'test put module',
@@ -452,63 +468,44 @@ describe('controllers/registry/module.test.js', function () {
       });
     });
 
-    it('should try to add not exists module return 201', function (done) {
+    it('should publish return 400', function (done) {
       request(app)
       .put('/' + pkg.name)
       .set('authorization', baseauth)
       .send(pkg)
-      .expect(201, function (err, res) {
+      .expect(400, function (err, res) {
         should.not.exist(err);
-        res.body.should.have.keys('ok', 'id', 'rev');
-        res.body.ok.should.equal(true);
-        res.body.id.should.equal(pkg.name);
-        res.body.rev.should.be.a.String;
+        res.body.reason.should.containEql('filename or version not found');
         done();
       });
     });
 
-    it('should try to add return 409 when only next module exists', function (done) {
+    it('should publish exists return 400', function (done) {
       request(app)
       .put('/' + pkg.name)
       .set('authorization', baseauth)
       .send(pkg)
-      .expect(201, done);
+      .expect(400, done);
     });
 
-    it.skip('should try to add return 403 when not module user and only next module exists',
+    it('should try to add return 400 when not module user and only next module exists',
     function (done) {
       mm(config, 'enablePrivate', false);
       request(app)
       .put('/' + pkg.name)
       .set('authorization', baseauthOther)
       .send(pkg)
-      .expect(403, function (err, res) {
+      .expect(400, function (err, res) {
         should.not.exist(err);
         res.body.should.eql({
-          error: 'no_perms',
-          reason: 'Current user can not publish this module'
+          error: 'version_error',
+          reason: 'filename or version not found, filename: undefined, version: undefined'
         });
         done();
       });
     });
 
-    it('should get versions empty when only next module exists', function (done) {
-      request(app)
-      .get('/' + pkg.name)
-      .expect(200, function (err, res) {
-        should.not.exist(err);
-        res.body.should.have.keys('_id', '_rev', 'name', 'description', 'versions', 'dist-tags',
-          'readme', 'maintainers', 'time', '_attachments', 'users');
-        res.body.versions.should.eql({});
-        res.body.time.should.eql({});
-        res.body['dist-tags'].should.eql({});
-        lastRev = res.body._rev;
-        // console.log('lastRev: %s', lastRev);
-        done();
-      });
-    });
-
-    it('should upload tarball success: /:name/-/:filename/-rev/:rev', function (done) {
+    it('should upload 404', function (done) {
       var body = fs.readFileSync(path.join(fixtures, 'testputmodule-0.1.9.tgz'));
       request(app)
       .put('/' + pkg.name + '/-/' + pkg.name + '-0.1.9.tgz/-rev/' + lastRev)
@@ -516,96 +513,10 @@ describe('controllers/registry/module.test.js', function () {
       .set('content-type', 'application/octet-stream')
       .set('content-length', '' + body.length)
       .send(body)
-      .expect(201, function (err, res) {
-        should.not.exist(err);
-        res.body.should.eql({
-          ok: true,
-          rev: lastRev,
-        });
-        done();
-      });
+      .expect(404, done);
     });
 
-    it('should upload tarball success again: /:name/-/:filename/-rev/:rev', function (done) {
-      var body = fs.readFileSync(path.join(fixtures, 'testputmodule-0.1.9.tgz'));
-      request(app)
-      .put('/' + pkg.name + '/-/' + pkg.name + '-0.1.9.tgz/-rev/' + lastRev)
-      .set('authorization', baseauth)
-      .set('content-type', 'application/octet-stream')
-      .set('content-length', '' + body.length)
-      .send(body)
-      .expect(201, function (err, res) {
-        should.not.exist(err);
-        res.body.should.eql({
-          ok: true,
-          rev: lastRev,
-        });
-        done();
-      });
-    });
-
-    it('should upload tarball fail 403 when user not admin', function (done) {
-      var body = fs.readFileSync(path.join(fixtures, 'testputmodule-0.1.9.tgz'));
-      request(app)
-      .put('/' + pkg.name + '/-/' + pkg.name + '-0.1.9.tgz/-rev/25')
-      .set('authorization', baseauthOther)
-      .set('content-type', 'application/octet-stream')
-      .set('content-length', '' + body.length)
-      .send(body)
-      .expect(403, function (err, res) {
-        should.not.exist(err);
-        res.body.should.eql({
-          error: 'no_perms',
-          reason: 'Private mode enable, only admin can publish this module'
-        });
-        done();
-      });
-    });
-
-    it('should upload tarball fail 404 when rev wrong', function (done) {
-      var body = fs.readFileSync(path.join(fixtures, 'testputmodule-0.1.9.tgz'));
-      request(app)
-      .put('/' + pkg.name + '/-/' + pkg.name + '-0.1.9.tgz/-rev/' + '1231231')
-      .set('authorization', baseauth)
-      .set('content-type', 'application/octet-stream')
-      .set('content-length', '' + body.length)
-      .send(body)
-      .expect(404, function (err, res) {
-        should.not.exist(err);
-        res.body.should.eql({
-          error: 'not_found',
-          reason: 'document not found'
-        });
-        done();
-      });
-    });
-
-    it('should update package.json info success: /:name/:version/-tag/latest', function (done) {
-      var pkg = require(path.join(fixtures, 'testputmodule.json')).versions['0.1.8'];
-      pkg.name = 'testputmodule';
-      pkg.version = '0.1.9';
-      pkg.dependencies['foo-testputmodule'] = '*';
-      request(app)
-      .put('/' + pkg.name + '/' + pkg.version + '/-tag/latest')
-      .set('authorization', baseauth)
-      .send(pkg)
-      .expect(201, function (err, res) {
-        should.not.exist(err);
-        res.body.should.have.keys('ok', 'rev');
-        // should get deps foo-testputmodule contains 'testputmodule'
-        ModuleDeps.list('foo-testputmodule', function (err, rows) {
-          should.not.exist(err);
-          var exists = rows.filter(function (r) {
-            return r.deps === 'testputmodule';
-          });
-          exists.should.length(1);
-          exists[0].deps.should.equal('testputmodule');
-          done();
-        });
-      });
-    });
-
-    it('should update package.json info version invalid: /:name/:version/-tag/latest', function (done) {
+    it('should update 404 package.json info version invalid: /:name/:version/-tag/latest', function (done) {
       var pkg = require(path.join(fixtures, 'testputmodule.json')).versions['0.1.8'];
       pkg.name = 'testputmodule';
       pkg.version = '0.1.9.alpha';
@@ -613,88 +524,44 @@ describe('controllers/registry/module.test.js', function () {
       .put('/' + pkg.name + '/' + pkg.version + '/-tag/latest')
       .set('authorization', baseauth)
       .send(pkg)
-      .expect(400)
-      .expect({
-        error: 'Params Invalid',
-        reason: 'Invalid version: ' + pkg.version
-      }, done);
+      .expect(404, done);
     });
+  });
 
-    it('should update package.json info again fail 403: /:name/:version/-tag/latest', function (done) {
-      var pkg = require(path.join(fixtures, 'testputmodule.json')).versions['0.1.8'];
-      pkg.name = 'testputmodule';
-      pkg.version = '0.1.10';
-      request(app)
-      .put('/' + pkg.name + '/' + pkg.version + '/-tag/latest')
-      .set('authorization', baseauth)
-      .send(pkg)
-      .expect(403, function (err, res) {
-        should.not.exist(err);
-        res.body.should.eql({
-          error: 'version_wrong',
-          reason: 'version not match'
-        });
-        done();
-      });
-    });
-
-    it('should get new package info', function (done) {
-      request(app)
-      .get('/testputmodule/0.1.9')
-      .expect(200, function (err, res) {
-        should.not.exist(err);
-        res.body.name.should.equal('testputmodule');
-        res.body.version.should.equal('0.1.9');
-        res.body.dist.tarball.should.containEql('/testputmodule/download/testputmodule-0.1.9.tgz');
-        done();
-      });
-    });
-
+  describe('PUT /:name publish new flow addPackageAndDist()', function () {
     it('should publish with tgz base64, addPackageAndDist()', function (done) {
-      var pkg = require(path.join(fixtures, 'package_and_tgz.json'));
-      // delete first
+      var pkg = utils.getPackage('testpublishmodule', '0.0.2');
       request(app)
-      .del('/' + pkg.name + '/-rev/1')
-      .set('authorization', baseauth)
-      .expect({ok: true})
-      .expect(200, function (err, res) {
+      .put('/' + pkg.name)
+      .set('authorization', utils.adminAuth)
+      .send(pkg)
+      .expect(201, function (err, res) {
         should.not.exist(err);
+        res.body.should.have.keys('ok', 'rev');
+        res.body.ok.should.equal(true);
 
+        // upload again should 403
         request(app)
         .put('/' + pkg.name)
-        .set('authorization', baseauth)
+        .set('authorization', utils.adminAuth)
         .send(pkg)
-        .expect(201, function (err, res) {
+        .expect(403, function (err, res) {
           should.not.exist(err);
-          res.body.should.have.keys('ok', 'rev');
-          res.body.ok.should.equal(true);
-
-          // upload again should 403
-          request(app)
-          .put('/' + pkg.name)
-          .set('authorization', baseauth)
-          .send(pkg)
-          .expect(403, function (err, res) {
-            should.not.exist(err);
-            res.body.should.eql({
-              error: 'forbidden',
-              reason: 'cannot modify pre-existing version: 0.0.1'
-            });
-            done();
+          res.body.should.eql({
+            error: 'forbidden',
+            reason: 'cannot modify pre-existing version: 0.0.2'
           });
-
+          done();
         });
       });
     });
 
-    var pkgJSON = fs.readFileSync(path.join(fixtures, 'package_and_tgz.json'), 'utf8');
-
     it('should version_error when versions missing', function (done) {
-      var pkg = JSON.parse(pkgJSON);
+      var pkg = utils.getPackage('version_missing_module');
       delete pkg.versions;
       request(app)
       .put('/' + pkg.name)
-      .set('authorization', baseauth)
+      .set('authorization', utils.adminAuth)
       .send(pkg)
       .expect(400, function (err, res) {
         should.not.exist(err);
@@ -707,11 +574,11 @@ describe('controllers/registry/module.test.js', function () {
     });
 
     it('should 400 when dist-tags empty', function (done) {
-      var pkg = JSON.parse(pkgJSON);
+      var pkg = utils.getPackage('dist-tags-empty');
       pkg['dist-tags'] = {};
       request(app)
       .put('/' + pkg.name)
-      .set('authorization', baseauth)
+      .set('authorization', utils.adminAuth)
       .send(pkg)
       .expect(400, function (err, res) {
         should.not.exist(err);
@@ -724,24 +591,20 @@ describe('controllers/registry/module.test.js', function () {
     });
 
     it('should publish with beta tag addPackageAndDist()', function (done) {
-      var pkg = JSON.parse(pkgJSON);
-      pkg.name = 'publish-with-beta-tag';
-      var version = Object.keys(pkg.versions)[0];
-      pkg.versions[version].maintainers = [
-        {name: 'cnpmjstest10', email: 'cnpmjstest10@gmail.com'}
-      ];
+      var version = '0.1.1';
+      var pkg = utils.getPackage('publish-with-beta-tag', version);
       pkg['dist-tags'] = {
         beta: version
       };
       request(app)
       .del('/' + pkg.name + '/-rev/1')
-      .set('authorization', baseauth)
+      .set('authorization', utils.adminAuth)
       .end(function (err, res) {
         should.not.exist(err);
 
         request(app)
         .put('/' + pkg.name)
-        .set('authorization', baseauth)
+        .set('authorization', utils.adminAuth)
         .send(pkg)
         .expect(201, function (err, res) {
           should.not.exist(err);
@@ -766,7 +629,7 @@ describe('controllers/registry/module.test.js', function () {
             };
             request(app)
             .put('/' + pkg.name)
-            .set('authorization', baseauth)
+            .set('authorization', utils.adminAuth)
             .send(pkg)
             .expect(201, function (err, res) {
               should.not.exist(err);
@@ -848,12 +711,14 @@ describe('controllers/registry/module.test.js', function () {
   });
 
   describe('PUT /:name/-rev/:rev removeWithVersions', function () {
+    var pkg = require(path.join(fixtures, 'package_and_tgz.json'));
+    var pkgname = pkg.name;
     var baseauth = 'Basic ' + new Buffer('cnpmjstest10:cnpmjstest10').toString('base64');
     var baseauthOther = 'Basic ' + new Buffer('cnpmjstest101:cnpmjstest101').toString('base64');
     var lastRev;
     before(function (done) {
       request(app)
-      .get('/testputmodule')
+      .get('/' + pkgname)
       .end(function (err, res) {
         lastRev = res.body._rev;
         done(err);
@@ -862,24 +727,25 @@ describe('controllers/registry/module.test.js', function () {
 
     it('should update 401 when no auth', function (done) {
       request(app)
-      .put('/testputmodule/-rev/123')
+      .put('/' + pkgname + '/-rev/123')
       .expect(401, done);
     });
 
     it('should update 403 when auth error', function (done) {
       request(app)
-      .put('/testputmodule/-rev/123')
+      .put('/' + pkgname + '/-rev/123')
       .set('authorization', baseauthOther)
       .expect(403, done);
     });
 
     it('should remove nothing removed ok', function (done) {
       request(app)
-      .put('/testputmodule/-rev/' + lastRev)
+      .put('/' + pkgname + '/-rev/' + lastRev)
       .set('authorization', baseauth)
       .send({
         versions: {
-          '0.1.9': {}
+          '0.0.1': {},
+          '0.0.2': {}
         }
       })
       .expect(201, done);
@@ -890,7 +756,7 @@ describe('controllers/registry/module.test.js', function () {
       mm.empty(Module, 'removeByNameAndVersions');
       mm.empty(Module, 'removeTagsByIds');
       request(app)
-      .put('/testputmodule/-rev/' + lastRev)
+      .put('/' + pkgname + '/-rev/' + lastRev)
       .set('authorization', baseauth)
       .send({
         versions: {}
@@ -911,31 +777,36 @@ describe('controllers/registry/module.test.js', function () {
   describe('DELETE /:name/download/:filename/-rev/:rev', function () {
     var lastRev;
     before(function (done) {
+      var pkg = utils.getPackage('test-delete-download-module', '0.1.9');
       request(app)
-      .get('/testputmodule')
-      .end(function (err, res) {
-        lastRev = res.body._rev;
-        done(err);
+      .put('/' + pkg.name)
+      .set('content-type', 'application/json')
+      .set('authorization', utils.adminAuth)
+      .send(pkg)
+      .expect(201, function (err, res) {
+        should.not.exist(err);
+        lastRev = res.body.rev;
+        done();
       });
     });
 
     it('should delete 401 when no auth', function (done) {
       request(app)
-      .del('/testputmodule/download/testputmodule-0.1.9.tgz/-rev/' + lastRev)
+      .del('/test-delete-download-module/download/test-delete-download-module-0.1.9.tgz/-rev/' + lastRev)
       .expect(401, done);
     });
 
     it('should delete 403 when auth error', function (done) {
       request(app)
-      .del('/testputmodule/download/testputmodule-0.1.9.tgz/-rev/' + lastRev)
-      .set('authorization', baseauthOther)
+      .del('/test-delete-download-module/download/test-delete-download-module-0.1.9.tgz/-rev/' + lastRev)
+      .set('authorization', utils.otherUserAuth)
       .expect(403, done);
     });
 
     it('should delete file ok', function (done) {
       request(app)
-      .del('/testputmodule/download/testputmodule-0.1.9.tgz/-rev/' + lastRev)
-      .set('authorization', baseauth)
+      .del('/test-delete-download-module/download/test-delete-download-module-0.1.9.tgz/-rev/' + lastRev)
+      .set('authorization', utils.adminAuth)
       .expect(200, done);
     });
   });
@@ -945,7 +816,7 @@ describe('controllers/registry/module.test.js', function () {
       request(app)
       .put('/mk2testmodule/newtag')
       .set('content-type', 'application/json')
-      .set('authorization', baseauth)
+      .set('authorization', utils.adminAuth)
       .send('"0.0.1"')
       .expect(201)
       .expect({"ok":true}, done);
@@ -955,7 +826,7 @@ describe('controllers/registry/module.test.js', function () {
       request(app)
       .put('/mk2testmodule/newtag')
       .set('content-type', 'application/json')
-      .set('authorization', baseauth)
+      .set('authorization', utils.adminAuth)
       .send('"0.0.1"')
       .expect(201, done);
     });
@@ -964,7 +835,7 @@ describe('controllers/registry/module.test.js', function () {
       request(app)
       .put('/mk2testmodule/newtag')
       .set('content-type', 'application/json')
-      .set('authorization', baseauth)
+      .set('authorization', utils.adminAuth)
       .send('"hello"')
       .expect(403)
       .expect({
@@ -977,7 +848,7 @@ describe('controllers/registry/module.test.js', function () {
       request(app)
       .put('/mk2testmodule/newtag')
       .set('content-type', 'application/json')
-      .set('authorization', baseauth)
+      .set('authorization', utils.adminAuth)
       .send('"5.0.0"')
       .expect(403)
       .expect({
@@ -986,17 +857,29 @@ describe('controllers/registry/module.test.js', function () {
       }, done);
     });
 
-    it('should not maintainer tag return no permission 403', function (done) {
-      request(app)
-      .put('/mk2testmodule/newtag')
-      .set('content-type', 'application/json')
-      .set('authorization', baseauthOther)
-      .send('"0.0.1"')
-      .expect(403)
-      .expect({
-        error: 'forbidden user',
-        reason: 'cnpmjstest101 not authorized to modify mk2testmodule'
-      }, done);
+    describe('update tag not maintainer', function () {
+      before(function (done) {
+        var pkg = utils.getPackage('update-tag-not-maintainer', '1.0.0');
+        request(app)
+        .put('/' + pkg.name)
+        .set('content-type', 'application/json')
+        .set('authorization', utils.adminAuth)
+        .send(pkg)
+        .expect(201, done);
+      });
+
+      it('should not maintainer update tag return no permission 403', function (done) {
+        request(app)
+        .put('/update-tag-not-maintainer/newtag')
+        .set('content-type', 'application/json')
+        .set('authorization', utils.otherUserAuth)
+        .send('"1.0.0"')
+        .expect(403)
+        .expect({
+          error: 'forbidden user',
+          reason: 'cnpmjstest101 not authorized to modify update-tag-not-maintainer'
+        }, done);
+      });
     });
   });
 
@@ -1022,20 +905,44 @@ describe('controllers/registry/module.test.js', function () {
     it('should delete 403 when auth error', function (done) {
       request(app)
       .del('/testputmodule/-rev/' + lastRev)
-      .set('authorization', baseauthOther)
+      .set('authorization', utils.otherUserAuth)
       .expect(403, done);
     });
 
-    it('shold remove all the module ok', function (done) {
-      //do not really remove
-      mm.empty(Module, 'removeByName');
-      request(app)
-      .del('/testputmodule/-rev/' + lastRev)
-      .set('authorization', baseauth)
-      .expect(200, function (err, res) {
-        should.not.exist(err);
-        should.not.exist(res.headers['set-cookie']);
-        done();
+    describe('remove all modules by name', function () {
+      before(function (done) {
+        var pkg = utils.getPackage('remove-all-module');
+        request(app)
+        .put('/remove-all-module')
+        .set('content-type', 'application/json')
+        .set('authorization', utils.adminAuth)
+        .send(pkg)
+        .expect(201, done);
+      });
+
+      it('shold fail when user not maintainer', function (done) {
+        request(app)
+        .del('/remove-all-module/-rev/1')
+        .set('authorization', utils.otherUserAuth)
+        .expect(403, function (err, res) {
+          should.not.exist(err);
+          res.body.should.eql({
+            error: 'no_perms',
+            reason: 'Private mode enable, only admin can publish this module'
+          });
+          done();
+        });
+      });
+
+      it('shold ok', function (done) {
+        request(app)
+        .del('/remove-all-module/-rev/1')
+        .set('authorization', utils.adminAuth)
+        .expect(200, function (err, res) {
+          should.not.exist(err);
+          should.not.exist(res.headers['set-cookie']);
+          done();
+        });
       });
     });
   });
