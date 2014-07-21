@@ -152,5 +152,26 @@ describe('controllers/registry/module/scope_package.test.js', function () {
         done();
       });
     });
+
+    it('should not adapt when defaultScope is empty', function (done) {
+      mm(config, 'defaultScope', '');
+      request(app)
+      .get('/@cnpm/test-default-scope-package')
+      .expect(404, done);
+    });
+
+    it('should 404 when pkg not exists', function (done) {
+      mm(config, 'defaultScope', '@cnpm');
+      request(app)
+      .get('/@cnpm/test-default-scope-package-not-exists')
+      .expect(404, done);
+    });
+
+    it('should 404 when scope not match', function (done) {
+      mm(config, 'defaultScope', '@cnpm123');
+      request(app)
+      .get('/@cnpm/test-default-scope-package')
+      .expect(404, done);
+    });
   });
 });

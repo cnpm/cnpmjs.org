@@ -134,5 +134,26 @@ describe('controllers/web/package/scope_package.test.js', function () {
         done();
       });
     });
+
+    it('should not adapt', function (done) {
+      mm(config, 'defaultScope', '');
+      request(web)
+      .get('/package/@cnpm/test-default-web-scope-package')
+      .expect(404, done);
+    });
+
+    it('should 404 when scope not match', function (done) {
+      mm(config, 'defaultScope', '@cnpm123');
+      request(web)
+      .get('/package/@cnpm/test-default-web-scope-package')
+      .expect(404, done);
+    });
+
+    it('should 404 when pkg not exists', function (done) {
+      mm(config, 'defaultScope', '@cnpm');
+      request(web)
+      .get('/package/@cnpm/test-default-web-scope-package-not-exists')
+      .expect(404, done);
+    });
   });
 });
