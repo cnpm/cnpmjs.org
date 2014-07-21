@@ -22,8 +22,7 @@ if (config.redis && config.redis.host && config.redis.port) {
   var redis = require('redis');
   var wrapper = require('co-redis');
   var logger = require('./logger');
-
-  var _client = redis.createClient(config.redis);
+  var _client = redis.createClient(config.redis.port, config.redis.host);
 
   _client.on('error', function (err) {
     logger.error(err);
