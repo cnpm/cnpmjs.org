@@ -35,7 +35,7 @@ var fixtures = path.join(path.dirname(path.dirname(__dirname)), 'fixtures');
 
 describe('controllers/registry/module.test.js', function () {
   before(function (done) {
-    app.listen(0, function () {
+    app = app.listen(0, function () {
       done = pedding(2, done);
       // name: mk2testmodule
       var pkg = utils.getPackage('mk2testmodule', '0.0.1', utils.admin);

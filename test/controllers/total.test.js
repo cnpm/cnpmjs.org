@@ -27,11 +27,6 @@ describe('controllers/total.test.js', function () {
     registryApp.listen(0, done);
     webApp.listen(0, done);
   });
-  after(function (done) {
-    done = pedding(2, done);
-    registryApp.close(done);
-    webApp.close(done);
-  });
 
   describe('GET / in registry', function () {
     it('should return total info', function (done) {

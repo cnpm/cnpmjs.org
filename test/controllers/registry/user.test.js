@@ -23,11 +23,7 @@ var mysql = require('../../../common/mysql');
 
 describe('controllers/registry/user.test.js', function () {
   before(function (done) {
-    app.listen(0, done);
-  });
-
-  after(function (done) {
-    app.close(done);
+    app = app.listen(0, done);
   });
 
   afterEach(mm.restore);
