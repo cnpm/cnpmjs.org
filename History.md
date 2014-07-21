@@ -1,4 +1,17 @@
 
+0.8.0 / 2014-07-21
+==================
+
+ * support "scoped" packages. close #352
+ * use safe jsonp
+ * Stop support old publish flow. fix #368
+ * update SQLs
+ * use sync_info and sync_error categories
+ * add categories to loggers. fix #370
+ * fix get latest tag always not exists bug
+ * support `npm publish --tag beta`. fix #366
+ * use mini-logger and error-formater
+
 0.7.0 / 2014-07-07
 ==================
 
