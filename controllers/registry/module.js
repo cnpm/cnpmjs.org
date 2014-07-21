@@ -56,7 +56,7 @@ exports.show = function* (next) {
   var tags = rs[1];
   var adaptDefaultScope = false;
 
-  if (tags.length === 0 && config.defaultScope && name.indexOf(config.defaultScope) === 0) {
+  if (tags.length === 0 && config.defaultScope && name.indexOf(config.defaultScope + '/') === 0) {
     // remove default scope name and retry
     name = name.split('/')[1];
     rs = yield [

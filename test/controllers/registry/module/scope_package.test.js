@@ -153,6 +153,13 @@ describe('controllers/registry/module/scope_package.test.js', function () {
       });
     });
 
+    it('should not adapt /@cnpm123/test-default-scope-package', function (done) {
+      mm(config, 'defaultScope', '@cnpm');
+      request(app)
+      .get('/@cnpm123/test-default-scope-package')
+      .expect(404, done);
+    });
+
     it('should not adapt when defaultScope is empty', function (done) {
       mm(config, 'defaultScope', '');
       request(app)

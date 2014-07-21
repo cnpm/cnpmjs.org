@@ -135,6 +135,13 @@ describe('controllers/web/package/scope_package.test.js', function () {
       });
     });
 
+    it('should not adapt /@cnpm123/test-default-web-scope-package', function (done) {
+      mm(config, 'defaultScope', '@cnpm');
+      request(web)
+      .get('/package/@cnpm123/test-default-web-scope-package')
+      .expect(404, done);
+    });
+
     it('should not adapt', function (done) {
       mm(config, 'defaultScope', '');
       request(web)
