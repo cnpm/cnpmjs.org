@@ -43,6 +43,11 @@ function routes(app) {
   app.get('/-/short', mod.listAllModuleNames);
 
   // module
+  // scope package: params: [$name]
+  app.get(/\/(@[\w\-\.]+\/[\w\-\.]+)$/, syncByInstall, mod.show);
+  // scope package: params: [$name, $version]
+  app.get(/\/(@[\w\-\.]+\/[\w\-\.]+)\/([\w\.\-]+)$/, syncByInstall, mod.get);
+
   app.get('/:name', syncByInstall, mod.show);
   app.get('/:name/:version', syncByInstall, mod.get);
   // try to add module

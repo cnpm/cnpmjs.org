@@ -46,7 +46,7 @@ var downloadAsReadStream = require('../utils').downloadAsReadStream;
  * GET /:name
  */
 exports.show = function* (next) {
-  var name = this.params.name;
+  var name = this.params.name || this.params[0];
   var rs = yield [
     Module.getLastModified(name),
     Module.listTags(name)
@@ -234,12 +234,13 @@ exports.show = function* (next) {
  * GET /:name/:version
  * GET /:name/:tag
  */
-exports.get = function *(next) {
-  var name = this.params.name;
-  var tag = this.params.version;
+exports.get = function* (next) {
+  var name = this.params.name || this.params[0];
+  var tag = this.params.version || this.params[1];
   var version = semver.valid(tag);
   var method = version ? 'get' : 'getByTag';
   var queryLabel = version ? version : tag;
+  debug('%s %s with %j', method, name, this.params);
 
   var rs = yield [
     Module[method](name, queryLabel),

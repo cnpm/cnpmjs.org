@@ -1,5 +1,5 @@
 /**!
- * cnpmjs.org - controllers/download.js
+ * cnpmjs.org - controllers/sync.js
  *
  * Copyright(c) cnpmjs.org and other contributors.
  * MIT Licensed
@@ -14,14 +14,16 @@
  * Module dependencies.
  */
 
+var debug = require('debug')('cnpmjs.org:controllers:sync');
 var Log = require('../proxy/module_log');
 var SyncModuleWorker = require('../proxy/sync_module_worker');
 
-exports.sync = function *() {
+exports.sync = function* () {
   var username = this.user.name || 'anonymous';
-  var name = this.params.name;
+  var name = this.params.name || this.params[0];
   var publish = this.query.publish === 'true';
   var noDep = this.query.nodeps === 'true';
+  debug('sync %s with query: %j', name, this.query);
   if (publish && !this.user.isAdmin) {
     this.status = 403;
     this.body = {
@@ -37,6 +39,7 @@ exports.sync = function *() {
   };
 
   var result = yield SyncModuleWorker.sync(name, username, options);
+  debug('sync %s got %j', name, result);
 
   // friendly 404 reason info
   if (result.statusCode === 404) {
@@ -59,8 +62,9 @@ exports.sync = function *() {
   };
 };
 
-exports.getSyncLog = function *(next) {
-  var logId = this.params.id;
+exports.getSyncLog = function* (next) {
+  // params: [$name, $id] on scope package
+  var logId = this.params.id || this.params[1];
   var offset = Number(this.query.offset) || 0;
   var row = yield Log.get(logId);
   if (!row) {
