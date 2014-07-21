@@ -1,0 +1,44 @@
+{
+  "name": "@cnpm/scope-package",
+  "version": "0.0.1",
+  "description": "scope-package",
+  "main": "index.js",
+  "scripts": {
+    "test": "make test-all"
+  },
+  "config": {
+    "cov": {
+      "threshold": 100
+    }
+  },
+  "dependencies": {
+
+  },
+  "devDependencies": {
+    "autod": "*",
+    "contributors": "*",
+    "should": "*",
+    "jshint": "*",
+    "cov": "*",
+    "istanbul-harmony": "*",
+    "mocha": "*"
+  },
+  "homepage": "https://github.com/node-modules/scope-package",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/node-modules/scope-package.git",
+    "web": "https://github.com/node-modules/scope-package"
+  },
+  "bugs": {
+    "url": "https://github.com/node-modules/scope-package/issues",
+    "email": "fengmk2@gmail.com"
+  },
+  "keywords": [
+    "scope-package"
+  ],
+  "engines": {
+    "node": ">= 0.10.0"
+  },
+  "author": "fengmk2 <fengmk2@gmail.com> (http://fengmk2.github.com)",
+  "license": "MIT"
+}

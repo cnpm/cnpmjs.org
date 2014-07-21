@@ -40,6 +40,9 @@ exports.getPackage = function (name, version, user) {
   pkg.maintainers[0].name = user;
   pkg.versions[version].maintainers[0].name = user;
   pkg.versions[version].name = name;
+  pkg.versions[version].version = version;
+  pkg.versions[version]._id = name + '@' + version;
   pkg.name = name;
+  pkg['dist-tags'] = {latest: version};
   return pkg;
 };

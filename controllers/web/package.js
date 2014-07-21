@@ -14,6 +14,7 @@
  * Module dependencies.
  */
 
+var debug = require('debug')('cnpmjs.org:controllers:web:package');
 var bytes = require('bytes');
 var giturl = require('giturl');
 var moment = require('moment');
@@ -32,10 +33,13 @@ var setDownloadURL = require('../../lib/common').setDownloadURL;
 var ModuleStar = require('../../proxy/module_star');
 var packageService = require('../../services/package');
 
-exports.display = function *(next) {
+exports.display = function* (next) {
   var params = this.params;
-  var name = params.name;
-  var tag = params.version;
+  // normal: {name: $name, version: $version}
+  // scope: [$name, $version]
+  var name = params.name || params[0];
+  var tag = params.version || params[1];
+  debug('display %s with %j', name, params);
 
   var getPackageMethod;
   var getPackageArgs;
@@ -129,7 +133,8 @@ exports.display = function *(next) {
 
 exports.search = function *(next) {
   var params = this.params;
-  var word = params.word;
+  var word = params.word || params[0];
+  debug('search %j', word);
   var result = yield Module.search(word);
 
   var match = null;
@@ -192,8 +197,8 @@ exports.rangeSearch = function *(next) {
   };
 };
 
-exports.displaySync = function *(next) {
-  var name = this.params.name || this.query.name;
+exports.displaySync = function* (next) {
+  var name = this.params.name || this.params[0] || this.query.name;
   yield this.render('sync', {
     name: name,
     title: 'Sync - ' + name

@@ -262,9 +262,9 @@ describe('controllers/registry/module.test.js', function () {
         should.not.exist(err);
         var body = res.body;
         body.name.should.equal('mk2testmodule');
-        body.version.should.equal('0.0.1');
-        body._id.should.equal('mk2testmodule@0.0.1');
-        body.dist.tarball.should.containEql('/mk2testmodule/download/mk2testmodule-0.0.1.tgz');
+        body.version.should.equal('0.0.2');
+        body._id.should.equal('mk2testmodule@0.0.2');
+        body.dist.tarball.should.containEql('/mk2testmodule/download/mk2testmodule-0.0.2.tgz');
         done();
       });
     });

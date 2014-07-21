@@ -22,6 +22,9 @@ module.exports = function *notFound(next) {
   if (this.status && this.status !== 404) {
     return;
   }
+  if (this.body) {
+    return;
+  }
 
   var m = /^\/([\w\-\_\.]+)\/?$/.exec(this.url);
   debug('%s match %j', this.url, m);

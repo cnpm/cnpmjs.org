@@ -27,8 +27,8 @@ var webApp = require('../../servers/web');
 describe('controllers/sync.test.js', function () {
   before(function (done) {
     done = pedding(2, done);
-    registryApp.listen(0, done);
-    webApp.listen(0, done);
+    registryApp = registryApp.listen(0, done);
+    webApp = webApp.listen(0, done);
   });
 
   afterEach(mm.restore);
@@ -114,6 +114,18 @@ describe('controllers/sync.test.js', function () {
         res.body.should.have.keys('ok', 'log');
         done();
       });
+    });
+  });
+
+  describe('scope package', function () {
+    it('should sync scope package not found', function (done) {
+      request(webApp)
+      .put('/sync/@cnpm/not-exists-package')
+      .expect({
+        "ok":false,
+        "reason":"can not found @cnpm/not-exists-package in the source registry"
+      })
+      .expect(404, done);
     });
   });
 });
