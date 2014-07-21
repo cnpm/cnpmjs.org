@@ -1,4 +1,11 @@
 
+0.8.1 / 2014-07-21
+==================
+
+ * add more test cases
+ * support default @org. close #376
+ * hotfix redis init error
+
 0.8.0 / 2014-07-21
 ==================
 
