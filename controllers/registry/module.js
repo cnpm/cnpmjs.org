@@ -46,14 +46,29 @@ var downloadAsReadStream = require('../utils').downloadAsReadStream;
  * GET /:name
  */
 exports.show = function* (next) {
-  var name = this.params.name || this.params[0];
+  var orginalName = this.params.name || this.params[0];
+  var name = orginalName;
   var rs = yield [
     Module.getLastModified(name),
     Module.listTags(name)
   ];
   var modifiedTime = rs[0];
   var tags = rs[1];
-  debug('show %s, last modified: %s, tags: %j', name, modifiedTime, tags);
+  var adaptDefaultScope = false;
+
+  if (tags.length === 0 && config.defaultScope && name.indexOf(config.defaultScope) === 0) {
+    // remove default scope name and retry
+    name = name.split('/')[1];
+    rs = yield [
+      Module.getLastModified(name),
+      Module.listTags(name)
+    ];
+    modifiedTime = rs[0];
+    tags = rs[1];
+    adaptDefaultScope = true;
+  }
+
+  debug('show %s(%s), last modified: %s, tags: %j', name, orginalName, modifiedTime, tags);
   if (modifiedTime) {
     // find out the latest modfied time
     // because update tags only modfied tag, wont change module gmt_modified
@@ -101,8 +116,8 @@ exports.show = function* (next) {
     if (unpublishedInfo) {
       this.status = 404;
       this.body = {
-        _id: name,
-        name: name,
+        _id: orginalName,
+        name: orginalName,
         time: {
           modified: unpublishedInfo.package.time,
           unpublished: unpublishedInfo.package,
@@ -116,7 +131,7 @@ exports.show = function* (next) {
   // if module not exist in this registry,
   // sync the module backend and return package info from official registry
   if (rows.length === 0) {
-    if (!this.allowSync) {
+    if (!this.allowSync || adaptDefaultScope) {
       this.status = 404;
       this.body = {
         error: 'not_found',
@@ -169,6 +184,12 @@ exports.show = function* (next) {
     if (!createdTime || t < createdTime) {
       createdTime = t;
     }
+
+    if (adaptDefaultScope) {
+      // change to orginal name for default scope was removed above
+      pkg.name = orginalName;
+      pkg._id = orginalName + '@' + pkg.version;
+    }
   }
 
   if (modifiedTime && createdTime) {
@@ -204,9 +225,9 @@ exports.show = function* (next) {
   }
 
   var info = {
-    _id: name,
+    _id: orginalName,
     _rev: rev,
-    name: name,
+    name: orginalName,
     description: pkg.description,
     "dist-tags": distTags,
     maintainers: pkg.maintainers,
@@ -224,7 +245,7 @@ exports.show = function* (next) {
   info.bugs = pkg.bugs;
   info.license = pkg.license;
 
-  debug('show module %s: %s, latest: %s', name, rev, latestMod.version);
+  debug('show module %s: %s, latest: %s', orginalName, rev, latestMod.version);
   this.body = info;
 };
 

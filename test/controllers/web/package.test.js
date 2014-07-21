@@ -18,31 +18,29 @@ var should = require('should');
 var request = require('supertest');
 var mm = require('mm');
 var path = require('path');
+var pedding = require('pedding');
 var mysql = require('../../../common/mysql');
 var app = require('../../../servers/web');
 var registry = require('../../../servers/registry');
 var pkg = require('../../../controllers/web/package');
+var utils = require('../../utils');
 
 var fixtures = path.join(path.dirname(path.dirname(__dirname)), 'fixtures');
 
 describe('controllers/web/package.test.js', function () {
-  var baseauth = 'Basic ' + new Buffer('cnpmjstest10:cnpmjstest10').toString('base64');
-
   before(function (done) {
-    registry.listen(0, function () {
-      var pkg = require(path.join(fixtures, 'package_and_tgz.json'));
+    done = pedding(2, done);
+    registry = registry.listen(0, function () {
+      // name: mk2testmodule
+      var pkg = utils.getPackage('mk2testmodule', '0.0.1', utils.admin);
       request(registry)
       .put('/' + pkg.name)
-      .set('authorization', baseauth)
+      .set('authorization', utils.adminAuth)
       .send(pkg)
-      .expect(201, function () {
-        app.listen(0, done);
-      });
+      .end(done);
     });
-  });
 
-  after(function (done) {
-    app.close(done);
+    app = app.listen(0, done);
   });
 
   afterEach(mm.restore);

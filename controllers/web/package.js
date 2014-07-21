@@ -37,7 +37,8 @@ exports.display = function* (next) {
   var params = this.params;
   // normal: {name: $name, version: $version}
   // scope: [$name, $version]
-  var name = params.name || params[0];
+  var orginalName = params.name || params[0];
+  var name = orginalName;
   var tag = params.version || params[1];
   debug('display %s with %j', name, params);
 
@@ -51,24 +52,29 @@ exports.display = function* (next) {
     getPackageMethod = 'getByTag';
     getPackageArgs = [name, tag || 'latest'];
   }
+
+  var pkg = yield Module[getPackageMethod].apply(Module, getPackageArgs);
+  if (!pkg && config.defaultScope && name.indexOf(config.defaultScope) === 0) {
+    name = name.split('/')[1];
+    pkg = yield Module[getPackageMethod].apply(Module, [name, getPackageArgs[1]]);
+  }
+
+  if (!pkg || !pkg.package) {
+    return yield* next;
+  }
+
   var r = yield [
-    Module[getPackageMethod].apply(Module, getPackageArgs),
     down.total(name),
     ModuleDeps.list(name),
     ModuleStar.listUsers(name),
     packageService.listMaintainers(name)
   ];
-  var pkg = r[0];
-  var download = r[1];
-  var dependents = (r[2] || []).map(function (item) {
+  var download = r[0];
+  var dependents = (r[1] || []).map(function (item) {
     return item.deps;
   });
-  var users = r[3];
-  var maintainers = r[4];
-
-  if (!pkg || !pkg.package) {
-    return yield* next;
-  }
+  var users = r[2];
+  var maintainers = r[3];
 
   pkg.package.fromNow = moment(pkg.publish_time).fromNow();
   pkg = pkg.package;
@@ -122,6 +128,10 @@ exports.display = function* (next) {
 
   if (pkg.dist) {
     pkg.dist.size = bytes(pkg.dist.size || 0);
+  }
+
+  if (pkg.name !== orginalName) {
+    pkg.name = orginalName;
   }
 
   yield this.render('package', {

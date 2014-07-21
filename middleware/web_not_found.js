@@ -26,7 +26,11 @@ module.exports = function *notFound(next) {
     return;
   }
 
-  var m = /^\/([\w\-\_\.]+)\/?$/.exec(this.url);
+  var m = /^\/([\w\-\.]+)\/?$/.exec(this.path);
+  if (!m) {
+    // scoped packages
+    m = /^\/(@[\w\-\.]+\/[\w\-\.]+)$/.exec(this.path);
+  }
   debug('%s match %j', this.url, m);
   if (m) {
     return this.redirect('/package/' + m[1]);
