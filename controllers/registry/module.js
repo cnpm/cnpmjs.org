@@ -56,16 +56,19 @@ exports.show = function* (next) {
   var tags = rs[1];
   var adaptDefaultScope = false;
 
-  if (tags.length === 0 && config.defaultScope && name.indexOf(config.defaultScope + '/') === 0) {
-    // remove default scope name and retry
-    name = name.split('/')[1];
-    rs = yield [
-      Module.getLastModified(name),
-      Module.listTags(name)
-    ];
-    modifiedTime = rs[0];
-    tags = rs[1];
-    adaptDefaultScope = true;
+  if (tags.length === 0) {
+    var adaptName = yield* Module.getAdaptName(name);
+    if (adaptName) {
+      adaptDefaultScope = true;
+      // remove default scope name and retry
+      name = adaptName;
+      rs = yield [
+        Module.getLastModified(name),
+        Module.listTags(name),
+      ];
+      modifiedTime = rs[0];
+      tags = rs[1];
+    }
   }
 
   debug('show %s(%s), last modified: %s, tags: %j', name, orginalName, modifiedTime, tags);
@@ -266,10 +269,13 @@ exports.get = function* (next) {
   debug('%s %s with %j', method, name, this.params);
 
   var mod = yield Module[method](name, queryLabel);
-  if (!mod && config.defaultScope && name.indexOf(config.defaultScope + '/') === 0) {
-    name = name.split('/')[1];
-    mod = yield Module[method](name, queryLabel);
-    adaptDefaultScope = true;
+  if (!mod) {
+    var adaptName = yield* Module.getAdaptName(name);
+    if (adaptName) {
+      name = adaptName;
+      mod = yield Module[method](name, queryLabel);
+      adaptDefaultScope = true;
+    }
   }
 
   if (mod) {

@@ -22,6 +22,7 @@ var config = require('../../../../config');
 var registry = require('../../../../servers/registry');
 var web = require('../../../../servers/web');
 var utils = require('../../../utils');
+var Module = require('../../../../proxy/module');
 
 describe('controllers/web/package/scope_package.test.js', function () {
   var pkgname = '@cnpm/test-web-scope-package';
@@ -160,6 +161,19 @@ describe('controllers/web/package/scope_package.test.js', function () {
       mm(config, 'defaultScope', '@cnpm');
       request(web)
       .get('/package/@cnpm/test-default-web-scope-package-not-exists')
+      .expect(404, done);
+    });
+
+    it('should 404 when pkg is not private package', function (done) {
+      var getByTag = Module.getByTag;
+      mm(Module, 'getByTag', function* (name, tag) {
+        var pkg = yield getByTag.call(Module, name, tag);
+        pkg && delete pkg.package._publish_on_cnpm;
+        return pkg;
+      });
+      mm(config, 'defaultScope', '@cnpm');
+      request(web)
+      .get('/package/@cnpm/test-default-web-scope-package')
       .expect(404, done);
     });
   });
