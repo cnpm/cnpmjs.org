@@ -1,4 +1,9 @@
 
+0.8.5 / 2014-07-22
+==================
+
+ * Only private package support default scoped. fixed #378
+
 0.8.4 / 2014-07-22
 ==================
 
