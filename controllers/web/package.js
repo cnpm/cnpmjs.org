@@ -54,9 +54,12 @@ exports.display = function* (next) {
   }
 
   var pkg = yield Module[getPackageMethod].apply(Module, getPackageArgs);
-  if (!pkg && config.defaultScope && name.indexOf(config.defaultScope + '/') === 0) {
-    name = name.split('/')[1];
-    pkg = yield Module[getPackageMethod].apply(Module, [name, getPackageArgs[1]]);
+  if (!pkg) {
+    var adaptName = yield* Module.getAdaptName(name);
+    if (adaptName) {
+      name = adaptName;
+      pkg = yield Module[getPackageMethod].apply(Module, [name, getPackageArgs[1]]);
+    }
   }
 
   if (!pkg || !pkg.package) {

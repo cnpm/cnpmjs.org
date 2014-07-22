@@ -27,3 +27,4 @@ bin/mysql.js
 bin/test.sql
 coverage/
 config/web_readme.md
+.tmp/

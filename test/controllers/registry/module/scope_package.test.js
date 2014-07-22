@@ -20,6 +20,7 @@ var mm = require('mm');
 var config = require('../../../../config');
 var app = require('../../../../servers/registry');
 var utils = require('../../../utils');
+var Module = require('../../../../proxy/module');
 
 describe('controllers/registry/module/scope_package.test.js', function () {
   var pkgname = '@cnpm/test-scope-package';
@@ -235,6 +236,32 @@ describe('controllers/registry/module/scope_package.test.js', function () {
 
       it('should 404 when scope not match', function (done) {
         mm(config, 'defaultScope', '@cnpm123');
+        request(app)
+        .get('/@cnpm/test-default-scope-package/latest')
+        .expect(404, done);
+      });
+
+      it('should show() 404 when adapt package is not private package', function (done) {
+        var getByTag = Module.getByTag;
+        mm(Module, 'getByTag', function* (name, tag) {
+          var pkg = yield getByTag.call(Module, name, tag);
+          pkg && delete pkg.package._publish_on_cnpm;
+          return pkg;
+        });
+        mm(config, 'defaultScope', '@cnpm');
+        request(app)
+        .get('/@cnpm/test-default-scope-package')
+        .expect(404, done);
+      });
+
+      it('should get() 404 when adapt package is not private package', function (done) {
+        var getByTag = Module.getByTag;
+        mm(Module, 'getByTag', function* (name, tag) {
+          var pkg = yield getByTag.call(Module, name, tag);
+          pkg && delete pkg.package._publish_on_cnpm;
+          return pkg;
+        });
+        mm(config, 'defaultScope', '@cnpm');
         request(app)
         .get('/@cnpm/test-default-scope-package/latest')
         .expect(404, done);
