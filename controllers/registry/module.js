@@ -261,25 +261,33 @@ exports.get = function* (next) {
   var version = semver.valid(tag);
   var method = version ? 'get' : 'getByTag';
   var queryLabel = version ? version : tag;
+  var orginalName = name;
+  var adaptDefaultScope = false;
   debug('%s %s with %j', method, name, this.params);
 
-  var rs = yield [
-    Module[method](name, queryLabel),
-    packageService.listMaintainers(name),
-  ];
-  var mod = rs[0];
+  var mod = yield Module[method](name, queryLabel);
+  if (!mod && config.defaultScope && name.indexOf(config.defaultScope + '/') === 0) {
+    name = name.split('/')[1];
+    mod = yield Module[method](name, queryLabel);
+    adaptDefaultScope = true;
+  }
+
   if (mod) {
     common.setDownloadURL(mod.package, this);
     mod.package._cnpm_publish_time = mod.publish_time;
-    var maintainers = rs[1];
+    var maintainers = yield* packageService.listMaintainers(name);
     if (maintainers.length > 0) {
       mod.package.maintainers = maintainers;
+    }
+    if (adaptDefaultScope) {
+      mod.package.name = orginalName;
+      mod.package._id = orginalName + '@' + mod.package.version;
     }
     this.body = mod.package;
     return;
   }
   // if not fond, sync from source registry
-  if (!this.allowSync) {
+  if (!this.allowSync || adaptDefaultScope) {
     this.status = 404;
     this.body = {
       error: 'not exist',
