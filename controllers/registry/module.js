@@ -304,8 +304,8 @@ exports.get = function* (next) {
 var _downloads = {};
 
 exports.download = function *(next) {
-  var name = this.params.name;
-  var filename = this.params.filename;
+  var name = this.params.name || this.params[0];
+  var filename = this.params.filename || this.params[1];
   var version = filename.slice(name.length + 1, -4);
   var row = yield Module.get(name, version);
   // can not get dist
@@ -314,6 +314,8 @@ exports.download = function *(next) {
   if (typeof nfs.url === 'function') {
     url = nfs.url(common.getCDNKey(name, filename));
   }
+
+  debug('download %s %s %s %s', name, filename, version, url);
 
   if (!row || !row.package || !row.package.dist) {
     if (!url) {
@@ -568,7 +570,7 @@ exports.updateOrRemove = function* (next) {
 };
 
 exports.updateMaintainers = function* (next) {
-  var name = this.params.name;
+  var name = this.params.name || this.params[0];
   var body = this.request.body;
   debug('updateMaintainers module %s, %j', name, body);
 
@@ -609,7 +611,7 @@ exports.updateMaintainers = function* (next) {
 
 exports.removeWithVersions = function* (next) {
   var username = this.user.name;
-  var name = this.params.name;
+  var name = this.params.name || this.params[0];
   // left versions
   var versions = this.request.body.versions || {};
 
@@ -696,12 +698,12 @@ exports.removeWithVersions = function* (next) {
 };
 
 exports.removeTar = function* (next) {
-  debug('remove tarball with filename: %s, id: %s', this.params.filename, this.params.rev);
-  var id = Number(this.params.rev);
-  var filename = this.params.filename;
-  var name = this.params.name;
-  var username = this.user.name;
+  var name = this.params.name || this.params[0];
+  var filename = this.params.filename || this.params[1];
+  var id = Number(this.params.rev || this.params[2]);
+  debug('remove tarball with filename: %s, id: %s', filename, id);
 
+  var username = this.user.name;
   if (isNaN(id)) {
     return yield* next;
   }
@@ -728,9 +730,10 @@ exports.removeTar = function* (next) {
 };
 
 exports.removeAll = function* (next) {
-  debug('remove all the module with name: %s, id: %s', this.params.name, this.params.rev);
-  var name = this.params.name;
+  var name = this.params.name || this.params[0];
   var username = this.user.name;
+  var rev = this.params.rev || this.params[1];
+  debug('remove all the module with name: %s, id: %s', name, rev);
 
   var mods = yield Module.listByName(name);
   debug('removeAll module %s: %d', name, mods.length);
@@ -839,8 +842,8 @@ exports.listAllModuleNames = function *() {
 // PUT /:name/:tag
 exports.updateTag = function* () {
   var version = this.request.body;
-  var tag = this.params.tag;
-  var name = this.params.name;
+  var name = this.params.name || this.params[0];
+  var tag = this.params.tag || this.params[1];
   debug('updateTag: %s %s to %s', name, version, tag);
 
   if (!version) {

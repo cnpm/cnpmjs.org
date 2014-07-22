@@ -44,28 +44,35 @@ function routes(app) {
 
   // module
   // scope package: params: [$name]
-  app.get(/\/(@[\w\-\.]+\/[\w\-\.]+)$/, syncByInstall, mod.show);
+  app.get(/^\/(@[\w\-\.]+\/[\w\-\.]+)$/, syncByInstall, mod.show);
   // scope package: params: [$name, $version]
-  app.get(/\/(@[\w\-\.]+\/[\w\-\.]+)\/([\w\.\-]+)$/, syncByInstall, mod.get);
+  app.get(/^\/(@[\w\-\.]+\/[\w\-\.]+)\/([\w\.\-]+)$/, syncByInstall, mod.get);
 
   app.get('/:name', syncByInstall, mod.show);
   app.get('/:name/:version', syncByInstall, mod.get);
   // try to add module
+  // app.put(/^\/(@[\w\-\.]+\/[\w\-\.]+)$/, login, publishable, mod.addPackageAndDist);
   app.put('/:name', login, publishable, mod.addPackageAndDist);
 
   // sync from source npm
   app.put('/:name/sync', sync.sync);
   app.get('/:name/sync/log/:id', sync.getSyncLog);
 
+  app.put(/^\/(@[\w\-\.]+\/[\w\-\.]+)\/([\w\-\.]+)/, login, mod.updateTag);
   app.put('/:name/:tag', login, mod.updateTag);
 
   // need limit by ip
+  app.get(/^\/(@[\w\-\.]+\/[\w\-\.]+)\/download\/(@[\w\-\.]+\/[\w\-\.]+)/, limit, mod.download);
   app.get('/:name/download/:filename', limit, mod.download);
 
   // delete tarball
+  app.delete(/^\/(@[\w\-\.]+\/[\w\-\.]+)\/download\/(@[\w\-\.]+\/[\w\-\.]+)\/\-rev\/([\w\-\.]+)/,
+    login, publishable, mod.removeTar);
   app.delete('/:name/download/:filename/-rev/:rev', login, publishable, mod.removeTar);
 
   // update module, unpublish will PUT this
+  app.put(/^\/(@[\w\-\.]+\/[\w\-\.]+)\/\-rev\/([\w\-\.]+)/, login, publishable, mod.updateOrRemove);
+  app.delete(/^\/(@[\w\-\.]+\/[\w\-\.]+)\/\-rev\/([\w\-\.]+)/, login, publishable, mod.removeAll);
   app.put('/:name/-rev/:rev', login, publishable, mod.updateOrRemove);
   app.delete('/:name/-rev/:rev', login, publishable, mod.removeAll);
 
