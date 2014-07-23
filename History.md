@@ -1,4 +1,9 @@
 
+0.8.7 / 2014-07-24
+==================
+
+ * fix unpublished info missing maintainers cause TypeError
+
 0.8.6 / 2014-07-23
 ==================
 
