@@ -1,0 +1,64 @@
+<div id="package">
+  <h1>
+    <%= package.name %>
+    <small>
+    (<a href="/sync/<%= package.name %>" target="_blank">SYNC</a> again from source npm registry)
+    </small>
+  </h1>
+
+  <p class="description">This package has been unpublished.</p>
+
+  <ul class="nav nav-tabs">
+    <li class="active"><a href="#meta">package.json</a></li>
+  </ul>
+
+  <table class="metadata active">
+    <tr>
+      <th>Description</th>
+      <td>
+        <%= package.unpublished.description %>
+      </td>
+    </tr>
+
+    <tr>
+      <th>Unpublished By</th>
+      <td>
+        <span class="user">
+          <a class="username" href="/~<%= package.unpublished.name %>">
+            <%= package.unpublished.name %>
+          </a>
+        </span>
+      </td>
+    </tr>
+
+    <tr>
+      <th>Unpublished On</th>
+      <td>
+        <%- package.unpublished.time %>
+      </td>
+    </tr>
+
+    <tr>
+      <th>Maintainers</th>
+      <td>
+      <% package.unpublished.maintainers.forEach(function (m) { %>
+        <span class="user">
+          <a class="username" href="/~<%= m.name %>">
+            <% if (m.gravatar) { %>
+            <img src="<%- m.gravatar %>" class="avatar">
+            <% } %>
+            <%= m.name %>
+          </a>
+        </span>
+      <% }) %>
+      </td>
+
+      <tr>
+        <th>Versions (<%- package.unpublished.versions.length %>)</th>
+        <td>
+        <%- package.unpublished.versions.reverse().slice(0, 20).join(', ') %> ...
+        </td>
+    </tr>
+
+  </table>
+</div>

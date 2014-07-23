@@ -23,6 +23,7 @@ var mysql = require('../../../common/mysql');
 var app = require('../../../servers/web');
 var registry = require('../../../servers/registry');
 var pkg = require('../../../controllers/web/package');
+var SyncModuleWorker = require('../../../proxy/sync_module_worker');
 var utils = require('../../utils');
 
 var fixtures = path.join(path.dirname(path.dirname(__dirname)), 'fixtures');
@@ -210,6 +211,30 @@ describe('controllers/web/package.test.js', function () {
       .expect(200)
       .expect(/Sync Package/)
       .expect(/Log/, done);
+    });
+  });
+
+  describe('unpublished package', function () {
+    before(function (done) {
+      var worker = new SyncModuleWorker({
+        name: ['browserjs'],
+        username: 'fengmk2'
+      });
+
+      worker.start();
+      worker.on('end', function () {
+        var names = worker.successes.concat(worker.fails);
+        names.sort();
+        names.should.eql(['browserjs']);
+        done();
+      });
+    });
+
+    it('should display unpublished info', function (done) {
+      request(app)
+      .get('/package/browserjs')
+      .expect(200)
+      .expect(/This package has been unpublished\./, done);
     });
   });
 });

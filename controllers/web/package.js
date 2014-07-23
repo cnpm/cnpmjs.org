@@ -32,6 +32,7 @@ var ModuleDeps = require('../../proxy/module_deps');
 var setDownloadURL = require('../../lib/common').setDownloadURL;
 var ModuleStar = require('../../proxy/module_star');
 var packageService = require('../../services/package');
+var ModuleUnpublished = require('../../proxy/module_unpublished');
 
 exports.display = function* (next) {
   var params = this.params;
@@ -63,6 +64,29 @@ exports.display = function* (next) {
   }
 
   if (!pkg || !pkg.package) {
+    // check if unpublished
+    var unpublishedInfo = yield* ModuleUnpublished.get(name);
+    debug('show unpublished %j', unpublishedInfo);
+    if (unpublishedInfo) {
+      var data = {
+        name: name,
+        unpublished: unpublishedInfo.package
+      };
+      data.unpublished.time = new Date(data.unpublished.time);
+      if (data.unpublished.maintainers) {
+        for (var i = 0; i < data.unpublished.maintainers.length; i++) {
+          var maintainer = data.unpublished.maintainers[i];
+          if (maintainer.email) {
+            maintainer.gravatar = gravatar.url(maintainer.email, {s: '50', d: 'retro'}, true);
+          }
+        }
+      }
+      yield this.render('package_unpublished', {
+        package: data
+      });
+      return;
+    }
+
     return yield* next;
   }
 
