@@ -1,4 +1,9 @@
 
+0.8.6 / 2014-07-23
+==================
+
+ * show unpublished info on web package page. fixes #381
+
 0.8.5 / 2014-07-22
 ==================
 
