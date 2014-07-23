@@ -13,12 +13,14 @@
   </ul>
 
   <table class="metadata active">
+    <% if (package.unpublished.description) { %>
     <tr>
       <th>Description</th>
       <td>
         <%= package.unpublished.description %>
       </td>
     </tr>
+    <% } %>
 
     <tr>
       <th>Unpublished By</th>
@@ -38,6 +40,7 @@
       </td>
     </tr>
 
+    <% if (package.unpublished.maintainers) { %>
     <tr>
       <th>Maintainers</th>
       <td>
@@ -52,13 +55,17 @@
         </span>
       <% }) %>
       </td>
-
-      <tr>
-        <th>Versions (<%- package.unpublished.versions.length %>)</th>
-        <td>
-        <%- package.unpublished.versions.reverse().slice(0, 20).join(', ') %> ...
-        </td>
     </tr>
+    <% } %>
+
+    <% if (package.unpublished.versions) { %>
+    <tr>
+      <th>Versions (<%- package.unpublished.versions.length %>)</th>
+      <td>
+      <%- package.unpublished.versions.reverse().slice(0, 20).join(', ') %> ...
+      </td>
+    </tr>
+    <% } %>
 
   </table>
 </div>
