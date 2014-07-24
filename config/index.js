@@ -120,6 +120,9 @@ var config = {
     '@cnpm',
     '@cnpmtest'
   ],
+
+  // redirect @cnpm/private-package => private-package
+  // forward compatbility for update from lower version cnpmjs.org
   adaptScope: true
 };
 

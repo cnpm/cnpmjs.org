@@ -25,11 +25,13 @@ module.exports = function* assertScope(next) {
   }
   var scope = name.split('/')[0];
   if (config.scopes.indexOf(scope) < 0) {
-    var err = util.format('scope %s not match legal scopes %j', scope, config.scopes);
-    err.status = 400;
-    err.code = 'SCOPE';
     debug('assert scope %s error', name);
-    throw err;
+    this.status = 400;
+    this.body = {
+      error: 'invalid scope',
+      reason: util.format('scope %s not match legal scopes %j', scope, config.scopes)
+    };
+    return;
   }
   yield* next;
 };
