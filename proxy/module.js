@@ -677,13 +677,17 @@ exports.removeTagsByNames = function* (moduleName, tagNames) {
   return yield mysql.query(DELETE_TAGS_BY_NAMES_SQL, [moduleName, tagNames]);
 };
 
+/**
+ * forward compatbility for update from lower version cnpmjs.org
+ * redirect @scope/name => name
+ */
 exports.getAdaptName = function* (name) {
-  if (!config.defaultScope || name.indexOf(config.defaultScope + '/') !== 0) {
+  if (!config.adaptScope) {
     return;
   }
   name = name.split('/')[1];
-  // only private module can adapt
   var pkg = yield exports.getByTag(name, 'latest');
+  // only private module can adapt
   if (pkg && pkg.package._publish_on_cnpm) {
     return name;
   }

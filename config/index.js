@@ -117,8 +117,10 @@ var config = {
   },
   enableCompress: false, // enable gzip response or not
   scopes: [
-    '@cnpm'
+    '@cnpm',
+    '@cnpmtest'
   ],
+  adaptScope: true
 };
 
 // load config/config.js, everything in config.js will cover the same key in index.js
