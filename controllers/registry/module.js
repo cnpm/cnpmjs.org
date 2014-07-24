@@ -572,7 +572,9 @@ exports.addPackageAndDist = function *(next) {
 
 // PUT /:name/-rev/:rev
 exports.updateOrRemove = function* (next) {
-  debug('updateOrRemove module %s, %s, %j', this.url, this.params.name, this.request.body);
+  var name = this.params.name || this.params[0];
+  debug('updateOrRemove module %s, %s, %j', this.url, name, this.request.body);
+
   var body = this.request.body;
   if (body.versions) {
     yield* exports.removeWithVersions.call(this, next);
