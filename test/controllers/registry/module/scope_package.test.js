@@ -53,6 +53,13 @@ describe('controllers/registry/module/scope_package.test.js', function () {
 
   afterEach(mm.restore);
 
+  it('should get 404 when do not support scope', function (done) {
+    mm(config, 'scopes', []);
+    request(app)
+    .get('/@invalid/test')
+    .expect(404, done);
+  });
+
   it('should get 400 when scope not match', function (done) {
     request(app)
     .get('/@invalid/test')

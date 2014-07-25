@@ -1,11 +1,11 @@
 /**!
  * cnpmjs.org - middleware/scope.js
  *
- * Copyright(c) fengmk2 and other contributors.
+ * Copyright(c) cnpmjs.org and other contributors.
  * MIT Licensed
  *
  * Authors:
- *   fengmk2 <fengmk2@gmail.com> (http://fengmk2.github.com)
+ *   dead-horse <dead_borse@qq.com> (https://github.com/dead-horse)
  */
 
 'use strict';
@@ -20,8 +20,10 @@ var util = require('util');
 
 module.exports = function* assertScope(next) {
   var name = this.params[0];
+  // if config.scopes.length === 0, means do not support scope
+  // respond 404
   if (!name || !config.scopes || !config.scopes.length) {
-    return yield* next;
+    return;
   }
   var scope = name.split('/')[0];
   if (config.scopes.indexOf(scope) < 0) {

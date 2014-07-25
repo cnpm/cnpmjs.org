@@ -35,8 +35,8 @@ var logger = module.exports = Logger({
 });
 
 var to = [];
-for (var name in config.admins) {
-  to.push(config.admins[name]);
+for (var user in config.admins) {
+  to.push(config.admins[user]);
 }
 
 function errorFormater(err) {

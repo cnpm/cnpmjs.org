@@ -9,6 +9,7 @@
  */
 
 'use strict';
+/* jshint -W032 */
 
 /**
  * Module dependencies.
@@ -26,7 +27,7 @@ exports.create = function (data, callback) {
     name: data.name,
     username: data.username,
     log: ''
-  }
+  };
   mysql.query(INSERT_LOG_SQL, [args], function (err, result) {
     if (err) {
       return callback(err);
