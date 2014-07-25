@@ -175,6 +175,25 @@ describe('controllers/registry/module/scope_package.test.js', function () {
         });
       });
 
+      it('should adapt /@cnpmtest/test-default-scope-package => /test-default-scope-package', function (done) {
+        mm(config, 'adaptScope', true);
+        request(app)
+        .get('/@cnpmtest/test-default-scope-package')
+        .expect(200, function (err, res) {
+          should.not.exist(err);
+          var pkg = res.body;
+          pkg._id.should.equal('@cnpmtest/test-default-scope-package');
+          pkg.name.should.equal('@cnpmtest/test-default-scope-package');
+          pkg.versions.should.have.keys('0.0.1');
+          pkg['dist-tags'].latest.should.equal('0.0.1');
+          pkg.versions['0.0.1'].name.should.equal('@cnpmtest/test-default-scope-package');
+          pkg.versions['0.0.1']._id.should.equal('@cnpmtest/test-default-scope-package@0.0.1');
+          pkg.versions['0.0.1'].dist.tarball
+            .should.containEql('/test-default-scope-package/download/test-default-scope-package-0.0.1.tgz');
+          done();
+        });
+      });
+
       it('should not adapt when adaptScope is false', function (done) {
         mm(config, 'adaptScope', false);
         request(app)
