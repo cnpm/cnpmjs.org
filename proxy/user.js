@@ -21,51 +21,9 @@ var config = require('../config');
 var mysql = require('../common/mysql');
 var multiline = require('multiline');
 
-var SELECT_USER_SQL = multiline(function () {;/*
-  SELECT
-    id, rev, name, email, salt, password_sha, ip,
-    roles, json, npm_user, gmt_create, gmt_modified
-  FROM
-    user
-  WHERE
-    name=?;
-*/});
-exports.get = function (name, callback) {
-  mysql.queryOne(SELECT_USER_SQL, [name], function (err, row) {
-    if (row) {
-      try {
-        row.roles = row.roles ? JSON.parse(row.roles) : [];
-      } catch (e) {
-        row.roles = [];
-      }
-      try {
-        row.json = row.json ? JSON.parse(row.json) : null;
-      } catch (e) {
-        row.json = null;
-      }
-    }
-    callback(err, row);
-  });
-};
-
 function passwordSha(password, salt) {
   return utility.sha1(password + salt);
 }
-
-exports.auth = function (name, password, callback) {
-  exports.get(name, function (err, row) {
-    if (err || !row) {
-      return callback(err, row);
-    }
-
-    var sha = passwordSha(password, row.salt);
-    if (row.password_sha !== sha) {
-      row = null;
-    }
-    callback(null, row);
-  });
-};
-
 
 var INSERT_USER_SQL = 'INSERT INTO user SET ?';
 exports.add = function (user, callback) {
@@ -144,7 +102,42 @@ thunkify(exports);
 
 exports.passwordSha = passwordSha;
 
-exports.saveNpmUser = function *(user) {
+var SELECT_USER_SQL = 'SELECT \
+    id, rev, name, email, salt, password_sha, ip, \
+    roles, json, npm_user, gmt_create, gmt_modified \
+  FROM \
+    user \
+  WHERE \
+    name=?;';
+exports.get = function* (name) {
+  var row = yield mysql.queryOne(SELECT_USER_SQL, [name]);
+  if (row) {
+    try {
+      row.roles = row.roles ? JSON.parse(row.roles) : [];
+    } catch (e) {
+      row.roles = [];
+    }
+    try {
+      row.json = row.json ? JSON.parse(row.json) : null;
+    } catch (e) {
+      row.json = null;
+    }
+  }
+  return row;
+};
+
+exports.auth = function* (name, password) {
+  var row = yield* exports.get(name);
+  if (row) {
+    var sha = passwordSha(password, row.salt);
+    if (row.password_sha !== sha) {
+      row = null;
+    }
+  }
+  return row;
+};
+
+exports.saveNpmUser = function* (user) {
   var sql = 'SELECT id, json FROM user WHERE name=?;';
   var row = yield mysql.queryOne(sql, [user.name]);
   if (!row) {
@@ -157,17 +150,22 @@ exports.saveNpmUser = function *(user) {
   }
 };
 
-var LIST_BY_NAMES_SQL = multiline(function () {;/*
-  SELECT
-    id, name, email, json
-  FROM
-    user
-  WHERE
-    name in (?);
-*/});
-exports.listByNames = function *(names) {
+var LIST_BY_NAMES_SQL = 'SELECT \
+    id, name, email, json \
+  FROM \
+    user \
+  WHERE \
+    name in (?);';
+exports.listByNames = function* (names) {
   if (names.length === 0) {
     return [];
   }
   return yield mysql.query(LIST_BY_NAMES_SQL, [names]);
+};
+
+var SEARCH_SQL = 'SELECT id, name, email, json FROM user WHERE name LIKE ? LIMIT ?;';
+exports.search = function* (query, options) {
+  var limit = options.limit;
+  query = query + '%';
+  return yield mysql.query(SEARCH_SQL, [query, limit]);
 };

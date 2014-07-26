@@ -92,7 +92,7 @@ function ensurePasswordSalt(user, body) {
 //   type: 'user',
 //   roles: [],
 //   date: '2014-03-15T02:39:25.696Z' }
-exports.add = function *() {
+exports.add = function* () {
   var name = this.params.name;
   var body = this.request.body || {};
   var user = {
@@ -114,7 +114,21 @@ exports.add = function *() {
     };
     return;
   }
-  debug('add user: %j', user);
+
+  debug('add user: %j', body);
+
+  if (body.password) {
+    var row = yield User.auth(body.name, body.password);
+    if (row) {
+      this.status = 201;
+      this.body = {
+        ok: true,
+        id: 'org.couchdb.user:' + body.name,
+        rev: row.rev
+      };
+      return;
+    }
+  }
 
   var existUser = yield User.get(name);
   if (existUser) {
@@ -182,6 +196,8 @@ exports.update = function *(next) {
     rev: body.rev || body._rev,
     // roles: body.roles || [],
   };
+
+  debug('update user %j', body);
 
   ensurePasswordSalt(user, body);
 

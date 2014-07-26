@@ -22,7 +22,6 @@ var common = require('../lib/common');
 module.exports = function (options) {
   return function *auth(next) {
     var session = yield *this.session;
-    debug('%s, %s, %j', this.url, this.sessionId, session);
     this.user = {};
 
     if (session.name) {
@@ -34,6 +33,7 @@ module.exports = function (options) {
 
     var authorization = (this.get('authorization') || '').split(' ')[1] || '';
     authorization = authorization.trim();
+    debug('%s with %j', this.url, authorization);
     if (!authorization) {
       return yield *next;
     }
