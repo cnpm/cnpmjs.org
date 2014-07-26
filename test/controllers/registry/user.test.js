@@ -124,7 +124,7 @@ describe('controllers/registry/user.test.js', function () {
     });
   });
 
-  describe('POST /_session', function () {
+  describe.skip('POST /_session', function () {
     it('should 500 auth error by user.auth', function (done) {
       mm.error(user, 'auth', 'mock error');
       request(app)

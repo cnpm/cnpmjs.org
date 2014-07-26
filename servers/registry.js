@@ -22,10 +22,15 @@ var middlewares = require('koa-middlewares');
 var routes = require('../routes/registry');
 var logger = require('../common/logger');
 var config = require('../config');
-var session = require('../common/session');
+// var session = require('../common/session');
 var auth = require('../middleware/auth');
 var staticCache = require('../middleware/static');
 var notFound = require('../middleware/registry_not_found');
+
+if (!config.userService) {
+  var DefaultUserService = require('../services/default_user_service');
+  config.userService = new DefaultUserService();
+}
 
 middlewares.jsonp(app);
 app.use(middlewares.rt({headerName: 'X-ReadTime'}));
@@ -34,7 +39,7 @@ app.use(staticCache);
 
 app.keys = ['todokey', config.sessionSecret];
 app.proxy = true;
-app.use(session);
+// app.use(session);
 app.use(middlewares.bodyParser({jsonLimit: config.jsonLimit}));
 app.use(auth());
 app.use(notFound);

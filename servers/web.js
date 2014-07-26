@@ -21,7 +21,7 @@ var fs = require('fs');
 var koa = require('koa');
 var middlewares = require('koa-middlewares');
 var markdown = require('koa-markdown');
-var session = require('../common/session');
+// var session = require('../common/session');
 var opensearch = require('../middleware/opensearch');
 var notFound = require('../middleware/web_not_found');
 var staticCache = require('../middleware/static');
@@ -29,6 +29,11 @@ var auth = require('../middleware/auth');
 var routes = require('../routes/web');
 var logger = require('../common/logger');
 var config = require('../config');
+
+if (!config.userService) {
+  var DefaultUserService = require('../services/default_user_service');
+  config.userService = new DefaultUserService();
+}
 
 var app = koa();
 
@@ -41,7 +46,7 @@ app.use(staticCache);
 app.use(opensearch);
 app.keys = ['todokey', config.sessionSecret];
 app.proxy = true;
-app.use(session);
+// app.use(session);
 app.use(middlewares.bodyParser());
 app.use(auth());
 app.use(notFound);

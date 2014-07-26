@@ -51,59 +51,51 @@ describe('proxy/user.test.js', function () {
 
   describe('get()', function () {
     before(initUser);
-    it('should get user ok', function (done) {
-      user.get('mockuser', function (err, data) {
-        should.not.exist(err);
-        data.should.have.keys('id', 'rev', 'name', 'email', 'salt',
-          'json', 'npm_user',
-          'password_sha', 'ip', 'roles', 'gmt_create', 'gmt_modified');
-        done();
-      });
+    it('should get user ok', function* () {
+      var data = yield* user.get('mockuser');
+      data.should.have.keys('id', 'rev', 'name', 'email', 'salt',
+        'json', 'npm_user',
+        'password_sha', 'ip', 'roles', 'gmt_create', 'gmt_modified');
     });
 
-    it('should get error when mysql error', function (done) {
+    it('should get error when mysql error', function* () {
       mm.error(mysql, 'query', 'mock error');
-      user.get('mockuser', function (err) {
+      try {
+        yield* user.get('mockuser');
+        new Error('should not run this');
+      } catch (err) {
         err.message.should.equal('mock error');
-        done();
-      });
+      }
     });
   });
 
   describe('auth()', function () {
     before(initUser);
-    it('should auth user ok', function (done) {
-      user.auth(mockUser.name, mockUser.password, function (err, data) {
-        should.not.exist(err);
-        data.should.have.keys('id', 'rev', 'name', 'email', 'salt',
-          'json', 'npm_user',
-          'password_sha', 'ip', 'roles', 'gmt_create', 'gmt_modified');
-        done();
-      });
+    it('should auth user ok', function* () {
+      var data = yield* user.auth(mockUser.name, mockUser.password);
+      data.should.have.keys('id', 'rev', 'name', 'email', 'salt',
+        'json', 'npm_user',
+        'password_sha', 'ip', 'roles', 'gmt_create', 'gmt_modified');
     });
 
-    it('should auth user fail when user not exist', function (done) {
-      user.auth('notexistmockuser', '123', function (err, data) {
-        should.not.exist(err);
-        should.not.exist(data);
-        done();
-      });
+    it('should auth user fail when user not exist', function* () {
+      var data = yield* user.auth('notexistmockuser', '123');
+      should.not.exist(data);
     });
 
-    it('should auth fail when password error', function (done) {
-      user.auth(mockUser.name, '123', function (err, data) {
-        should.not.exist(err);
-        should.not.exist(data);
-        done();
-      });
+    it('should auth fail when password error', function* () {
+      var data = yield* user.auth(mockUser.name, '123');
+      should.not.exist(data);
     });
 
-    it('should auth error when mysql error', function (done) {
+    it('should auth error when mysql error', function* () {
       mm.error(mysql, 'query', 'mock error');
-      user.auth(mockUser.name, '123', function (err, data) {
+      try {
+        yield* user.auth(mockUser.name, '123');
+        new Error('should not run this');
+      } catch (err) {
         err.message.should.equal('mock error');
-        done();
-      });
+      }
     });
   });
 
