@@ -123,7 +123,10 @@ var config = {
 
   // redirect @cnpm/private-package => private-package
   // forward compatbility for update from lower version cnpmjs.org
-  adaptScope: true
+  adaptScope: true,
+
+  // force publish with scope
+  forcePublishWithScope: true,
 };
 
 // load config/config.js, everything in config.js will cover the same key in index.js

@@ -63,11 +63,7 @@ describe('controllers/registry/module/scope_package.test.js', function () {
   it('should get 400 when scope not match', function (done) {
     request(app)
     .get('/@invalid/test')
-    .expect(400)
-    .expect( {
-      error: 'invalid scope',
-      reason: 'scope @invalid not match legal scopes ["@cnpm","@cnpmtest"]'
-    }, done);
+    .expect(404, done);
   });
 
   it('should get scope package info: /@scope%2Fname', function (done) {

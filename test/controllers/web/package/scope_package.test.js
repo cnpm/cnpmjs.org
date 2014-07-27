@@ -56,23 +56,6 @@ describe('controllers/web/package/scope_package.test.js', function () {
 
   afterEach(mm.restore);
 
-  it('should get 404 when do not support scope', function (done) {
-    mm(config, 'scopes', []);
-    request(web)
-    .get('/package/@invalid/test')
-    .expect(404, done);
-  });
-
-  it('should get 400 when scope not match', function (done) {
-    request(web)
-    .get('/package/@invalid/test')
-    .expect(400)
-    .expect( {
-      error: 'invalid scope',
-      reason: 'scope @invalid not match legal scopes ["@cnpm","@cnpmtest"]'
-    }, done);
-  });
-
   it('should show scope package info page: /@scope%2Fname', function (done) {
     request(web)
     .get('/package' + pkgURL)
@@ -161,7 +144,7 @@ describe('controllers/web/package/scope_package.test.js', function () {
       mm(config, 'adaptScope', true);
       request(web)
       .get('/package/@cnpm123/test-default-web-scope-package')
-      .expect(400, done);
+      .expect(404, done);
     });
 
     it('should not adapt', function (done) {
