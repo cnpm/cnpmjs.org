@@ -683,9 +683,12 @@ exports.removeTagsByNames = function* (moduleName, tagNames) {
  * redirect @scope/name => name
  */
 exports.getAdaptName = function* (name) {
-  if (!config.adaptScope) {
+  if (!config.scopes
+    || !config.scopes.length
+    || !config.adaptScope) {
     return;
   }
+
   var tmp = name.split('/');
   var scope = tmp[0];
   name = tmp[1];
