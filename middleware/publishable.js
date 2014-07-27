@@ -45,9 +45,9 @@ module.exports = function *publishable(next) {
   }
 
   // none-scope
-  // if (checkScope(this)) {
+  if (checkNoneScope(this)) {
     return yield* next;
-  // }
+  }
 };
 
 /**

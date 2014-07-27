@@ -420,6 +420,7 @@ describe('controllers/registry/module.test.js', function () {
 
     it('should 403 when not maintainer update in public mode', function (done) {
       mm(config, 'enablePrivate', false);
+      mm(config, 'forcePublishWithScope', false);
       request(app)
       .put('/mk2testmodule/-rev/1')
       .send({
@@ -491,6 +492,7 @@ describe('controllers/registry/module.test.js', function () {
     it('should try to add return 400 when not module user and only next module exists',
     function (done) {
       mm(config, 'enablePrivate', false);
+      mm(config, 'forcePublishWithScope', false);
       request(app)
       .put('/' + pkg.name)
       .set('authorization', baseauthOther)

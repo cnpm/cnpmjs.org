@@ -25,6 +25,9 @@ exports.adminAuth = 'Basic ' + new Buffer(admin + ':' + admin).toString('base64'
 var otherUser = exports.otherUser = 'cnpmjstest101';
 exports.otherUserAuth = 'Basic ' + new Buffer(otherUser + ':' + otherUser).toString('base64');
 
+var secondUser = exports.secondUser = 'cnpmjstest102';
+exports.secondUserAuth = 'Basic ' + new Buffer(secondUser + ':' + secondUser).toString('base64');
+
 var _pkg = fs.readFileSync(path.join(fixtures, 'package_and_tgz.json'));
 
 exports.getPackage = function (name, version, user) {

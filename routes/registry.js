@@ -58,21 +58,21 @@ function routes(app) {
   app.put('/:name/sync', sync.sync);
   app.get('/:name/sync/log/:id', sync.getSyncLog);
 
-  app.put(/^\/(@[\w\-\.]+\/[\w\-\.]+)\/([\w\-\.]+)/, login, mod.updateTag);
+  app.put(/^\/(@[\w\-\.]+\/[\w\-\.]+)\/([\w\-\.]+)$/, login, mod.updateTag);
   app.put('/:name/:tag', login, mod.updateTag);
 
   // need limit by ip
-  app.get(/^\/(@[\w\-\.]+\/[\w\-\.]+)\/download\/(@[\w\-\.]+\/[\w\-\.]+)/, limit, mod.download);
+  app.get(/^\/(@[\w\-\.]+\/[\w\-\.]+)\/download\/(@[\w\-\.]+\/[\w\-\.]+)$/, limit, mod.download);
   app.get('/:name/download/:filename', limit, mod.download);
 
   // delete tarball
-  app.delete(/^\/(@[\w\-\.]+\/[\w\-\.]+)\/download\/(@[\w\-\.]+\/[\w\-\.]+)\/\-rev\/([\w\-\.]+)/,
+  app.delete(/^\/(@[\w\-\.]+\/[\w\-\.]+)\/download\/(@[\w\-\.]+\/[\w\-\.]+)\/\-rev\/([\w\-\.]+)$/,
     login, publishable, mod.removeTar);
   app.delete('/:name/download/:filename/-rev/:rev', login, publishable, mod.removeTar);
 
   // update module, unpublish will PUT this
-  app.put(/^\/(@[\w\-\.]+\/[\w\-\.]+)\/\-rev\/([\w\-\.]+)/, login, publishable, mod.updateOrRemove);
-  app.delete(/^\/(@[\w\-\.]+\/[\w\-\.]+)\/\-rev\/([\w\-\.]+)/, login, publishable, mod.removeAll);
+  app.put(/^\/(@[\w\-\.]+\/[\w\-\.]+)\/\-rev\/([\w\-\.]+)$/, login, publishable, mod.updateOrRemove);
+  app.delete(/^\/(@[\w\-\.]+\/[\w\-\.]+)\/\-rev\/([\w\-\.]+)$/, login, publishable, mod.removeAll);
   app.put('/:name/-rev/:rev', login, publishable, mod.updateOrRemove);
   app.delete('/:name/-rev/:rev', login, publishable, mod.removeAll);
 
