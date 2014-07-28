@@ -21,6 +21,7 @@ var app = require('../../../servers/registry');
 var user = require('../../../proxy/user');
 var mysql = require('../../../common/mysql');
 var config = require('../../../config');
+var UserService = require('../../../services/user');
 
 describe('controllers/registry/user.test.js', function () {
   before(function (done) {
@@ -236,6 +237,110 @@ describe('controllers/registry/user.test.js', function () {
         reason: 'Login fail, please check your login name and password'
       })
       .expect(401, done);
+    });
+  });
+
+  describe('config.customUserService = true', function () {
+    beforeEach(function () {
+      mm(config, 'customUserService', true);
+    });
+
+    afterEach(mm.restore);
+
+    it('should show custom user info: admin', function (done) {
+      mm(UserService, 'get', function* () {
+        return {
+          login: 'mock_custom_user',
+          email: 'mock_custom_user@cnpmjs.org',
+          name: 'mock_custom_user fullname',
+          avatar_url: 'avatar_url',
+          html_url: 'html_url',
+          im_url: '',
+          site_admin: true,
+          scopes: ['@test-user-scope']
+        };
+      });
+      request(app)
+      .get('/-/user/org.couchdb.user:mock_custom_user')
+      .expect(200, function (err, res) {
+        should.not.exist(err);
+        var user = res.body;
+        delete user._cnpm_meta.gmt_create;
+        delete user._cnpm_meta.gmt_modified;
+        delete user._cnpm_meta.id;
+        delete user.date;
+
+        user.should.eql({
+          _id: 'org.couchdb.user:mock_custom_user',
+          _rev: '1-mock_custom_user',
+          name: 'mock_custom_user',
+          email: 'mock_custom_user@cnpmjs.org',
+          type: 'user',
+          roles: [],
+          // date: '2014-07-28T16:46:36.000Z',
+          avatar: 'avatar_url',
+          fullname: 'mock_custom_user fullname',
+          homepage: 'html_url',
+          _cnpm_meta:
+           {
+            //  id: 4,
+             npm_user: false,
+             custom_user: true,
+            //  gmt_create: '2014-07-28T16:46:36.000Z',
+            //  gmt_modified: '2014-07-28T16:46:36.000Z',
+             admin: true,
+             scopes: [ '@test-user-scope' ] }
+        });
+        done();
+      });
+    });
+
+    it('should show custom user info: not admin', function (done) {
+      mm(UserService, 'get', function* () {
+        return {
+          login: 'mock_custom_not_admin_user',
+          email: 'mock_custom_not_admin_user@cnpmjs.org',
+          name: 'mock_custom_not_admin_user fullname',
+          avatar_url: 'avatar_url',
+          html_url: 'html_url',
+          im_url: '',
+          site_admin: false,
+          scopes: ['@test-user-scope']
+        };
+      });
+      request(app)
+      .get('/-/user/org.couchdb.user:mock_custom_not_admin_user')
+      .expect(200, function (err, res) {
+        should.not.exist(err);
+        var user = res.body;
+        delete user._cnpm_meta.gmt_create;
+        delete user._cnpm_meta.gmt_modified;
+        delete user._cnpm_meta.id;
+        delete user.date;
+
+        user.should.eql({
+          _id: 'org.couchdb.user:mock_custom_not_admin_user',
+          _rev: '1-mock_custom_not_admin_user',
+          name: 'mock_custom_not_admin_user',
+          email: 'mock_custom_not_admin_user@cnpmjs.org',
+          type: 'user',
+          roles: [],
+          // date: '2014-07-28T16:46:36.000Z',
+          avatar: 'avatar_url',
+          fullname: 'mock_custom_not_admin_user fullname',
+          homepage: 'html_url',
+          _cnpm_meta:
+           {
+            //  id: 5,
+             npm_user: false,
+             custom_user: true,
+            //  gmt_create: '2014-07-28T16:46:36.000Z',
+            //  gmt_modified: '2014-07-28T16:46:36.000Z',
+             admin: false,
+             scopes: [ '@test-user-scope' ] }
+        });
+        done();
+      });
     });
   });
 });

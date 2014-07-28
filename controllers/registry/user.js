@@ -21,12 +21,27 @@ var crypto = require('crypto');
 var UserService = require('../../services/user');
 var User = require('../../proxy/user');
 var config = require('../../config');
+var common = require('../../lib/common');
 
-exports.show = function *(next) {
+exports.show = function* (next) {
   var name = this.params.name;
-  var user = yield User.get(name);
+  var isAdmin = common.isAdmin(name);
+  var scopes = config.scopes;
+  if (config.customUserService) {
+    var customUser = yield* UserService.get(name);
+    if (customUser) {
+      isAdmin = !!customUser.site_admin;
+      scopes = customUser.scopes;
+      var data = {
+        user: customUser
+      };
+      yield* User.saveCustomUser(data);
+    }
+  }
+
+  var user = yield* User.get(name);
   if (!user) {
-    return yield *next;
+    return yield* next;
   }
 
   var data = user.json;
@@ -41,12 +56,32 @@ exports.show = function *(next) {
       date: user.gmt_modified,
     };
   }
+
+  if (data.login) {
+    // custom user format
+    // convert to npm user format
+    data = {
+      _id: 'org.couchdb.user:' + user.name,
+      _rev: user.rev,
+      name: user.name,
+      email: user.email,
+      type: 'user',
+      roles: [],
+      date: user.gmt_modified,
+      avatar: data.avatar_url,
+      fullname: data.name || data.login,
+      homepage: data.html_url,
+    };
+  }
+
   data._cnpm_meta = {
     id: user.id,
-    npm_user: user.npm_user,
+    npm_user: user.npm_user === 1,
+    custom_user: user.npm_user === 2,
     gmt_create: user.gmt_create,
     gmt_modified: user.gmt_modified,
-    admin: !!config.admins[user.name],
+    admin: isAdmin,
+    scopes: scopes,
   };
 
   this.body = data;

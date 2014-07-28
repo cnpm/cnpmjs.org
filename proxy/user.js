@@ -153,18 +153,23 @@ exports.saveNpmUser = function* (user) {
 exports.saveCustomUser = function* (data) {
   var sql = 'SELECT id, json FROM user WHERE name=?;';
   var row = yield mysql.queryOne(sql, [data.user.name]);
+  var salt = data.salt || '0';
+  var password_sha = data.password_sha || '0';
+  var ip = data.ip || '0';
+  var rev = rev || '1-' + data.user.login;
+  var json = JSON.stringify(data.user);
   if (!row) {
     sql = 'INSERT INTO user(npm_user, json, rev, name, email, salt, password_sha, ip, gmt_create, gmt_modified) \
       VALUES(2, ?, ?, ?, ?, ?, ?, ?, now(), now());';
     yield mysql.query(sql, [
-      JSON.stringify(data.user), data.rev, data.user.login, data.user.email,
-      data.salt, data.password_sha, data.ip
+      json, rev, data.user.login, data.user.email,
+      salt, password_sha, ip
     ]);
   } else {
     sql = 'UPDATE user SET json=?, rev=?, salt=?, password_sha=?, ip=? WHERE id=?;';
     yield mysql.query(sql, [
-      JSON.stringify(data.user), data.rev,
-      data.salt, data.password_sha, data.ip,
+      json, rev,
+      salt, password_sha, ip,
       row.id
     ]);
   }
