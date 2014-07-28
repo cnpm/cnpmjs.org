@@ -30,7 +30,7 @@ describe('controllers/web/user.test.js', function () {
       .expect(200)
       .expect('content-type', 'text/html; charset=utf-8')
       .expect(/<div id="profile">/)
-      .expect(/Packages by /, done);
+      .expect(/Packages by/, done);
     });
 
     it('should get 404', function (done) {

@@ -7,14 +7,49 @@
 </style>
 <div id="profile">
   <h1>
-    Packages by <span style="color:#09f;"><%= user.name %></span>
+    Packages by
+      <% if (user.json.homepage) { %>
+        <span class="user">
+          <a class="username" target="_blank" href="<%= user.json.homepage %>">
+            <% if (user.json.avatar) { %>
+            <img src="<%= user.json.avatar %>" class="avatar">
+            <% } %>
+            <%= user.name %>
+          </a>
+        </span>
+      <% } else { %>
+        <span style="color:#09f;"><%= user.name %></span>
+      <% } %>
+    <% if (user.json.fullname) { %>
+      <small>(<%= user.json.fullname %>)</small>
+    <% } %>
     <% if (user.email) { %>
       <small>(<a href="mailto:<%= user.email %>"><%= user.email %></a>)</small>
     <% } %>
   </h1>
+  <table class="downloads">
+    <tbody>
+      <tr>
+        <th>Name</th>
+        <th>Last modified</th>
+        <th>Is admin</th>
+        <th>Publish scopes</th>
+      </tr>
+      <tr>
+        <td>@<%= user.json.fullname || user.name %></td>
+        <td><%- lastModified %></td>
+        <td><%- isAdmin %></td>
+        <td>
+          <%- scopes.map(function (scope) {
+            return '<a href="/browse/keyword/' + scope + '" target="_blank">' + scope +  '</a>';
+          }).join(' , ') %>
+        </td>
+      </tr>
+    </tbody>
+  </table>
   <hr />
   <% if (!packages.length) { %>
-    <div class="alert alert-warning">Can not found package by <%= user.name %>.</div>
+    <div class="alert alert-warning">Can not found any package by <%= user.name %>.</div>
   <% } %>
   <% for (var i = 0; i < packages.length; i++) { %>
     <div class="package">

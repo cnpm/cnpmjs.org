@@ -26,12 +26,13 @@ var common = require('../../lib/common');
 exports.show = function* (next) {
   var name = this.params.name;
   var isAdmin = common.isAdmin(name);
-  var scopes = config.scopes;
+  var scopes = config.scopes || [];
   if (config.customUserService) {
     var customUser = yield* UserService.get(name);
     if (customUser) {
       isAdmin = !!customUser.site_admin;
       scopes = customUser.scopes;
+
       var data = {
         user: customUser
       };
