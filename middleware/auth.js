@@ -15,9 +15,6 @@
  */
 
 var debug = require('debug')('cnpmjs.org:middleware:auth');
-var User = require('../proxy/user');
-var config = require('../config');
-var common = require('../lib/common');
 var UserService = require('../services/user');
 
 module.exports = function (options) {
@@ -48,9 +45,6 @@ module.exports = function (options) {
     this.user.name = row.login;
     this.user.isAdmin = row.site_admin;
     this.user.scopes = row.scopes;
-    if (!this.user.scopes || this.user.scopes.length === 0) {
-      this.user.scopes = config.scopes || [];
-    }
     debug('auth pass user: %j, headers: %j', this.user, this.header);
     yield* next;
   };
