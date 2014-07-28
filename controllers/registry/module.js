@@ -440,7 +440,7 @@ exports.addPackageAndDist = function *(next) {
 
   var pkg = this.request.body;
   var username = this.user.name;
-  var name = this.params.name;
+  var name = this.params.name || this.params[0];
   var filename = Object.keys(pkg._attachments || {})[0];
   var version = Object.keys(pkg.versions || {})[0];
   if (!version || !filename) {
@@ -454,6 +454,34 @@ exports.addPackageAndDist = function *(next) {
 
   var attachment = pkg._attachments[filename];
   var versionPackage = pkg.versions[version];
+
+  // should never happened in normal request
+  if (!versionPackage.maintainers) {
+    this.status = 400;
+    this.body = {
+      error: 'maintainers error',
+      reason: 'request body need maintainers'
+    };
+    return;
+  }
+
+  // notice that admins can not publish to all modules
+  // (but admins can add self to maintainers first)
+
+  // make sure user in auth is in maintainers
+  // should never happened in normal request
+  var m = versionPackage.maintainers.filter(function (maintainer) {
+    return maintainer.name === username;
+  });
+  if (!m.length) {
+    this.status = 403;
+    this.body = {
+      error: 'maintainers error',
+      reason: username + ' does not in maintainer list'
+    };
+    return;
+  }
+
   versionPackage._publish_on_cnpm = true;
   var distTags = pkg['dist-tags'] || {};
   var tags = []; // tag, version
@@ -572,7 +600,9 @@ exports.addPackageAndDist = function *(next) {
 
 // PUT /:name/-rev/:rev
 exports.updateOrRemove = function* (next) {
-  debug('updateOrRemove module %s, %s, %j', this.url, this.params.name, this.request.body);
+  var name = this.params.name || this.params[0];
+  debug('updateOrRemove module %s, %s, %j', this.url, name, this.request.body);
+
   var body = this.request.body;
   if (body.versions) {
     yield* exports.removeWithVersions.call(this, next);
@@ -894,7 +924,7 @@ exports.updateTag = function* () {
 
   // check permission
   var isMaintainer = yield* packageService.isMaintainer(name, this.user.name);
-  if (!isMaintainer) {
+  if (!isMaintainer && !this.user.isAdmin) {
     this.status = 403;
     this.body = {
       error: 'forbidden user',

@@ -121,10 +121,6 @@ describe('controllers/sync.test.js', function () {
     it('should sync scope package not found', function (done) {
       request(webApp)
       .put('/sync/@cnpm/not-exists-package')
-      .expect({
-        "ok":false,
-        "reason":"can not found @cnpm/not-exists-package in the source registry"
-      })
       .expect(404, done);
     });
   });

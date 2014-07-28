@@ -351,13 +351,13 @@ SyncModuleWorker.prototype._sync = function* (name, pkg) {
       maintainers = [maintainers];
     }
 
-    maintainers.forEach(function (m) {
-      if (m.name) {
-        npmUsernames[m.name.toLowerCase()] = 1;
-      }
-    });
+    maintainers.forEach(pushName);
   }
-
+  function pushName(m) {
+    if (m.name) {
+      npmUsernames[m.name.toLowerCase()] = 1;
+    }
+  }
   // get the missing star users
   var starUsers = pkg.users || {};
   for (var k in starUsers) {

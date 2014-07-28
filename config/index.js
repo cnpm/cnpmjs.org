@@ -116,7 +116,17 @@ var config = {
     message: 'request frequency limited, any question, please contact fengmk2@gmail.com',
   },
   enableCompress: false, // enable gzip response or not
-  defaultScope: '', // default scope name
+  scopes: [
+    '@cnpm',
+    '@cnpmtest'
+  ],
+
+  // redirect @cnpm/private-package => private-package
+  // forward compatbility for update from lower version cnpmjs.org
+  adaptScope: true,
+
+  // force publish with scope
+  forcePublishWithScope: true,
 };
 
 // load config/config.js, everything in config.js will cover the same key in index.js

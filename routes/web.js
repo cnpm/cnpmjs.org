@@ -36,10 +36,8 @@ function routes(app) {
 
   app.get('/~:name', user.display);
 
-  app.get(/\/sync\/(@[\w\-\.]+\/[\w\-\.]+)$/, pkg.displaySync);
   app.get('/sync/:name', pkg.displaySync);
 
-  app.put(/\/sync\/(@[\w\-\.]+\/[\w\-\.]+)$/, sync.sync);
   app.put('/sync/:name', sync.sync);
 
   // params: [$name, $id]

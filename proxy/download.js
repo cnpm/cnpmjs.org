@@ -9,6 +9,8 @@
  */
 
 'use strict';
+/* jshint -W032 */
+
 
 /**
  * Module dependencies.

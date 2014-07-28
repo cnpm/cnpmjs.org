@@ -47,7 +47,24 @@ describe('controllers/registry/module/scope_package.test.js', function () {
     });
   });
 
+  beforeEach(function () {
+    mm(config, 'scopes', ['@cnpm', '@cnpmtest']);
+  });
+
   afterEach(mm.restore);
+
+  it('should get 404 when do not support scope', function (done) {
+    mm(config, 'scopes', []);
+    request(app)
+    .get('/@invalid/test')
+    .expect(404, done);
+  });
+
+  it('should get 400 when scope not match', function (done) {
+    request(app)
+    .get('/@invalid/test')
+    .expect(404, done);
+  });
 
   it('should get scope package info: /@scope%2Fname', function (done) {
     request(app)
@@ -132,7 +149,7 @@ describe('controllers/registry/module/scope_package.test.js', function () {
     .expect(302, done);
   });
 
-  describe('support defaultScope', function () {
+  describe('support adaptScope', function () {
     before(function (done) {
       var pkg = utils.getPackage('test-default-scope-package', '0.0.1', utils.admin);
       request(app)
@@ -143,7 +160,7 @@ describe('controllers/registry/module/scope_package.test.js', function () {
     });
     describe('/@:scope/:name', function () {
       it('should adapt /@cnpm/test-default-scope-package => /test-default-scope-package', function (done) {
-        mm(config, 'defaultScope', '@cnpm');
+        mm(config, 'adaptScope', true);
         request(app)
         .get('/@cnpm/test-default-scope-package')
         .expect(200, function (err, res) {
@@ -161,29 +178,47 @@ describe('controllers/registry/module/scope_package.test.js', function () {
         });
       });
 
-      it('should not adapt /@cnpm123/test-default-scope-package', function (done) {
-        mm(config, 'defaultScope', '@cnpm');
+      it('should adapt /@cnpmtest/test-default-scope-package => /test-default-scope-package', function (done) {
+        mm(config, 'adaptScope', true);
         request(app)
-        .get('/@cnpm123/test-default-scope-package')
-        .expect(404, done);
+        .get('/@cnpmtest/test-default-scope-package')
+        .expect(200, function (err, res) {
+          should.not.exist(err);
+          var pkg = res.body;
+          pkg._id.should.equal('@cnpmtest/test-default-scope-package');
+          pkg.name.should.equal('@cnpmtest/test-default-scope-package');
+          pkg.versions.should.have.keys('0.0.1');
+          pkg['dist-tags'].latest.should.equal('0.0.1');
+          pkg.versions['0.0.1'].name.should.equal('@cnpmtest/test-default-scope-package');
+          pkg.versions['0.0.1']._id.should.equal('@cnpmtest/test-default-scope-package@0.0.1');
+          pkg.versions['0.0.1'].dist.tarball
+            .should.containEql('/test-default-scope-package/download/test-default-scope-package-0.0.1.tgz');
+          done();
+        });
       });
 
-      it('should not adapt when defaultScope is empty', function (done) {
-        mm(config, 'defaultScope', '');
+      it('should not adapt when adaptScope is false', function (done) {
+        mm(config, 'adaptScope', false);
         request(app)
         .get('/@cnpm/test-default-scope-package')
         .expect(404, done);
       });
 
       it('should 404 when pkg not exists', function (done) {
-        mm(config, 'defaultScope', '@cnpm');
+        mm(config, 'adaptScope', true);
         request(app)
         .get('/@cnpm/test-default-scope-package-not-exists')
         .expect(404, done);
       });
 
-      it('should 404 when scope not match', function (done) {
-        mm(config, 'defaultScope', '@cnpm123');
+      it('should show() 404 when adapt package is not private package', function (done) {
+        var getByTag = Module.getByTag;
+        mm(Module, 'getByTag', function* (name, tag) {
+          var pkg = yield getByTag.call(Module, name, tag);
+          pkg && delete pkg.package._publish_on_cnpm;
+          return pkg;
+        });
+        mm(config, 'adaptScope', true);
         request(app)
         .get('/@cnpm/test-default-scope-package')
         .expect(404, done);
@@ -192,7 +227,7 @@ describe('controllers/registry/module/scope_package.test.js', function () {
 
     describe('/@:scope/:name/:tag', function () {
       it('should adapt /@cnpm/test-default-scope-package/latest => /test-default-scope-package/latest', function (done) {
-        mm(config, 'defaultScope', '@cnpm');
+        mm(config, 'adaptScope', true);
         request(app)
         .get('/@cnpm/test-default-scope-package/latest')
         .expect(200, function (err, res) {
@@ -206,51 +241,24 @@ describe('controllers/registry/module/scope_package.test.js', function () {
         });
       });
 
-      it('should not adapt /@cnpm123/test-default-scope-package/latest', function (done) {
-        mm(config, 'defaultScope', '@cnpm');
-        request(app)
-        .get('/@cnpm123/test-default-scope-package/latest')
-        .expect(404, done);
-      });
-
-      it('should not adapt when defaultScope is empty', function (done) {
-        mm(config, 'defaultScope', '');
+      it('should not adapt when adaptScope is false', function (done) {
+        mm(config, 'adaptScope', false);
         request(app)
         .get('/@cnpm/test-default-scope-package/latest')
         .expect(404, done);
       });
 
       it('should 404 when pkg not exists', function (done) {
-        mm(config, 'defaultScope', '@cnpm');
+        mm(config, 'adaptScope', true);
         request(app)
         .get('/@cnpm/test-default-scope-package-not-exists/latest')
         .expect(404, done);
       });
 
       it('should 404 when pkg version not exists', function (done) {
-        mm(config, 'defaultScope', '@cnpm');
+        mm(config, 'adaptScope', true);
         request(app)
         .get('/@cnpm/test-default-scope-package-not-exists/1.0.0')
-        .expect(404, done);
-      });
-
-      it('should 404 when scope not match', function (done) {
-        mm(config, 'defaultScope', '@cnpm123');
-        request(app)
-        .get('/@cnpm/test-default-scope-package/latest')
-        .expect(404, done);
-      });
-
-      it('should show() 404 when adapt package is not private package', function (done) {
-        var getByTag = Module.getByTag;
-        mm(Module, 'getByTag', function* (name, tag) {
-          var pkg = yield getByTag.call(Module, name, tag);
-          pkg && delete pkg.package._publish_on_cnpm;
-          return pkg;
-        });
-        mm(config, 'defaultScope', '@cnpm');
-        request(app)
-        .get('/@cnpm/test-default-scope-package')
         .expect(404, done);
       });
 
@@ -261,7 +269,7 @@ describe('controllers/registry/module/scope_package.test.js', function () {
           pkg && delete pkg.package._publish_on_cnpm;
           return pkg;
         });
-        mm(config, 'defaultScope', '@cnpm');
+        mm(config, 'adaptScope', true);
         request(app)
         .get('/@cnpm/test-default-scope-package/latest')
         .expect(404, done);

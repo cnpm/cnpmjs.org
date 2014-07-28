@@ -20,6 +20,7 @@ var User = require('../proxy/user');
 
 var usernames = [
   'cnpmjstest101',
+  'cnpmjstest102',
   'cnpmjstest10'
 ];
 

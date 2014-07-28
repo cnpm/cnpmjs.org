@@ -50,6 +50,10 @@ describe('controllers/web/package/scope_package.test.js', function () {
     web = web.listen(0, done);
   });
 
+  beforeEach(function () {
+    mm(config, 'scopes', ['@cnpm', '@cnpmtest']);
+  });
+
   afterEach(mm.restore);
 
   it('should show scope package info page: /@scope%2Fname', function (done) {
@@ -113,7 +117,7 @@ describe('controllers/web/package/scope_package.test.js', function () {
     .expect(302, done);
   });
 
-  describe('support default scope', function () {
+  describe('support adapt scope', function () {
     before(function (done) {
       var pkg = utils.getPackage('test-default-web-scope-package', '0.0.1', utils.admin);
       request(registry)
@@ -124,7 +128,7 @@ describe('controllers/web/package/scope_package.test.js', function () {
     });
 
     it('should adapt /@cnpm/test-default-web-scope-package => /test-default-web-scope-package', function (done) {
-      mm(config, 'defaultScope', '@cnpm');
+      mm(config, 'adaptScope', true);
       request(web)
       .get('/package/@cnpm/test-default-web-scope-package')
       .expect(200, function (err, res) {
@@ -137,28 +141,21 @@ describe('controllers/web/package/scope_package.test.js', function () {
     });
 
     it('should not adapt /@cnpm123/test-default-web-scope-package', function (done) {
-      mm(config, 'defaultScope', '@cnpm');
+      mm(config, 'adaptScope', true);
       request(web)
       .get('/package/@cnpm123/test-default-web-scope-package')
       .expect(404, done);
     });
 
     it('should not adapt', function (done) {
-      mm(config, 'defaultScope', '');
-      request(web)
-      .get('/package/@cnpm/test-default-web-scope-package')
-      .expect(404, done);
-    });
-
-    it('should 404 when scope not match', function (done) {
-      mm(config, 'defaultScope', '@cnpm123');
+      mm(config, 'adaptScope', false);
       request(web)
       .get('/package/@cnpm/test-default-web-scope-package')
       .expect(404, done);
     });
 
     it('should 404 when pkg not exists', function (done) {
-      mm(config, 'defaultScope', '@cnpm');
+      mm(config, 'adaptScope', true);
       request(web)
       .get('/package/@cnpm/test-default-web-scope-package-not-exists')
       .expect(404, done);
@@ -171,7 +168,7 @@ describe('controllers/web/package/scope_package.test.js', function () {
         pkg && delete pkg.package._publish_on_cnpm;
         return pkg;
       });
-      mm(config, 'defaultScope', '@cnpm');
+      mm(config, 'adaptScope', true);
       request(web)
       .get('/package/@cnpm/test-default-web-scope-package')
       .expect(404, done);
