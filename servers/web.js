@@ -30,11 +30,6 @@ var routes = require('../routes/web');
 var logger = require('../common/logger');
 var config = require('../config');
 
-if (!config.userService) {
-  var DefaultUserService = require('../services/default_user_service');
-  config.userService = new DefaultUserService();
-}
-
 var app = koa();
 
 var rootdir = path.dirname(__dirname);

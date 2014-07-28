@@ -20,6 +20,7 @@ var mm = require('mm');
 var app = require('../../../servers/registry');
 var user = require('../../../proxy/user');
 var mysql = require('../../../common/mysql');
+var config = require('../../../config');
 
 describe('controllers/registry/user.test.js', function () {
   before(function (done) {
@@ -84,88 +85,48 @@ describe('controllers/registry/user.test.js', function () {
     });
 
     it('should 409 when already exist', function (done) {
-      mm.data(user, 'get', {name: 'name'});
+      mm(user, 'get', function* () {
+        return {name: 'name'};
+      });
       request(app)
       .put('/-/user/org.couchdb.user:name')
       .send({
         name: 'name',
-        salt: 'salt',
-        password_sha: 'password_sha',
+        password: 'password',
         email: 'email'
       })
       .expect(409, done);
     });
 
     it('should 500 when user.get error', function (done) {
-      mm.error(user, 'get', 'mock error');
+      mm(user, 'get', function* () {
+        throw new Error('mock User.get error');
+      });
       request(app)
       .put('/-/user/org.couchdb.user:name')
       .send({
         name: 'name',
-        salt: 'salt',
-        password_sha: 'password_sha',
+        password: 'password',
         email: 'email'
       })
       .expect(500, done);
     });
 
     it('should 201 when user.add ok', function (done) {
-      mm.empty(user, 'get');
-      mm.data(user, 'add', {rev: '1-123'});
+      mm(user, 'get', function* () {
+        return null;
+      });
+      mm(user, 'add', function* () {
+        return {rev: '1-123'};
+      });
       request(app)
       .put('/-/user/org.couchdb.user:name')
       .send({
         name: 'name',
-        salt: 'salt',
-        password_sha: 'password_sha',
+        password: 'password',
         email: 'email'
       })
       .expect(201, done);
-    });
-  });
-
-  describe.skip('POST /_session', function () {
-    it('should 500 auth error by user.auth', function (done) {
-      mm.error(user, 'auth', 'mock error');
-      request(app)
-      .post('/_session')
-      .send({
-        name: 'name',
-        password: '123'
-      })
-      .expect(500, done);
-    });
-
-    it('should 401 auth fail by user.auth', function (done) {
-      mm.empty(user, 'auth');
-      request(app)
-      .post('/_session')
-      .send({
-        name: 'name',
-        password: '123'
-      })
-      .expect(401, done);
-    });
-
-    it('should 200 auth pass by user.auth', function (done) {
-      mm.data(user, 'auth', {name: 'name'});
-      request(app)
-      .post('/_session')
-      .send({
-        name: 'name',
-        password: '123'
-      })
-      .expect(200)
-      .expect({
-        ok: true,
-        name: 'name',
-        roles: []
-      }, function (err, res) {
-        should.not.exist(err);
-        should.exist(res.headers['set-cookie']);
-        res.headers['set-cookie'].join(';').should.containEql('AuthSession=');
-        done();
-      });
     });
   });
 
@@ -221,6 +182,60 @@ describe('controllers/registry/user.test.js', function () {
         rev: '1-123'
       })
       .expect(201, done);
+    });
+  });
+
+  describe('config.customUserSerivce = true', function () {
+    beforeEach(function () {
+      mm(config, 'customUserService', true);
+    });
+
+    it('should 422 when password missing', function (done) {
+      request(app)
+      .put('/-/user/org.couchdb.user:cnpmjstest10-not-exists')
+      .send({
+        name: 'cnpmjstest10-not-exists',
+        password: '',
+        email: 'cnpmjstest10@cnpmjs.org'
+      })
+      .expect({
+        error: 'paramError',
+        reason: 'params missing, name, email or password missing.'
+      })
+      .expect(422, done);
+    });
+
+    it('should 201 login success', function (done) {
+      request(app)
+      .put('/-/user/org.couchdb.user:cnpmjstest10')
+      .send({
+        name: 'cnpmjstest10',
+        password: 'cnpmjstest10',
+        email: 'cnpmjstest10@cnpmjs.org'
+      })
+      .expect(201, function (err, res) {
+        should.not.exist(err);
+        res.body.should.have.keys('ok', 'id', 'rev');
+        res.body.id.should.equal('org.couchdb.user:cnpmjstest10');
+        res.body.rev.should.match(/\d+\-cnpmjstest10/);
+        res.body.ok.should.equal(true);
+        done();
+      });
+    });
+
+    it('should 401 login fail', function (done) {
+      request(app)
+      .put('/-/user/org.couchdb.user:cnpmjstest10-not-exists')
+      .send({
+        name: 'cnpmjstest10-not-exists',
+        password: 'cnpmjstest10',
+        email: 'cnpmjstest10@cnpmjs.org'
+      })
+      .expect({
+        error: 'unauthorized',
+        reason: 'Login fail, please check your login name and password'
+      })
+      .expect(401, done);
     });
   });
 });

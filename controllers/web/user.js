@@ -1,4 +1,4 @@
-/*!
+/**!
  * cnpmjs.org - controllers/web/package.js
  *
  * Copyright(c) cnpmjs.org and other contributors.
@@ -6,6 +6,7 @@
  *
  * Authors:
  *  dead_horse <dead_horse@qq.com> (http://deadhorse.me)
+ *  fengmk2 <fengmk2@gmail.com> (http://fengmk2.github.com)
  */
 
 'use strict';
@@ -16,7 +17,7 @@
 var Module = require('../../proxy/module');
 var User = require('../../proxy/user');
 
-exports.display = function *(next) {
+exports.display = function* (next) {
   var name = this.params.name;
 
   var r = yield [Module.listByAuthor(name), User.get(name)];
@@ -25,14 +26,15 @@ exports.display = function *(next) {
   if (!user && !packages.length) {
     return yield* next;
   }
-  user = {
+  var data = {
     name: name,
-    email: user && user.email
+    email: user && user.email,
+    json: user && user.json
   };
 
   yield this.render('profile', {
     title: 'User - ' + name,
     packages: packages || [],
-    user: user
+    user: data
   });
 };

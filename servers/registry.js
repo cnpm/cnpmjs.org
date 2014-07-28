@@ -27,11 +27,6 @@ var auth = require('../middleware/auth');
 var staticCache = require('../middleware/static');
 var notFound = require('../middleware/registry_not_found');
 
-if (!config.userService) {
-  var DefaultUserService = require('../services/default_user_service');
-  config.userService = new DefaultUserService();
-}
-
 middlewares.jsonp(app);
 app.use(middlewares.rt({headerName: 'X-ReadTime'}));
 app.use(middlewares.rewrite('/favicon.ico', '/favicon.png'));
@@ -62,6 +57,7 @@ routes(app);
  */
 
 app.on('error', function (err, ctx) {
+  // console.log(err.stack)
   err.url = err.url || ctx.request.url;
   logger.error(err);
 });

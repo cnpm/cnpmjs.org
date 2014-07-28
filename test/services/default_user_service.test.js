@@ -15,9 +15,11 @@
  */
 
 var should = require('should');
+var mm = require('mm');
 var npm = require('../../proxy/npm');
 var User = require('../../proxy/user');
 var DefaultUserService = require('../../services/default_user_service');
+var config = require('../../config');
 
 describe('services/default_user_service.test.js', function () {
   var userService = new DefaultUserService();
@@ -31,6 +33,11 @@ describe('services/default_user_service.test.js', function () {
     yield* User.saveNpmUser(user);
   });
 
+  beforeEach(function () {
+    mm(config, 'scopes', ['@cnpm', '@cnpmtest']);
+  });
+  afterEach(mm.restore);
+
   describe('auth()', function () {
     it('should return user when auth success', function* () {
       var user = yield* userService.auth('cnpmjstest10', 'cnpmjstest10');
@@ -42,7 +49,8 @@ describe('services/default_user_service.test.js', function () {
         html_url: 'http://cnpmjs.org/~cnpmjstest10',
         avatar_url: 'https://secure.gravatar.com/avatar/95b9d41231617a05ced5604d242c9670?s=50&d=retro',
         im_url: '',
-        site_admin: true
+        site_admin: true,
+        scopes: ['@cnpm', '@cnpmtest'],
       });
     });
 
@@ -63,7 +71,8 @@ describe('services/default_user_service.test.js', function () {
         html_url: 'http://cnpmjs.org/~cnpmjstest10',
         avatar_url: 'https://secure.gravatar.com/avatar/95b9d41231617a05ced5604d242c9670?s=50&d=retro',
         im_url: '',
-        site_admin: true
+        site_admin: true,
+        scopes: ['@cnpm', '@cnpmtest'],
       });
     });
 
@@ -77,7 +86,8 @@ describe('services/default_user_service.test.js', function () {
         html_url: 'http://cnpmjs.org/~cnpmjstest101',
         avatar_url: 'https://secure.gravatar.com/avatar/95b9d41231617a05ced5604d242c9670?s=50&d=retro',
         im_url: '',
-        site_admin: false
+        site_admin: false,
+        scopes: ['@cnpm', '@cnpmtest'],
       });
     });
 
@@ -91,7 +101,8 @@ describe('services/default_user_service.test.js', function () {
         html_url: 'http://fengmk2.github.com',
         avatar_url: 'https://secure.gravatar.com/avatar/95b9d41231617a05ced5604d242c9670?s=50&d=retro',
         im_url: 'https://twitter.com/fengmk2',
-        site_admin: true
+        site_admin: true,
+        scopes: ['@cnpm', '@cnpmtest'],
       });
     });
 
@@ -124,7 +135,7 @@ describe('services/default_user_service.test.js', function () {
   describe('search()', function () {
     it('should return login name matched users', function* () {
       var users = yield* userService.search('cnpm');
-      users.should.length(2);
+      users.length.should.above(2);
     });
 
     it('should return limit 1 user', function* () {

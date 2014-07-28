@@ -16,7 +16,6 @@
 
 var util = require('util');
 var config = require('../config');
-var common = require('../lib/common');
 var debug = require('debug')('cnpmjs.org:middlewares/publishable');
 
 module.exports = function *publishable(next) {
@@ -55,18 +54,18 @@ module.exports = function *publishable(next) {
  */
 
 function checkScope(name, ctx) {
-  if (!config.scopes || !config.scopes.length) {
+  if (!ctx.user.scopes || !ctx.user.scopes.length) {
     ctx.status = 404;
     return false;
   }
 
   var scope = name.split('/')[0];
-  if (config.scopes.indexOf(scope) < 0) {
+  if (ctx.user.scopes.indexOf(scope) === -1) {
     debug('assert scope  %s error', name);
     ctx.status = 400;
     ctx.body = {
       error: 'invalid scope',
-      reason: util.format('scope %s not match legal scopes %j', scope, config.scopes)
+      reason: util.format('scope %s not match legal scopes %j', scope, ctx.user.scopes)
     };
     return false;
   }
@@ -86,13 +85,13 @@ function checkNoneScope(ctx) {
   }
 
   // only admins can publish or unpublish non-scope modules
-  if (common.isAdmin(ctx.user.name)) {
+  if (ctx.user.isAdmin) {
     return true;
   }
 
   ctx.status = 403;
   ctx.body = {
     error: 'no_perms',
-    reason: 'only allow publish with ' + config.scopes.join(',') + ' scope(s)'
+    reason: 'only allow publish with ' + ctx.user.scopes.join(',') + ' scope(s)'
   };
 }

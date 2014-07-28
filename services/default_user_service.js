@@ -17,6 +17,7 @@
 var gravatar = require('gravatar');
 var User = require('../proxy/user');
 var isAdmin = require('../lib/common').isAdmin;
+var config = require('../config');
 
 // User: https://github.com/cnpm/cnpmjs.org/wiki/Use-Your-Own-User-Authorization#user-data-structure
 // {
@@ -26,7 +27,8 @@ var isAdmin = require('../lib/common').isAdmin;
 //   "html_url": "http://fengmk2.github.com",
 //   "avatar_url": "https://avatars3.githubusercontent.com/u/156269?s=460",
 //   "im_url": "",
-//   "site_admin": false
+//   "site_admin": false,
+//   "scopes": ["@org1", "@org2"]
 // }
 
 module.exports = DefaultUserService;
@@ -40,16 +42,27 @@ function convertToUser(row) {
     avatar_url: '',
     im_url: '',
     site_admin: isAdmin(row.name),
+    scopes: config.scopes
   };
   if (row.json) {
     var data = row.json;
-    user.avatar_url = data.avatar;
-    user.name = data.fullname;
-    if (data.homepage) {
-      user.html_url = data.homepage;
-    }
-    if (data.twitter) {
-      user.im_url = 'https://twitter.com/' + data.twitter;
+    if (data.login) {
+      // custom user
+      user = data;
+    } else {
+      // npm user
+      if (data.avatar) {
+        user.avatar_url = data.avatar;
+      }
+      if (data.fullname) {
+        user.name = data.fullname;
+      }
+      if (data.homepage) {
+        user.html_url = data.homepage;
+      }
+      if (data.twitter) {
+        user.im_url = 'https://twitter.com/' + data.twitter;
+      }
     }
   }
   if (!user.avatar_url) {
