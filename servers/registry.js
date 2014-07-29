@@ -22,7 +22,6 @@ var middlewares = require('koa-middlewares');
 var routes = require('../routes/registry');
 var logger = require('../common/logger');
 var config = require('../config');
-var session = require('../common/session');
 var auth = require('../middleware/auth');
 var staticCache = require('../middleware/static');
 var notFound = require('../middleware/registry_not_found');
@@ -34,7 +33,6 @@ app.use(staticCache);
 
 app.keys = ['todokey', config.sessionSecret];
 app.proxy = true;
-app.use(session);
 app.use(middlewares.bodyParser({jsonLimit: config.jsonLimit}));
 app.use(auth());
 app.use(notFound);
@@ -57,6 +55,7 @@ routes(app);
  */
 
 app.on('error', function (err, ctx) {
+  // console.log(err.stack)
   err.url = err.url || ctx.request.url;
   logger.error(err);
 });

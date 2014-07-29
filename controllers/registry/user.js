@@ -18,14 +18,31 @@
 var debug = require('debug')('cnpmjs.org:controllers:registry:user');
 var utility = require('utility');
 var crypto = require('crypto');
+var UserService = require('../../services/user');
 var User = require('../../proxy/user');
 var config = require('../../config');
+var common = require('../../lib/common');
 
-exports.show = function *(next) {
+exports.show = function* (next) {
   var name = this.params.name;
-  var user = yield User.get(name);
+  var isAdmin = common.isAdmin(name);
+  var scopes = config.scopes || [];
+  if (config.customUserService) {
+    var customUser = yield* UserService.get(name);
+    if (customUser) {
+      isAdmin = !!customUser.site_admin;
+      scopes = customUser.scopes;
+
+      var data = {
+        user: customUser
+      };
+      yield* User.saveCustomUser(data);
+    }
+  }
+
+  var user = yield* User.get(name);
   if (!user) {
-    return yield *next;
+    return yield* next;
   }
 
   var data = user.json;
@@ -40,12 +57,32 @@ exports.show = function *(next) {
       date: user.gmt_modified,
     };
   }
+
+  if (data.login) {
+    // custom user format
+    // convert to npm user format
+    data = {
+      _id: 'org.couchdb.user:' + user.name,
+      _rev: user.rev,
+      name: user.name,
+      email: user.email,
+      type: 'user',
+      roles: [],
+      date: user.gmt_modified,
+      avatar: data.avatar_url,
+      fullname: data.name || data.login,
+      homepage: data.html_url,
+    };
+  }
+
   data._cnpm_meta = {
     id: user.id,
-    npm_user: user.npm_user,
+    npm_user: user.npm_user === 1,
+    custom_user: user.npm_user === 2,
     gmt_create: user.gmt_create,
     gmt_modified: user.gmt_modified,
-    admin: !!config.admins[user.name],
+    admin: isAdmin,
+    scopes: scopes,
   };
 
   this.body = data;
@@ -85,20 +122,20 @@ function ensurePasswordSalt(user, body) {
 //   'content-length': '258',
 //   connection: 'keep-alive' }
 // { name: 'mk2',
-//   salt: '18d8d51936478446a5466d4fb1633b80f3838b4caaa03649a885ac722cd6',
-//   password_sha: '8f4408912a6db1d96b132a90856d99db029cef3d',
+//   salt: '12351936478446a5466d4fb1633b80f3838b4caaa03649a885ac722cd6',
+//   password_sha: '123408912a6db1d96b132a90856d99db029cef3d',
 //   email: 'fengmk2@gmail.com',
 //   _id: 'org.couchdb.user:mk2',
 //   type: 'user',
 //   roles: [],
 //   date: '2014-03-15T02:39:25.696Z' }
-exports.add = function *() {
+exports.add = function* () {
   var name = this.params.name;
   var body = this.request.body || {};
   var user = {
     name: body.name,
-    salt: body.salt,
-    password_sha: body.password_sha,
+    // salt: body.salt,
+    // password_sha: body.password_sha,
     email: body.email,
     ip: this.ip || '0.0.0.0',
     // roles: body.roles || [],
@@ -106,7 +143,7 @@ exports.add = function *() {
 
   ensurePasswordSalt(user, body);
 
-  if (!user.name || !user.salt || !user.password_sha || !user.email) {
+  if (!body.password || !user.name || !user.salt || !user.password_sha || !user.email) {
     this.status = 422;
     this.body = {
       error: 'paramError',
@@ -114,7 +151,37 @@ exports.add = function *() {
     };
     return;
   }
-  debug('add user: %j', user);
+
+  debug('add user: %j', body);
+
+  var loginedUser = yield UserService.auth(body.name, body.password);
+  if (loginedUser) {
+    var rev = Date.now() + '-' + loginedUser.login;
+    if (config.customUserService) {
+      // make sure sync user meta to cnpm database
+      var data = user;
+      data.rev = rev;
+      data.user = loginedUser;
+      yield* User.saveCustomUser(data);
+    }
+    this.status = 201;
+    this.body = {
+      ok: true,
+      id: 'org.couchdb.user:' + loginedUser.login,
+      rev: rev,
+    };
+    return;
+  }
+
+  if (config.customUserService) {
+    // user login fail, not allow to add new user
+    this.status = 401;
+    this.body = {
+      error: 'unauthorized',
+      reason: 'Login fail, please check your login name and password'
+    };
+    return;
+  }
 
   var existUser = yield User.get(name);
   if (existUser) {
@@ -136,24 +203,7 @@ exports.add = function *() {
   };
 };
 
-exports.authSession = function *() {
-  // body: {"name":"foo","password":"****"}
-  var body = this.request.body || {};
-  var name = body.name;
-  var password = body.password;
-  var user = yield User.auth(name, password);
-  debug('authSession %s: %j', name, user);
-
-  if (!user) {
-    this.status = 401;
-    this.body = {ok: false, name: null, roles: []};
-    return;
-  }
-  var session = yield *this.session;
-  session.name = user.name;
-  this.body = {ok: true, name: user.name, roles: []};
-};
-
+// logined before update, no need to auth user again
 exports.update = function *(next) {
   var name = this.params.name;
   var rev = this.params.rev;
@@ -175,17 +225,19 @@ exports.update = function *(next) {
   var body = this.request.body || {};
   var user = {
     name: body.name,
-    salt: body.salt,
-    password_sha: body.password_sha,
+    // salt: body.salt,
+    // password_sha: body.password_sha,
     email: body.email,
     ip: this.ip || '0.0.0.0',
     rev: body.rev || body._rev,
     // roles: body.roles || [],
   };
 
+  debug('update user %j', body);
+
   ensurePasswordSalt(user, body);
 
-  if (!user.name || !user.salt || !user.password_sha || !user.email) {
+  if (!body.password || !user.name || !user.salt || !user.password_sha || !user.email) {
     this.status = 422;
     this.body = {
       error: 'paramError',

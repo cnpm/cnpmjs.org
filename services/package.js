@@ -32,6 +32,10 @@ exports.listMaintainers = function* (name) {
   });
 };
 
+exports.listMaintainerNamesOnly = function* (name) {
+  return yield* ModuleMaintainer.get(name);
+};
+
 exports.updateMaintainers = function* (name, usernames) {
   var rs = yield [
     ModuleMaintainer.update(name, usernames),
@@ -41,10 +45,21 @@ exports.updateMaintainers = function* (name, usernames) {
 };
 
 exports.isMaintainer = function* (name, username) {
-  var maintainers = yield* ModuleMaintainer.get(name);
+  var rs = yield [
+    ModuleMaintainer.get(name),
+    Module.getLatest(name)
+  ];
+  var maintainers = rs[0];
+  var latestMod = rs[1];
+
+  if (latestMod && !latestMod.package._publish_on_cnpm) {
+    // no one can update public package maintainers
+    // public package only sync from source npm registry
+    return false;
+  }
+
   if (maintainers.length === 0) {
     // if not found maintainers, try to get from latest module package info
-    var latestMod = yield Module.getLatest(name);
     var ms = latestMod && latestMod.package && latestMod.package.maintainers;
     if (ms && ms.length > 0) {
       maintainers = ms.map(function (user) {

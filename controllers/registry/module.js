@@ -39,6 +39,7 @@ var ModuleDeps = require('../../proxy/module_deps');
 var ModuleStar = require('../../proxy/module_star');
 var ModuleUnpublished = require('../../proxy/module_unpublished');
 var packageService = require('../../services/package');
+var UserService = require('../../services/user');
 var downloadAsReadStream = require('../utils').downloadAsReadStream;
 
 /**
@@ -642,14 +643,53 @@ exports.updateMaintainers = function* (next) {
     return;
   }
 
-  var r = yield *packageService.updateMaintainers(name, usernames);
+  if (config.customUserService) {
+    // ensure new authors are vaild
+    var maintainers = yield* packageService.listMaintainerNamesOnly(name);
+    var map = {};
+    var newNames = [];
+    for (var i = 0; i < maintainers.length; i++) {
+      map[maintainers[i]] = 1;
+    }
+    for (var i = 0; i < usernames.length; i++) {
+      var username = usernames[i];
+      if (map[username] !== 1) {
+        newNames.push(username);
+      }
+    }
+    if (newNames.length > 0) {
+      var users = yield* UserService.list(newNames);
+      var map = {};
+      for (var i = 0; i < users.length; i++) {
+        var user = users[i];
+        map[user.login] = 1;
+      }
+      var invailds = [];
+      for (var i = 0; i < newNames.length; i++) {
+        var username = newNames[i];
+        if (map[username] !== 1) {
+          invailds.push(username);
+        }
+      }
+      if (invailds.length > 0) {
+        this.status = 403;
+        this.body = {
+          error: 'invalid user name',
+          reason: 'User: ' + invailds.join(', ') + ' not exists'
+        };
+        return;
+      }
+    }
+  }
+
+  var r = yield* packageService.updateMaintainers(name, usernames);
   debug('result: %j', r);
 
   this.status = 201;
   this.body = {
     ok: true,
     id: name,
-    rev: this.params.rev,
+    rev: this.params.rev || this.params[1],
   };
 };
 

@@ -177,8 +177,3 @@ Release [History](/history).
 ## npm and cnpm relation
 
 ![npm&cnpm](https://docs.google.com/drawings/d/12QeQfGalqjsB77mRnf5Iq5oSXHCIUTvZTwECMonqCmw/pub?w=383&h=284)
-
-## 捐赠 Donate
-如果您觉得 [cnpmjs.org](/) 对您有帮助，欢迎请作者一杯咖啡.
-
-[![Donate](https://img.alipay.com/sys/personalprod/style/mc/btn-index.png)](https://me.alipay.com/imk2)

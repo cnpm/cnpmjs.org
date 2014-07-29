@@ -81,8 +81,6 @@ function routes(app) {
   app.put('/-/user/org.couchdb.user::name', user.add);
   app.get('/-/user/org.couchdb.user::name', user.show);
   app.put('/-/user/org.couchdb.user::name/-rev/:rev', login, user.update);
-  // _session
-  app.post('/_session', user.authSession);
 }
 
 module.exports = routes;

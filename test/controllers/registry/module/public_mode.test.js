@@ -286,7 +286,7 @@ describe('controllers/registry/module/public_module.test.js', function () {
           }]
         })
         .set('authorization', utils.otherUserAuth)
-        .expect( { ok: true, id: '@cnpm/publictestmodule' })
+        .expect( { ok: true, id: '@cnpm/publictestmodule', rev: '1' })
         .expect(201, done);
       });
     });

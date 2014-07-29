@@ -15,46 +15,37 @@
  */
 
 var debug = require('debug')('cnpmjs.org:middleware:auth');
-var User = require('../proxy/user');
-var config = require('../config');
-var common = require('../lib/common');
+var UserService = require('../services/user');
 
 module.exports = function (options) {
-  return function *auth(next) {
-    var session = yield *this.session;
-    debug('%s, %s, %j', this.url, this.sessionId, session);
+  return function* auth(next) {
     this.user = {};
-
-    if (session.name) {
-      this.user.name = session.name;
-      this.user.isAdmin = common.isAdmin(session.name);
-      debug('auth exists user: %j, headers: %j', this.user, this.header);
-      return yield *next;
-    }
 
     var authorization = (this.get('authorization') || '').split(' ')[1] || '';
     authorization = authorization.trim();
+    debug('%s %s with %j', this.method, this.url, authorization);
     if (!authorization) {
-      return yield *next;
+      return yield* next;
     }
 
     authorization = new Buffer(authorization, 'base64').toString().split(':');
     if (authorization.length !== 2) {
-      return yield *next;
+      return yield* next;
     }
 
     var username = authorization[0];
     var password = authorization[1];
 
-    var row = yield User.auth(username, password);
+    var row = yield* UserService.auth(username, password);
     if (!row) {
       debug('auth fail user: %j, headers: %j', row, this.header);
-      return yield *next;
+      return yield* next;
     }
 
-    this.user.name = row.name;
-    this.user.isAdmin = common.isAdmin(row.name);
+    this.user.name = row.login;
+    this.user.isAdmin = row.site_admin;
+    this.user.scopes = row.scopes;
     debug('auth pass user: %j, headers: %j', this.user, this.header);
-    yield *next;
+    yield* next;
   };
 };
