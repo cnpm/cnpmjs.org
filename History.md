@@ -1,4 +1,19 @@
 
+0.9.0 / 2014-07-29
+==================
+
+ * scopes init mv to services/user.js
+ * show user more profile
+ * registry show user support custom user service
+ * support custom user service for user auth
+ * remove session middleware
+ * add DefaultUserService
+ * check scopes in module.getAdapt
+ * test public mode, fix some logic, close #382
+ * move scope.js into publishable.js, add forcePublishWithScope
+ * config.scopes not exist, means do not support scope
+ * add assert scope middleware
+
 0.8.7 / 2014-07-24
 ==================
 
