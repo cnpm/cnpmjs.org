@@ -23,7 +23,13 @@ exports.listMaintainers = function* (name) {
   if (names.length === 0) {
     return names;
   }
-  return yield* User.listByNames(names);
+  var users = yield* User.listByNames(names);
+  return users.map(function (user) {
+    return {
+      name: user.name,
+      email: user.email
+    };
+  });
 };
 
 exports.listMaintainerNamesOnly = function* (name) {

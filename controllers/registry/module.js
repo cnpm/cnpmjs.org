@@ -102,12 +102,7 @@ exports.show = function* (next) {
   ];
   var rows = r[0];
   var users = r[1];
-  var maintainers = r[2].map(function (user) {
-    return {
-      name: user.name,
-      email: user.email,
-    };
-  });
+  var maintainers = r[2];
 
   debug('show %s got %d rows, %d tags, %d star users, maintainers: %j',
     name, rows.length, tags.length, users.length, maintainers);
@@ -289,12 +284,6 @@ exports.get = function* (next) {
     mod.package._cnpm_publish_time = mod.publish_time;
     var maintainers = yield* packageService.listMaintainers(name);
     if (maintainers.length > 0) {
-      maintainers = maintainers.map(function (user) {
-        return {
-          name: user.name,
-          email: user.email,
-        };
-      });
       mod.package.maintainers = maintainers;
     }
     if (adaptDefaultScope) {
