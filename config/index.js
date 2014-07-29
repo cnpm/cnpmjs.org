@@ -160,6 +160,11 @@ var config = {
   // but admins still can publish without scope
   forcePublishWithScope: true,
 
+  // some registry already have some private packages in global scope
+  // but we want to treat them as scoped private packages,
+  // so you can use this white list.
+  privatePackages: ['private-package'],
+
   /**
    * sync configs
    */
