@@ -152,7 +152,7 @@ exports.saveNpmUser = function* (user) {
 
 exports.saveCustomUser = function* (data) {
   var sql = 'SELECT id, json FROM user WHERE name=?;';
-  var row = yield mysql.queryOne(sql, [data.user.name]);
+  var row = yield mysql.queryOne(sql, [data.user.login]);
   var salt = data.salt || '0';
   var password_sha = data.password_sha || '0';
   var ip = data.ip || '0';
