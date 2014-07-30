@@ -35,6 +35,12 @@ module.exports = function *publishable(next) {
   // if `config.forcePublishWithScope` set to true, only admins can publish without scope
 
   var name = this.params.name || this.params[0];
+
+  // check if is private package list in config
+  if (config.privatePackages && config.privatePackages.indexOf(name) !== -1) {
+    return yield* next;
+  }
+
   // scope
   if (name[0] === '@') {
     if (checkScope(name, this)) {
