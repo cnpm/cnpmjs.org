@@ -20,6 +20,8 @@ var request = require('supertest');
 var app = require('../../servers/registry');
 var mm = require('mm');
 var mysql = require('../../common/mysql');
+var config = require('../../config');
+var UserService = require('../../services/user');
 
 describe('middleware/auth.test.js', function () {
   before(function (done) {
@@ -59,6 +61,30 @@ describe('middleware/auth.test.js', function () {
       .get('/-/user/org.couchdb.user:cnpmjstest10')
       .set('authorization', 'basic ' + new Buffer('cnpmjstest10:cnpmjstest10').toString('base64'))
       .expect(500, done);
+    });
+
+    describe('config.customUserService = true', function () {
+      beforeEach(function () {
+        mm(config, 'customUserService', true);
+      });
+
+      it('should 401 when user service auth throw error', function (done) {
+        mm(UserService, 'auth', function* () {
+          var err = new Error('mock user service auth error, please visit http://ooxx.net/user to sigup first');
+          err.name = 'UserSeriveAuthError';
+          err.status = 401;
+          throw err;
+        });
+
+        request(app)
+        .get('/-/user/org.couchdb.user:cnpmjstest10')
+        .set('authorization', 'basic ' + new Buffer('cnpmjstest10:cnpmjstest10').toString('base64'))
+        .expect({
+          error: 'UserSeriveAuthError',
+          reason: 'mock user service auth error, please visit http://ooxx.net/user to sigup first'
+        })
+        .expect(401, done);
+      });
     });
   });
 });

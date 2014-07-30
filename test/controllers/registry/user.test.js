@@ -342,5 +342,27 @@ describe('controllers/registry/user.test.js', function () {
         done();
       });
     });
+
+    it('should show error json when userSerive.auth throw error', function (done) {
+      mm(UserService, 'auth', function* () {
+        var err = new Error('mock user service auth error, please visit http://ooxx.net/user to sigup first');
+        err.name = 'UserSeriveAuthError';
+        err.status = 401;
+        throw err;
+      });
+
+      request(app)
+      .put('/-/user/org.couchdb.user:cnpmjstest10')
+      .send({
+        name: 'cnpmjstest10',
+        password: 'cnpmjstest10',
+        email: 'cnpmjstest10@cnpmjs.org'
+      })
+      .expect({
+        error: 'UserSeriveAuthError',
+        reason: 'mock user service auth error, please visit http://ooxx.net/user to sigup first'
+      })
+      .expect(401, done);
+    });
   });
 });
