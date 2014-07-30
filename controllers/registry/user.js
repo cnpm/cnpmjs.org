@@ -154,7 +154,17 @@ exports.add = function* () {
 
   debug('add user: %j', body);
 
-  var loginedUser = yield UserService.auth(body.name, body.password);
+  var loginedUser;
+  try {
+    loginedUser = yield UserService.auth(body.name, body.password);
+  } catch (err) {
+    this.status = err.status || 500;
+    this.body = {
+      error: err.name,
+      reason: err.message
+    };
+    return;
+  }
   if (loginedUser) {
     var rev = Date.now() + '-' + loginedUser.login;
     if (config.customUserService) {

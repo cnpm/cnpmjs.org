@@ -36,7 +36,18 @@ module.exports = function (options) {
     var username = authorization[0];
     var password = authorization[1];
 
-    var row = yield* UserService.auth(username, password);
+    var row;
+    try {
+      row = yield* UserService.auth(username, password);
+    } catch (err) {
+      this.status = err.status || 500;
+      this.body = {
+        error: err.name,
+        reason: err.message
+      };
+      return;
+    }
+
     if (!row) {
       debug('auth fail user: %j, headers: %j', row, this.header);
       return yield* next;
