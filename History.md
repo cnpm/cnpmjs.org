@@ -1,4 +1,12 @@
 
+0.9.1 / 2014-07-30
+==================
+
+ * Handle user service auth throw custom error message
+ * add test for config private packages
+ * add config.privatePackages
+ * add more comments in config/index.js
+
 0.9.0 / 2014-07-29
 ==================
 
