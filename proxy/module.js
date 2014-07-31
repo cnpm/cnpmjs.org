@@ -704,3 +704,38 @@ exports.getAdaptName = function* (name) {
   }
   return;
 };
+
+exports.listPrivates = function* () {
+  var scopes = config.scopes;
+  if (!scopes || !scopes.length) {
+    return [];
+  }
+  var privatePackages = config.privatePackages || [];
+
+  var args = [];
+  var sql = 'SELECT module_id AS id FROM tag WHERE tag="latest" AND (';
+  var wheres = [];
+
+  scopes.forEach(function (scope) {
+    wheres.push('name LIKE ?');
+    args.push(scope + '%');
+  });
+
+  if (privatePackages.length) {
+    wheres.push('name in (?)');
+    args.push(privatePackages);
+  }
+
+  sql = sql + wheres.join(' OR ') + ')';
+
+  var ids = yield mysql.query(sql, args);
+  ids = ids.map(function (row) {
+    return row.id;
+  });
+
+  if (!ids.length) {
+    return [];
+  }
+
+  return yield mysql.query(QUERY_MODULES_BY_ID_SQL, [ids]);
+};
