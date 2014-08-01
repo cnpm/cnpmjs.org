@@ -43,14 +43,14 @@ describe('controllers/sync.test.js', function () {
 
     it('should sync as publish success', function (done) {
       request(registryApp)
-      .del('/utility/-rev/123')
+      .del('/pedding/-rev/123')
       .set('authorization', baseauth)
       .end(function (err, res) {
         should.not.exist(err);
 
         mm.data(Npm, 'get', require(path.join(fixtures, 'utility.json')));
         request(registryApp)
-        .put('/utility/sync?publish=true&nodeps=true')
+        .put('/pedding/sync?publish=true&nodeps=true')
         .set('authorization', baseauth)
         .end(function (err, res) {
           should.not.exist(err);
@@ -75,7 +75,7 @@ describe('controllers/sync.test.js', function () {
     it('should sync through web success', function (done) {
       mm.data(Npm, 'get', require(path.join(fixtures, 'utility.json')));
       request(webApp)
-      .put('/sync/utility')
+      .put('/sync/pedding')
       .end(function (err, res) {
         should.not.exist(err);
         res.body.should.have.keys('ok', 'logId');
@@ -87,7 +87,7 @@ describe('controllers/sync.test.js', function () {
     it('should sync through registry success', function (done) {
       mm.data(Npm, 'get', require(path.join(fixtures, 'utility.json')));
       request(registryApp)
-      .put('/utility/sync')
+      .put('/pedding/sync')
       .set('authorization', baseauth)
       .end(function (err, res) {
         should.not.exist(err);
@@ -100,7 +100,7 @@ describe('controllers/sync.test.js', function () {
     it('should get sync log', function (done) {
       done = pedding(2, done);
       request(registryApp)
-      .get('/utility/sync/log/' + logIdRegistry)
+      .get('/pedding/sync/log/' + logIdRegistry)
       .end(function (err, res) {
         should.not.exist(err);
         res.body.should.have.keys('ok', 'log');
@@ -108,7 +108,7 @@ describe('controllers/sync.test.js', function () {
       });
 
       request(webApp)
-      .get('/sync/utility/log/' + logIdWeb)
+      .get('/sync/pedding/log/' + logIdWeb)
       .end(function (err, res) {
         should.not.exist(err);
         res.body.should.have.keys('ok', 'log');
