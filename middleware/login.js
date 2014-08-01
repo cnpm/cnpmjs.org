@@ -15,7 +15,16 @@
  */
 
 module.exports = function *login(next) {
+  if (this.user.error) {
+    this.status = this.user.error.status || 500;
+    this.body = {
+      error: this.user.error.name,
+      reason: this.user.error.message
+    };
+  }
+
   if (!this.user.name) {
+
     this.status = 401;
     this.body = {
       error: 'unauthorized',
