@@ -1,4 +1,10 @@
 
+1.0.1 / 2014-08-01
+==================
+
+  * Merge pull request #398 from cnpm/fix-auth
+  * hot fix auth error
+
 1.0.0 / 2014-08-01
 ==================
 
