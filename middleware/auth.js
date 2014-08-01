@@ -17,6 +17,11 @@
 var debug = require('debug')('cnpmjs.org:middleware:auth');
 var UserService = require('../services/user');
 
+/**
+ * Parse the request authorization
+ * get the real user
+ */
+
 module.exports = function (options) {
   return function* auth(next) {
     this.user = {};
@@ -40,12 +45,9 @@ module.exports = function (options) {
     try {
       row = yield* UserService.auth(username, password);
     } catch (err) {
-      this.status = err.status || 500;
-      this.body = {
-        error: err.name,
-        reason: err.message
-      };
-      return;
+      // do not response error here
+      // many request do not need login
+      this.user.error = err;
     }
 
     if (!row) {
