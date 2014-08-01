@@ -35,7 +35,7 @@
     "mime": "1.2.11",
     "mini-logger": "0.3.0",
     "mkdirp": "0.5.0",
-    "moment": "2.8.0",
+    "moment": "~2.8.1",
     "ms": "0.6.2",
     "multiline": "0.3.4",
     "mysql": "2.4.1",
