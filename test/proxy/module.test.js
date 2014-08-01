@@ -20,6 +20,7 @@ var fs = require('fs');
 var path = require('path');
 var mysql = require('../../common/mysql');
 var Module = require('../../proxy/module');
+var config = require('../../config');
 
 var fixtures = path.join(path.dirname(__dirname), 'fixtures');
 
@@ -171,6 +172,28 @@ describe('proxy/module.test.js', function () {
   describe('removeTagsByNames()', function () {
     it('should work', function* () {
       yield* Module.removeTagsByNames('foo', ['latest', '1.0']);
+    });
+  });
+
+  describe('listPrivates()', function () {
+    it('should response [] if scopes not present', function* () {
+      mm(config, 'scopes', []);
+      var modules = yield Module.listPrivates();
+      modules.should.eql([]);
+    });
+
+    it('should response [] if private modules not present', function* () {
+      mm(config, 'privatePackages', []);
+      mm(config, 'scopes', ['@not-exist']);
+      var modules = yield Module.listPrivates();
+      modules.should.eql([]);
+    });
+
+    it('should work', function* () {
+      var modules = yield Module.listPrivates();
+      modules.forEach(function (m) {
+        m.should.have.keys(['name', 'description']);
+      })
     });
   });
 });

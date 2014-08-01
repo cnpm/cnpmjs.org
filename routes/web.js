@@ -31,6 +31,8 @@ function routes(app) {
   app.get('/package/:name', pkg.display);
   app.get('/package/:name/:version', pkg.display);
 
+  app.get('/privates', pkg.listPrivates);
+
   app.get(/\/browse\/keyword\/(@[\w\-\.]+\/[\w\-\.]+)$/, pkg.search);
   app.get('/browse/keyword/:word', pkg.search);
 

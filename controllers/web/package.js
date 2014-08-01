@@ -242,6 +242,14 @@ exports.displaySync = function* (next) {
   });
 };
 
+exports.listPrivates = function* () {
+  var packages = yield Module.listPrivates();
+  yield this.render('private', {
+      title: 'private packages',
+      packages: packages
+    });
+};
+
 function setLicense(pkg) {
   var license;
   license = pkg.license || pkg.licenses || pkg.licence || pkg.licences;

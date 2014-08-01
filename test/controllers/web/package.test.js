@@ -25,6 +25,7 @@ var registry = require('../../../servers/registry');
 var pkg = require('../../../controllers/web/package');
 var SyncModuleWorker = require('../../../proxy/sync_module_worker');
 var utils = require('../../utils');
+var config = require('../../../config');
 
 var fixtures = path.join(path.dirname(path.dirname(__dirname)), 'fixtures');
 
@@ -235,6 +236,23 @@ describe('controllers/web/package.test.js', function () {
       .get('/package/browserjs')
       .expect(200)
       .expect(/This package has been unpublished\./, done);
+    });
+  });
+
+  describe('GET /privates', function () {
+    it('should response no private packages', function (done) {
+      mm(config, 'scopes', []);
+      request(app)
+      .get('/privates')
+      .expect(/Can not found private package/)
+      .expect(200, done);
+    });
+
+    it('should response no private packages', function (done) {
+      request(app)
+      .get('/privates')
+      .expect(/Private packages in this registry/)
+      .expect(200, done);
     });
   });
 });
