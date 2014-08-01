@@ -44,10 +44,12 @@ exports.display = function* (next) {
     return yield* next;
   }
 
+  user = user || {};
+
   var data = {
     name: name,
-    email: user && user.email,
-    json: user && user.json || {}
+    email: user.email,
+    json: user.json || {}
   };
 
   if (data.json.login) {
@@ -72,7 +74,7 @@ exports.display = function* (next) {
     title: 'User - ' + name,
     packages: packages,
     user: data,
-    lastModified: user.gmt_modified,
+    lastModified: user && user.gmt_modified,
     isAdmin: isAdmin,
     scopes: scopes
   });
