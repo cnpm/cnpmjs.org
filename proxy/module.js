@@ -495,63 +495,6 @@ exports.removeByNameAndVersions = function (name, versions, callback) {
   mysql.query(DELETE_MODULE_BY_NAME_AND_VERSIONS_SQL, [name, versions], callback);
 };
 
-var LIST_BY_AUTH_SQLS = [];
-LIST_BY_AUTH_SQLS.push(multiline(function () {;/*
-  SELECT
-    distinct(name) AS name
-  FROM
-    module
-  WHERE
-    author=?
-  ORDER BY
-    publish_time DESC
-  LIMIT
-    100;
-*/}));
-LIST_BY_AUTH_SQLS.push(multiline(function () {;/*
-  SELECT
-    module_id
-  FROM
-    tag
-  WHERE
-    tag="latest" AND name IN (?);
-*/}));
-LIST_BY_AUTH_SQLS.push(multiline(function () {;/*
-  SELECT
-    name, description
-  FROM
-    module
-  WHERE
-    id IN (?)
-  ORDER BY
-    publish_time DESC;
-*/}));
-exports.listByAuthor = function (author, callback) {
-  var ep = eventproxy.create();
-  ep.fail(callback);
-  mysql.query(LIST_BY_AUTH_SQLS[0], [author], ep.done(function (rows) {
-    if (!rows || rows.length === 0) {
-      return callback(null, []);
-    }
-    ep.emit('names', rows.map(function (r) {
-      return r.name;
-    }));
-  }));
-  ep.on('names', function (names) {
-    mysql.query(LIST_BY_AUTH_SQLS[1], [names], ep.done(function (rows) {
-      if (!rows || rows.length === 0) {
-        return callback(null, []);
-      }
-      ep.emit('ids', rows.map(function (r) {
-        return r.module_id;
-      }));
-    }));
-  });
-  ep.on('ids', function (ids) {
-    mysql.query(LIST_BY_AUTH_SQLS[2], [ids], callback);
-  });
-};
-
 var SEARCH_MODULES_SQL = multiline(function () {;/*
   SELECT
     module_id
@@ -738,4 +681,68 @@ exports.listPrivates = function* () {
   }
 
   return yield mysql.query(QUERY_MODULES_BY_ID_SQL, [ids]);
+};
+
+var LIST_BY_AUTH_SQLS = [];
+LIST_BY_AUTH_SQLS.push(multiline(function () {;/*
+  SELECT
+    distinct(name) AS name
+  FROM
+    module
+  WHERE
+    author=?
+  ORDER BY
+    publish_time DESC
+  LIMIT
+    100;
+*/}));
+LIST_BY_AUTH_SQLS.push(multiline(function () {;/*
+  SELECT
+    name
+  FROM
+    module_maintainer
+  WHERE
+    user = ?
+*/}));
+LIST_BY_AUTH_SQLS.push(multiline(function () {;/*
+  SELECT
+    module_id
+  FROM
+    tag
+  WHERE
+    tag="latest" AND name IN (?);
+*/}));
+LIST_BY_AUTH_SQLS.push(multiline(function () {;/*
+  SELECT
+    name, description
+  FROM
+    module
+  WHERE
+    id IN (?)
+  ORDER BY
+    publish_time DESC;
+*/}));
+exports.listByAuthor = function* (author, callback) {
+  var names = yield [
+    mysql.query(LIST_BY_AUTH_SQLS[0], [author]),
+    mysql.query(LIST_BY_AUTH_SQLS[1], [author])
+  ];
+
+  names = names[0].concat(names[1]).map(function (n) {
+    return n.name;
+  }).sort();
+
+  if (!names.length) {
+    return [];
+  }
+
+  var ids = yield mysql.query(LIST_BY_AUTH_SQLS[2], [names]);
+  if (!ids.length) {
+    return [];
+  }
+
+  ids = ids.map(function (i) {
+    return i.module_id;
+  });
+  return yield mysql.query(LIST_BY_AUTH_SQLS[3], [ids]);
 };

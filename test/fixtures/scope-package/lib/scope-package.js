@@ -14,4 +14,4 @@
  * Module dependencies.
  */
 
-var varname = require('modulename');
+var koa = require('koa');
