@@ -747,7 +747,7 @@ exports.removeWithVersions = function* (next) {
   debug('remove versions: %j, remain versions: %j', removeVersions, remainVersions);
 
   // step 4: remove all the versions which need to remove
-  yield Module.removeByNameAndVersions(name, removeVersions);
+  // let removeTar do remove versions from module table
   var tags = yield Module.listTags(name);
 
   var removeTags = [];
@@ -785,20 +785,24 @@ exports.removeTar = function* (next) {
   var name = this.params.name || this.params[0];
   var filename = this.params.filename || this.params[1];
   var id = Number(this.params.rev || this.params[2]);
-  debug('remove tarball with filename: %s, id: %s', filename, id);
+  // cnpmjs.org-2.0.0.tgz
+  var version = filename.split(name + '-')[1];
+  if (version) {
+    // 2.0.0.tgz
+    version = version.substring(0, version.lastIndexOf('.tgz'));
+  }
+  if (!version) {
+    return yield* next;
+  }
+
+  debug('remove tarball with filename: %s, version: %s, revert to => rev id: %s', filename, version, id);
 
   var username = this.user.name;
   if (isNaN(id)) {
     return yield* next;
   }
 
-  var mod = yield Module.getById(id);
-  if (!mod || mod.name !== name) {
-    return yield* next;
-  }
-
   var isMaintainer = yield* packageService.isMaintainer(name, username);
-
   if (!isMaintainer && !this.user.isAdmin) {
     this.status = 403;
     this.body = {
@@ -807,9 +811,33 @@ exports.removeTar = function* (next) {
     };
     return;
   }
-  var key = mod.package.dist && mod.package.dist.key;
+
+  var rs = yield [
+    Module.getById(id),
+    Module.get(name, version),
+  ];
+  var revertTo = rs[0];
+  var mod = rs[1]; // module need to delete
+  if (!mod || mod.name !== name) {
+    return yield* next;
+  }
+
+  var key = mod.package && mod.package.dist && mod.package.dist.key;
   key = key || common.getCDNKey(mod.name, filename);
-  yield nfs.remove(key);
+
+  if (revertTo && revertTo.package) {
+    debug('removing key: %s from nfs, revert to %s@%s', key, revertTo.name, revertTo.package.version);
+  } else {
+    debug('removing key: %s from nfs, no revert mod', key);
+  }
+  try {
+    yield nfs.remove(key);
+  } catch (err) {
+    logger.error(err);
+  }
+  // remove version from table
+  yield Module.removeByNameAndVersions(name, [version]);
+  debug('removed %s@%s', name, version);
   this.body = { ok: true };
 };
 
