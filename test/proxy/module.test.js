@@ -145,13 +145,10 @@ describe('proxy/module.test.js', function () {
   });
 
   describe('listByAuthor()', function () {
-    it('should return author recent modules', function (done) {
-      Module.listByAuthor('fengmk2', function (err, rows) {
-        should.not.exist(err);
-        rows.forEach(function (r) {
-          r.should.have.keys('name', 'description');
-        });
-        done();
+    it('should return author recent modules', function* () {
+      var rows = yield Module.listByAuthor('fengmk2');
+      rows.forEach(function (r) {
+        r.should.have.keys('name', 'description');
       });
     });
   });

@@ -12,7 +12,7 @@
   "dependencies": {
     "bytes": "1.0.0",
     "cheerio": "0.17.0",
-    "co": "3.0.6",
+    "co": "3.1.0",
     "co-defer": "0.1.0",
     "co-gather": "0.0.1",
     "co-read": "0.1.0",
@@ -27,7 +27,7 @@
     "graceful": "0.1.0",
     "gravatar": "1.0.6",
     "humanize-number": "0.0.2",
-    "koa": "0.8.1",
+    "koa": "0.8.2",
     "koa-limit": "1.0.2",
     "koa-markdown": "0.0.3",
     "koa-middlewares": "1.2.0",
@@ -35,7 +35,7 @@
     "mime": "1.2.11",
     "mini-logger": "0.3.0",
     "mkdirp": "0.5.0",
-    "moment": "2.7.0",
+    "moment": "2.8.0",
     "ms": "0.6.2",
     "multiline": "0.3.4",
     "mysql": "2.4.1",
@@ -44,7 +44,7 @@
     "ready": "0.1.1",
     "redis": "0.11.0",
     "semver": "3.0.1",
-    "thunkify-wrap": "1.0.1",
+    "thunkify-wrap": "1.0.2",
     "utility": "0.1.16"
   },
   "devDependencies": {
