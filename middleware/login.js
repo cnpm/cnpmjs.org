@@ -21,6 +21,7 @@ module.exports = function *login(next) {
       error: this.user.error.name,
       reason: this.user.error.message
     };
+    return;
   }
 
   if (!this.user.name) {

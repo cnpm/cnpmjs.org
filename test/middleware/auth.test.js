@@ -77,7 +77,7 @@ describe('middleware/auth.test.js', function () {
         });
 
         request(app)
-        .put('/-/user/org.couchdb.user:cnpmjstest10')
+        .put('/-/user/org.couchdb.user:cnpmjstest10/-rev/1')
         .set('authorization', 'basic ' + new Buffer('cnpmjstest10:cnpmjstest10').toString('base64'))
         .expect({
           error: 'UserSeriveAuthError',
