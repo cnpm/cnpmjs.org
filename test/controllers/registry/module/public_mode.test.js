@@ -560,7 +560,7 @@ describe('controllers/registry/module/public_module.test.js', function () {
       mm(config, 'enablePrivate', false);
       mm(config, 'forcePublishWithScope', false);
     });
-    before(function (done) {
+    beforeEach(function (done) {
       mm(config, 'enablePrivate', false);
       mm(config, 'forcePublishWithScope', false);
       var pkg = utils.getPackage('public-test-delete-download-module', '0.1.9', utils.otherUser);
@@ -569,9 +569,11 @@ describe('controllers/registry/module/public_module.test.js', function () {
       .set('content-type', 'application/json')
       .set('authorization', utils.otherUserAuth)
       .send(pkg)
-      .expect(201, function (err, res) {
+      .end(function (err, res) {
         should.not.exist(err);
-        withoutScopeRev = res.body.rev;
+        if (res.body.rev) {
+          withoutScopeRev = res.body.rev;
+        }
         done();
       });
     });
@@ -603,7 +605,7 @@ describe('controllers/registry/module/public_module.test.js', function () {
         mm(config, 'enablePrivate', false);
         mm(config, 'forcePublishWithScope', true);
       });
-      before(function (done) {
+      beforeEach(function (done) {
         mm(config, 'enablePrivate', false);
         mm(config, 'forcePublishWithScope', true);
         var pkg = utils.getPackage('@cnpm/public-test-delete-download-module', '0.1.9', utils.otherUser);
@@ -612,9 +614,11 @@ describe('controllers/registry/module/public_module.test.js', function () {
         .set('content-type', 'application/json')
         .set('authorization', utils.otherUserAuth)
         .send(pkg)
-        .expect(201, function (err, res) {
+        .end(function (err, res) {
           should.not.exist(err);
-          withScopeRev = res.body.rev;
+          if (res.body.rev) {
+            withScopeRev = res.body.rev;
+          }
           done();
         });
       });
