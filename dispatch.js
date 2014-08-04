@@ -75,3 +75,8 @@ function forkSyncer() {
     setTimeout(forkSyncer, 1000);
   });
 }
+
+process.on('uncaughtException', function (err) {
+  console.error('[%s] [master:%s] master uncaughtException: %s', Date(), process.pid, err.stack);
+  console.error(err);
+});
