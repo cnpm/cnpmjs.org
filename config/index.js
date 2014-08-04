@@ -135,6 +135,12 @@ var config = {
     domain: "http://qiniu-sdk-test.qiniudn.com",
   },
 
+  upyun: {
+    oprator: "test",
+    password: "test1234",
+    bucket: "jackson-test-space"
+  },
+
   // registry url name
   registryHost: 'r.cnpmjs.org',
 
