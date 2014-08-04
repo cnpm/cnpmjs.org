@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "bytes": "1.0.0",
+    "cfork": "1.0.0",
     "cheerio": "0.17.0",
     "co": "3.1.0",
     "co-defer": "0.1.0",
@@ -35,17 +36,17 @@
     "mime": "1.2.11",
     "mini-logger": "0.3.0",
     "mkdirp": "0.5.0",
-    "moment": "~2.8.1",
+    "moment": "2.8.1",
     "ms": "0.6.2",
     "multiline": "0.3.4",
-    "mysql": "2.4.1",
+    "mysql": "2.4.2",
     "nodemailer": "0.7.1",
     "qn": "0.2.2",
     "ready": "0.1.1",
     "redis": "0.11.0",
     "semver": "3.0.1",
     "thunkify-wrap": "1.0.2",
-    "utility": "0.1.16"
+    "utility": "1.0.0"
   },
   "devDependencies": {
     "autod": "~0.2.0",
