@@ -143,13 +143,12 @@ exports.show = function* (next) {
       };
       return;
     }
-    var result = yield SyncModuleWorker.sync(name, 'sync-by-install');
+    var result = yield* SyncModuleWorker.sync(name, 'sync-by-install');
     this.body = result.pkg;
     this.status = result.ok ? 200 : (result.statusCode || 500);
     return;
   }
 
-  var nextMod = null;
   var latestMod = null;
   var readme = null;
   // set tags
@@ -166,22 +165,19 @@ exports.show = function* (next) {
   var createdTime = null;
   for (var i = 0; i < rows.length; i++) {
     var row = rows[i];
-    if (row.version === 'next') {
-      nextMod = row;
-      continue;
-    }
     var pkg = row.package;
     common.setDownloadURL(pkg, this);
     pkg._cnpm_publish_time = row.publish_time;
     versions[pkg.version] = pkg;
+
     var t = times[pkg.version] = row.publish_time ? new Date(row.publish_time) : row.gmt_modified;
-    if ((!distTags.latest && !latestMod) || distTags.latest === row.version) {
+    if ((!distTags.latest && !latestMod) || distTags.latest === pkg.version) {
       latestMod = row;
       readme = pkg.readme;
     }
+
     delete pkg.readme;
     if (maintainers.length > 0) {
-      // TODO: need to use newer maintainers
       pkg.maintainers = maintainers;
     }
 
@@ -208,21 +204,13 @@ exports.show = function* (next) {
   }
 
   if (!latestMod) {
-    latestMod = nextMod || rows[0];
+    latestMod = rows[0];
   }
 
-  if (!nextMod) {
-    nextMod = latestMod;
-  }
-
-  var rev = '';
-  if (nextMod) {
-    rev = String(nextMod.id);
-  }
-
+  var rev = String(latestMod.id);
   var pkg = latestMod.package;
 
-  if (tags.length === 0 && pkg.version !== 'next') {
+  if (tags.length === 0) {
     // some sync error reason, will cause tags missing
     // set latest tag at least
     distTags.latest = pkg.version;
@@ -922,6 +910,8 @@ exports.listAllModules = function *() {
   this.body = result;
 };
 
+var A_WEEK_MS = 3600000 * 24 * 7;
+
 exports.listAllModulesSince = function *() {
   var query = this.query || {};
   if (query.stale !== 'update_after') {
@@ -936,6 +926,11 @@ exports.listAllModulesSince = function *() {
   debug('list all modules from %s', query.startkey);
   var startkey = Number(query.startkey) || 0;
   var updated = Date.now();
+  if (updated - startkey > A_WEEK_MS) {
+    startkey = updated - A_WEEK_MS;
+    console.warn('[%s] list modules since time out of range: query: %j, ip: %s',
+      Date(), query, this.ip);
+  }
   var mods = yield Module.listSince(startkey);
   var result = { _updated: updated };
   mods.forEach(function (mod) {

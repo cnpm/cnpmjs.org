@@ -76,12 +76,14 @@ SyncModuleWorker.prototype.finish = function () {
   if (this._finished || Object.keys(this.syncingNames).length > 0) {
     return;
   }
+  this._finished = true;
   this.log('[done] Sync %s module finished, %d success, %d fail\nSuccess: [ %s ]\nFail: [ %s ]',
     this.startName,
     this.successes.length, this.fails.length,
     this.successes.join(', '), this.fails.join(', '));
   this.emit('end');
-  this._finished = true;
+  // make sure all event listeners release
+  this.removeAllListeners();
 };
 
 SyncModuleWorker.prototype.log = function (format, arg1, arg2) {
