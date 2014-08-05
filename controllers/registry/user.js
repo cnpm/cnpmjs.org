@@ -214,6 +214,22 @@ exports.add = function* () {
 };
 
 // logined before update, no need to auth user again
+// { name: 'admin',
+// password: '123123',
+// email: 'fengmk2@gmail.com',
+// _id: 'org.couchdb.user:admin',
+// type: 'user',
+// roles: [],
+// date: '2014-08-05T16:08:22.645Z',
+// _rev: '1-1a18c3d73ba42e863523a399ff3304d8',
+// _cnpm_meta:
+//  { id: 14,
+//    npm_user: false,
+//    custom_user: false,
+//    gmt_create: '2014-08-05T15:46:58.000Z',
+//    gmt_modified: '2014-08-05T15:46:58.000Z',
+//    admin: true,
+//    scopes: [ '@cnpm', '@cnpmtest' ] } }
 exports.update = function *(next) {
   var name = this.params.name;
   var rev = this.params.rev;

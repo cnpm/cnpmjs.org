@@ -426,7 +426,6 @@ exports.addPackageAndDist = function *(next) {
   //    { content_type: 'application/octet-stream',
   //      data: 'H4sIAAAAA
   //      length: 9883
-
   var pkg = this.request.body;
   var username = this.user.name;
   var name = this.params.name || this.params[0];
