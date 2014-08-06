@@ -30,6 +30,7 @@ var controller = require('../../../controllers/registry/module');
 var ModuleDeps = require('../../../proxy/module_deps');
 var SyncModuleWorker = require('../../../proxy/sync_module_worker');
 var utils = require('../../utils');
+var mysql = require('../../../common/mysql');
 
 var fixtures = path.join(path.dirname(path.dirname(__dirname)), 'fixtures');
 
@@ -532,7 +533,8 @@ describe('controllers/registry/module.test.js', function () {
 
   describe('PUT /:name publish new flow addPackageAndDist()', function () {
     it('should publish with tgz base64, addPackageAndDist()', function (done) {
-      var pkg = utils.getPackage('testpublishmodule', '0.0.2');
+      done = pedding(2, done);
+      var pkg = utils.getPackage('testpublishmodule-new-add', '0.0.2');
       request(app)
       .put('/' + pkg.name)
       .set('authorization', utils.adminAuth)
@@ -553,6 +555,15 @@ describe('controllers/registry/module.test.js', function () {
             error: 'forbidden',
             reason: 'cannot modify pre-existing version: 0.0.2'
           });
+          done();
+        });
+
+        // maintainers should exists
+        mysql.query('SELECT user FROM module_maintainer WHERE name=?', ['testpublishmodule-new-add'],
+        function (err, rows) {
+          should.not.exist(err);
+          rows.length.should.above(0);
+          rows.should.eql([ { user: 'cnpmjstest10' } ]);
           done();
         });
       });
@@ -922,7 +933,7 @@ describe('controllers/registry/module.test.js', function () {
         .expect(201, done);
       });
 
-      it('shold fail when user not maintainer', function (done) {
+      it('should fail when user not maintainer', function (done) {
         request(app)
         .del('/remove-all-module/-rev/1')
         .set('authorization', utils.otherUserAuth)
@@ -936,14 +947,19 @@ describe('controllers/registry/module.test.js', function () {
         });
       });
 
-      it('shold ok', function (done) {
+      it('should remove all versions ok', function (done) {
         request(app)
         .del('/remove-all-module/-rev/1')
         .set('authorization', utils.adminAuth)
         .expect(200, function (err, res) {
           should.not.exist(err);
           should.not.exist(res.headers['set-cookie']);
-          done();
+          mysql.query('SELECT * FROM module_maintainer WHERE name=?', ['remove-all-module'],
+          function (err, rows) {
+            should.not.exist(err);
+            rows.should.length(0);
+            done();
+          });
         });
       });
     });

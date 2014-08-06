@@ -36,12 +36,20 @@ exports.listMaintainerNamesOnly = function* (name) {
   return yield* ModuleMaintainer.get(name);
 };
 
+exports.addMaintainers = function* (name, usernames) {
+  return yield* ModuleMaintainer.addMulti(name, usernames);
+};
+
 exports.updateMaintainers = function* (name, usernames) {
   var rs = yield [
     ModuleMaintainer.update(name, usernames),
     Module.updateLastModified(name),
   ];
   return rs[0];
+};
+
+exports.removeAllMaintainers = function* (name) {
+  return yield* ModuleMaintainer.removeAll(name);
 };
 
 exports.isMaintainer = function* (name, username) {

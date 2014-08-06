@@ -442,9 +442,10 @@ exports.addPackageAndDist = function *(next) {
 
   var attachment = pkg._attachments[filename];
   var versionPackage = pkg.versions[version];
+  var maintainers = versionPackage.maintainers;
 
   // should never happened in normal request
-  if (!versionPackage.maintainers) {
+  if (!maintainers) {
     this.status = 400;
     this.body = {
       error: 'maintainers error',
@@ -458,7 +459,7 @@ exports.addPackageAndDist = function *(next) {
 
   // make sure user in auth is in maintainers
   // should never happened in normal request
-  var m = versionPackage.maintainers.filter(function (maintainer) {
+  var m = maintainers.filter(function (maintainer) {
     return maintainer.name === username;
   });
   if (!m.length) {
@@ -578,6 +579,11 @@ exports.addPackageAndDist = function *(next) {
       return Module.addTag(name, tag[0], tag[1]);
     });
   }
+
+  // ensure maintainers exists
+  yield* packageService.addMaintainers(name, maintainers.map(function (item) {
+    return item.name;
+  }));
 
   this.status = 201;
   this.body = {
@@ -872,6 +878,9 @@ exports.removeAll = function* (next) {
       // ignore error here
     }
   }
+
+  // remove the maintainers
+  yield* packageService.removeAllMaintainers(name);
 
   this.body = { ok: true };
 };

@@ -44,6 +44,20 @@ function* remove(name, usernames) {
   return yield mysql.query(REMOVE_SQL, [name, usernames]);
 }
 
+var REMOVE_ALL_SQL = 'DELETE FROM module_maintainer WHERE name = ?';
+
+exports.removeAll = function* (name) {
+  return yield mysql.query(REMOVE_ALL_SQL, [name]);
+};
+
+exports.addMulti = function* (name, usernames) {
+  var tasks = [];
+  for (var i = 0; i < usernames.length; i++) {
+    tasks.push(add(name, usernames[i]));
+  }
+  return yield tasks;
+};
+
 exports.update = function* (name, maintainers) {
   // maintainers should be [name1, name2, ...] format
   // find out the exists maintainers then remove the deletes and add the left
@@ -64,11 +78,8 @@ exports.update = function* (name, maintainers) {
       }
     }
   }
-  var tasks = [];
-  for (var i = 0; i < addUsers.length; i++) {
-    tasks.push(add(name, addUsers[i]));
-  }
-  yield tasks;
+
+  yield* exports.addMulti(name, addUsers);
   // make sure all add users success then remove users
   if (removeUsers.length > 0) {
     yield* remove(name, removeUsers);

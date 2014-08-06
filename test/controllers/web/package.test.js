@@ -218,7 +218,7 @@ describe('controllers/web/package.test.js', function () {
   describe('unpublished package', function () {
     before(function (done) {
       var worker = new SyncModuleWorker({
-        name: ['browserjs'],
+        name: ['tnpm'],
         username: 'fengmk2'
       });
 
@@ -226,14 +226,14 @@ describe('controllers/web/package.test.js', function () {
       worker.on('end', function () {
         var names = worker.successes.concat(worker.fails);
         names.sort();
-        names.should.eql(['browserjs']);
+        names.should.eql(['tnpm']);
         done();
       });
     });
 
     it('should display unpublished info', function (done) {
       request(app)
-      .get('/package/browserjs')
+      .get('/package/tnpm')
       .expect(200)
       .expect(/This package has been unpublished\./, done);
     });
