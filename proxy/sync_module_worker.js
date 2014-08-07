@@ -458,7 +458,6 @@ SyncModuleWorker.prototype._sync = function* (name, pkg) {
         }
 
         if (version.deprecated && version.deprecated !== exists.package.deprecated) {
-          console.log(version.deprecated, exists.package.deprecated)
           // need to sync deprecated field
           missingDeprecateds.push({
             id: exists.id,
