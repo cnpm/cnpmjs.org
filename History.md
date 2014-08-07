@@ -1,4 +1,11 @@
 
+1.2.0 / 2014-08-07
+==================
+
+ * show deprecated message
+ * Sync deprecated field if it missing
+ * Support $ cnpm deprecate [pkgname]@[version] "message". fixed #415
+
 1.1.0 / 2014-08-07
 ==================
 
