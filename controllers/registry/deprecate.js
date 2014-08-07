@@ -44,7 +44,7 @@ function* deprecateVersions(next) {
       return;
     }
     var data = body.versions[row.package.version];
-    if (data.deprecated) {
+    if (typeof data.deprecated === 'string') {
       row.package.deprecated = data.deprecated;
       updateTasks.push(Module.updatePackage(row.id, row.package));
     }
