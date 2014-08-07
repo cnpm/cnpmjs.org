@@ -162,26 +162,6 @@ exports.updateDescription = function (id, description, callback) {
   mysql.query(UPDATE_DESC_SQL, [description, id], callback);
 };
 
-var UPDATE_PACKAGE_SQL = multiline(function () {;/*
-  UPDATE
-    module
-  SET
-    package=?
-  WHERE
-    id=?;
-*/});
-exports.updateReadme = function (id, readme, callback) {
-  exports.getById(id, function (err, data) {
-    if (err) {
-      return callback(err);
-    }
-    data.package = data.package || {};
-    data.package.readme = readme;
-    var pkg = stringifyPackage(data.package);
-    mysql.query(UPDATE_PACKAGE_SQL, [pkg, id], callback);
-  });
-};
-
 var UPDATE_DIST_SQL = 'UPDATE module SET ? WHERE id=?';
 exports.update = function (mod, callback) {
   var pkg;
@@ -745,4 +725,28 @@ exports.listByAuthor = function* (author, callback) {
     return i.module_id;
   });
   return yield mysql.query(LIST_BY_AUTH_SQLS[3], [ids]);
+};
+
+var UPDATE_PACKAGE_SQL = multiline(function () {;/*
+  UPDATE
+    module
+  SET
+    package=?
+  WHERE
+    id=?;
+*/});
+
+exports.updatePackage = function* (id, pkg) {
+  pkg = stringifyPackage(pkg);
+  return yield mysql.query(UPDATE_PACKAGE_SQL, [pkg, id]);
+};
+
+exports.updateReadme = function* (id, readme) {
+  var data = yield exports.getById(id);
+  if (!data) {
+    throw new Error('module#' + id + ' not exists');
+  }
+  data.package = data.package || {};
+  data.package.readme = readme;
+  return yield* exports.updatePackage(id, data.package);
 };

@@ -41,6 +41,7 @@ var ModuleUnpublished = require('../../proxy/module_unpublished');
 var packageService = require('../../services/package');
 var UserService = require('../../services/user');
 var downloadAsReadStream = require('../utils').downloadAsReadStream;
+var deprecateVersions = require('./deprecate');
 
 /**
  * show all version of a module
@@ -431,17 +432,31 @@ exports.addPackageAndDist = function *(next) {
   var name = this.params.name || this.params[0];
   var filename = Object.keys(pkg._attachments || {})[0];
   var version = Object.keys(pkg.versions || {})[0];
-  if (!version || !filename) {
+  if (!version) {
     this.status = 400;
     this.body = {
       error: 'version_error',
-      reason: 'filename or version not found, filename: ' + filename + ', version: ' + version
+      reason: 'version ' + version + ' not found'
+    };
+    return;
+  }
+
+  var versionPackage = pkg.versions[version];
+
+  if (!filename) {
+    if (versionPackage.deprecated) {
+      return yield* deprecateVersions.call(this, next);
+    }
+
+    this.status = 400;
+    this.body = {
+      error: 'filename_error',
+      reason: 'filename ' + filename + ' not found'
     };
     return;
   }
 
   var attachment = pkg._attachments[filename];
-  var versionPackage = pkg.versions[version];
   var maintainers = versionPackage.maintainers;
 
   // should never happened in normal request
