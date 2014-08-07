@@ -477,7 +477,7 @@ describe('controllers/registry/module.test.js', function () {
       .send(pkg)
       .expect(400, function (err, res) {
         should.not.exist(err);
-        res.body.reason.should.containEql('filename or version not found');
+        res.body.reason.should.equal('version undefined not found');
         done();
       });
     });
@@ -502,7 +502,7 @@ describe('controllers/registry/module.test.js', function () {
         should.not.exist(err);
         res.body.should.eql({
           error: 'version_error',
-          reason: 'filename or version not found, filename: undefined, version: undefined'
+          reason: 'version undefined not found'
         });
         done();
       });
@@ -580,7 +580,7 @@ describe('controllers/registry/module.test.js', function () {
         should.not.exist(err);
         res.body.should.eql({
           error: 'version_error',
-          reason: 'filename or version not found, filename: mk2testmodule-0.0.1.tgz, version: undefined'
+          reason: 'version undefined not found'
         });
         done();
       });

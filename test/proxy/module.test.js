@@ -18,14 +18,30 @@ var should = require('should');
 var mm = require('mm');
 var fs = require('fs');
 var path = require('path');
+var request = require('supertest');
 var mysql = require('../../common/mysql');
 var Module = require('../../proxy/module');
 var config = require('../../config');
+var utils = require('../utils');
+var app = require('../../servers/registry');
 
 var fixtures = path.join(path.dirname(__dirname), 'fixtures');
 
 var id;
+var pkgname = 'module-proxy-test-pkg';
+var pkgversion = '1.0.0';
+
 describe('proxy/module.test.js', function () {
+
+  before(function (done) {
+    var pkg = utils.getPackage(pkgname, pkgversion, utils.admin);
+    request(app.listen())
+    .put('/' + pkgname)
+    .set('authorization', utils.adminAuth)
+    .send(pkg)
+    .expect(201, done);
+  });
+
   afterEach(mm.restore);
 
   describe('addTag()', function () {
@@ -154,15 +170,12 @@ describe('proxy/module.test.js', function () {
   });
 
   describe('updateReadme()', function () {
-    it('should update ok', function (done) {
-      Module.updateReadme(id, 'test', function (err, data) {
-        should.not.exist(err);
-        Module.getById(id, function (err, data) {
-          should.not.exist(err);
-          data.package.readme.should.equal('test');
-          done();
-        });
-      });
+    it('should update ok', function* () {
+      var row = yield Module.get(pkgname, pkgversion);
+      should.exist(row);
+      yield* Module.updateReadme(row.id, 'test');
+      var data = yield Module.getById(row.id);
+      data.package.readme.should.equal('test');
     });
   });
 
