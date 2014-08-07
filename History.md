@@ -1,4 +1,14 @@
 
+1.1.0 / 2014-08-07
+==================
+
+ * Add user to maintainers when publish. fixed #395
+ * List all npm registry api. close #413
+ * limit list since
+ * change deps by "~"
+ * use cfork to make sure worker fork and restart
+ * handle master uncaughtException. fixed #403
+
 1.0.6 / 2014-08-02
 ==================
 
