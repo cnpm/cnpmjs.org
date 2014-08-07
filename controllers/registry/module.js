@@ -441,10 +441,27 @@ exports.addPackageAndDist = function *(next) {
     return;
   }
 
-  var versionPackage = pkg.versions[version];
+  // check maintainers
+  var isMaintainer = yield* packageService.isMaintainer(name, username);
+  if (!isMaintainer) {
+    this.status = 403;
+    this.body = {
+      error: 'forbidden user',
+      reason: username + ' not authorized to modify ' + name
+    };
+    return;
+  }
 
   if (!filename) {
-    if (versionPackage.deprecated) {
+    var hasDeprecated = false;
+    for (var v in pkg.versions) {
+      var row = pkg.versions[v];
+      if (typeof row.deprecated === 'string') {
+        hasDeprecated = true;
+        break;
+      }
+    }
+    if (hasDeprecated) {
       return yield* deprecateVersions.call(this, next);
     }
 
@@ -457,6 +474,7 @@ exports.addPackageAndDist = function *(next) {
   }
 
   var attachment = pkg._attachments[filename];
+  var versionPackage = pkg.versions[version];
   var maintainers = versionPackage.maintainers;
 
   // should never happened in normal request
@@ -512,17 +530,6 @@ exports.addPackageAndDist = function *(next) {
     this.body = {
       error: 'forbidden',
       reason: 'cannot modify pre-existing version: ' + version
-    };
-    return;
-  }
-
-  // check maintainers
-  var isMaintainer = yield* packageService.isMaintainer(name, username);
-  if (!isMaintainer) {
-    this.status = 403;
-    this.body = {
-      error: 'forbidden user',
-      reason: username + ' not authorized to modify ' + name
     };
     return;
   }
