@@ -50,6 +50,8 @@ function* deprecateVersions(next) {
     }
   }
   yield updateTasks;
+  // update last modified
+  yield* Module.updateLastModified(name);
 
   this.status = 201;
   this.body = {

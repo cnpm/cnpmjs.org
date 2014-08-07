@@ -741,6 +741,18 @@ exports.updatePackage = function* (id, pkg) {
   return yield mysql.query(UPDATE_PACKAGE_SQL, [pkg, id]);
 };
 
+exports.updatePackageFields = function* (id, fields) {
+  var data = yield exports.getById(id);
+  if (!data) {
+    throw new Error('module#' + id + ' not exists');
+  }
+  data.package = data.package || {};
+  for (var k in fields) {
+    data.package[k] = fields[k];
+  }
+  return yield* exports.updatePackage(id, data.package);
+};
+
 exports.updateReadme = function* (id, readme) {
   var data = yield exports.getById(id);
   if (!data) {

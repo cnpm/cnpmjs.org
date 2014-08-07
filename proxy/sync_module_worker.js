@@ -341,6 +341,7 @@ SyncModuleWorker.prototype._sync = function* (name, pkg) {
   var missingReadmes = [];
   var missingStarUsers = [];
   var npmUsernames = {};
+  var missingDeprecateds = [];
 
   // find out all user names
   for (var v in pkg.versions) {
@@ -430,8 +431,9 @@ SyncModuleWorker.prototype._sync = function* (name, pkg) {
     var sourceAuthor = version.maintainers && version.maintainers[0] &&
       version.maintainers[0].name || exists.author;
 
-    if (exists.package && exists.package.dist.shasum === version.dist.shasum &&
-      exists.author === sourceAuthor) {
+    if (exists.package &&
+        exists.package.dist.shasum === version.dist.shasum &&
+        exists.author === sourceAuthor) {
       // * author make sure equal
       // * shasum make sure equal
       if ((version.publish_time === exists.publish_time) ||
@@ -452,6 +454,15 @@ SyncModuleWorker.prototype._sync = function* (name, pkg) {
           missingReadmes.push({
             id: exists.id,
             readme: version.readme
+          });
+        }
+
+        if (version.deprecated && version.deprecated !== exists.package.deprecated) {
+          console.log(version.deprecated, exists.package.deprecated)
+          // need to sync deprecated field
+          missingDeprecateds.push({
+            id: exists.id,
+            deprecated: version.deprecated
           });
         }
         continue;
@@ -604,6 +615,29 @@ SyncModuleWorker.prototype._sync = function* (name, pkg) {
     }
   }
 
+  function *syncDeprecateds() {
+    if (missingDeprecateds.length === 0) {
+      return;
+    }
+    that.log('  [%s] saving %d Deprecated fields', name, missingDeprecateds.length);
+
+    var res = yield gather(missingDeprecateds.map(function (item) {
+      return Module.updatePackageFields(item.id, {
+        deprecated: item.deprecated
+      });
+    }));
+
+    for (var i = 0; i < res.length; i++) {
+      var item = missingDeprecateds[i];
+      var r = res[i];
+      if (r.error) {
+        that.log('    save error, id: %s, error: %s', item.id, r.error.message);
+      } else {
+        that.log('    saved, id: %s', item.id);
+      }
+    }
+  }
+
   function *syncMissingUsers() {
     var missingUsers = [];
     var names = Object.keys(npmUsernames);
@@ -660,7 +694,9 @@ SyncModuleWorker.prototype._sync = function* (name, pkg) {
     }
   }
 
-  yield [syncDes(), syncTag(), syncReadme(), syncMissingStarUsers(), syncMissingUsers()];
+  yield [
+    syncDes(), syncTag(), syncReadme(), syncDeprecateds(),
+    syncMissingStarUsers(), syncMissingUsers()];
   return syncedVersionNames;
 };
 
