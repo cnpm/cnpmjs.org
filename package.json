@@ -28,7 +28,7 @@
     "graceful": "~0.1.0",
     "gravatar": "~1.0.6",
     "humanize-number": "~0.0.2",
-    "koa": "~0.8.2",
+    "koa": "~0.9.0",
     "koa-limit": "~1.0.2",
     "koa-markdown": "~0.0.3",
     "koa-middlewares": "~1.2.0",
