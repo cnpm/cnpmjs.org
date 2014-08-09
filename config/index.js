@@ -128,12 +128,12 @@ var config = {
 
   // package tarball store in qn by default
   // qiniu cdn: http://www.qiniu.com/, it free for dev.
-  qn: {
+  nfs: require('qn-cnpm')({
     accessKey: "5UyUq-l6jsWqZMU6tuQ85Msehrs3Dr58G-mCZ9rE",
     secretKey: "YaRsPKiYm4nGUt8mdz2QxeV5Q_yaUzVxagRuWTfM",
     bucket: "qiniu-sdk-test",
     domain: "http://qiniu-sdk-test.qiniudn.com",
-  },
+  }),
 
   // registry url name
   registryHost: 'r.cnpmjs.org',

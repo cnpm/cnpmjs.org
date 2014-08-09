@@ -15,11 +15,5 @@
  */
 
 var config = require('../config');
-var nfs = config.nfs;
 
-if (!nfs) {
-  // use qnfs by default
-  nfs = require('./qnfs');
-}
-
-module.exports = nfs;
+module.exports = config.nfs;
