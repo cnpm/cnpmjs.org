@@ -782,7 +782,7 @@ describe('controllers/registry/module.test.js', function () {
     it('should download a file with 302 redirect', function (done) {
       request(app)
       .get('/cutter/download/cutter-0.0.2.tgz')
-      .expect('Location', config.qn.domain + '/cutter/-/cutter-0.0.2.tgz')
+      .expect('Location', /\/cutter\/-\/cutter-0\.0\.2\.tgz/)
       .expect(302, done);
     });
   });
