@@ -145,8 +145,7 @@ describe('controllers/registry/module/scope_package.test.js', function () {
   it('should download work', function (done) {
     request(app)
     .get('/@cnpm/test-scope-package/download/@cnpm/test-scope-package-0.0.2.tgz')
-    .expect('Location', /\.tgz$/)
-    .expect(302, done);
+    .expect(200, done);
   });
 
   describe('support adaptScope', function () {
