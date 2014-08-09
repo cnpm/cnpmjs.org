@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "bytes": "~1.0.0",
-    "cfork": "~1.0.1",
+    "cfork": "~1.1.0",
     "cheerio": "~0.17.0",
     "co": "~3.1.0",
     "co-defer": "~0.1.0",
