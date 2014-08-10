@@ -779,11 +779,10 @@ describe('controllers/registry/module.test.js', function () {
   });
 
   describe('GET /:name/download/:filename', function () {
-    it('should download a file with 302 redirect', function (done) {
+    it('should download a file with 200', function (done) {
       request(app)
-      .get('/cutter/download/cutter-0.0.2.tgz')
-      .expect('Location', config.qn.domain + '/cutter/-/cutter-0.0.2.tgz')
-      .expect(302, done);
+      .get('/mk2testmodule/download/mk2testmodule-0.0.1.tgz')
+      .expect(200, done);
     });
   });
 

@@ -16,6 +16,7 @@ pretest:
 	@mysql -uroot -e 'CREATE DATABASE cnpmjs_test;'
 	@mysql -uroot 'cnpmjs_test' < ./docs/db.sql
 	@mysql -uroot 'cnpmjs_test' -e 'show tables;'
+	@rm -rf .tmp/dist
 
 test: install pretest
 	@NODE_ENV=test ./node_modules/.bin/mocha \

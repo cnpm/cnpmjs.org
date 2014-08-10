@@ -18,6 +18,8 @@ var should = require('should');
 var request = require('supertest');
 var pedding = require('pedding');
 var mm = require('mm');
+var fs = require('fs');
+var nfs = require('../../../common/nfs');
 var app = require('../../../servers/web');
 var Dist = require('../../../proxy/dist');
 
@@ -127,7 +129,7 @@ describe('controllers/web/dist.test.js', function () {
           url: '/dist/v0.10.28/SHASUMS.txt'
         };
       });
-
+      fs.writeFileSync(nfs._getpath('/dist/v0.10.28/SHASUMS.txt'), '6eff580cc8460741155d42ef1ef537961194443f');
       request(app)
       .get('/dist/v0.10.28/SHASUMS.txt')
       .expect(200)
