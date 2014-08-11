@@ -1,4 +1,15 @@
 
+1.3.0 / 2014-08-11
+==================
+
+  * ignore config/config.js
+  * Merge pull request #421 from cnpm/qn-cnpm
+  * fix test case
+  * use fs-cnpm
+  * fix test
+  * use qn-cnpm
+  * bump cfork
+
 1.2.2 / 2014-08-08
 ==================
 
