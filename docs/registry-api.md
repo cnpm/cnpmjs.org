@@ -245,7 +245,9 @@ Content-Length: 2243
 }
 ```
 
-### Get a special version or tag package
+### ~~Get a special version or tag package~~
+
+__deprecated__
 
 ```
 GET /:package/:tag_or_version
@@ -505,12 +507,15 @@ Status: 201 Created
 ### Remove one version from package
 
 * Authentication required.
+* In any delete, note that __the version number still cannot be reused__.
 
 ```
 PUT /:package/-rev/:rev
 ```
 
 #### Input
+
+Remove that specific version from the versions hash in the `PUT` body.
 
 Example for removing `0.0.1` version:
 
@@ -539,6 +544,25 @@ Example for removing `0.0.1` version:
   "homepage": "https://github.com/fengmk2/pedding",
   "bugs": { ... },
   "license": "MIT" }
+```
+
+#### Response
+
+```json
+Status: 201 Created
+
+{
+  "ok": true
+}
+```
+
+### Remove all versions of a package
+
+* Authentication required.
+* In any delete, note that __the version number still cannot be reused__.
+
+```
+DELETE /:package/-rev/:rev
 ```
 
 #### Response
