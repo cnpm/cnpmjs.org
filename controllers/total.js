@@ -32,7 +32,7 @@ exports.show = function *() {
   total.instance_start_time = startTime;
   total.node_version = process.version;
   total.app_version = version;
-  total.donate = 'https://me.alipay.com/imk2';
+  total.donate = 'https://www.gittip.com/fengmk2';
   total.sync_model = config.syncModel;
 
   this.body = total;
