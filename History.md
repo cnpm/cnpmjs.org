@@ -1,9 +1,16 @@
 
+1.3.1 / 2014-08-18 
+==================
+
+  * add sync not exist tools, close [#424](https://github.com/cnpm/cnpmjs.org/issues/424)
+  * use gittip instand of alipay. close [#425](https://github.com/cnpm/cnpmjs.org/issues/425)
+  * update registry api doc
+
 1.3.0 / 2014-08-11
 ==================
 
   * ignore config/config.js
-  * Merge pull request #421 from cnpm/qn-cnpm
+  * Merge pull request [#421](https://github.com/cnpm/cnpmjs.org/issues/421) from cnpm/qn-cnpm
   * fix test case
   * use fs-cnpm
   * fix test
@@ -25,17 +32,17 @@
 
  * show deprecated message
  * Sync deprecated field if it missing
- * Support $ cnpm deprecate [pkgname]@[version] "message". fixed #415
+ * Support $ cnpm deprecate [pkgname]@[version] "message". fixed [#415](https://github.com/cnpm/cnpmjs.org/issues/415)
 
 1.1.0 / 2014-08-07
 ==================
 
- * Add user to maintainers when publish. fixed #395
- * List all npm registry api. close #413
+ * Add user to maintainers when publish. fixed [#395](https://github.com/cnpm/cnpmjs.org/issues/395)
+ * List all npm registry api. close [#413](https://github.com/cnpm/cnpmjs.org/issues/413)
  * limit list since
  * change deps by "~"
  * use cfork to make sure worker fork and restart
- * handle master uncaughtException. fixed #403
+ * handle master uncaughtException. fixed [#403](https://github.com/cnpm/cnpmjs.org/issues/403)
 
 1.0.6 / 2014-08-02
 ==================
@@ -45,12 +52,12 @@
 1.0.5 / 2014-08-02
 ==================
 
- * unpublish pkg@version bug hotfix. fixed #400
+ * unpublish pkg@version bug hotfix. fixed [#400](https://github.com/cnpm/cnpmjs.org/issues/400)
 
 1.0.4 / 2014-08-01
 ==================
 
- * hotfix #399 use not exists
+ * hotfix [#399](https://github.com/cnpm/cnpmjs.org/issues/399) use not exists
 
 1.0.3 / 2014-08-01
 ==================
@@ -65,7 +72,7 @@
 1.0.1 / 2014-08-01
 ==================
 
-  * Merge pull request #398 from cnpm/fix-auth
+  * Merge pull request [#398](https://github.com/cnpm/cnpmjs.org/issues/398) from cnpm/fix-auth
   * hot fix auth error
 
 1.0.0 / 2014-08-01
@@ -96,7 +103,7 @@
  * remove session middleware
  * add DefaultUserService
  * check scopes in module.getAdapt
- * test public mode, fix some logic, close #382
+ * test public mode, fix some logic, close [#382](https://github.com/cnpm/cnpmjs.org/issues/382)
  * move scope.js into publishable.js, add forcePublishWithScope
  * config.scopes not exist, means do not support scope
  * add assert scope middleware
@@ -109,12 +116,12 @@
 0.8.6 / 2014-07-23
 ==================
 
- * show unpublished info on web package page. fixes #381
+ * show unpublished info on web package page. fixes [#381](https://github.com/cnpm/cnpmjs.org/issues/381)
 
 0.8.5 / 2014-07-22
 ==================
 
- * Only private package support default scoped. fixed #378
+ * Only private package support default scoped. fixed [#378](https://github.com/cnpm/cnpmjs.org/issues/378)
 
 0.8.4 / 2014-07-22
 ==================
@@ -135,20 +142,20 @@
 ==================
 
  * add more test cases
- * support default @org. close #376
+ * support default @org. close [#376](https://github.com/cnpm/cnpmjs.org/issues/376)
  * hotfix redis init error
 
 0.8.0 / 2014-07-21
 ==================
 
- * support "scoped" packages. close #352
+ * support "scoped" packages. close [#352](https://github.com/cnpm/cnpmjs.org/issues/352)
  * use safe jsonp
- * Stop support old publish flow. fix #368
+ * Stop support old publish flow. fix [#368](https://github.com/cnpm/cnpmjs.org/issues/368)
  * update SQLs
  * use sync_info and sync_error categories
- * add categories to loggers. fix #370
+ * add categories to loggers. fix [#370](https://github.com/cnpm/cnpmjs.org/issues/370)
  * fix get latest tag always not exists bug
- * support `npm publish --tag beta`. fix #366
+ * support `npm publish --tag beta`. fix [#366](https://github.com/cnpm/cnpmjs.org/issues/366)
  * use mini-logger and error-formater
 
 0.7.0 / 2014-07-07
@@ -156,7 +163,7 @@
 
  * use module_maintainers on GET /pakcage/:name page
  * use new module_maintainers on GET /:name
- * admin user should never publish to other user's packages. fix #363
+ * admin user should never publish to other user's packages. fix [#363](https://github.com/cnpm/cnpmjs.org/issues/363)
  * Add a new table for module-maintainers.
  * gravatar use https
  * support https
@@ -171,8 +178,8 @@
 0.6.0 / 2014-06-16
 ==================
 
- * sync unpublished info. close #353
- * Delete not exists versions on sync worker. #353
+ * sync unpublished info. close [#353](https://github.com/cnpm/cnpmjs.org/issues/353)
+ * Delete not exists versions on sync worker. [#353](https://github.com/cnpm/cnpmjs.org/issues/353)
 
 0.5.3 / 2014-06-13
 ==================
