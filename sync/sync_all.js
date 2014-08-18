@@ -15,7 +15,6 @@
  */
 
 var debug = require('debug')('cnpmjs.org:sync:sync_all');
-var eventproxy = require('eventproxy');
 var ms = require('ms');
 var utility = require('utility');
 var config = require('../config');
