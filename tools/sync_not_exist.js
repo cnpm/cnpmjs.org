@@ -37,14 +37,16 @@ function subtraction(arrOne, arrTwo) {
   return results;
 }
 
-function *sync() {
-  var syncTime = Date.now();
+function *sync(conf) {
+  if (conf) {
+    debug('load custom config');
+    config.loadConfig(conf);
+  }
 
   var allExists = yield Module.listShort();
   var existPackages = allExists.map(function (p) {
     return p.name;
   });
-
   var allPackages = yield Npm.getShort();
   var packages = subtraction(allPackages, existPackages);
   if (!packages.length) {
@@ -65,16 +67,17 @@ function *sync() {
   debug('All packages sync done, successes %d, fails %d',
     worker.successes.length, worker.fails.length);
 
-  Total.setLastExistSyncTime(syncTime, utility.noop);
   return {
     successes: worker.successes,
     fails: worker.fails
   };
 }
 
-module.exports = sync;
+module.exports = function (config, callback) {
+  co(sync(config))(callback);
+};
 
 if (!module.parent) {
   console.log('[tools/sync_not_exist.js] start sync not exist modules');
-  co(sync)();
+  module.exports();
 }
