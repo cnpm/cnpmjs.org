@@ -1,5 +1,11 @@
 
-1.3.1 / 2014-08-18 
+1.3.2 / 2014-08-18
+==================
+
+  * remove unused eventproxy
+  * add custom config in tools/sync_not_exist.js
+
+1.3.1 / 2014-08-18
 ==================
 
   * add sync not exist tools, close [#424](https://github.com/cnpm/cnpmjs.org/issues/424)
