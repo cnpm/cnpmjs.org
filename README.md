@@ -6,17 +6,23 @@ cnpmjs.org
 [![Test coverage][coveralls-image]][coveralls-url]
 [![Gittip][gittip-image]][gittip-url]
 [![David deps][david-image]][david-url]
+[![node version][node-image]][node-url]
+[![npm download][download-image]][download-url]
 
-[npm-image]: https://img.shields.io/npm/v/cnpmjs.org.svg?style=flat
+[npm-image]: https://img.shields.io/npm/v/cnpmjs.org.svg?style=flat-square
 [npm-url]: https://npmjs.org/package/cnpmjs.org
-[travis-image]: https://img.shields.io/travis/cnpm/cnpmjs.org.svg?style=flat
+[travis-image]: https://img.shields.io/travis/cnpm/cnpmjs.org.svg?style=flat-square
 [travis-url]: https://travis-ci.org/cnpm/cnpmjs.org
-[coveralls-image]: https://img.shields.io/coveralls/cnpm/cnpmjs.org.svg?style=flat
+[coveralls-image]: https://img.shields.io/coveralls/cnpm/cnpmjs.org.svg?style=flat-square
 [coveralls-url]: https://coveralls.io/r/cnpm/cnpmjs.org?branch=master
-[gittip-image]: https://img.shields.io/gittip/fengmk2.svg?style=flat
+[gittip-image]: https://img.shields.io/gittip/fengmk2.svg?style=flat-square
 [gittip-url]: https://www.gittip.com/fengmk2/
-[david-image]: https://img.shields.io/david/cnpm/cnpmjs.org.svg?style=flat
+[david-image]: https://img.shields.io/david/cnpm/cnpmjs.org.svg?style=flat-square
 [david-url]: https://david-dm.org/cnpm/cnpmjs.org
+[node-image]: https://img.shields.io/badge/node.js-%3E=_0.11-red.svg?style=flat-square
+[node-url]: http://nodejs.org/download/
+[download-image]: https://img.shields.io/npm/dm/cnpmjs.org.svg?style=flat-square
+[download-url]: https://npmjs.org/package/cnpmjs.org
 
 ![logo](https://raw.github.com/cnpm/cnpmjs.org/master/logo.png)
 
