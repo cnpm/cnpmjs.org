@@ -20,6 +20,7 @@ var user = require('../controllers/web/user');
 var sync = require('../controllers/sync');
 var total = require('../controllers/total');
 var dist = require('../controllers/web/dist');
+var badge = require('../controllers/web/badge');
 
 function routes(app) {
   app.get('/total', total.show);
@@ -51,6 +52,8 @@ function routes(app) {
   app.get('/_list/search/search', pkg.rangeSearch);
 
   app.get(/^\/dist(\/.*)?/, dist.list);
+
+  app.get(/^\/badge\/v\/([@\w\-\.\/]+)\.svg$/, badge.version);
 }
 
 module.exports = routes;

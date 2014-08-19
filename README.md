@@ -9,8 +9,8 @@ cnpmjs.org
 [![node version][node-image]][node-url]
 [![npm download][download-image]][download-url]
 
-[npm-image]: https://img.shields.io/npm/v/cnpmjs.org.svg?style=flat-square
-[npm-url]: https://npmjs.org/package/cnpmjs.org
+[npm-image]: http://cnpmjs.org/badge/v/cnpmjs.org.svg?style=flat-square
+[npm-url]: http://cnpmjs.org/package/cnpmjs.org
 [travis-image]: https://img.shields.io/travis/cnpm/cnpmjs.org.svg?style=flat-square
 [travis-url]: https://travis-ci.org/cnpm/cnpmjs.org
 [coveralls-image]: https://img.shields.io/coveralls/cnpm/cnpmjs.org.svg?style=flat-square
@@ -54,6 +54,7 @@ to extend `npm` with more features(`sync` command, [gzip](https://github.com/npm
 And it easy to wrap for your own registry which build with `cnpmjs.org`.
 * **Compatible with NPM client**: you can use the origin NPM client with `cnpmjs.org`,
 only need to change the registry in config. Even include manual synchronization (through `install` command).
+* **Version badge**: base on [shields.io](http://shields.io/) ![cnpm-badge](http://cnpmjs.org/badge/v/cnpmjs.org.svg?style=flat-square)
 
 ## Getting Start
 

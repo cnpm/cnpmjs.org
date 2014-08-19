@@ -24,9 +24,9 @@ exports.total = function (name, callback) {
     name = null;
   }
   var end = moment();
-  var start = end.clone().subtract('months', 1).startOf('month');
-  var lastday = end.clone().subtract('days', 1).format('YYYY-MM-DD');
-  var lastweekStart = end.clone().subtract('weeks', 1).startOf('week');
+  var start = end.clone().subtract(1, 'months').startOf('month');
+  var lastday = end.clone().subtract(1, 'days').format('YYYY-MM-DD');
+  var lastweekStart = end.clone().subtract(1, 'weeks').startOf('week');
   var lastweekEnd = lastweekStart.clone().endOf('week').format('YYYY-MM-DD');
   var lastmonthEnd = start.clone().endOf('month').format('YYYY-MM-DD');
   var thismonthStart = end.clone().startOf('month').format('YYYY-MM-DD');
