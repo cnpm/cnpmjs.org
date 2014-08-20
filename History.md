@@ -1,4 +1,10 @@
 
+1.4.0 / 2014-08-20
+==================
+
+ * different version, different color badge, add version badge. fixed #427
+ * add download and node version badge
+
 1.3.2 / 2014-08-18
 ==================
 

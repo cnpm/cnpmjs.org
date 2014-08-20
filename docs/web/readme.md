@@ -104,6 +104,16 @@ $(function () {
 });
 </script>
 
+## Version Badge
+
+Default style is `flat-square`.
+
+Badge URL: `http://cnpmjs.org/badge/v/cnpmjs.org.svg` ![cnpmjs.org-badge](http://cnpmjs.org/badge/v/cnpmjs.org.svg)
+
+* `<0.1.0 & >=0.0.0`: ![red-badge](https://img.shields.io/badge/cnpm-0.0.1-red.svg?style=flat-square)
+* `<1.0.0 & >=0.1.0`: ![red-badge](https://img.shields.io/badge/cnpm-0.1.0-green.svg?style=flat-square)
+* `>=1.0.0`: ![red-badge](https://img.shields.io/badge/cnpm-1.0.0-blue.svg?style=flat-square)
+
 ## Usage
 
 use our npm client [cnpm](https://github.com/cnpm/cnpm)(More suitable with cnpmjs.org and gzip support), you can get our client through npm:

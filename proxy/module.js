@@ -762,3 +762,7 @@ exports.updateReadme = function* (id, readme) {
   data.package.readme = readme;
   return yield* exports.updatePackage(id, data.package);
 };
+
+exports.getTag = function* (name, tag) {
+  return yield mysql.queryOne(SELECT_TAG_SQL, [name, tag]);
+};

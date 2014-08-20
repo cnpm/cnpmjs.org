@@ -1,6 +1,7 @@
   <div id="package">
     <h1>
       <%= package.name %>
+      <img title="<%= package.version %>" src="/badge/v/<%= package.name %>.svg?style=flat-square">
       <small>
       <% if (package._publish_on_cnpm) { %>
       (Private package)
@@ -76,9 +77,7 @@
         <tr>
           <th>Version</th>
           <td>
-            <b>
-            <%= package.version %>
-            </b>
+            <img title="<%= package.version %>" src="/badge/v/<%= package.name %>.svg?style=flat-square">
             <% if (package.fromNow) { %>
             last updated
             <%= package.fromNow %>
@@ -89,11 +88,11 @@
         <tr>
           <th>Engines</th>
           <td>
-            <ul>
-            <% for (var k in package.engines) { %>
-              <li><%= k %>: <%= package.engines[k] %></li>
-            <% } %>
-            </ul>
+          <% for (var k in package.engines) {
+            var engine = package.engines[k];
+          %>
+            <img title="<%= engine.title %>" src="<%- engine.badgeURL %>">
+          <% } %>
           </td>
         </tr>
         <% } %>
