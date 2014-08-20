@@ -126,8 +126,7 @@ var config = {
   // use for koa-limit module as storage
   redis: null,
 
-  // package tarball store in qn by default
-  // qiniu cdn: http://www.qiniu.com/, it free for dev.
+  // package tarball store in local filesystem by default
   nfs: require('fs-cnpm')({
     dir: path.join(root, '.tmp', 'dist')
   }),
@@ -187,6 +186,9 @@ var config = {
   syncConcurrency: 1,
   // sync interval, default is 10 minutes
   syncInterval: '10m',
+
+  // badge subject on http://shields.io/
+  badgeSubject: 'cnpm',
 };
 
 // load config/config.js, everything in config.js will cover the same key in index.js

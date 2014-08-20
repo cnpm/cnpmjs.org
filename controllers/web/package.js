@@ -161,6 +161,41 @@ exports.display = function* (next) {
     pkg.name = orginalName;
   }
 
+  // pkg.engines = {
+  //   "python": ">= 0.11.9",
+  //   "node": ">= 0.11.9",
+  //   "node1": ">= 0.8.9",
+  //   "node2": ">= 0.10.9",
+  //   "node3": ">= 0.6.9",
+  // };
+  if (pkg.engines) {
+    for (var k in pkg.engines) {
+      var engine = String(pkg.engines[k] || '').trim();
+      var color = 'blue';
+      if (k.indexOf('node') === 0) {
+        color = 'yellowgreen';
+        var version = /(\d+\.\d+\.\d+)/.exec(engine);
+        if (version) {
+          version = version[0];
+          if (/^0\.11\.\d+/.test(version)) {
+            color = 'red';
+          } else if (/^0\.10\./.test(version) ||
+              /^0\.12\./.test(version) ||
+              /^0\.14\./.test(version) ||
+              /^[^0]+\./.test(version)) {
+            color = 'brightgreen';
+          }
+        }
+      }
+      pkg.engines[k] = {
+        version: engine,
+        title: k + ': ' + engine,
+        badgeURL: 'https://img.shields.io/badge/' + encodeURIComponent(k) +
+          '-' + encodeURIComponent(engine) + '-' + color + '.svg?style=flat-square',
+      };
+    }
+  }
+
   yield this.render('package', {
     title: 'Package - ' + pkg.name,
     package: pkg,
