@@ -14,9 +14,15 @@
  * Module dependencies.
  */
 
+var http = require('http');
+
 module.exports = function *login(next) {
   if (this.user.error) {
-    this.status = this.user.error.status || 500;
+    var status = this.user.error.status;
+    this.status = http.STATUS_CODES[status]
+      ? status
+      : 500;
+
     this.body = {
       error: this.user.error.name,
       reason: this.user.error.message
