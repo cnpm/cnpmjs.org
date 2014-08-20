@@ -1,8 +1,13 @@
 
+1.4.1 / 2014-08-20
+==================
+
+  * fix login error status
+
 1.4.0 / 2014-08-20
 ==================
 
- * different version, different color badge, add version badge. fixed #427
+ * different version, different color badge, add version badge. fixed [#427](https://github.com/cnpm/cnpmjs.org/issues/427)
  * add download and node version badge
 
 1.3.2 / 2014-08-18
