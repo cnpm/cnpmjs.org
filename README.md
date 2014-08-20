@@ -111,24 +111,6 @@ $ node --harmony_generators dispatch.js
 
 Tips: make sure your code is following the [node-style-guide](https://github.com/felixge/node-style-guide).
 
-## Authors
-
-```bash
-$ git summary
-
- project  : cnpmjs.org
- repo age : 4 months ago
- commits  : 472
- active   : 167 days
- files    : 104
- authors  :
-   272  fengmk2                 57.6%
-   195  dead_horse              41.3%
-     2  4simple                 0.4%
-     2  Stanley Zheng           0.4%
-     1  Alsotang                0.2%
-```
-
 ## License
 
 (The MIT License)

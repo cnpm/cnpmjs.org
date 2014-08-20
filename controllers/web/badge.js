@@ -39,6 +39,8 @@ exports.version = function* (next) {
   var url = 'https://img.shields.io/badge/' + config.badgeSubject + '-' + version + '-' + color + '.svg';
   if (this.querystring) {
     url += '?' + this.querystring;
+  } else {
+    url += '?style=flat-square';
   }
 
   this.redirect(url);
