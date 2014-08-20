@@ -23,8 +23,17 @@ exports.version = function* (next) {
   var name = this.params[0];
   var latestTag = yield* Module.getTag(name, 'latest');
   if (latestTag) {
-    color = 'blue';
     version = latestTag.version;
+    if (/^0\.0\./.test(version)) {
+      // <0.1.0 & >=0.0.0
+      color = 'red';
+    } else if (/^0\./.test(version)) {
+      // <1.0.0 & >=0.1.0
+      color = 'green';
+    } else {
+      // >=1.0.0
+      color = 'blue';
+    }
   }
 
   var url = 'https://img.shields.io/badge/' + config.badgeSubject + '-' + version + '-' + color + '.svg';

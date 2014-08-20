@@ -88,8 +88,10 @@
         <tr>
           <th>Engines</th>
           <td>
-          <% for (var k in package.engines) { %>
-            <img title="<%= k %>: <%= package.engines[k] %>" src="https://img.shields.io/badge/<%= k %>-<%= package.engines[k] %>-green.svg?style=flat-square">
+          <% for (var k in package.engines) {
+            var engine = package.engines[k];
+          %>
+            <img title="<%= engine.title %>" src="<%- engine.badgeURL %>">
           <% } %>
           </td>
         </tr>
