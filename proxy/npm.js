@@ -14,7 +14,7 @@
  * Module dependencies.
  */
 
-var urllib = require('co-urllib');
+var urllib = require('../common/urllib');
 var config = require('../config');
 
 var USER_AGENT = 'cnpmjs.org/' + config.version + ' ' + urllib.USER_AGENT;
@@ -30,7 +30,7 @@ function* request(url, options) {
   url = registry + url;
   var r;
   try {
-    r = yield* urllib.request(url, options);
+    r = yield urllib.request(url, options);
   } catch (err) {
     var statusCode = err.status || -1;
     var data = err.data || '[empty]';

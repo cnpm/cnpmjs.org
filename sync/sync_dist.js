@@ -16,7 +16,7 @@
 
 var debug = require('debug')('cnpmjs.org:sync:sync_dist');
 var fs = require('fs');
-var urllib = require('co-urllib');
+var urllib = require('../common/urllib');
 var co = require('co');
 var bytes = require('bytes');
 var crypto = require('crypto');
@@ -100,7 +100,7 @@ function* syncFile(info) {
     logger.syncInfo('downloading %s %s to %s, isPhantomjsURL: %s',
       bytes(info.size), downurl, filepath, isPhantomjsURL);
     // get tarball
-    var r = yield *urllib.request(downurl, options);
+    var r = yield urllib.request(downurl, options);
     var statusCode = r.status || -1;
     logger.syncInfo('download %s got status %s, headers: %j',
       downurl, statusCode, r.headers);
@@ -173,7 +173,7 @@ var FILE_RE = /^<a[^>]+>([^<]+)<\/a>\s+(\d+\-\w+\-\d+ \d+\:\d+)\s+([\-\d]+)/;
 
 function* listdir(fullname) {
   var url = disturl + fullname;
-  var result = yield* urllib.request(url, {
+  var result = yield urllib.request(url, {
     timeout: 60000,
   });
   debug('listdir %s got %s, %j', url, result.status, result.headers);
@@ -270,7 +270,7 @@ sync.syncPhantomjsDir = syncPhantomjsDir;
 
 function* listPhantomjsDir(fullname) {
   var url = 'https://bitbucket.org/ariya/phantomjs/downloads';
-  var result = yield* urllib.request(url, {
+  var result = yield urllib.request(url, {
     timeout: 60000,
   });
   debug('listPhantomjsDir %s got %s, %j', url, result.status, result.headers);
