@@ -63,7 +63,7 @@ only need to change the registry in config. Even include manual synchronization 
 * Mirror NPM in China: [cnpmjs.org](http://cnpmjs.org)
 * cnpm client: [cnpm](https://github.com/cnpm/cnpm), `npm install -g cnpm`
 * [How to deploy cnpmjs.org](https://github.com/cnpm/cnpmjs.org/wiki/Deploy)
-* [NFS guide](https://github.com/cnpm/cnpmjs.org/wiki/NFS-Guide)
+* [wiki](https://github.com/cnpm/cnpmjs.org/wiki)
 
 ## Develop on your local machine
 
