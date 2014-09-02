@@ -333,7 +333,7 @@ exports.download = function *(next) {
 
   var dist = row.package.dist;
   if (!dist.key) {
-    debug('get tarball by 302');
+    debug('get tarball by 302, url: %s', dist.tarball || url);
     this.status = 302;
     this.set('Location', dist.tarball || url);
     _downloads[name] = (_downloads[name] || 0) + 1;

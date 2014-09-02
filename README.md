@@ -65,8 +65,6 @@ only need to change the registry in config. Even include manual synchronization 
 * [How to deploy cnpmjs.org](https://github.com/cnpm/cnpmjs.org/wiki/Deploy)
 * [NFS guide](https://github.com/cnpm/cnpmjs.org/wiki/NFS-Guide)
 
-![cnpm](https://docs.google.com/drawings/d/12QeQfGalqjsB77mRnf5Iq5oSXHCIUTvZTwECMonqCmw/pub?w=480&h=360)
-
 ## Develop on your local machine
 
 ### Dependencies
