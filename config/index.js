@@ -171,7 +171,7 @@ var config = {
   syncDist: false,
 
   // sync source
-  sourceNpmRegistry: 'http://registry.npmjs.org',
+  sourceNpmRegistry: 'http://registry.npm.taobao.org',
 
   // if install return 404, try to sync from source registry
   syncByInstall: true,
