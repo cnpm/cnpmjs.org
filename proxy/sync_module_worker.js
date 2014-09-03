@@ -520,7 +520,7 @@ SyncModuleWorker.prototype._sync = function* (name, pkg) {
       syncedVersionNames.push(syncModule.version);
     } catch (err) {
       that.log('    [%s:%d] sync error, version: %s, %s: %s',
-        syncModule.name, index, syncModule.version, err.name, err.message);
+        syncModule.name, index, syncModule.version, err.name, err.stack);
     }
   }
 
