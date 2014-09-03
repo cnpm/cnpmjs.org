@@ -27,7 +27,6 @@ var version = require('../package.json').version;
 var root = path.dirname(__dirname);
 
 var config = {
-
   version: version,
 
   /**

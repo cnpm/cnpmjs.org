@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "agentkeepalive": "~1.2.0",
+    "bluebird": "~2.3.2",
     "bytes": "~1.0.0",
     "cfork": "~1.1.0",
     "cheerio": "~0.17.0",
