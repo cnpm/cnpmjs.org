@@ -1,4 +1,16 @@
 
+1.4.2 / 2014-09-03
+==================
+
+  * change default source registry to taobao's registry
+  * Merge pull request [#435](https://github.com/cnpm/cnpmjs.org/issues/435) from cnpm/bluebird
+  * add bluebird
+  * bump fs-cnpm
+  * Merge pull request [#434](https://github.com/cnpm/cnpmjs.org/issues/434) from cnpm/agent-stat
+  * show agent sockets stat. fixed [#433](https://github.com/cnpm/cnpmjs.org/issues/433)
+  * update readme
+  * remove pic in readme
+
 1.4.1 / 2014-08-20
 ==================
 
