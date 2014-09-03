@@ -25,7 +25,7 @@ var util = require('util');
 var fs = require('fs');
 var path = require('path');
 var crypto = require('crypto');
-var urllib = require('co-urllib');
+var urllib = require('../common/urllib');
 var utility = require('utility');
 var ms = require('ms');
 var urlparse = require('url').parse;
@@ -757,7 +757,7 @@ SyncModuleWorker.prototype._syncOneVersion = function *(versionIndex, sourcePack
 
   try {
     // get tarball
-    var r = yield *urllib.request(downurl, options);
+    var r = yield urllib.request(downurl, options);
     var statusCode = r.status || -1;
     // https://github.com/cnpm/cnpmjs.org/issues/325
     // if (statusCode === 404) {

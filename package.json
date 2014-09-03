@@ -10,6 +10,7 @@
     "stop": "./bin/nodejsctl stop"
   },
   "dependencies": {
+    "agentkeepalive": "~1.2.0",
     "bytes": "~1.0.0",
     "cfork": "~1.1.0",
     "cheerio": "~0.17.0",
@@ -18,10 +19,9 @@
     "co-gather": "~0.0.1",
     "co-read": "~0.1.0",
     "co-redis": "~1.1.0",
-    "co-urllib": "~0.2.3",
     "co-write": "~0.3.0",
     "copy-to": "~1.0.1",
-    "debug": "~1.0.4",
+    "debug": "~2.0.0",
     "error-formater": "~1.0.3",
     "eventproxy": "~0.3.1",
     "fs-cnpm": "~1.0.2",
@@ -37,16 +37,17 @@
     "mime": "~1.2.11",
     "mini-logger": "~0.3.0",
     "mkdirp": "~0.5.0",
-    "moment": "~2.8.1",
+    "moment": "~2.8.2",
     "ms": "~0.6.2",
     "multiline": "~1.0.0",
-    "mysql": "~2.4.2",
+    "mysql": "~2.4.3",
     "nodemailer": "0.7.1",
     "ready": "~0.1.1",
     "redis": "~0.12.1",
     "semver": "~3.0.1",
     "thunkify-wrap": "~1.0.2",
-    "utility": "~1.0.0"
+    "urllib": "~1.4.1",
+    "utility": "~1.1.0"
   },
   "devDependencies": {
     "autod": "~0.2.0",
