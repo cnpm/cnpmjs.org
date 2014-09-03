@@ -24,7 +24,7 @@
     "debug": "~2.0.0",
     "error-formater": "~1.0.3",
     "eventproxy": "~0.3.1",
-    "fs-cnpm": "~1.0.2",
+    "fs-cnpm": "~1.1.0",
     "giturl": "~0.0.3",
     "graceful": "~0.1.0",
     "gravatar": "~1.0.6",
