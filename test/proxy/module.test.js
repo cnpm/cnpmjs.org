@@ -203,7 +203,7 @@ describe('proxy/module.test.js', function () {
       var modules = yield Module.listPrivates();
       modules.forEach(function (m) {
         m.should.have.keys(['name', 'description']);
-      })
+      });
     });
   });
 });

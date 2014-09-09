@@ -784,6 +784,12 @@ describe('controllers/registry/module.test.js', function () {
       .get('/mk2testmodule/download/mk2testmodule-0.0.1.tgz')
       .expect(200, done);
     });
+
+    it('should alias /:name/-/:filename to /:name/download/:filename', function (done) {
+      request(app)
+      .get('/mk2testmodule/-/mk2testmodule-0.0.1.tgz')
+      .expect(200, done);
+    });
   });
 
   describe('DELETE /:name/download/:filename/-rev/:rev', function () {

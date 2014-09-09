@@ -64,6 +64,8 @@ function routes(app) {
   // need limit by ip
   app.get(/^\/(@[\w\-\.]+\/[\w\-\.]+)\/download\/(@[\w\-\.]+\/[\w\-\.]+)$/, limit, mod.download);
   app.get('/:name/download/:filename', limit, mod.download);
+  app.get(/^\/(@[\w\-\.]+\/[\w\-\.]+)\/\-\/(@[\w\-\.]+\/[\w\-\.]+)$/, limit, mod.download);
+  app.get('/:name/-/:filename', limit, mod.download);
 
   // delete tarball
   app.delete(/^\/(@[\w\-\.]+\/[\w\-\.]+)\/download\/(@[\w\-\.]+\/[\w\-\.]+)\/\-rev\/([\w\-\.]+)$/,
