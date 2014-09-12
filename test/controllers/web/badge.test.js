@@ -53,6 +53,21 @@ describe('controllers/web/badge.test.js', function () {
       });
     });
 
+    it('should support 1.0.0-beta1', function (done) {
+      var pkg = utils.getPackage('badge-test-module', '1.0.0-beta1', utils.admin);
+      request(registry)
+      .put('/' + pkg.name)
+      .set('authorization', utils.adminAuth)
+      .send(pkg)
+      .end(function (err) {
+        should.not.exists(err);
+        request(app)
+        .get('/badge/v/badge-test-module.svg?style=flat-square')
+        .expect('Location', 'https://img.shields.io/badge/cnpm-1.0.0--beta1-blue.svg?style=flat-square')
+        .expect(302, done);
+      });
+    });
+
     it('should show green version on <1.0.0 & >=0.1.0 when package exists', function (done) {
       var pkg = utils.getPackage('badge-test-module', '0.1.0', utils.admin);
       request(registry)

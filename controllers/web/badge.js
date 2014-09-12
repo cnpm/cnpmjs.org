@@ -36,7 +36,9 @@ exports.version = function* (next) {
     }
   }
 
-  var url = 'https://img.shields.io/badge/' + config.badgeSubject + '-' + version + '-' + color + '.svg';
+  var subject = config.badgeSubject.replace(/\-/g, '--');
+  version = version.replace(/\-/g, '--');
+  var url = 'https://img.shields.io/badge/' + subject + '-' + version + '-' + color + '.svg';
   if (this.querystring) {
     url += '?' + this.querystring;
   } else {
