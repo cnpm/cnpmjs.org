@@ -74,12 +74,11 @@ exports.list = function* (next) {
   }
 
   // download it from nfs
-  if (typeof info.size === 'number') {
+  if (typeof info.size === 'number' && info.size > 0) {
     this.length = info.size;
   }
   this.type = mime.lookup(info.url);
   this.attachment = info.name;
   this.etag = info.sha1;
-
   this.body = yield* downloadAsReadStream(info.url);
 }

@@ -19,7 +19,9 @@ debug.enable('cnpmjs.org*');
 var co = require('co');
 var syncdist = require('../sync/sync_dist');
 
+var dir = process.argv[2] || '/v0.11.13/docs/api/';
+
 co(function* () {
-  // yield* syncdist('/v0.10.28/');
-  yield* syncdist.syncPhantomjsDir();
+  yield* syncdist(dir);
+  // yield* syncdist.syncPhantomjsDir();
 })();
