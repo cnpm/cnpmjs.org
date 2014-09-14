@@ -33,6 +33,20 @@ describe('sync/sync_dist.test.js', function () {
     });
   });
 
+  describe('listdir()', function () {
+    it('should list /v0.11.12/', function* () {
+      var items = yield* distsync.listdir('/v0.11.12/');
+      items[0].name.should.equal('docs/');
+      var docsItems = yield* distsync.listdir('/v0.11.12/docs/');
+      docsItems[0].name.should.equal('api/');
+    });
+
+    it('should list /v0.11.12/docs/api/', function* () {
+      var items = yield* distsync.listdir('/v0.11.12/docs/api/');
+      items.length.should.above(5);
+    });
+  });
+
   describe('listdiff()', function () {
     it('should got all news', function* () {
       mm(urllib, 'request', function () {

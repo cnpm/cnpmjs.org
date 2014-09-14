@@ -37,6 +37,9 @@ module.exports = sync;
 
 function* sync(name) {
   name = name || '/';
+  if (name[name.length - 1] !== '/') {
+    name += '/';
+  }
   yield* syncDir(name);
 }
 
@@ -136,7 +139,7 @@ function* syncFile(info) {
         throw err;
       }
       info.size = dataSize;
-    } else if (dataSize !== info.size) {
+    } else if (info.size > 0 && dataSize !== info.size) {
       var err = new Error('Download ' + downurl + ' file size is '
         + dataSize + ' not match ' + info.size);
       err.name = 'DownloadDistFileSizeError';
@@ -171,40 +174,146 @@ function* syncFile(info) {
 // <a href="node-v0.4.10.tar.gz">node-v0.4.10.tar.gz</a>                                26-Aug-2011 16:22            12410018
 var FILE_RE = /^<a[^>]+>([^<]+)<\/a>\s+(\d+\-\w+\-\d+ \d+\:\d+)\s+([\-\d]+)/;
 
+// */docs/api/
+var DOC_API_RE = /\/docs\/api\/$/;
+
+// <li><a href="documentation.html">About these Docs</a></li>
+// <li><a href="synopsis.html">Synopsis</a></li>
+// <li><a href="assert.html">Assertion Testing</a></li>
+// <li><a href="buffer.html">Buffer</a></li>
+// <li><a href="addons.html">C/C++ Addons</a></li>
+// <li><a href="child_process.html">Child Processes</a></li>
+// <div id="gtoc">
+//   <p>
+//     <a href="index.html" name="toc">Index</a> |
+//     <a href="all.html">View on single page</a> |
+//     <a href="index.json">View as JSON</a>
+//   </p>
+// </div>
+var DOC_API_FILE_ALL_RE = /<a[^"]+\"(\w+\.(?:html|json))\"[^>]*>[^<]+<\/a>/gm;
+var DOC_API_FILE_RE = /<a[^"]+\"(\w+\.(?:html|json))\"[^>]*>[^<]+<\/a>/;
+
 function* listdir(fullname) {
   var url = disturl + fullname;
+  var isDocPath = false;
+  if (DOC_API_RE.test(fullname)) {
+    isDocPath = true;
+    url += 'index.html';
+  }
   var result = yield urllib.request(url, {
     timeout: 60000,
   });
   debug('listdir %s got %s, %j', url, result.status, result.headers);
   var html = result.data && result.data.toString() || '';
-  var lines = html.split('\n');
   var items = [];
-  for (var i = 0; i < lines.length; i++) {
-    var m = FILE_RE.exec(lines[i].trim());
-    if (!m) {
-      continue;
-    }
-    var itemName = m[1].replace(/^\/+/, '');
-    if (!itemName) {
-      continue;
-    }
+  // "last-modified":"Tue, 11 Mar 2014 22:44:36 GMT"
+  var date = result.headers['last-modified'] || result.headers.date || '';
 
-    // filter /nightlies/*
-    if (itemName.indexOf('nightlies/') === 0) {
-      continue;
+  if (isDocPath) {
+    // add assets/
+    items.push({
+      name: 'assets/',
+      date: date,
+      size: '-',
+      type: 'dir',
+      parent: fullname,
+    });
+
+    var needJSON = false;
+    var htmlfileNames = [];
+    var lines = html.match(DOC_API_FILE_ALL_RE) || [];
+    for (var i = 0; i < lines.length; i++) {
+      var m = DOC_API_FILE_RE.exec(lines[i].trim());
+      if (!m) {
+        continue;
+      }
+      var itemName = m[1];
+      items.push({
+        name: itemName,
+        date: date,
+        size: 0,
+        type: 'file',
+        parent: fullname,
+      });
+      if (itemName.indexOf('.json') > 0) {
+        needJSON = true;
+      }
+      if (itemName.indexOf('.html') > 0 && itemName !== 'index.html') {
+        htmlfileNames.push(itemName);
+      }
     }
+    debug('listdir %s got %j', fullname, htmlfileNames);
+    if (needJSON) {
+      // node >= 0.8.0
+      htmlfileNames.forEach(function (itemName) {
+        items.push({
+          name: itemName.replace('.html', '.json'), // download *.json format
+          date: date,
+          size: 0,
+          type: 'file',
+          parent: fullname,
+        });
+      });
+    }
+  } else {
+    var lines = html.split('\n');
+    for (var i = 0; i < lines.length; i++) {
+      var m = FILE_RE.exec(lines[i].trim());
+      if (!m) {
+        continue;
+      }
+      var itemName = m[1].replace(/^\/+/, '');
+      if (!itemName) {
+        continue;
+      }
+
+      // filter /nightlies/*
+      if (itemName.indexOf('nightlies/') === 0) {
+        continue;
+      }
+
+      items.push({
+        name: itemName, // 'SHASUMS.txt', 'x64/'
+        date: m[2],
+        size: m[3] === '-' ? '-' : parseInt(m[3]),
+        type: m[3] === '-' ? 'dir' : 'file',
+        parent: fullname, // '/', '/v0.10.28/'
+      });
+    }
+  }
+
+  // node <= v0.11.11, /docs/ is not list, has a index.html
+  if (items.length === 0 && /\/docs\/$/.test(fullname)) {
+    items.push({
+      name: 'api/',
+      date: date,
+      size: '-',
+      type: 'dir',
+      parent: fullname,
+    });
+
+    // sh_main.js
+    // sh_javascript.min.js
+    items.push({
+      name: 'sh_main.js',
+      date: date,
+      size: 0,
+      type: 'file',
+      parent: fullname,
+    });
 
     items.push({
-      name: itemName, // 'SHASUMS.txt', 'x64/'
-      date: m[2],
-      size: m[3] === '-' ? '-' : parseInt(m[3]),
-      type: m[3] === '-' ? 'dir' : 'file',
-      parent: fullname, // '/', '/v0.10.28/'
+      name: 'sh_javascript.min.js',
+      date: date,
+      size: 0,
+      type: 'file',
+      parent: fullname,
     });
   }
+
   return items;
 }
+sync.listdir = listdir;
 
 sync.listdiff = function* (fullname) {
   var items = yield* listdir(fullname);
