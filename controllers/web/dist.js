@@ -16,6 +16,7 @@
 
 var debug = require('debug')('cnpmjs.org:controllers:web:dist');
 var mime = require('mime');
+var urlparse = require('url').parse;
 var Dist = require('../../proxy/dist');
 var config = require('../../config');
 var downloadAsReadStream = require('../utils').downloadAsReadStream;
@@ -61,7 +62,7 @@ exports.list = function* (next) {
   });
 };
 
- function* download(next) {
+function* download(next) {
   var fullname = this.params[0];
   var info = yield* Dist.getfile(fullname);
   debug('download %s got %j', fullname, info);
@@ -69,16 +70,31 @@ exports.list = function* (next) {
     return yield* next;
   }
 
+  if (/\.(html|js|css|json|txt)$/.test(fullname)) {
+    if (info.url.indexOf('http') === 0) {
+      info.url = urlparse(info.url).path;
+    }
+    return yield* pipe.call(this, info, false);
+  }
+
   if (info.url.indexOf('http') === 0) {
     return this.redirect(info.url);
   }
+  yield* pipe.call(this, info, true);
+}
 
+function* pipe(info, attachment) {
+  debug('pipe %j, attachment: %s', info, attachment);
   // download it from nfs
   if (typeof info.size === 'number' && info.size > 0) {
     this.length = info.size;
   }
   this.type = mime.lookup(info.url);
-  this.attachment = info.name;
-  this.etag = info.sha1;
+  if (attachment) {
+    this.attachment(info.name);
+  }
+  if (info.sha1) {
+    this.etag = info.sha1;
+  }
   this.body = yield* downloadAsReadStream(info.url);
 }

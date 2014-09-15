@@ -91,36 +91,81 @@ describe('controllers/web/dist.test.js', function () {
   });
 
   describe('GET /dist/ files', function () {
-    it('should redirect to nfs url', function (done) {
+    it('should pipe txt', function (done) {
       mm(Dist, 'getfile', function* () {
         return {
           name: 'foo.txt', size: 1024, date: '02-May-2014 00:54',
           url: 'http://mock.com/dist/v0.10.28/SHASUMS.txt'
         };
       });
+      fs.writeFileSync(nfs._getpath('/dist/v0.10.28/SHASUMS.txt'), '6eff580cc8460741155d42ef1ef537961194443f');
 
       request(app)
       .get('/dist/v0.10.28/SHASUMS.txt')
-      .expect(302)
-      .expect('Location', 'http://mock.com/dist/v0.10.28/SHASUMS.txt', done);
+      .expect('Content-Type', 'text/plain; charset=utf-8')
+      .expect(200, function (err, res) {
+        should.not.exist(err);
+        should.not.exist(res.headers['Content-Disposition']);
+        done();
+      });
     });
 
-    it('should GET /dist/npm-versions.txt redirect to nfs url', function (done) {
+    it('should pipe html', function (done) {
+      mm(Dist, 'getfile', function* () {
+        return {
+          name: 'foo.html', size: 1024, date: '02-May-2014 00:54',
+          url: 'http://mock.com/dist/v0.10.28/foo.html'
+        };
+      });
+      fs.writeFileSync(nfs._getpath('/dist/v0.10.28/foo.html'), '<p>hi</p>');
+
+      request(app)
+      .get('/dist/v0.10.28/foo.html')
+      .expect('Content-Type', 'text/html; charset=utf-8')
+      .expect('<p>hi</p>')
+      .expect(200, function (err, res) {
+        should.not.exist(err);
+        should.not.exist(res.headers['Content-Disposition']);
+        done();
+      });
+    });
+
+    it('should pipe json', function (done) {
+      mm(Dist, 'getfile', function* () {
+        return {
+          name: 'foo.json', date: '02-May-2014 00:54',
+          url: 'http://mock.com/dist/v0.10.28/foo.json'
+        };
+      });
+      fs.writeFileSync(nfs._getpath('/dist/v0.10.28/foo.json'), '{}');
+
+      request(app)
+      .get('/dist/v0.10.28/foo.json')
+      .expect('Content-Type', 'application/json; charset=utf-8')
+      .expect('{}')
+      .expect(200, function (err, res) {
+        should.not.exist(err);
+        should.not.exist(res.headers['Content-Disposition']);
+        done();
+      });
+    });
+
+    it('should GET /dist/npm-versions.tgz redirect to nfs url', function (done) {
       mm(Dist, 'getfile', function* (fullname) {
-        fullname.should.equal('/npm-versions.txt');
+        fullname.should.equal('/npm-versions.tgz');
         return {
           name: 'npm-versions.txt', size: 1024, date: '02-May-2014 00:54',
-          url: 'http://mock.com/dist/npm-versions.txt'
+          url: 'http://mock.com/dist/npm-versions.tgz'
         };
       });
 
       request(app)
-      .get('/dist/npm-versions.txt')
+      .get('/dist/npm-versions.tgz')
       .expect(302)
-      .expect('Location', 'http://mock.com/dist/npm-versions.txt', done);
+      .expect('Location', 'http://mock.com/dist/npm-versions.tgz', done);
     });
 
-    it('should download nfs file and send it', function (done) {
+    it('should download nfs txt file and send it', function (done) {
       mm(Dist, 'getfile', function* () {
         return {
           name: 'foo.txt',
@@ -134,6 +179,38 @@ describe('controllers/web/dist.test.js', function () {
       .get('/dist/v0.10.28/SHASUMS.txt')
       .expect(200)
       .expect(/6eff580cc8460741155d42ef1ef537961194443f/, done);
+    });
+
+    it('should download nfs tgz file and send it', function (done) {
+      mm(Dist, 'getfile', function* () {
+        return {
+          name: 'foo.tgz',
+          size: 1264,
+          date: '02-May-2014 00:54',
+          url: '/dist/v0.10.28/foo.tgz'
+        };
+      });
+      fs.writeFileSync(nfs._getpath('/dist/v0.10.28/foo.tgz'), '6eff580cc8460741155d42ef1ef537961194443f');
+      request(app)
+      .get('/dist/v0.10.28/foo.tgz')
+      .expect('Content-Disposition', 'attachment; filename="foo.tgz"')
+      .expect(200, done);
+    });
+
+    it.skip('should download nfs no-ascii attachment file name', function (done) {
+      mm(Dist, 'getfile', function* () {
+        return {
+          name: '中文名.tgz',
+          size: 1264,
+          date: '02-May-2014 00:54',
+          url: '/dist/v0.10.28/foo.tgz'
+        };
+      });
+      fs.writeFileSync(nfs._getpath('/dist/v0.10.28/foo.tgz'), '6eff580cc8460741155d42ef1ef537961194443f');
+      request(app)
+      .get('/dist/v0.10.28/foo.tgz')
+      .expect('Content-Disposition', 'attachment; filename="%E4%B8%AD%E6%96%87%E5%90%8D.tgz"')
+      .expect(200, done);
     });
   });
 });
