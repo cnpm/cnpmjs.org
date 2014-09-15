@@ -351,7 +351,7 @@ exports.download = function *(next) {
     this.length = dist.size;
   }
   this.type = mime.lookup(dist.key);
-  this.attachment = filename;
+  this.attachment(filename);
   this.etag = dist.shasum;
 
   this.body = yield* downloadAsReadStream(dist.key);
