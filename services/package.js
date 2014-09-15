@@ -52,20 +52,13 @@ exports.removeAllMaintainers = function* (name) {
   return yield* ModuleMaintainer.removeAll(name);
 };
 
-exports.isMaintainer = function* (name, username) {
+exports.authMaintainer = function* (packageName, username) {
   var rs = yield [
-    ModuleMaintainer.get(name),
-    Module.getLatest(name)
+    ModuleMaintainer.get(packageName),
+    Module.getLatest(packageName)
   ];
   var maintainers = rs[0];
   var latestMod = rs[1];
-
-  if (latestMod && !latestMod.package._publish_on_cnpm) {
-    // no one can update public package maintainers
-    // public package only sync from source npm registry
-    return false;
-  }
-
   if (maintainers.length === 0) {
     // if not found maintainers, try to get from latest module package info
     var ms = latestMod && latestMod.package && latestMod.package.maintainers;
@@ -75,9 +68,27 @@ exports.isMaintainer = function* (name, username) {
       });
     }
   }
-  if (maintainers.length === 0) {
+
+  var isMaintainer = false;
+
+  if (latestMod && !latestMod.package._publish_on_cnpm) {
+    // no one can update public package maintainers
+    // public package only sync from source npm registry
+    isMaintainer = false;
+  } else if (maintainers.length === 0) {
     // no maintainers, meaning this module is free for everyone
-    return true;
+    isMaintainer = true;
+  } else if (maintainers.indexOf(username) >= 0) {
+    isMaintainer = true;
   }
-  return maintainers.indexOf(username) >= 0;
+
+  return {
+    isMaintainer: isMaintainer,
+    maintainers: maintainers
+  };
+};
+
+exports.isMaintainer = function* (name, username) {
+  var result = yield* exports.authMaintainer(name, username);
+  return result.isMaintainer;
 };

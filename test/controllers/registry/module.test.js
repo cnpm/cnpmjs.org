@@ -569,6 +569,34 @@ describe('controllers/registry/module.test.js', function () {
       });
     });
 
+    it('should 403 when user is not maintainer', function (done) {
+      mm(config, 'enablePrivate', false);
+      var pkg = utils.getPackage('@cnpmtest/testpublishmodule-not-maintainer', '0.0.1');
+      request(app)
+      .put('/' + pkg.name)
+      .set('authorization', utils.adminAuth)
+      .send(pkg)
+      .expect(201, function (err, res) {
+        should.not.exist(err);
+        res.body.should.have.keys('ok', 'rev');
+        res.body.ok.should.equal(true);
+
+        // upload again should 403
+        request(app)
+        .put('/' + pkg.name)
+        .set('authorization', utils.otherUserAuth)
+        .send(pkg)
+        .expect(403, function (err, res) {
+          should.not.exist(err);
+          res.body.should.eql({
+            error: 'forbidden user',
+            reason: 'cnpmjstest101 not authorized to modify @cnpmtest/testpublishmodule-not-maintainer, please contact maintainers: cnpmjstest10'
+          });
+          done();
+        });
+      });
+    });
+
     it('should version_error when versions missing', function (done) {
       var pkg = utils.getPackage('version_missing_module');
       delete pkg.versions;

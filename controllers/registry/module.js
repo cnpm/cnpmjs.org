@@ -442,12 +442,13 @@ exports.addPackageAndDist = function *(next) {
   }
 
   // check maintainers
-  var isMaintainer = yield* packageService.isMaintainer(name, username);
-  if (!isMaintainer) {
+  var result = yield* packageService.authMaintainer(name, username);
+  if (!result.isMaintainer) {
     this.status = 403;
     this.body = {
       error: 'forbidden user',
-      reason: username + ' not authorized to modify ' + name
+      reason: username + ' not authorized to modify ' + name +
+        ', please contact maintainers: ' + result.maintainers.join(', ')
     };
     return;
   }
