@@ -273,7 +273,8 @@ exports.displaySync = function* (next) {
   var name = this.params.name || this.params[0] || this.query.name;
   yield this.render('sync', {
     name: name,
-    title: 'Sync - ' + name
+    title: 'Sync - ' + name,
+    syncInWeb: config._syncInWeb
   });
 };
 
