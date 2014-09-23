@@ -1,18 +1,29 @@
 
+1.5.1 / 2014-09-23 
+==================
+
+  * search support case insensitive, close [#450](https://github.com/cnpm/cnpmjs.org/issues/450)
+  * Merge pull request [#449](https://github.com/cnpm/cnpmjs.org/issues/449) from cnpm/sync-in-web
+  * add config._syncInWeb, close [#448](https://github.com/cnpm/cnpmjs.org/issues/448)
+  * Merge pull request [#445](https://github.com/cnpm/cnpmjs.org/issues/445) from cnpm/show-maintainers-when-publish-fail
+  * show maintainers when publish 403. fixed [#430](https://github.com/cnpm/cnpmjs.org/issues/430)
+  * Merge pull request [#444](https://github.com/cnpm/cnpmjs.org/issues/444) from cnpm/no-attachment-for-html
+  * no attachment for html
+
 1.5.0 / 2014-09-15
 ==================
 
- * dist sync document too. fixed #420
+  * dist sync document too. fixed [#420](https://github.com/cnpm/cnpmjs.org/issues/420)
 
 1.4.4 / 2014-09-12
 ==================
 
- * badge version support 1.0.0-beta1. fixed #440
+  * badge version support 1.0.0-beta1. fixed [#440](https://github.com/cnpm/cnpmjs.org/issues/440)
 
 1.4.3 / 2014-09-09
 ==================
 
- * alias /:name/-/:file to /:name/download/:file. fixed #439
+  * alias /:name/-/:file to /:name/download/:file. fixed [#439](https://github.com/cnpm/cnpmjs.org/issues/439)
 
 1.4.2 / 2014-09-03
 ==================
