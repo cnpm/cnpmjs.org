@@ -182,6 +182,10 @@ var config = {
   // all: sync all modules
   syncModel: 'none', // 'none', 'all', 'exist'
 
+  // can we open a web page to sync the package
+  // please don't turn this off, it is for Chinese mirror only
+  _syncInWeb: true,
+
   syncConcurrency: 1,
   // sync interval, default is 10 minutes
   syncInterval: '10m',
