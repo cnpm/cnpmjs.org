@@ -481,7 +481,7 @@ var SEARCH_MODULES_SQL = multiline(function () {;/*
   FROM
     tag
   WHERE
-    name LIKE ? AND tag="latest"
+    LOWER(name) LIKE LOWER(?) AND tag="latest"
   ORDER BY
     name
   LIMIT
