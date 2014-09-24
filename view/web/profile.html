@@ -31,12 +31,18 @@
     <tbody>
       <tr>
         <th>Name</th>
+        <th>IM</th>
         <th>Last modified</th>
         <th>Is admin</th>
         <th>Publish scopes</th>
       </tr>
       <tr>
         <td>@<%= user.json.fullname || user.name %></td>
+        <td>
+          <% if (user.json.im) { %>
+            <a href="<%- user.json.im %>" target="_blank"><span class="glyphicon  glyphicon-comment"></span></a>
+          <% } %>
+        </td>
         <td><%- lastModified %></td>
         <td><%- isAdmin %></td>
         <td>

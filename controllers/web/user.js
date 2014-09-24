@@ -67,6 +67,7 @@ exports.display = function* (next) {
       avatar: json.avatar_url,
       fullname: json.name || json.login,
       homepage: json.html_url,
+      im: json.im_url
     };
   }
 
