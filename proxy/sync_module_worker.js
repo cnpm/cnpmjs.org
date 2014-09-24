@@ -127,6 +127,8 @@ SyncModuleWorker.prototype.add = function (name) {
 };
 
 SyncModuleWorker.prototype._doneOne = function* (concurrencyId, name, success) {
+  this.log('----------------- Synced %s %s -------------------',
+    name, success ? 'success' : 'fail');
   if (success) {
     this.pushSuccess(name);
   } else {
@@ -136,7 +138,6 @@ SyncModuleWorker.prototype._doneOne = function* (concurrencyId, name, success) {
   var that = this;
   // relase the stack: https://github.com/cnpm/cnpmjs.org/issues/328
   defer.setImmediate(function *() {
-    that.log('[c#%s] setImmediate after, %s done, start next...', concurrencyId, name);
     yield *that.next(concurrencyId);
   });
 };
@@ -159,7 +160,7 @@ SyncModuleWorker.prototype.syncUpstream = function* (name) {
 
   var logURL =  url + '/log/' + r.data.logId;
   var offset = 0;
-  this.log('Syncing upstream %s', logURL);
+  this.log('----------------- Syncing upstream %s -------------------', logURL);
 
   var count = 0;
   while (true) {
@@ -178,25 +179,31 @@ SyncModuleWorker.prototype.syncUpstream = function* (name) {
 
     var data = rs.data;
     var syncDone = false;
-    if (data.log.indexOf('[done] Sync') >= 0) {
+    if (data.log && data.log.indexOf('[done] Sync') >= 0) {
       syncDone = true;
-      data.log = data.log.replace('[done] Sync', '[upstream sync done]') +
-        '\n-------------------------------------------------------------\n';
+      data.log = data.log.replace('[done] Sync', '[Upstream done] Sync');
     }
-    this.log(data.log);
+
+    if (data.log) {
+      this.log(data.log);
+    }
 
     if (syncDone) {
       break;
     }
+
     if (count >= 30) {
-      this.log('sync upstream %s fail, give up %s',
-        logURL, '\n-------------------------------------------------------------\n');
+      this.log('sync upstream %s fail, give up', logURL);
       break;
     }
 
-    offset += data.log.split('\n').length;
+    if (data.log) {
+      offset += data.log.split('\n').length;
+    }
+
     yield sleep(2000);
   }
+  this.log('----------------- Synced upstream %s -------------------', logURL);
 };
 
 SyncModuleWorker.prototype.next = function *(concurrencyId) {
@@ -214,6 +221,8 @@ SyncModuleWorker.prototype.next = function *(concurrencyId) {
   if (config.sourceNpmRegistryIsCNpm) {
     yield* this.syncUpstream(name);
   }
+
+  this.log('----------------- Syncing %s -------------------', name);
 
   // get from npm
   try {
@@ -270,9 +279,9 @@ SyncModuleWorker.prototype.next = function *(concurrencyId) {
     return;
   }
 
-  that.log('[c#%d] [%s] synced success, %d versions: %s',
+  this.log('[c#%d] [%s] synced success, %d versions: %s',
     concurrencyId, name, versions.length, versions.join(', '));
-  yield* that._doneOne(concurrencyId, name, true);
+  yield* this._doneOne(concurrencyId, name, true);
 };
 
 function *_listStarUsers(modName) {
