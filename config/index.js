@@ -170,9 +170,12 @@ var config = {
   syncDist: false,
 
   // sync source, upstream registry
+  // If you want to directly sync from official npm's registry
+  // please drop them an email first
   sourceNpmRegistry: 'http://registry.npm.taobao.org',
   // upstream registry is base on cnpm/cnpmjs.org or not
-  sourceNpmRegistryIsCNpm: false,
+  // if your upstream is official npm registry, please turn it off
+  sourceNpmRegistryIsCNpm: true,
 
   // if install return 404, try to sync from source registry
   syncByInstall: true,
