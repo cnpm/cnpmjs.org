@@ -274,7 +274,6 @@ exports.displaySync = function* (next) {
   yield this.render('sync', {
     name: name,
     title: 'Sync - ' + name,
-    syncInWeb: config._syncInWeb
   });
 };
 
