@@ -1,13 +1,15 @@
 
+1.5.2 / 2014-09-24
+==================
+
+ * support im url on user profile page; update bootstrap to 3.2.0
+
 1.5.1 / 2014-09-23 
 ==================
 
   * search support case insensitive, close [#450](https://github.com/cnpm/cnpmjs.org/issues/450)
-  * Merge pull request [#449](https://github.com/cnpm/cnpmjs.org/issues/449) from cnpm/sync-in-web
   * add config._syncInWeb, close [#448](https://github.com/cnpm/cnpmjs.org/issues/448)
-  * Merge pull request [#445](https://github.com/cnpm/cnpmjs.org/issues/445) from cnpm/show-maintainers-when-publish-fail
   * show maintainers when publish 403. fixed [#430](https://github.com/cnpm/cnpmjs.org/issues/430)
-  * Merge pull request [#444](https://github.com/cnpm/cnpmjs.org/issues/444) from cnpm/no-attachment-for-html
   * no attachment for html
 
 1.5.0 / 2014-09-15
