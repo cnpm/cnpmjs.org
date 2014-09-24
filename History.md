@@ -1,4 +1,11 @@
 
+1.5.5 / 2014-09-25
+==================
+
+ * fix sync in web
+ * sync upstream only the first package. make sync devDependencies optionsal, default is false
+ * add some comment, default sourceNpmRegistryIsCNpm to true
+
 1.5.4 / 2014-09-24
 ==================
 
