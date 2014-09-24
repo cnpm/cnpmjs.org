@@ -15,12 +15,35 @@
  */
 
 var should = require('should');
+var mm = require('mm');
 var SyncModuleWorker = require('../../proxy/sync_module_worker');
 var mysql = require('../../common/mysql');
 var Log = require('../../proxy/module_log');
+var config = require('../../config');
 
 describe('proxy/sync_module_worker.test.js', function () {
+  afterEach(mm.restore);
+
   it('should start a sync worker', function (done) {
+    Log.create({
+      name: 'mk2testmodule',
+      username: 'fengmk2',
+    }, function (err, result) {
+      should.not.exist(err);
+      result.id.should.above(0);
+      var worker = new SyncModuleWorker({
+        logId: result.id,
+        name: 'mk2testmodule',
+        username: 'fengmk2'
+      });
+
+      worker.start();
+      worker.on('end', done);
+    });
+  });
+
+  it('should sync upstream first', function (done) {
+    mm(config, 'sourceNpmRegistryIsCNpm', true);
     Log.create({
       name: 'mk2testmodule',
       username: 'fengmk2',
@@ -88,6 +111,19 @@ describe('proxy/sync_module_worker.test.js', function () {
       names.sort();
       names.should.eql(['tnpm']);
       done();
+    });
+  });
+
+  describe('syncUpstream()', function () {
+    it('should sync upstream work', function* () {
+      var worker = new SyncModuleWorker({
+        name: ['tnpm'],
+        username: 'fengmk2'
+      });
+      yield [
+        worker.syncUpstream('tnpm'),
+        worker.syncUpstream('pedding'),
+      ];
     });
   });
 });

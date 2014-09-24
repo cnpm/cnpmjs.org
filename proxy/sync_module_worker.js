@@ -25,6 +25,7 @@ var util = require('util');
 var fs = require('fs');
 var path = require('path');
 var crypto = require('crypto');
+var sleep = require('co-sleep');
 var urllib = require('../common/urllib');
 var utility = require('utility');
 var ms = require('ms');
@@ -140,6 +141,64 @@ SyncModuleWorker.prototype._doneOne = function* (concurrencyId, name, success) {
   });
 };
 
+SyncModuleWorker.prototype.syncUpstream = function* (name) {
+  var url = config.sourceNpmRegistry + '/' + name + '/sync';
+  var r = yield urllib.request(url, {
+    method: 'put',
+    timeout: 20000,
+    headers: {
+      'content-length': 0
+    },
+    dataType: 'json'
+  });
+
+  if (r.status !== 201 || !r.data.ok) {
+    return this.log('sync upstream %s error, status: %s, response: %j',
+      url, r.status, r.data);
+  }
+
+  var logURL =  url + '/log/' + r.data.logId;
+  var offset = 0;
+  this.log('Syncing upstream %s', logURL);
+
+  var count = 0;
+  while (true) {
+    count++;
+    var synclogURL = logURL + '?offset=' + offset;
+    var rs = yield urllib.request(synclogURL, {
+      timeout: 20000,
+      dataType: 'json'
+    });
+
+    if (rs.status !== 200 || !rs.data.ok) {
+      this.log('sync upstream %s error, status: %s, response: %j',
+        synclogURL, rs.status, rs.data);
+      break;
+    }
+
+    var data = rs.data;
+    var syncDone = false;
+    if (data.log.indexOf('[done] Sync') >= 0) {
+      syncDone = true;
+      data.log = data.log.replace('[done] Sync', '[upstream sync done]') +
+        '\n-------------------------------------------------------------\n';
+    }
+    this.log(data.log);
+
+    if (syncDone) {
+      break;
+    }
+    if (count >= 30) {
+      this.log('sync upstream %s fail, give up %s',
+        logURL, '\n-------------------------------------------------------------\n');
+      break;
+    }
+
+    offset += data.log.split('\n').length;
+    yield sleep(2000);
+  }
+};
+
 SyncModuleWorker.prototype.next = function *(concurrencyId) {
   var name = this.names.shift();
   if (!name) {
@@ -150,6 +209,12 @@ SyncModuleWorker.prototype.next = function *(concurrencyId) {
   that.syncingNames[name] = true;
   var pkg = null;
   var status = 0;
+
+  // sync upstream
+  if (config.sourceNpmRegistryIsCNpm) {
+    yield* this.syncUpstream(name);
+  }
+
   // get from npm
   try {
     var result = yield npm.request('/' + name);

@@ -133,7 +133,6 @@ var config = {
   // registry url name
   registryHost: 'r.cnpmjs.org',
 
-
   /**
    * registry mode config
    */
@@ -170,8 +169,10 @@ var config = {
   disturl: 'http://nodejs.org/dist',
   syncDist: false,
 
-  // sync source
+  // sync source, upstream registry
   sourceNpmRegistry: 'http://registry.npm.taobao.org',
+  // upstream registry is base on cnpm/cnpmjs.org or not
+  sourceNpmRegistryIsCNpm: false,
 
   // if install return 404, try to sync from source registry
   syncByInstall: true,
