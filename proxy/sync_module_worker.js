@@ -63,6 +63,7 @@ function SyncModuleWorker(options) {
     this.nameMap[name] = true;
   }.bind(this));
   this.noDep = options.noDep; //do not sync dependences
+  this.syncDevDependencies = config.syncDevDependencies;
 
   this.successes = [];
   this.fails = [];
@@ -96,11 +97,16 @@ SyncModuleWorker.prototype.log = function (format, arg1, arg2) {
 SyncModuleWorker.prototype.start = function () {
   this.log('user: %s, sync %s worker start, %d concurrency, nodeps: %s, publish: %s',
     this.username, this.names[0], this.concurrency, this.noDep, this._publish);
-  var self = this;
+  var that = this;
   co(function *() {
+    // sync upstream
+    if (config.sourceNpmRegistryIsCNpm) {
+      yield* that.syncUpstream(that.startName);
+    }
+
     var arr = [];
-    for (var i = 0; i < self.concurrency; i++) {
-      arr.push(self.next(i));
+    for (var i = 0; i < that.concurrency; i++) {
+      arr.push(that.next(i));
     }
     yield arr;
   })();
@@ -144,6 +150,9 @@ SyncModuleWorker.prototype._doneOne = function* (concurrencyId, name, success) {
 
 SyncModuleWorker.prototype.syncUpstream = function* (name) {
   var url = config.sourceNpmRegistry + '/' + name + '/sync';
+  if (this.noDep) {
+    url += '?nodeps=true';
+  }
   var r = yield urllib.request(url, {
     method: 'put',
     timeout: 20000,
@@ -158,7 +167,7 @@ SyncModuleWorker.prototype.syncUpstream = function* (name) {
       url, r.status, r.data);
   }
 
-  var logURL =  url + '/log/' + r.data.logId;
+  var logURL = config.sourceNpmRegistry + '/' + name + '/sync/log/' + r.data.logId;
   var offset = 0;
   this.log('----------------- Syncing upstream %s -------------------', logURL);
 
@@ -216,11 +225,6 @@ SyncModuleWorker.prototype.next = function *(concurrencyId) {
   that.syncingNames[name] = true;
   var pkg = null;
   var status = 0;
-
-  // sync upstream
-  if (config.sourceNpmRegistryIsCNpm) {
-    yield* this.syncUpstream(name);
-  }
 
   this.log('----------------- Syncing %s -------------------', name);
 
@@ -791,13 +795,17 @@ SyncModuleWorker.prototype._syncOneVersion = function *(versionIndex, sourcePack
   };
 
   var dependencies = Object.keys(sourcePackage.dependencies || {});
-  var devDependencies = Object.keys(sourcePackage.devDependencies || {});
+  var devDependencies = [];
+  if (this.syncDevDependencies) {
+    devDependencies = Object.keys(sourcePackage.devDependencies || {});
+  }
 
   that.log('    [%s:%d] syncing, version: %s, dist: %j, no deps: %s, ' +
-   'publish on cnpm: %s, dependencies: %d, devDependencies: %d',
+   'publish on cnpm: %s, dependencies: %d, devDependencies: %d, syncDevDependencies: %s',
     sourcePackage.name, versionIndex, sourcePackage.version,
     sourcePackage.dist, that.noDep, that._publish,
-    dependencies.length, devDependencies.length);
+    dependencies.length,
+    devDependencies.length, this.syncDevDependencies);
 
   if (dependencies.length > config.maxDependencies) {
     dependencies = dependencies.slice(0, config.maxDependencies);
