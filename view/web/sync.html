@@ -50,8 +50,7 @@
 
     var offset = 0;
     var logs = '';
-    var successFlag = false;
-    var failFlag = false;
+    var syncDone = false;
     var hasFail = false;
     function getSyncLog(id) {
       $.ajax({
@@ -65,17 +64,16 @@
           offset += data.log.split('\n').length;
           logs = logs + '\n' + data.log;
 
-          if (data.log.indexOf('Success: [') >= 0) {
-            successFlag = true;
+          if (data.log.indexOf('[done] Sync') >= 0) {
+            syncDone = true;
           }
           if (data.log.indexOf('Fail: [') >= 0) {
-            failFlag = true;
             var failInfo = data.log.match(/Fail: \[ (.*?) \]/);
             if (failInfo && failInfo[1]) {
               hasFail = true;
             }
           }
-          if (successFlag && failFlag) {
+          if (syncDone) {
             logs += '\nSync package ' + name + ' complete!';
             if (hasFail) {
               logs += ' But some packages sync failed, you can refresh to sync again.';
