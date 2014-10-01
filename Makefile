@@ -64,7 +64,12 @@ contributors: install
 	@./node_modules/.bin/contributors -f plain -o AUTHORS
 
 autod: install
-	@./node_modules/.bin/autod -w -e public,view,docs,backup,coverage -k bluebird,nodemailer --prefix "~"
+	@./node_modules/.bin/autod -w \
+		--prefix "~"\
+		--exclude public,view,docs,backup,coverage \
+		--dep bluebird \
+		--devdep mocha,should,istanbul-harmony,jshint \
+		--keep nodemailer
 	@$(MAKE) install
 
 .PHONY: test
