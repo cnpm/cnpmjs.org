@@ -68,8 +68,7 @@ autod: install
 		--prefix "~"\
 		--exclude public,view,docs,backup,coverage \
 		--dep bluebird \
-		--devdep mocha,should,istanbul-harmony,jshint \
-		--keep nodemailer
+		--devdep mocha,should,istanbul-harmony,jshint
 	@$(MAKE) install
 
 .PHONY: test

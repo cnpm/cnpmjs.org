@@ -81,16 +81,27 @@ var config = {
   },
 
   // email notification for errors
+  // check https://github.com/andris9/Nodemailer for more informations
   mail: {
     appname: 'cnpmjs.org',
-    sender: 'cnpmjs.org mail sender <adderss@gmail.com>',
-    host: 'smtp.gmail.com',
-    port: 465,
-    user: 'address@gmail.com',
-    pass: 'your password',
-    ssl: true,
-    debug: false
+    from: 'cnpmjs.org mail sender <adderss@gmail.com>',
+    service: 'gmail',
+    auth: {
+      user: 'address@gmail.com',
+      pass: 'your password'
+    }
   },
+  // forward Compat with old style
+  // mail: {
+  //   appname: 'cnpmjs.org',
+  //   sender: 'cnpmjs.org mail sender <adderss@gmail.com>',
+  //   host: 'smtp.gmail.com',
+  //   port: 465,
+  //   user: 'address@gmail.com',
+  //   pass: 'your password',
+  //   ssl: true,
+  //   debug: false
+  // },
 
 
   logoURL: '//ww4.sinaimg.cn/large/69c1d4acgw1ebfly5kjlij208202oglr.jpg', // cnpm logo image url
