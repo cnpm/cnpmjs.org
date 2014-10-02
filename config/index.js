@@ -180,10 +180,17 @@ var config = {
   disturl: 'http://nodejs.org/dist',
   syncDist: false,
 
+  // the official npm registry
+  // cnpm wont directly sync from this one
+  // but sometimes will request it for some package infomations
+  // please don't change it if not necessary
+  officialNpmRegistry: 'https://registry.npmjs.org',
+
   // sync source, upstream registry
   // If you want to directly sync from official npm's registry
   // please drop them an email first
   sourceNpmRegistry: 'http://registry.npm.taobao.org',
+
   // upstream registry is base on cnpm/cnpmjs.org or not
   // if your upstream is official npm registry, please turn it off
   sourceNpmRegistryIsCNpm: true,

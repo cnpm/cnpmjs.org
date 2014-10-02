@@ -38,27 +38,13 @@ exports.sync = function* () {
     noDep: noDep,
   };
 
-  var result = yield SyncModuleWorker.sync(name, username, options);
-  debug('sync %s got %j', name, result);
+  var logId = yield SyncModuleWorker.sync(name, username, options);
+  debug('sync %s got log id %j', name, logId);
 
-  // friendly 404 reason info
-  if (result.statusCode === 404) {
-    this.status = 404;
-    this.body = {
-      ok: false,
-      reason: 'can not found ' + name + ' in the source registry'
-    };
-    return;
-  }
-  if (!result.ok) {
-    this.status = result.statusCode || 500;
-    this.body = result.pkg;
-    return;
-  }
   this.status = 201;
   this.body = {
     ok: true,
-    logId: result.logId
+    logId: logId
   };
 };
 
