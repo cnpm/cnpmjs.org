@@ -69,7 +69,7 @@ only need to change the registry in config. Even include manual synchronization 
 
 ### Dependencies
 
-* [node](http://nodejs.org) =0.11.12
+* [node](http://nodejs.org) >=0.11.12, use `--harmony`
 * [mysql](http://dev.mysql.com/downloads/) >= 0.5.0, include `mysqld` and `mysql cli`. I test on `mysql@5.6.16`.
 
 ### Start MySQL
@@ -96,8 +96,8 @@ $ make test-cov
 # udpate dependencies
 $ make autod
 
-# start server
-$ node --harmony_generators dispatch.js
+# start server with development mode
+$ make dev
 ```
 
 ## How to contribute
