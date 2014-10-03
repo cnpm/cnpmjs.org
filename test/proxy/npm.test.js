@@ -36,7 +36,7 @@ describe('proxy/npm.test.js', function () {
     should.not.exist(data);
   });
 
-  it('should return error when http error', function *() {
+  it.skip('should return error when http error', function* () {
     mm.http.request(/\//, new ChunkStream(['{']));
     try {
       var data = yield npm.get('pedding-not-exists');

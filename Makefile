@@ -43,7 +43,6 @@ test-cov cov: install pretest
 		--require ./test/init.js \
 		$(MOCHA_OPTS) \
 		$(TESTS)
-	@./node_modules/.bin/cov coverage
 
 test-travis: install pretest
 	@NODE_ENV=test node --harmony \
@@ -59,6 +58,9 @@ test-travis: install pretest
 		--require ./test/init.js \
 		$(MOCHA_OPTS) \
 		$(TESTS)
+
+dev:
+	@node_modules/.bin/node-dev --harmony dispatch.js
 
 contributors: install
 	@./node_modules/.bin/contributors -f plain -o AUTHORS
