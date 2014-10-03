@@ -948,21 +948,6 @@ SyncModuleWorker.prototype._syncOneVersion = function *(versionIndex, sourcePack
 
 SyncModuleWorker.sync = function* (name, username, options) {
   options = options || {};
-  var result = yield npm.request('/' + name);
-  var pkg = result.data;
-  if (result.status === 404 &&
-      (!pkg.time || !pkg.time.unpublished || !pkg.time.unpublished.time)) {
-    pkg = null;
-  }
-
-  if (!pkg || !pkg._id) {
-    return {
-      ok: false,
-      pkg: pkg,
-      statusCode: 404
-    };
-  }
-
   var result = yield Log.create({name: name, username: username});
   var worker = new SyncModuleWorker({
     logId: result.id,
@@ -972,9 +957,5 @@ SyncModuleWorker.sync = function* (name, username, options) {
     publish: options.publish,
   });
   worker.start();
-  return {
-    ok: true,
-    logId: result.id,
-    pkg: pkg
-  };
+  return result.id;
 };

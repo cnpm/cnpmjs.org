@@ -42,6 +42,7 @@ var packageService = require('../../services/package');
 var UserService = require('../../services/user');
 var downloadAsReadStream = require('../utils').downloadAsReadStream;
 var deprecateVersions = require('./deprecate');
+var npm = require('../../proxy/npm');
 
 /**
  * show all version of a module
@@ -144,9 +145,26 @@ exports.show = function* (next) {
       };
       return;
     }
-    var result = yield* SyncModuleWorker.sync(name, 'sync-by-install');
-    this.body = result.pkg;
-    this.status = result.ok ? 200 : (result.statusCode || 500);
+    // start sync
+    var logId = yield* SyncModuleWorker.sync(name, 'sync-by-install');
+    debug('start sync %s, get log id %s', name, logId);
+
+    // rty to get package from official registry
+    var r = yield npm.request('/' + name, {
+      registry: config.officialNpmRegistry
+    });
+
+    if (r.statusCode !== 200) {
+      debug('requet from officialNpmRegistry response %s', r.statusCode);
+      this.status = 404;
+      this.body = {
+        error: 'not_found',
+        reason: 'document not found'
+      }
+      return;
+    }
+
+    this.body = r.data;
     return;
   }
 
@@ -292,17 +310,26 @@ exports.get = function* (next) {
     return;
   }
 
-  var result = yield SyncModuleWorker.sync(name, 'sync-by-install');
-  var pkg = result.pkg && result.pkg.versions[version];
-  if (!pkg) {
+  // start sync
+  var logId = yield* SyncModuleWorker.sync(name, 'sync-by-install');
+  debug('start sync %s, get log id %s', name, logId);
+
+  // rty to get package from official registry
+  var r = yield npm.request('/' + name + '/' + version, {
+    registry: config.officialNpmRegistry
+  });
+
+  if (r.statusCode !== 200) {
+    debug('requet from officialNpmRegistry response %s', r.statusCode);
     this.status = 404;
     this.body = {
       error: 'not exist',
       reason: 'version not found: ' + version
-    };
+    }
     return;
   }
-  this.body = pkg;
+
+  this.body = r.data;
 };
 
 var _downloads = {};

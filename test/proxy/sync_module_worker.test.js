@@ -89,14 +89,12 @@ describe('proxy/sync_module_worker.test.js', function () {
 
   it('should sync unpublished module by name', function* () {
     var result = yield* SyncModuleWorker.sync('tnpm', 'fengmk2');
-    result.ok.should.equal(true);
-    result.should.have.property('logId');
+    result.should.be.Number;
   });
 
-  it('should not sync not exists module', function* () {
+  it('should sync not exists module', function* () {
     var result = yield* SyncModuleWorker.sync('tnpm-not-exists', 'fengmk2');
-    result.ok.should.equal(false);
-    result.should.not.have.property('logId');
+    result.should.be.Number;
   });
 
   it('should sync unpublished info', function (done) {
