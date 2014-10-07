@@ -77,7 +77,6 @@ var config = {
     fengmk2: 'fengmk2@gmail.com',
     admin: 'admin@cnpmjs.org',
     dead_horse: 'dead_horse@qq.com',
-    cnpmjstest10: 'cnpmjstest10@cnpmjs.org',
   },
 
   // email notification for errors
