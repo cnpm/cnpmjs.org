@@ -16,11 +16,21 @@
 
 var path = require('path');
 var fs = require('fs');
+var config = require('../config');
 
 var fixtures = path.join(__dirname, 'fixtures');
 
 var admin = exports.admin = 'cnpmjstest10';
 exports.adminAuth = 'Basic ' + new Buffer(admin + ':' + admin).toString('base64');
+config.admins[admin] = admin + '@cnpmjs.org';
+
+var otherAdmin2 = exports.otherAdmin2 = 'cnpmjstestAdmin2';
+exports.otherAdmin2Auth = 'Basic ' + new Buffer(otherAdmin2 + ':' + otherAdmin2).toString('base64');
+config.admins[otherAdmin2] = otherAdmin2 + '@cnpmjs.org';
+
+var otherAdmin3 = exports.otherAdmin3 = 'cnpmjstestAdmin3';
+exports.otherAdmin3Auth = 'Basic ' + new Buffer(otherAdmin3 + ':' + otherAdmin3).toString('base64');
+config.admins[otherAdmin3] = otherAdmin3 + '@cnpmjs.org';
 
 var otherUser = exports.otherUser = 'cnpmjstest101';
 exports.otherUserAuth = 'Basic ' + new Buffer(otherUser + ':' + otherUser).toString('base64');

@@ -21,7 +21,9 @@ var User = require('../proxy/user');
 var usernames = [
   'cnpmjstest101',
   'cnpmjstest102',
-  'cnpmjstest10'
+  'cnpmjstest10', // admin
+  'cnpmjstestAdmin2', // other admin
+  'cnpmjstestAdmin3', // other admin
 ];
 
 usernames.forEach(function (name) {

@@ -23,6 +23,7 @@ var total = require('../controllers/total');
 var mod = require('../controllers/registry/module');
 var user = require('../controllers/registry/user');
 var sync = require('../controllers/sync');
+var userPackage = require('../controllers/registry/user_package');
 
 function routes(app) {
 
@@ -83,6 +84,9 @@ function routes(app) {
   app.put('/-/user/org.couchdb.user::name', user.add);
   app.get('/-/user/org.couchdb.user::name', user.show);
   app.put('/-/user/org.couchdb.user::name/-rev/:rev', login, user.update);
+
+  // list all packages of user
+  app.get('/-/by-user/:user', userPackage.list);
 }
 
 module.exports = routes;
