@@ -17,6 +17,14 @@
 var crypto = require('crypto');
 var utility = require('utility');
 var User = require('../proxy/user');
+var config = require('../config');
+
+if (process.env.CNPM_SOURCE_NPM) {
+  config.sourceNpmRegistry = process.env.CNPM_SOURCE_NPM;
+}
+if (process.env.CNPM_SOURCE_NPM_ISCNPM === 'false') {
+  config.sourceNpmRegistryIsCNpm = false;
+}
 
 var usernames = [
   'cnpmjstest101',
