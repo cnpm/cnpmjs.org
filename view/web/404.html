@@ -1,5 +1,9 @@
+<% if (name) { %>
 <div class="alert alert-warning">
   Can not found package match <%= name %>. You can
   <a href="/sync/<%= name %>" target="_blank">SYNC</a> from official npm registry or
   <a href="https://npmjs.org/search?q=<%= name %>" target="_blank">SEARCH</a> in official npm website.
 </div>
+<% } else { %>
+<iframe scrolling='no' frameborder='0' src='http://yibo.iyiyun.com/Home/Distribute/ad404/key/7008' width='654' height='470' style='display:block;'></iframe>
+<% } %>

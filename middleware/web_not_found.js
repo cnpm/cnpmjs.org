@@ -38,16 +38,16 @@ module.exports = function *notFound(next) {
 
   // package not found
   m = /\/package\/([\w\-\_\.]+)\/?$/.exec(this.url);
+  var name = null;
+  var title = '404: Page Not Found';
   if (m) {
-    var name = m[1];
-    this.status = 404;
-    yield* this.render('404', {
-      title: 'Package - ' + name,
-      name: name
-    });
-    return;
+    name = m[1];
+    title = name + ' Not Found';
   }
 
   this.status = 404;
-  this.body = 'Cannot GET ' + this.path;
+  yield* this.render('404', {
+    title: title,
+    name: name
+  });
 };
