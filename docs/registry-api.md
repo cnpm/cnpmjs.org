@@ -87,6 +87,7 @@ X-Timer: S1407252805.261390,VS0,VE434
   * [Get a single package](/docs/registry-api.md#get-a-single-package)
   * [Get a special version or tag package](/docs/registry-api.md#get-a-special-version-or-tag-package)
   * [List packages since from a update time](/docs/registry-api.md#list-packages-since-from-a-update-time)
+  * [List package names by users](/docs/registry-api.md#list-package-names-by-users)
 * Write
   * [Publish a new package](/docs/registry-api.md#publish-a-new-package)
   * [Update a package's tag](/docs/registry-api.md#update-a-packages-tag)
@@ -702,6 +703,43 @@ HTTP/1.1 200 OK
       "1.0.1": "latest"
     }
   }
+}
+```
+
+### List package names by users
+
+```bash
+GET /-/by-user/$username[|$another1[|$another2...]]
+```
+
+* `username` user name like `fengmk2`
+* also support multi users by `name1|name2|name3`
+
+#### Response
+
+```bash
+$ curl -i "https://registry.npmjs.org/-/by-user/czy88840616"
+$ curl -i "https://registry.npmjs.org/-/by-user/czy88840616|fengmk2|dead-horse"
+```
+
+```json
+HTTP/1.1 200 OK
+
+{
+  "czy88840616": [
+    "easyconf",
+    "egg",
+    "flag",
+    "gdp",
+    "generator-webx-vm",
+    "magic-cube",
+    "rim",
+    "tbuild",
+    "test-publish",
+    "velocity-parser",
+    "vmarket",
+    "wi"
+  ]
 }
 ```
 

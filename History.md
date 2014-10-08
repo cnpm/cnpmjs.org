@@ -1,4 +1,13 @@
 
+1.6.0 / 2014-10-08
+==================
+
+ * list user all packages api. fixed #462
+ * add node-dev: $ make dev
+ * always start sync worker
+ * update node mailer
+ * update autod
+
 1.5.5 / 2014-09-25
 ==================
 
