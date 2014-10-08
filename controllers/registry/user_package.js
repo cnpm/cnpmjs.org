@@ -28,23 +28,40 @@ exports.list = function* () {
     return;
   }
 
+  var firstUser = users[0];
+  if (!firstUser) {
+    // params.user = '|'
+    this.body = {};
+    return;
+  }
+
   var data = {};
-  var rows = yield* NpmModuleMaintainer.listByUsers(users);
-  if (rows.length > 0) {
-    for (var i = 0; i < rows.length; i++) {
-      var row = rows[i];
-      if (data[row.user]) {
-        data[row.user].push(row.name);
-      } else {
-        data[row.user] = [row.name];
-      }
+  var r = yield [
+    NpmModuleMaintainer.listByUsers(users),
+    // get the first user module by author field
+    Module.listNamesByAuthor(firstUser),
+  ];
+  var rows = r[0];
+  var firstUserModuleNames = r[1];
+  for (var i = 0; i < rows.length; i++) {
+    var row = rows[i];
+    if (data[row.user]) {
+      data[row.user].push(row.name);
+    } else {
+      data[row.user] = [row.name];
     }
-  } else {
-    if (users.length === 1) {
-      // try to get from module author
-      var names = Module.listNamesByAuthor(users[0]);
-      if (names.length > 0) {
-        data[users[0]] = names;
+  }
+
+  if (firstUserModuleNames.length > 0) {
+    if (!data[firstUser]) {
+      data[firstUser] = firstUserModuleNames;
+    } else {
+      var items = data[firstUser];
+      for (var i = 0; i < firstUserModuleNames.length; i++) {
+        var name = firstUserModuleNames[i];
+        if (items.indexOf(name) === -1) {
+          items.push(name);
+        }
       }
     }
   }
