@@ -45,7 +45,8 @@ test-cov cov: install pretest
 		$(TESTS)
 
 test-travis: install pretest
-	@NODE_ENV=test node --harmony \
+	@NODE_ENV=test CNPM_SOURCE_NPM=https://registry.npmjs.org CNPM_SOURCE_NPM_ISCNPM=false \
+		node --harmony \
 		node_modules/.bin/istanbul cover --preserve-comments \
 		./node_modules/.bin/_mocha \
 		--report lcovonly \

@@ -74,7 +74,7 @@ describe('controllers/registry/module.test.js', function () {
     it('should put /:name/sync success', function (done) {
       mm.data(Npm, 'get', require(path.join(fixtures, 'utility.json')));
       request(app)
-      .put('/utility/sync')
+      .put('/pedding/sync')
       .set('authorization', utils.adminAuth)
       .end(function (err, res) {
         should.not.exist(err);
@@ -86,7 +86,7 @@ describe('controllers/registry/module.test.js', function () {
 
     it('should get sync log', function (done) {
       request(app)
-      .get('/utility/sync/log/' + logId)
+      .get('/pedding/sync/log/' + logId)
       .end(function (err, res) {
         should.not.exist(err);
         res.body.should.have.keys('ok', 'log');

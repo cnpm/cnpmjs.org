@@ -84,7 +84,7 @@
     "registry"
   ],
   "engines": {
-    "node": ">= 0.11.9"
+    "node": ">= 0.11.14"
   },
   "author": [
     "fengmk2 <fengmk2@gmail.com> (http://fengmk2.github.com)",

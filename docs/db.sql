@@ -1,4 +1,4 @@
-CREATE TABLE `user` (
+CREATE TABLE IF NOT EXISTS `user` (
  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'primary key',
  `gmt_create` datetime NOT NULL COMMENT 'create time',
  `gmt_modified` datetime NOT NULL COMMENT 'modified time',
@@ -19,7 +19,7 @@ CREATE TABLE `user` (
 --   ADD `json` longtext CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'json details',
 --   ADD `npm_user` tinyint(1) DEFAULT '0' COMMENT 'user sync from npm or not, 1: true, other: false';
 
-CREATE TABLE `module_keyword` (
+CREATE TABLE IF NOT EXISTS `module_keyword` (
  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'primary key',
  `gmt_create` datetime NOT NULL COMMENT 'create time',
  `keyword` varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT 'keyword',
@@ -30,7 +30,7 @@ CREATE TABLE `module_keyword` (
  KEY `name` (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='module keyword';
 
-CREATE TABLE `module_star` (
+CREATE TABLE IF NOT EXISTS `module_star` (
  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'primary key',
  `gmt_create` datetime NOT NULL COMMENT 'create time',
  `user` varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT 'user name',
@@ -40,7 +40,7 @@ CREATE TABLE `module_star` (
  KEY `name` (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='module star';
 
-CREATE TABLE `module_maintainer` (
+CREATE TABLE IF NOT EXISTS `module_maintainer` (
  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'primary key',
  `gmt_create` datetime NOT NULL COMMENT 'create time',
  `user` varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT 'user name',
@@ -48,9 +48,19 @@ CREATE TABLE `module_maintainer` (
  PRIMARY KEY (`id`),
  UNIQUE KEY `user_module_name` (`user`,`name`),
  KEY `name` (`name`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='module maintainers';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='private module maintainers';
 
-CREATE TABLE `module` (
+CREATE TABLE IF NOT EXISTS `npm_module_maintainer` (
+ `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'primary key',
+ `gmt_create` datetime NOT NULL COMMENT 'create time',
+ `user` varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT 'user name',
+ `name` varchar(100) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL COMMENT 'module name',
+ PRIMARY KEY (`id`),
+ UNIQUE KEY `user_module_name` (`user`,`name`),
+ KEY `name` (`name`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='npm original module maintainers';
+
+CREATE TABLE IF NOT EXISTS `module` (
  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'primary key',
  `gmt_create` datetime NOT NULL COMMENT 'create time',
  `gmt_modified` datetime NOT NULL COMMENT 'modified time',
@@ -76,7 +86,7 @@ CREATE TABLE `module` (
 -- show create table module\G
 -- ALTER TABLE  `module` CHANGE  `name`  `name` VARCHAR( 100 ) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL COMMENT  'module name';
 
-CREATE TABLE `module_log` (
+CREATE TABLE IF NOT EXISTS `module_log` (
  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'primary key',
  `gmt_create` datetime NOT NULL COMMENT 'create time',
  `gmt_modified` datetime NOT NULL COMMENT 'modified time',
@@ -88,7 +98,7 @@ CREATE TABLE `module_log` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='module sync log';
 -- ALTER TABLE  `module_log` CHANGE  `name`  `name` VARCHAR( 100 ) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL COMMENT  'module name';
 
-CREATE TABLE `tag` (
+CREATE TABLE IF NOT EXISTS `tag` (
  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'primary key',
  `gmt_create` datetime NOT NULL COMMENT 'create time',
  `gmt_modified` datetime NOT NULL COMMENT 'modified time',
@@ -104,7 +114,7 @@ CREATE TABLE `tag` (
 -- ALTER TABLE  `tag` CHANGE  `name`  `name` VARCHAR( 100 ) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL COMMENT  'module name';
 -- ALTER TABLE `tag` ADD KEY `gmt_modified` (`gmt_modified`);
 
-CREATE TABLE `module_unpublished` (
+CREATE TABLE IF NOT EXISTS `module_unpublished` (
  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'primary key',
  `gmt_create` datetime NOT NULL COMMENT 'create time',
  `gmt_modified` datetime NOT NULL COMMENT 'modified time',
@@ -115,7 +125,7 @@ CREATE TABLE `module_unpublished` (
  KEY `gmt_modified` (`gmt_modified`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='module unpublished info';
 
-CREATE TABLE `total` (
+CREATE TABLE IF NOT EXISTS `total` (
  `name` varchar(100) NOT NULL COMMENT 'total name',
  `gmt_modified` datetime NOT NULL COMMENT 'modified time',
  `module_delete` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT 'module delete count',
@@ -129,7 +139,9 @@ CREATE TABLE `total` (
  `last_sync_module` varchar(100) COMMENT 'last sync success module name',
  PRIMARY KEY (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='total info';
-INSERT INTO total(name, gmt_modified) VALUES('total', now());
+-- init `total` count
+INSERT INTO total(name, gmt_modified) VALUES('total', now())
+  ON DUPLICATE KEY UPDATE gmt_modified=now();
 -- ALTER TABLE `total` ADD `last_sync_time` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT 'last timestamp sync from official registry'
 -- ALTER TABLE `total` ADD `last_exist_sync_time` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT 'last timestamp sync exist packages from official registry'
 -- ALTER TABLE `total` ADD `sync_status` tinyint unsigned NOT NULL DEFAULT '0' COMMENT 'system sync from official registry status'
@@ -139,7 +151,7 @@ INSERT INTO total(name, gmt_modified) VALUES('total', now());
 -- ALTER TABLE `total` ADD `left_sync_num` int unsigned NOT NULL DEFAULT '0' COMMENT 'how many packages left to be sync'
 -- ALTER TABLE `total` ADD `last_sync_module` varchar(100) NOT NULL COMMENT 'last sync success module name';
 
-CREATE TABLE `download_total` (
+CREATE TABLE IF NOT EXISTS `download_total` (
  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'primary key',
  `gmt_create` datetime NOT NULL COMMENT 'create time',
  `gmt_modified` datetime NOT NULL COMMENT 'modified time',
@@ -151,7 +163,7 @@ CREATE TABLE `download_total` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='module download total info';
 -- ALTER TABLE  `download_total` CHANGE  `name`  `name` VARCHAR( 100 ) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL COMMENT  'module name';
 
-CREATE TABLE `module_deps` (
+CREATE TABLE IF NOT EXISTS `module_deps` (
  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'primary key',
  `gmt_create` datetime NOT NULL COMMENT 'create time',
  `name` varchar(100) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL COMMENT 'module name',
@@ -161,7 +173,7 @@ CREATE TABLE `module_deps` (
  KEY `name` (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='module deps';
 
-CREATE TABLE `dist_dir` (
+CREATE TABLE IF NOT EXISTS `dist_dir` (
  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'primary key',
  `gmt_create` datetime NOT NULL COMMENT 'create time',
  `gmt_modified` datetime NOT NULL COMMENT 'modified time',
@@ -173,7 +185,7 @@ CREATE TABLE `dist_dir` (
  KEY `gmt_modified` (`gmt_modified`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='dist dir info';
 
-CREATE TABLE `dist_file` (
+CREATE TABLE IF NOT EXISTS `dist_file` (
  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'primary key',
  `gmt_create` datetime NOT NULL COMMENT 'create time',
  `gmt_modified` datetime NOT NULL COMMENT 'modified time',
