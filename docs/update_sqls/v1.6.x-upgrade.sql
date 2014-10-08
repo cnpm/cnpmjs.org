@@ -1,4 +1,4 @@
-CREATE TABLE `npm_module_maintainer` (
+CREATE TABLE IF NOT EXISTS `npm_module_maintainer` (
  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'primary key',
  `gmt_create` datetime NOT NULL COMMENT 'create time',
  `user` varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT 'user name',
