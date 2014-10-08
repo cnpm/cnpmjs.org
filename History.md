@@ -1,4 +1,13 @@
 
+1.6.1 / 2014-10-09
+==================
+
+ * make test on travis faster
+ * ensure not sync user also has his own package names
+ * add [v1.6.x-upgrade.sql](https://github.com/cnpm/cnpmjs.org/blob/master/docs/update_sqls/v1.6.x-upgrade.sql)
+ * save npm original package maintainers to npm_module_maintainer table. fixed #464
+ * use simple 404
+
 1.6.0 / 2014-10-08
 ==================
 
