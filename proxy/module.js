@@ -57,7 +57,9 @@ exports.add = function (mod, callback) {
   dist.size = 0;
   var publish_time = mod.publish_time || Date.now();
   var values = [
-    publish_time, mod.author, mod.name, mod.version, pkg,
+    publish_time,
+    mod.author, // meaning first maintainer, more maintainers please check module_maintainer table
+    mod.name, mod.version, pkg,
     dist.tarball, dist.shasum, dist.size, description
   ];
   mysql.query(INSERT_MODULE_SQL, values, function (err, result) {
@@ -702,7 +704,7 @@ LIST_BY_AUTH_SQLS.push(multiline(function () {;/*
   ORDER BY
     publish_time DESC;
 */}));
-exports.listByAuthor = function* (author, callback) {
+exports.listByAuthor = function* (author) {
   var names = yield [
     mysql.query(LIST_BY_AUTH_SQLS[0], [author]),
     mysql.query(LIST_BY_AUTH_SQLS[1], [author])
@@ -725,6 +727,14 @@ exports.listByAuthor = function* (author, callback) {
     return i.module_id;
   });
   return yield mysql.query(LIST_BY_AUTH_SQLS[3], [ids]);
+};
+
+exports.listNamesByAuthor = function* (author) {
+  var sql = 'SELECT distinct(name) AS name FROM module WHERE author=?;';
+  var names = yield mysql.query(sql, [author]);
+  return names.map(function (item) {
+    return item.name;
+  });
 };
 
 var UPDATE_PACKAGE_SQL = multiline(function () {;/*

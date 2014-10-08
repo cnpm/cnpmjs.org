@@ -90,13 +90,3 @@ exports.update = function* (name, maintainers) {
     remove: removeUsers
   };
 };
-
-exports.listByUsers = function* (users) {
-  var sql = 'SELECT name, user FROM module_maintainer WHERE user = ?;';
-  var args = users;
-  if (users.length > 1) {
-    sql = 'SELECT name, user FROM module_maintainer WHERE user in (?);';
-    args = [users];
-  }
-  return yield mysql.query(sql, args);
-};

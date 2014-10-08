@@ -21,7 +21,7 @@ var mysql = require('../common/mysql');
 var Log = require('../proxy/module_log');
 var config = require('../config');
 
-config.sourceNpmRegistry = 'http://registry.npmjs.org';
+config.sourceNpmRegistry = 'https://registry.npm.taobao.org';
 
 var names = process.argv[2] || 'byte';
 names = names.split(',');
@@ -29,6 +29,7 @@ names = names.split(',');
 Log.create({
   name: names[0],
   username: 'fengmk2',
+  noDep: true,
 }, function (err, result) {
   if (err) {
     throw err;

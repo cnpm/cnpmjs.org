@@ -17,47 +17,37 @@
 var should = require('should');
 var request = require('supertest');
 var pedding = require('pedding');
+var co = require('co');
 var app = require('../../../servers/registry');
+var SyncModuleWorker = require('../../../proxy/sync_module_worker');
+var NpmModuleMaintainer = require('../../../proxy/npm_module_maintainer');
 var utils = require('../../utils');
 
 describe('contributors/registry/user_package.test.js', function () {
   before(function (done) {
-    // TODO: need to unpublish all exists packages
-    var pkg = utils.getPackage('user_package_list_one_package_1', '0.0.1', utils.otherAdmin2);
+    co(function* () {
+      yield* NpmModuleMaintainer.removeAll('pedding');
+    })(function (err) {
+      should.not.exist(err);
 
-    request(app.listen())
-    .put('/' + pkg.name)
-    .set('authorization', utils.otherAdmin2Auth)
-    .send(pkg)
-    .expect(201, function (err) {
-      should.not.exists(err);
-      pkg = utils.getPackage('user_package_list_one_package_2', '0.0.2', utils.otherAdmin2);
-      request(app.listen())
-      .put('/' + pkg.name)
-      .set('authorization', utils.otherAdmin2Auth)
-      .send(pkg)
-      .expect(201, function (err) {
-        // other admin publish
-        should.not.exists(err);
-        pkg = utils.getPackage('user_package_list_one_package_3', '1.0.2', utils.otherAdmin3);
-        request(app.listen())
-        .put('/' + pkg.name)
-        .set('authorization', utils.otherAdmin3Auth)
-        .send(pkg)
-        .expect(201, done);
+      // sync pedding
+      var worker = new SyncModuleWorker({
+        name: 'pedding',
+        noDep: true,
       });
+      worker.start();
+      worker.on('end', done);
     });
   });
 
   describe('listOne()', function () {
     it('should return one user\'s all package names', function (done) {
       request(app.listen())
-      .get('/-/by-user/' + utils.otherAdmin2)
+      .get('/-/by-user/fengmk2')
       .expect(200)
       .expect({
-        cnpmjstestAdmin2: [
-          'user_package_list_one_package_1',
-          'user_package_list_one_package_2'
+        fengmk2: [
+          'pedding',
         ]
       }, done);
     });
@@ -75,28 +65,26 @@ describe('contributors/registry/user_package.test.js', function () {
       done = pedding(2, done);
 
       request(app.listen())
-      .get('/-/by-user/' + encodeURIComponent(utils.otherAdmin2 + '|' + utils.otherAdmin3))
+      .get('/-/by-user/' + encodeURIComponent('fengmk2|dead-horse'))
       .expect(200)
       .expect({
-        cnpmjstestAdmin2: [
-          'user_package_list_one_package_1',
-          'user_package_list_one_package_2'
+        fengmk2: [
+          'pedding',
         ],
-        cnpmjstestAdmin3: [
-          'user_package_list_one_package_3'
+        'dead-horse': [
+          'pedding'
         ]
       }, done);
 
       request(app.listen())
-      .get('/-/by-user/' + utils.otherAdmin2 + '|' + utils.otherAdmin3)
+      .get('/-/by-user/fengmk2|dead-horse')
       .expect(200)
       .expect({
-        cnpmjstestAdmin2: [
-          'user_package_list_one_package_1',
-          'user_package_list_one_package_2'
+        fengmk2: [
+          'pedding',
         ],
-        cnpmjstestAdmin3: [
-          'user_package_list_one_package_3'
+        'dead-horse': [
+          'pedding'
         ]
       }, done);
     });
@@ -105,22 +93,20 @@ describe('contributors/registry/user_package.test.js', function () {
       done = pedding(2, done);
 
       request(app.listen())
-      .get('/-/by-user/' + encodeURIComponent(utils.otherAdmin2 + '|user-not-exists'))
+      .get('/-/by-user/' + encodeURIComponent('fengmk2|user-not-exists'))
       .expect(200)
       .expect({
-        cnpmjstestAdmin2: [
-          'user_package_list_one_package_1',
-          'user_package_list_one_package_2'
+        fengmk2: [
+          'pedding'
         ]
       }, done);
 
       request(app.listen())
-      .get('/-/by-user/' + utils.otherAdmin2 + '|user-not-exists')
+      .get('/-/by-user/fengmk2|user-not-exists')
       .expect(200)
       .expect({
-        cnpmjstestAdmin2: [
-          'user_package_list_one_package_1',
-          'user_package_list_one_package_2'
+        fengmk2: [
+          'pedding'
         ]
       }, done);
     });

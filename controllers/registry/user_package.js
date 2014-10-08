@@ -14,7 +14,8 @@
  * Module dependencies.
  */
 
-var ModuleMaintainer = require('../../proxy/module_maintainer');
+var Module = require('../../proxy/module');
+var NpmModuleMaintainer = require('../../proxy/npm_module_maintainer');
 
 exports.list = function* () {
   var users = this.params.user.split('|');
@@ -27,16 +28,26 @@ exports.list = function* () {
     return;
   }
 
-
-  var rows = yield* ModuleMaintainer.listByUsers(users);
   var data = {};
-  for (var i = 0; i < rows.length; i++) {
-    var row = rows[i];
-    if (data[row.user]) {
-      data[row.user].push(row.name);
-    } else {
-      data[row.user] = [row.name];
+  var rows = yield* NpmModuleMaintainer.listByUsers(users);
+  if (rows.length > 0) {
+    for (var i = 0; i < rows.length; i++) {
+      var row = rows[i];
+      if (data[row.user]) {
+        data[row.user].push(row.name);
+      } else {
+        data[row.user] = [row.name];
+      }
+    }
+  } else {
+    if (users.length === 1) {
+      // try to get from module author
+      var names = Module.listNamesByAuthor(users[0]);
+      if (names.length > 0) {
+        data[users[0]] = names;
+      }
     }
   }
+
   this.body = data;
 };

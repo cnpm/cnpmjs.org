@@ -40,6 +40,7 @@ var config = require('../config');
 var ModuleStar = require('./module_star');
 var User = require('./user');
 var ModuleUnpublished = require('./module_unpublished');
+var NpmModuleMaintainer = require('./npm_module_maintainer');
 
 var USER_AGENT = 'sync.cnpmjs.org/' + config.version + ' ' + urllib.USER_AGENT;
 
@@ -309,6 +310,14 @@ function *_saveNpmUser(username) {
   yield User.saveNpmUser(user);
 }
 
+function *_saveMaintainer(modName, username, action) {
+  if (action === 'add') {
+    yield* NpmModuleMaintainer.add(modName, username);
+  } else if (action === 'remove') {
+    yield* NpmModuleMaintainer.remove(modName, username);
+  }
+}
+
 SyncModuleWorker.prototype._unpublished = function* (name, unpublishedInfo) {
   var mods = yield Module.listByName(name);
   this.log('  [%s] start unpublished %d versions from local cnpm registry',
@@ -371,11 +380,13 @@ SyncModuleWorker.prototype._sync = function* (name, pkg) {
   var result = yield [
     Module.listByName(name),
     Module.listTags(name),
-    _listStarUsers(name)
+    _listStarUsers(name),
+    NpmModuleMaintainer.list(name),
   ];
   var moduleRows = result[0];
   var tagRows = result[1];
   var existsStarUsers = result[2];
+  var existsNpmMaintainers = result[3];
 
   if (that._isLocalModule(moduleRows)) {
     // publish on cnpm, dont sync this version package
@@ -420,6 +431,39 @@ SyncModuleWorker.prototype._sync = function* (name, pkg) {
   var missingStarUsers = [];
   var npmUsernames = {};
   var missingDeprecateds = [];
+  // [[user, 'add or remove'], ...]
+  var diffNpmMaintainers = [];
+
+  // find out new maintainers
+  var pkgMaintainers = pkg.maintainers || [];
+  if (Array.isArray(pkgMaintainers)) {
+    var existsMap = {};
+    var originalMap = {};
+    for (var i = 0; i < existsNpmMaintainers.length; i++) {
+      var item = existsNpmMaintainers[i];
+      existsMap[item.user] = item;
+    }
+    for (var i = 0; i < pkgMaintainers.length; i++) {
+      var item = pkgMaintainers[i];
+      originalMap[item.name] = item;
+    }
+
+    // find add users
+    for (var i = 0; i < pkgMaintainers.length; i++) {
+      var item = pkgMaintainers[i];
+      if (!existsMap[item.name]) {
+        diffNpmMaintainers.push([item.name, 'add']);
+      }
+    }
+
+    // find remove users
+    for (var i = 0; i < existsNpmMaintainers.length; i++) {
+      var item = existsNpmMaintainers[i];
+      if (!originalMap[item.user]) {
+        diffNpmMaintainers.push([item.user, 'remove']);
+      }
+    }
+  }
 
   // find out all user names
   for (var v in pkg.versions) {
@@ -771,9 +815,35 @@ SyncModuleWorker.prototype._sync = function* (name, pkg) {
     }
   }
 
+  // sync diff npm package maintainers
+  function* syncNpmPackageMaintainers() {
+    if (diffNpmMaintainers.length === 0) {
+      return;
+    }
+
+    that.log('  [%s] syncing %d diff package maintainers: %j',
+      name, diffNpmMaintainers.length, diffNpmMaintainers);
+    var res = yield gather(diffNpmMaintainers.map(function (item) {
+      return _saveMaintainer(name, item[0], item[1]);
+    }));
+
+    for (var i = 0; i < res.length; i++) {
+      var r = res[i];
+      if (r.error) {
+        that.log('    save package maintainer error, %s', r.error.message);
+      }
+    }
+  }
+
   yield [
-    syncDes(), syncTag(), syncReadme(), syncDeprecateds(),
-    syncMissingStarUsers(), syncMissingUsers()];
+    syncDes(),
+    syncTag(),
+    syncReadme(),
+    syncDeprecateds(),
+    syncMissingStarUsers(),
+    syncMissingUsers(),
+    syncNpmPackageMaintainers(),
+  ];
   return syncedVersionNames;
 };
 
