@@ -6,7 +6,7 @@ REGISTRY = --registry=https://registry.npm.taobao.org
 DB = sqlite
 
 install:
-	@npm install $(REGISTRY) \
+	@npm install --build-from-source $(REGISTRY) \
 		--disturl=https://npm.taobao.org/dist
 
 jshint: install
