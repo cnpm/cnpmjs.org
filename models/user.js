@@ -147,28 +147,27 @@ module.exports = function (sequelize, DataTypes) {
         return yield user.save();
       },
       saveCustomUser: function* (data) {
-        // var sql = 'SELECT id, json FROM user WHERE name=?;';
-        // var row = yield mysql.queryOne(sql, [data.user.login]);
-        // var salt = data.salt || '0';
-        // var password_sha = data.password_sha || '0';
-        // var ip = data.ip || '0';
-        // var rev = rev || '1-' + data.user.login;
-        // var json = JSON.stringify(data.user);
-        // if (!row) {
-        //   sql = 'INSERT INTO user(npm_user, json, rev, name, email, salt, password_sha, ip, gmt_create, gmt_modified) \
-        //     VALUES(2, ?, ?, ?, ?, ?, ?, ?, now(), now());';
-        //   yield mysql.query(sql, [
-        //     json, rev, data.user.login, data.user.email,
-        //     salt, password_sha, ip
-        //   ]);
-        // } else {
-        //   sql = 'UPDATE user SET json=?, rev=?, salt=?, password_sha=?, ip=? WHERE id=?;';
-        //   yield mysql.query(sql, [
-        //     json, rev,
-        //     salt, password_sha, ip,
-        //     row.id
-        //   ]);
-        // }
+        var name = data.user.login;
+        var user = yield* this.findByName(name);
+        if (!user) {
+          user = this.build({
+            isNpmUser: false,
+            name: name,
+          });
+        }
+
+        var rev = '1-' + data.user.login;
+        var salt = data.salt || '0';
+        var passwordSha = data.password_sha || '0';
+        var ip = data.ip || '0';
+        var json = data.user;
+
+        user.email = data.user.email;
+        user.ip = ip;
+        user.json = data.user;
+        user.rev = rev;
+        user.passwordSha = passwordSha;
+        return yield user.save();
       },
     }
   });

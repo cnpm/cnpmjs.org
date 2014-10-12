@@ -21,7 +21,7 @@ var npm = require('../../services/npm');
 var DefaultUserService = require('../../services/default_user_service');
 var config = require('../../config');
 
-describe.only('services/default_user_service.test.js', function () {
+describe('services/default_user_service.test.js', function () {
   var userService = new DefaultUserService();
 
   before(function* () {

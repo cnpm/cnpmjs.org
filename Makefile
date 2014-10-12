@@ -15,11 +15,12 @@ jshint: install
 pretest-mysql:
 	@mysql -uroot -e 'DROP DATABASE IF EXISTS cnpmjs_test;'
 	@mysql -uroot -e 'CREATE DATABASE cnpmjs_test;'
-	@mysql -uroot 'cnpmjs_test' < ./docs/db.sql
 	@mysql -uroot 'cnpmjs_test' -e 'show tables;'
-	@rm -rf .tmp/dist
 
-test: install
+pretest:
+	@node --harmony test/init_db.js
+
+test: install pretest
 	@NODE_ENV=test DB=${DB} ./node_modules/.bin/mocha \
 		--harmony \
 		--reporter $(REPORTER) \
