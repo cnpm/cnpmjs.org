@@ -124,9 +124,8 @@ var config = {
     password: '',
 
     // the sql dialect of the database
-    // - default is 'mysql'
     // - currently supported: 'mysql', 'sqlite', 'postgres', 'mariadb'
-    dialect: 'mysql',
+    dialect: 'sqlite',
 
     // custom host; default: 127.0.0.1
     host: '127.0.0.1',

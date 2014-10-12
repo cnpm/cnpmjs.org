@@ -65,6 +65,7 @@
     "pedding": "~1.0.0",
     "should": "~4.0.4",
     "should-http": "0.0.1",
+    "sqlite3": "~3.0.2",
     "supertest": "~0.14.0"
   },
   "homepage": "https://github.com/cnpm/cnpmjs.org",

@@ -15,7 +15,8 @@
  */
 
 var gravatar = require('gravatar');
-var User = require('../proxy/user');
+// var User = require('../proxy/user');
+var User = require('../models').User;
 var isAdmin = require('../lib/common').isAdmin;
 var config = require('../config');
 
@@ -95,7 +96,7 @@ proto.auth = function* (login, password) {
  * @return {User}
  */
 proto.get = function* (login) {
-  var row = yield* User.get(login);
+  var row = yield User.findByName(login);
   if (!row) {
     return null;
   }

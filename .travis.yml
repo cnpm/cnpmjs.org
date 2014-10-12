@@ -3,5 +3,5 @@ node_js:
   - '0.11'
 script:
   - "npm install"
-  - "make test-travis"
+  - "make test-travis-all"
 after_script: "npm install coveralls@2 && cat ./coverage/lcov.info | coveralls"

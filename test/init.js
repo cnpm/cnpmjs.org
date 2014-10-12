@@ -16,8 +16,14 @@
 
 var crypto = require('crypto');
 var utility = require('utility');
-var User = require('../proxy/user');
 var config = require('../config');
+
+if (process.env.DB) {
+  config.database.dialect = process.env.DB;
+}
+
+var sequelize = require('../common/sequelize');
+var User = require('../models').User;
 
 if (process.env.CNPM_SOURCE_NPM) {
   config.sourceNpmRegistry = process.env.CNPM_SOURCE_NPM;
@@ -34,19 +40,27 @@ var usernames = [
   'cnpmjstestAdmin3', // other admin
 ];
 
-usernames.forEach(function (name) {
-  var user = {
-    name: name,
-    email: 'fengmk2@gmail.com',
-    // password: 'cnpmjstest10',
-    ip: '127.0.0.1'
-  };
-  user.salt = crypto.randomBytes(30).toString('hex');
-  user.password_sha = utility.sha1(user.name + user.salt);
+sequelize.sync({ force: true })
+// sequelize.sync()
+.then(function () {
+  console.log('[test/init.js] sequelize sync `%s` success', config.database.dialect);
 
-  User.add(user, function (err, result) {
-    if (err) {
+  usernames.forEach(function (name) {
+    var user = User.build({
+      name: name,
+      email: 'fengmk2@gmail.com',
+      // password: 'cnpmjstest10',
+      ip: '127.0.0.1',
+      rev: '1',
+    });
+    user.salt = crypto.randomBytes(30).toString('hex');
+    user.passwordSha = utility.sha1(user.name + user.salt);
+    user.save().then(function (newUser) {
+      // console.log(newUser.toJSON());
+    }).catch(function (err) {
       throw err;
-    }
+    });
   });
+}).catch(function (err) {
+  throw err;
 });

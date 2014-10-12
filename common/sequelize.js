@@ -15,7 +15,20 @@
  */
 
 var Sequelize = require('sequelize');
+var DataTypes = require('sequelize/lib/data-types');
 var config = require('../config').database;
+
+// add longtext for mysql
+Sequelize.LONGTEXT = DataTypes.LONGTEXT = DataTypes.TEXT;
+if (config.dialect === 'mysql') {
+  Sequelize.LONGTEXT = DataTypes.LONGTEXT = 'LONGTEXT';
+}
+
+config.define = {
+  timestamps: true,
+  createdAt: 'gmt_create',
+  updatedAt: 'gmt_modified',
+};
 
 var sequelize = new Sequelize(config.db, config.username, config.password, config);
 

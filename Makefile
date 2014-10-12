@@ -3,6 +3,7 @@ REPORTER = spec
 TIMEOUT = 30000
 MOCHA_OPTS =
 REGISTRY = --registry=https://registry.npm.taobao.org
+DB = sqlite
 
 install:
 	@npm install $(REGISTRY) \
@@ -11,15 +12,15 @@ install:
 jshint: install
 	@-./node_modules/.bin/jshint ./
 
-pretest:
+pretest-mysql:
 	@mysql -uroot -e 'DROP DATABASE IF EXISTS cnpmjs_test;'
 	@mysql -uroot -e 'CREATE DATABASE cnpmjs_test;'
 	@mysql -uroot 'cnpmjs_test' < ./docs/db.sql
 	@mysql -uroot 'cnpmjs_test' -e 'show tables;'
 	@rm -rf .tmp/dist
 
-test: install pretest
-	@NODE_ENV=test ./node_modules/.bin/mocha \
+test: install
+	@NODE_ENV=test DB=${DB} ./node_modules/.bin/mocha \
 		--harmony \
 		--reporter $(REPORTER) \
 		--timeout $(TIMEOUT) \
@@ -30,8 +31,16 @@ test: install pretest
 		$(MOCHA_OPTS) \
 		$(TESTS)
 
-test-cov cov: install pretest
-	@NODE_ENV=test node --harmony \
+test-sqlite:
+	@$(MAKE) test DB=sqlite
+
+test-mysql: pretest-mysql
+	@$(MAKE) test DB=mysql
+
+test-all: test-sqlite test-mysql
+
+test-cov cov: install
+	@NODE_ENV=test DB=${DB} node --harmony \
 		node_modules/.bin/istanbul cover --preserve-comments \
 		./node_modules/.bin/_mocha \
 		-- -u exports \
@@ -44,8 +53,14 @@ test-cov cov: install pretest
 		$(MOCHA_OPTS) \
 		$(TESTS)
 
-test-travis: install pretest
-	@NODE_ENV=test CNPM_SOURCE_NPM=https://registry.npmjs.org CNPM_SOURCE_NPM_ISCNPM=false \
+test-cov-sqlite:
+	@$(MAKE) test-cov DB=sqlite
+
+test-cov-mysql: pretest-mysql
+	@$(MAKE) test-cov DB=mysql
+
+test-travis: install
+	@NODE_ENV=test DB=${DB} CNPM_SOURCE_NPM=https://registry.npmjs.org CNPM_SOURCE_NPM_ISCNPM=false \
 		node --harmony \
 		node_modules/.bin/istanbul cover --preserve-comments \
 		./node_modules/.bin/_mocha \
@@ -60,6 +75,14 @@ test-travis: install pretest
 		$(MOCHA_OPTS) \
 		$(TESTS)
 
+test-travis-sqlite:
+	@$(MAKE) test-travis DB=sqlite
+
+test-travis-mysql: pretest-mysql
+	@$(MAKE) test-travis DB=mysql
+
+test-travis-all: test-travis-sqlite test-travis-mysql
+
 dev:
 	@node_modules/.bin/node-dev --harmony dispatch.js
 
@@ -68,9 +91,9 @@ contributors: install
 
 autod: install
 	@./node_modules/.bin/autod -w \
-		--prefix "~"\
+		--prefix "~" \
 		--exclude public,view,docs,backup,coverage \
-		--dep bluebird \
+		--dep bluebird,mysql \
 		--devdep mocha,should,istanbul-harmony,jshint
 	@$(MAKE) install
 

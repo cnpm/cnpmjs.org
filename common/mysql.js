@@ -63,15 +63,15 @@ ready(exports);
 
 thunkify(exports);
 
-function init() {
-  exports.query('show tables', function (err, rows) {
-    if (err) {
-      console.error('[%s] [worker:%s] mysql init error: %s', Date(), process.pid, err);
-      setTimeout(init, 1000);
-      return;
-    }
-    console.log('[%s] [worker:%s] mysql ready, got %d tables', Date(), process.pid, rows.length);
-    exports.ready(true);
-  });
-}
-init();
+// function init() {
+//   exports.query('show tables', function (err, rows) {
+//     if (err) {
+//       console.error('[%s] [worker:%s] mysql init error: %s', Date(), process.pid, err);
+//       setTimeout(init, 1000);
+//       return;
+//     }
+//     console.log('[%s] [worker:%s] mysql ready, got %d tables', Date(), process.pid, rows.length);
+//     exports.ready(true);
+//   });
+// }
+// init();
