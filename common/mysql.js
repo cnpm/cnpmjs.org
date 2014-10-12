@@ -17,32 +17,29 @@
 
 var thunkify = require('thunkify-wrap');
 var ready = require('ready');
-var mysql = require('mysql');
-var config = require('../config');
-
-var server = config.mysqlServers[0];
-
-// TODO: query timeout
-var pool = mysql.createPool({
-  host: server.host,
-  port: server.port,
-  user: server.user,
-  password: server.password,
-  database: config.mysqlDatabase,
-  connectionLimit: config.mysqlMaxConnections,
-  multipleStatements: true,
-});
-
-exports.pool = pool;
+var sequelize = require('./sequelize');
 
 exports.query = function (sql, values, cb) {
   if (typeof values === 'function') {
     cb = values;
     values = null;
   }
-  pool.query(sql, values, function (err, rows) {
-    cb(err, rows);
-  });
+  var ctx = {
+    Model: {
+      autoIncrementField: 'id'
+    }
+  };
+  sequelize.query(sql, ctx, { raw: true }, values)
+    .then(function (rows) {
+      // black hack to get back the insertId
+      if (!rows && ctx.id) {
+        rows = {
+          insertId: ctx.id
+        };
+      }
+      cb(null, rows);
+    })
+    .catch(cb);
 };
 
 exports.queryOne = function (sql, values, cb) {

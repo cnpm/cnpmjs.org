@@ -21,7 +21,7 @@ var User = require('../../proxy/user');
 var DefaultUserService = require('../../services/default_user_service');
 var config = require('../../config');
 
-describe('services/default_user_service.test.js', function () {
+describe.only('services/default_user_service.test.js', function () {
   var userService = new DefaultUserService();
 
   before(function* () {

@@ -115,21 +115,60 @@ var config = {
   backupFilePrefix: '/cnpm/backup/',
 
   /**
-   * mysql config
+   * database config
    */
 
-  mysqlServers: [
-    {
-      host: '127.0.0.1',
-      port: 3306,
-      user: 'root',
-      password: ''
-    }
-  ],
-  mysqlDatabase: 'cnpmjs_test',
-  mysqlMaxConnections: 4,
-  mysqlQueryTimeout: 5000,
+  database: {
+    db: 'cnpmjs_test',
+    username: 'root',
+    password: '',
 
+    // the sql dialect of the database
+    // - default is 'mysql'
+    // - currently supported: 'mysql', 'sqlite', 'postgres', 'mariadb'
+    dialect: 'mysql',
+
+    // custom host; default: 127.0.0.1
+    host: '127.0.0.1',
+
+    // custom port; default: 3306
+    port: 3306,
+
+    // you can also pass any dialect options to the underlying dialect library
+    // - default is empty
+    // - currently supported: 'mysql', 'mariadb'
+    dialectOptions: {
+      multipleStatements: true,
+    //   supportBigNumbers: true,
+    //   bigNumberStrings: true
+    },
+
+    // use pooling in order to reduce db connection overload and to increase speed
+    // currently only for mysql and postgresql (since v1.5.0)
+    pool: {
+      maxConnections: 10,
+      minConnections: 0,
+      maxIdleTime: 30000
+    },
+
+    // the storage engine for 'sqlite'
+    storage: path.join(root, 'database.sqlite'),
+
+    logging: false,
+  },
+
+  // forward Compat with old style
+  // mysqlServers: [
+  //   {
+  //     host: '127.0.0.1',
+  //     port: 3306,
+  //     user: 'root',
+  //     password: ''
+  //   }
+  // ],
+  // mysqlDatabase: 'cnpmjs_test',
+  // mysqlMaxConnections: 4,
+  // mysqlQueryTimeout: 5000,
 
   // redis config
   // use for koa-limit module as storage
