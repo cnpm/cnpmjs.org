@@ -28,6 +28,8 @@ config.define = {
   timestamps: true,
   createdAt: 'gmt_create',
   updatedAt: 'gmt_modified',
+  charset: 'utf8',
+  collate: 'utf8_general_ci',
 };
 
 var sequelize = new Sequelize(config.db, config.username, config.password, config);

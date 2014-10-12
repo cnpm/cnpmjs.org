@@ -15,14 +15,14 @@
  * Module dependencies.
  */
 
-var Total = require('../proxy/total');
+var Total = require('../services/total');
 var Download = require('./download');
 var version = require('../package.json').version;
 var config = require('../config');
 
 var startTime = '' + Date.now();
 
-exports.show = function *() {
+exports.show = function* () {
   var r = yield [Total.get(), Download.total()];
   var total = r[0];
   var download = r[1];

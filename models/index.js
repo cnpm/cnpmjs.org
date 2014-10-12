@@ -23,5 +23,16 @@ function load(name) {
 
 var models = module.exports = {
   sequelize: sequelize,
+  Module: load('module'),
   User: load('user'),
+  Total: load('total'),
+  Download: load('download_total'),
+
+  query: function* (sql, args) {
+    return yield this.sequelize.query(sql, null, {raw: true}, args);
+  },
+  queryOne: function* (sql, args) {
+    var rows = yield* this.query(sql, args);
+    return rows && rows[0];
+  }
 };

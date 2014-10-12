@@ -18,7 +18,7 @@ var should = require('should');
 var npm = require('../../services/npm');
 var User = require('../../models').User;
 
-describe.only('models/user.test.js', function () {
+describe('models/user.test.js', function () {
   describe('auth()', function () {
     it('should auth user fail when user not exist', function* () {
       var data = yield* User.auth('notexistmockuser', '123');

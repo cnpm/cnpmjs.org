@@ -27,8 +27,7 @@ module.exports = function (sequelize, DataTypes) {
       type: DataTypes.STRING(100),
       allowNull: false,
     },
-    passwordSha: {
-      field: 'password_sha',
+    password_sha: {
       type: DataTypes.STRING(100),
       allowNull: false,
       comment: 'user password hash',
@@ -80,12 +79,10 @@ module.exports = function (sequelize, DataTypes) {
     comment: 'user base info',
     indexes: [
       {
-        name: 'name',
         unique: true,
         fields: ['name']
       },
       {
-        name: 'gmt_modified',
         fields: ['gmt_modified']
       }
     ],
@@ -100,7 +97,7 @@ module.exports = function (sequelize, DataTypes) {
         var user = yield* this.findByName(name);
         if (user) {
           var sha = this.createPasswordSha(password, user.salt);
-          if (user.passwordSha !== sha) {
+          if (user.password_sha !== sha) {
             user = null;
           }
         }
@@ -137,7 +134,7 @@ module.exports = function (sequelize, DataTypes) {
             isNpmUser: true,
             name: data.name,
             salt: '0',
-            passwordSha: '0',
+            password_sha: '0',
             ip: '0',
           });
         }
@@ -166,7 +163,7 @@ module.exports = function (sequelize, DataTypes) {
         user.ip = ip;
         user.json = data.user;
         user.rev = rev;
-        user.passwordSha = passwordSha;
+        user.password_sha = passwordSha;
         return yield user.save();
       },
     }

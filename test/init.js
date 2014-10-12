@@ -15,6 +15,11 @@
  */
 
 var config = require('../config');
+
+if (process.env.DB) {
+  config.database.dialect = process.env.DB;
+}
+
 if (process.env.CNPM_SOURCE_NPM) {
   config.sourceNpmRegistry = process.env.CNPM_SOURCE_NPM;
 }

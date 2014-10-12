@@ -14,15 +14,10 @@
  * Module dependencies.
  */
 
-var thunkify = require('thunkify-wrap');
 var moment = require('moment');
-var DownloadTotal = require('../proxy/download');
+var DownloadTotal = require('../services/download_total');
 
-exports.total = function (name, callback) {
-  if (typeof name === 'function') {
-    callback = name;
-    name = null;
-  }
+exports.total = function* (name) {
   var end = moment();
   var start = end.clone().subtract(1, 'months').startOf('month');
   var lastday = end.clone().subtract(1, 'days').format('YYYY-MM-DD');
@@ -39,45 +34,38 @@ exports.total = function (name, callback) {
   if (name) {
     args.unshift(name);
   }
-  args.push(function (err, rows) {
-    if (err) {
-      return callback(err);
+
+  var rows = yield* DownloadTotal[method].apply(DownloadTotal, args);
+  var download = {
+    today: 0,
+    thisweek: 0,
+    thismonth: 0,
+    lastday: 0,
+    lastweek: 0,
+    lastmonth: 0,
+  };
+
+  for (var i = 0; i < rows.length; i++) {
+    var r = rows[i];
+    if (r.date === end) {
+      download.today += r.count;
+    }
+    if (r.date >= thismonthStart) {
+      download.thismonth += r.count;
+    }
+    if (r.date >= thisweekStart) {
+      download.thisweek += r.count;
     }
 
-    var download = {
-      today: 0,
-      thisweek: 0,
-      thismonth: 0,
-      lastday: 0,
-      lastweek: 0,
-      lastmonth: 0,
-    };
-    for (var i = 0; i < rows.length; i++) {
-      var r = rows[i];
-      if (r.date === end) {
-        download.today += r.count;
-      }
-      if (r.date >= thismonthStart) {
-        download.thismonth += r.count;
-      }
-      if (r.date >= thisweekStart) {
-        download.thisweek += r.count;
-      }
-
-      if (r.date === lastday) {
-        download.lastday += r.count;
-      }
-      if (r.date >= lastweekStart && r.date <= lastweekEnd) {
-        download.lastweek += r.count;
-      }
-      if (r.date >= start && r.date <= lastmonthEnd) {
-        download.lastmonth += r.count;
-      }
+    if (r.date === lastday) {
+      download.lastday += r.count;
     }
-    callback(null, download);
-  });
-
-  DownloadTotal[method].apply(DownloadTotal, args);
+    if (r.date >= lastweekStart && r.date <= lastweekEnd) {
+      download.lastweek += r.count;
+    }
+    if (r.date >= start && r.date <= lastmonthEnd) {
+      download.lastmonth += r.count;
+    }
+  }
+  return download;
 };
-
-thunkify(exports);

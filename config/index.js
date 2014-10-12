@@ -119,6 +119,9 @@ var config = {
    */
 
   database: {
+    // sync database before app start, defaul is false
+    syncFirst: false,
+
     db: 'cnpmjs_test',
     username: 'root',
     password: '',

@@ -16,6 +16,8 @@
 
 var crypto = require('crypto');
 var utility = require('utility');
+var path = require('path');
+var childProcess = require('child_process');
 var config = require('../config');
 
 config.database.logging = console.log;
@@ -23,8 +25,15 @@ if (process.env.DB) {
   config.database.dialect = process.env.DB;
 }
 
-var sequelize = require('../common/sequelize');
-var User = require('../models').User;
+// init db first
+var initscript = path.join(__dirname, '..', 'models', 'init_script.js');
+var cmd = ['node', '--harmony', initscript, 'true', config.database.dialect].join(' ');
+console.log('$ %s', cmd);
+var stdout = childProcess.execSync(cmd);
+process.stdout.write(stdout);
+
+var models = require('../models');
+var User = models.User;
 
 var usernames = [
   'cnpmjstest101',
@@ -34,30 +43,23 @@ var usernames = [
   'cnpmjstestAdmin3', // other admin
 ];
 
-sequelize.sync({ force: true })
-// sequelize.sync()
-.then(function () {
-  console.log('[test/init_db.js] sequelize sync `%s` success', config.database.dialect);
-
-  var count = usernames.length;
-  usernames.forEach(function (name) {
-    var user = User.build({
-      name: name,
-      email: 'fengmk2@gmail.com',
-      ip: '127.0.0.1',
-      rev: '1',
-    });
-    user.salt = crypto.randomBytes(30).toString('hex');
-    user.passwordSha = User.createPasswordSha(name, user.salt);
-    user.save().then(function (newUser) {
-      count--;
-      if (count === 0) {
-        process.exit(0);
-      }
-    }).catch(function (err) {
-      throw err;
-    });
+var count = usernames.length;
+usernames.forEach(function (name) {
+  var user = User.build({
+    name: name,
+    email: 'fengmk2@gmail.com',
+    ip: '127.0.0.1',
+    rev: '1',
   });
-}).catch(function (err) {
-  throw err;
+  user.salt = crypto.randomBytes(30).toString('hex');
+  user.password_sha = User.createPasswordSha(name, user.salt);
+  user.save().then(function (newUser) {
+    count--;
+    if (count === 0) {
+      console.log('[test/init_db.js] init test users success');
+      process.exit(0);
+    }
+  }).catch(function (err) {
+    throw err;
+  });
 });

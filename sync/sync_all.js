@@ -20,7 +20,7 @@ var utility = require('utility');
 var config = require('../config');
 var Status = require('./status');
 var Npm = require('../proxy/npm');
-var Total = require('../proxy/total');
+var Total = require('../services/total');
 var SyncModuleWorker = require('../proxy/sync_module_worker');
 var Module = require('../proxy/module');
 var thunkify = require('thunkify-wrap');
@@ -96,7 +96,7 @@ function *getMissPackages(callback) {
 
 module.exports = function *sync() {
   var syncTime = Date.now();
-  var info = yield Total.getTotalInfo();
+  var info = yield* Total.getTotalInfo();
   if (!info) {
     throw new Error('can not found total info');
   }
