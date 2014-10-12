@@ -28,7 +28,6 @@ var crypto = require('crypto');
 var sleep = require('co-sleep');
 var urllib = require('../common/urllib');
 var utility = require('utility');
-var ms = require('ms');
 var urlparse = require('url').parse;
 var nfs = require('../common/nfs');
 var npm = require('./npm');

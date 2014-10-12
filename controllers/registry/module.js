@@ -26,7 +26,6 @@ var coWrite = require('co-write');
 var urlparse = require('url').parse;
 var mime = require('mime');
 var semver = require('semver');
-var ms = require('ms');
 var config = require('../../config');
 var Module = require('../../proxy/module');
 var Total = require('../../proxy/total');

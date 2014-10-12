@@ -16,7 +16,7 @@
 
 var debug = require('debug')('cnpmjs.org:sync:index');
 var co = require('co');
-var ms = require('ms');
+var ms = require('humanize-ms');
 var util = require('util');
 var utility = require('utility');
 var config = require('../config');
@@ -58,7 +58,7 @@ var handleSync = co(function *() {
     var data;
     var error;
     try {
-      var data = yield *sync();
+      data = yield *sync();
     } catch (err) {
       error = err;
       error.message += ' (sync package error)';
@@ -77,6 +77,9 @@ if (sync) {
   setInterval(handleSync, ms(config.syncInterval));
 }
 
+/**
+ * sync dist(node.js and phantomjs)
+ */
 var syncingDist = false;
 var syncDist = co(function* syncDist() {
   if (syncingDist) {
@@ -102,6 +105,44 @@ if (config.syncDist) {
   setInterval(syncDist, ms(config.syncInterval));
 } else {
   logger.syncInfo('sync dist disable');
+}
+
+/**
+ * sync popular modules
+ */
+
+var syncingPopular = false;
+var syncPopular = co(function* syncPopular() {
+  if (syncingPopular) {
+    return;
+  }
+  syncingPopular = true;
+  logger.syncInfo('Start syncing popular modules...');
+  var data;
+  var error;
+  try {
+    data = yield *require('./sync_popular');
+  } catch (err) {
+    error = err;
+    error.message += ' (sync package error)';
+    logger.syncError(error);
+  }
+
+  if (data) {
+    logger.syncInfo(data);
+  }
+  if (!config.debug) {
+    sendMailToAdmin(error, data, new Date());
+  }
+
+  syncPopular = false;
+});
+
+if (config.syncPopular) {
+  syncPopular();
+  setInterval(syncPopular, ms(config.syncPopularInterval));
+} else {
+  logger.syncInfo('sync popular module disable');
 }
 
 function sendMailToAdmin(err, result, syncTime) {

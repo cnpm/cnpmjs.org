@@ -15,7 +15,7 @@
  */
 
 var debug = require('debug')('cnpmjs.org:sync:sync_all');
-var ms = require('ms');
+var ms = require('humanize-ms');
 var utility = require('utility');
 var config = require('../config');
 var Status = require('./status');
