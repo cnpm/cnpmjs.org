@@ -16,7 +16,8 @@
 
 var debug = require('debug')('cnpmjs.org:sync:status');
 var utility = require('utility');
-var Total = require('../proxy/total');
+var co = require('co');
+var Total = require('../services/total');
 
 function Status(options) {
   this.need = options.need;
@@ -35,7 +36,9 @@ Status.prototype.log = function (syncDone) {
     left: this.left,
     lastSyncModule: this.lastSyncModule,
   };
-  Total.updateSyncNum(params, utility.noop);
+  co(function* () {
+    yield* Total.updateSyncNum(params);
+  })();
 };
 
 Status.prototype.start = function () {

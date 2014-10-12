@@ -15,8 +15,8 @@
  */
 var sync = require('../../sync/sync_all');
 var mm = require('mm');
-var Npm = require('../../proxy/npm');
-var Total = require('../../proxy/total');
+var Npm = require('../../services/npm');
+var Total = require('../../services/total');
 var should = require('should');
 var Module = require('../../proxy/module');
 

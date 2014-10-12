@@ -39,7 +39,7 @@ function intersection(arrOne, arrTwo) {
   return results;
 }
 
-module.exports = function *sync() {
+module.exports = function* sync() {
   var syncTime = Date.now();
 
   var r = yield [Module.listShort(), Total.getTotalInfo()];
@@ -97,7 +97,7 @@ module.exports = function *sync() {
   debug('All packages sync done, successes %d, fails %d',
     worker.successes.length, worker.fails.length);
 
-  Total.setLastExistSyncTime(syncTime, utility.noop);
+  yield* Total.setLastExistSyncTime(syncTime);
   return {
     successes: worker.successes,
     fails: worker.fails

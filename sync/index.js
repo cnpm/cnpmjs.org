@@ -45,7 +45,9 @@ console.log('[%s] [sync_worker:%s] syncing with %s mode',
   Date(), process.pid, config.syncModel);
 
 //set sync_status = 0 at first
-Total.updateSyncStatus(0, utility.noop);
+co(function* () {
+  yield* Total.updateSyncStatus(0);
+})();
 
 // the same time only sync once
 var syncing = false;

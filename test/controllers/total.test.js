@@ -21,7 +21,7 @@ var pedding = require('pedding');
 var registryApp = require('../../servers/registry');
 var webApp = require('../../servers/web');
 
-describe.only('controllers/total.test.js', function () {
+describe('controllers/total.test.js', function () {
   before(function (done) {
     done = pedding(2, done);
     registryApp.listen(0, done);

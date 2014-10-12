@@ -39,7 +39,7 @@ test-mysql: init-mysql
 
 test-all: test-sqlite test-mysql
 
-test-cov cov: install
+test-cov cov: install init-database
 	@NODE_ENV=test DB=${DB} node --harmony \
 		node_modules/.bin/istanbul cover --preserve-comments \
 		node_modules/.bin/_mocha \
@@ -59,7 +59,7 @@ test-cov-sqlite:
 test-cov-mysql: init-mysql
 	@$(MAKE) test-cov DB=mysql
 
-test-travis: install
+test-travis: install init-database
 	@NODE_ENV=test DB=${DB} CNPM_SOURCE_NPM=https://registry.npmjs.org CNPM_SOURCE_NPM_ISCNPM=false \
 		node --harmony \
 		node_modules/.bin/istanbul cover --preserve-comments \

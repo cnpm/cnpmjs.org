@@ -17,8 +17,8 @@
 var should = require('should');
 var mm = require('mm');
 var sync = require('../../sync/sync_exist');
-var Npm = require('../../proxy/npm');
-var Total = require('../../proxy/total');
+var Npm = require('../../services/npm');
+var Total = require('../../services/total');
 
 describe('sync/sync_exist.test.js', function () {
   describe('sync()', function () {

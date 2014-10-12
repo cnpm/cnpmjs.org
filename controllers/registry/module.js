@@ -29,7 +29,7 @@ var semver = require('semver');
 var ms = require('ms');
 var config = require('../../config');
 var Module = require('../../proxy/module');
-var Total = require('../../proxy/total');
+var Total = require('../../services/total');
 var nfs = require('../../common/nfs');
 var common = require('../../lib/common');
 var DownloadTotal = require('../../proxy/download');
@@ -907,8 +907,11 @@ exports.removeAll = function* (next) {
     };
     return;
   }
-  Total.plusDeleteModule(utility.noop);
-  yield [Module.removeByName(name), Module.removeTags(name)];
+  yield [
+    Module.removeByName(name),
+    Module.removeTags(name),
+    Total.plusDeleteModule(),
+  ];
   var keys = [];
   for (var i = 0; i < mods.length; i++) {
     var row = mods[i];

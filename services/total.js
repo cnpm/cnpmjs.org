@@ -55,7 +55,7 @@ exports.get = function* () {
     doc_del_count: info.module_delete || 0,
     doc_version_count: vc.count,
     user_count: uc.count,
-    store_engine: 'mysql',
+    store_engine: config.database.dialect,
     sync_status: info.sync_status,
     need_sync_num: info.need_sync_num || 0,
     success_sync_num: info.success_sync_num || 0,
@@ -82,9 +82,42 @@ exports.get = function* () {
 };
 
 exports.getTotalInfo = function* () {
-  return Total.find({
+  return yield Total.find({
     where: {
       name: 'total'
     }
   });
+};
+
+exports.plusDeleteModule = function* () {
+  var sql = 'UPDATE total SET module_delete=module_delete+1 WHERE name="total"';
+  return yield* models.query(sql);
+};
+
+exports.setLastSyncTime = function* (time) {
+  var sql = 'UPDATE total SET last_sync_time=? WHERE name="total"';
+  return yield* models.query(sql, [Number(time)]);
+};
+
+exports.setLastExistSyncTime = function* (time) {
+  var sql = 'UPDATE total SET last_exist_sync_time=? WHERE name="total"';
+  return yield* models.query(sql, [Number(time)]);
+};
+
+exports.updateSyncStatus = function* (status) {
+  var sql = 'UPDATE total SET sync_status=? WHERE name="total"';
+  return yield* models.query(sql, [status]);
+};
+
+exports.updateSyncNum = function* (params) {
+  var arg = {
+    sync_status: params.syncStatus,
+    need_sync_num: params.need || 0,
+    success_sync_num: params.success || 0,
+    fail_sync_num: params.fail || 0,
+    left_sync_num: params.left || 0,
+    last_sync_module: params.lastSyncModule
+  };
+  var sql = 'UPDATE total SET ? WHERE name="total"';
+  return yield* models.query(sql, [arg]);
 };

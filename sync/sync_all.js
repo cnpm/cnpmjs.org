@@ -132,7 +132,7 @@ module.exports = function *sync() {
       worker.successes.length, worker.fails.length);
   //only when all succss, set last sync time
   if (!worker.fails.length) {
-    Total.setLastSyncTime(syncTime, utility.noop);
+    yield* Total.setLastSyncTime(syncTime);
   }
   return {
     successes: worker.successes,
