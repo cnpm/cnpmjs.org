@@ -19,7 +19,7 @@ var Npm = require('../../proxy/npm');
 var Total = require('../../proxy/total');
 var should = require('should');
 
-describe('sync/sync_all.test.js', function () {
+describe('sync/sync_popular.test.js', function () {
   describe('sync()', function () {
     afterEach(mm.restore);
     it('should sync popular modules ok', function *() {
