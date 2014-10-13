@@ -207,6 +207,14 @@ var config = {
   // sync interval, default is 10 minutes
   syncInterval: '10m',
 
+  // sync polular modules, default to false
+  // because cnpm can't auto sync tag change for now
+  // so we want to sync popular modules to ensure their tags
+  syncPopular: false,
+  syncPopularInterval: '1h',
+  // top 100
+  topPopular: 100,
+
   // sync devDependencies or not, default is false
   syncDevDependencies: false,
 

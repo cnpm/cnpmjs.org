@@ -64,17 +64,38 @@ exports.get = function *(name) {
   return data;
 };
 
-exports.getAllSince = function *(startkey) {
+exports.getAllSince = function *(startkey, timeout) {
   var r = yield *request('/-/all/since?stale=update_after&startkey=' + startkey, {
-    timeout: 300000
+    timeout: timeout || 300000
   });
   return r.data;
 };
 
-exports.getShort = function *() {
+exports.getShort = function *(timeout) {
   var r = yield *request('/-/short', {
-    timeout: 300000,
+    timeout: timeout || 300000,
     registry: 'http://r.cnpmjs.org', // registry.npmjs.org/-/short is 404 now.
   });
   return r.data;
 };
+
+exports.getPopular = function* (top, timeout) {
+  var r = yield *request('/-/_view/dependedUpon?group_level=1', {
+    registry: config.officialNpmRegistry,
+    timeout: timeout || 60000
+  });
+  if (!r.data || !r.data.rows || !r.data.rows.length) {
+    return [];
+  }
+
+  return r.data.rows.sort(function (a, b) {
+    return b.value - a.value;
+  })
+  .slice(0, top)
+  .map(function (r) {
+    return r.key && r.key[0]
+  })
+  .filter(function (r) {
+    return r;
+  });
+}

@@ -18,7 +18,7 @@ var debug = require('debug')('cnpmjs.org:controllers:utils');
 var path = require('path');
 var fs = require('fs');
 var utility = require('utility');
-var ms = require('ms');
+var ms = require('humanize-ms');
 var nfs = require('../common/nfs');
 var config = require('../config');
 

@@ -22,7 +22,7 @@ var SyncModuleWorker = require('../proxy/sync_module_worker');
 var debug = require('debug')('cnpmjs.org:sync:sync_exist');
 var utility = require('utility');
 var Status = require('./status');
-var ms = require('ms');
+var ms = require('humanize-ms');
 var thunkify = require('thunkify-wrap');
 
 function intersection(arrOne, arrTwo) {
