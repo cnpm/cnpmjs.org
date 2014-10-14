@@ -1,17 +1,27 @@
 
+1.7.0 / 2014-10-15
+==================
+
+  * Merge pull request [#475](https://github.com/cnpm/cnpmjs.org/issues/475) from KidkArolis/configurable-short-registry-url
+  * If sourceNpmRegistry is cnpm - use it in getShort
+  * Merge pull request [#472](https://github.com/cnpm/cnpmjs.org/issues/472) from cnpm/issue468-upon
+  * fix test label
+  * add sync popular modules, close [#468](https://github.com/cnpm/cnpmjs.org/issues/468)
+  * add sendmail test script
+
 1.6.1 / 2014-10-09
 ==================
 
  * make test on travis faster
  * ensure not sync user also has his own package names
  * add [v1.6.x-upgrade.sql](https://github.com/cnpm/cnpmjs.org/blob/master/docs/update_sqls/v1.6.x-upgrade.sql)
- * save npm original package maintainers to npm_module_maintainer table. fixed #464
+ * save npm original package maintainers to npm_module_maintainer table. fixed [#464](https://github.com/cnpm/cnpmjs.org/issues/464)
  * use simple 404
 
 1.6.0 / 2014-10-08
 ==================
 
- * list user all packages api. fixed #462
+ * list user all packages api. fixed [#462](https://github.com/cnpm/cnpmjs.org/issues/462)
  * add node-dev: $ make dev
  * always start sync worker
  * update node mailer
@@ -32,7 +42,7 @@
 1.5.3 / 2014-09-24
 ==================
 
- * support sync upstream first. fixed #451
+ * support sync upstream first. fixed [#451](https://github.com/cnpm/cnpmjs.org/issues/451)
 
 1.5.2 / 2014-09-24
 ==================
