@@ -1,4 +1,9 @@
 
+1.7.1 / 2014-10-15 
+==================
+
+  * fix typo in sync popular, fix [#477](https://github.com/cnpm/cnpmjs.org/issues/477)
+
 1.7.0 / 2014-10-15
 ==================
 
