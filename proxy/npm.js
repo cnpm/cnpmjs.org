@@ -74,7 +74,8 @@ exports.getAllSince = function *(startkey, timeout) {
 exports.getShort = function *(timeout) {
   var r = yield *request('/-/short', {
     timeout: timeout || 300000,
-    registry: 'http://r.cnpmjs.org', // registry.npmjs.org/-/short is 404 now.
+    // registry.npmjs.org/-/short is 404 now therefore have a fallback
+    registry: config.sourceNpmRegistryIsCNpm ? config.sourceNpmRegistry : 'http://r.cnpmjs.org',
   });
   return r.data;
 };
