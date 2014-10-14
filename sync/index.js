@@ -135,7 +135,7 @@ var syncPopular = co(function* syncPopular() {
     sendMailToAdmin(error, data, new Date());
   }
 
-  syncPopular = false;
+  syncingPopular = false;
 });
 
 if (config.syncPopular) {
