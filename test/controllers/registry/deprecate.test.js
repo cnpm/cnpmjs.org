@@ -14,8 +14,6 @@
  * Module dependencies.
  */
 
-var fs = require('fs');
-var path = require('path');
 var should = require('should');
 var request = require('supertest');
 var mm = require('mm');
@@ -23,9 +21,7 @@ var pedding = require('pedding');
 var app = require('../../../servers/registry');
 var utils = require('../../utils');
 
-var fixtures = path.join(path.dirname(path.dirname(__dirname)), 'fixtures');
-
-describe('controllers/registry/deprecate.test.js', function () {
+describe.only('controllers/registry/deprecate.test.js', function () {
   var pkgname = 'testmodule-deprecate';
   before(function (done) {
     done = pedding(2, done);

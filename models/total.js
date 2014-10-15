@@ -14,8 +14,6 @@
  * Module dependencies.
  */
 
-var utility = require('utility');
-
 // CREATE TABLE IF NOT EXISTS `total` (
 //  `name` varchar(100) NOT NULL COMMENT 'total name',
 //  `gmt_modified` datetime NOT NULL COMMENT 'modified time',

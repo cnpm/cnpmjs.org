@@ -28,7 +28,6 @@ var crypto = require('crypto');
 var sleep = require('co-sleep');
 var urllib = require('../common/urllib');
 var utility = require('utility');
-var ms = require('ms');
 var urlparse = require('url').parse;
 var nfs = require('../common/nfs');
 var npm = require('./npm');
@@ -522,7 +521,7 @@ SyncModuleWorker.prototype._sync = function* (name, pkg) {
         },
       };
       try {
-        var result = yield Module.add(nextMod);
+        var result = yield* Package.addModule(nextMod);
         that.log('  [%s] save next module, %j', name, result);
       } catch (err) {
         that.log('  [%s] save next module error %s', err.message);
@@ -1002,7 +1001,7 @@ SyncModuleWorker.prototype._syncOneVersion = function *(versionIndex, sourcePack
     }
 
     mod.package.dist = dist;
-    var r = yield Module.add(mod);
+    var r = yield* Package.addModule(mod);
 
     that.log('    [%s:%s] done, insertId: %s, author: %s, version: %s, '
       + 'size: %d, publish_time: %j, publish on cnpm: %s',

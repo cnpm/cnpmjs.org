@@ -14,20 +14,20 @@
  * Module dependencies.
  */
 
-var Module = require('../../proxy/module');
+var Package = require('../../services/package');
 
 module.exports = deprecateVersions;
 
 /**
  * @see https://github.com/cnpm/cnpmjs.org/issues/415
  */
-function* deprecateVersions(next) {
+function* deprecateVersions() {
   var body = this.request.body;
   var name = this.params.name || this.params[0];
 
   var tasks = [];
   for (var version in body.versions) {
-    tasks.push(Module.get(name, version));
+    tasks.push(Package.getModule(name, version));
   }
   var rs = yield tasks;
 
@@ -46,12 +46,12 @@ function* deprecateVersions(next) {
     var data = body.versions[row.package.version];
     if (typeof data.deprecated === 'string') {
       row.package.deprecated = data.deprecated;
-      updateTasks.push(Module.updatePackage(row.id, row.package));
+      updateTasks.push(Package.updateModulePackage(row.id, row.package));
     }
   }
   yield updateTasks;
   // update last modified
-  yield* Module.updateLastModified(name);
+  yield* Package.updateModuleLastModified(name);
 
   this.status = 201;
   this.body = {

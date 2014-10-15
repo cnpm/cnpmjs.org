@@ -14,8 +14,6 @@
  * Module dependencies.
  */
 
-var utility = require('utility');
-
 /*
 CREATE TABLE IF NOT EXISTS `module` (
   `id` INTEGER NOT NULL auto_increment ,
@@ -100,7 +98,11 @@ module.exports = function (sequelize, DataTypes) {
       }
     ],
     classMethods: {
-
+      findByNameAndVersion: function* (name, version) {
+        return yield this.find({
+          where: { name: name, version: version }
+        });
+      }
     }
   });
 };

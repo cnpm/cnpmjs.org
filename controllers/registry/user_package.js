@@ -39,7 +39,7 @@ exports.list = function* () {
   var r = yield [
     NpmModuleMaintainer.listByUsers(users),
     // get the first user module by author field
-    Module.listNamesByAuthor(firstUser),
+    Package.listPublicModuleNamesByUser(firstUser),
   ];
   var rows = r[0];
   var firstUserModuleNames = r[1];

@@ -21,9 +21,12 @@ function load(name) {
   return sequelize.import(path.join(__dirname, name));
 }
 
-var models = module.exports = {
+module.exports = {
   sequelize: sequelize,
   Module: load('module'),
+  ModuleKeyword: load('module_keyword'),
+  NpmModuleMaintainer: load('npm_module_maintainer'),
+  Tag: load('tag'),
   User: load('user'),
   Total: load('total'),
   Download: load('download_total'),

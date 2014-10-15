@@ -16,19 +16,13 @@
  */
 
 var debug = require('debug')('cnpmjs.org:controllers:registry:module');
-var path = require('path');
-var fs = require('fs');
 var util = require('util');
 var crypto = require('crypto');
 var utility = require('utility');
-var coRead = require('co-read');
-var coWrite = require('co-write');
 var urlparse = require('url').parse;
 var mime = require('mime');
 var semver = require('semver');
-var ms = require('ms');
 var config = require('../../config');
-var Module = require('../../proxy/module');
 var Total = require('../../services/total');
 var nfs = require('../../common/nfs');
 var common = require('../../lib/common');
@@ -325,7 +319,7 @@ exports.get = function* (next) {
     this.body = {
       error: 'not exist',
       reason: 'version not found: ' + version
-    }
+    };
     return;
   }
 
@@ -338,7 +332,7 @@ exports.download = function *(next) {
   var name = this.params.name || this.params[0];
   var filename = this.params.filename || this.params[1];
   var version = filename.slice(name.length + 1, -4);
-  var row = yield Module.get(name, version);
+  var row = yield* Package.getModule(name, version);
   // can not get dist
   var url = null;
 
@@ -374,7 +368,7 @@ exports.download = function *(next) {
 
   _downloads[name] = (_downloads[name] || 0) + 1;
 
-  if (typeof dist.size === 'number') {
+  if (typeof dist.size === 'number' && dist.size > 0) {
     this.length = dist.size;
   }
   this.type = mime.lookup(dist.key);
@@ -551,7 +545,7 @@ exports.addPackageAndDist = function *(next) {
   debug('%s addPackageAndDist %s:%s, attachment size: %s, maintainers: %j, distTags: %j',
     username, name, version, attachment.length, versionPackage.maintainers, distTags);
 
-  var exists = yield Module.get(name, version);
+  var exists = yield* Module.getModule(name, version);
   var shasum;
   if (exists) {
     this.status = 403;
@@ -620,7 +614,7 @@ exports.addPackageAndDist = function *(next) {
   mod.package.dist = dist;
   _addDepsRelations(mod.package);
 
-  var addResult = yield Module.add(mod);
+  var addResult = yield* Package.addModule(mod);
   debug('%s module: save file to %s, size: %d, sha1: %s, dist: %j, version: %s',
     addResult.id, dist.tarball, dist.size, shasum, dist, version);
 
@@ -818,7 +812,7 @@ exports.removeWithVersions = function* (next) {
     debug('no tag need to be remove');
   }
   // step 7: update last modified, make sure etag change
-  yield* Module.updateLastModified(name);
+  yield* Module.updateModuleLastModified(name);
 
   this.status = 201;
   this.body = { ok: true };
@@ -857,7 +851,7 @@ exports.removeTar = function* (next) {
 
   var rs = yield [
     Module.getById(id),
-    Module.get(name, version),
+    Package.getModule(name, version),
   ];
   var revertTo = rs[0];
   var mod = rs[1]; // module need to delete
@@ -1034,7 +1028,7 @@ exports.updateTag = function* () {
     return;
   }
 
-  var mod = yield Module.get(name, version);
+  var mod = yield* Package.getModule(name, version);
   if (!mod) {
     this.status = 403;
     var reason = util.format('setting tag %s to unknown version: %s: %s/%s',

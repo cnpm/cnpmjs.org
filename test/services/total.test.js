@@ -16,7 +16,7 @@
 
 var Total = require('../../services/total');
 
-describe.only('services/total.test.js', function () {
+describe('services/total.test.js', function () {
   describe('plusDeleteModule()', function () {
     it('should plus delete module count', function* () {
       var info = yield* Total.getTotalInfo();
