@@ -35,7 +35,6 @@ var npm = require('../services/npm');
 var Package = require('../services/package');
 var Log = require('../services/module_log');
 var config = require('../config');
-var ModuleStar = require('./module_star');
 var User = require('./user');
 var ModuleUnpublished = require('./module_unpublished');
 var NpmModuleMaintainer = require('./npm_module_maintainer');

@@ -24,14 +24,18 @@ function load(name) {
 module.exports = {
   sequelize: sequelize,
   Module: load('module'),
-  ModuleKeyword: load('module_keyword'),
-  NpmModuleMaintainer: load('npm_module_maintainer'),
-  ModuleDependency: load('module_deps'),
   ModuleLog: load('module_log'),
+  ModuleStar: load('module_star'),
+  ModuleKeyword: load('module_keyword'),
+  ModuleDependency: load('module_deps'),
+  NpmModuleMaintainer: load('npm_module_maintainer'),
+
   Tag: load('tag'),
   User: load('user'),
   Total: load('total'),
   Download: load('download_total'),
+  DistFile: load('dist_file'),
+  DistDir: load('dist_dir'),
 
   query: function* (sql, args) {
     return yield this.sequelize.query(sql, null, {raw: true}, args);

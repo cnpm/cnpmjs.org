@@ -451,7 +451,7 @@ describe('services/package.test.js', function () {
     });
   });
 
-  describe('addDependencies()', function () {
+  describe('addDependencies(), listDependencies(), listDependents()', function () {
     it('should add some module dependencies', function* () {
       var rows = yield* Package.addDependencies('addDependencies-test-module', [
         'addDependencies-dep1',
@@ -485,6 +485,26 @@ describe('services/package.test.js', function () {
       ]);
       names = yield* Package.listDependents('addDependencies-dep1');
       names.should.eql(['addDependencies-test-module', 'addDependencies-test-module2']);
+    });
+  });
+
+  describe('addStar(), removeStar(), listStarUserNames(), listUserStarModuleNames()', function () {
+    it('should star a module and remove that star', function* () {
+      var row = yield* Package.addStar('addStar-module', 'addStar-user');
+      row.id.should.be.a.Number;
+      row = yield* Package.addStar('addStar-module', 'addStar-user');
+      row.id.should.be.a.Number;
+
+      var users = yield* Package.listStarUserNames('addStar-module');
+      users.should.eql(['addStar-user']);
+      var names = yield* Package.listUserStarModuleNames('addStar-user');
+      names.should.eql(['addStar-module']);
+
+      yield* Package.removeStar('addStar-module', 'addStar-user');
+      users = yield* Package.listStarUserNames('addStar-module');
+      users.should.eql([]);
+      names = yield* Package.listUserStarModuleNames('addStar-user');
+      names.should.eql([]);
     });
   });
 });

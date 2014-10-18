@@ -21,6 +21,7 @@ var ModuleKeyword = models.ModuleKeyword;
 var NpmModuleMaintainer = models.NpmModuleMaintainer;
 var ModuleMaintainer = models.ModuleMaintainer;
 var ModuleDependency = models.ModuleDependency;
+var ModuleStar = models.ModuleStar;
 var Tag = models.Tag;
 
 // module
@@ -577,4 +578,55 @@ exports.search = function* (word, options) {
   }
 
   return data;
+};
+
+// module star
+
+exports.addStar = function* add(name, user) {
+  var row = yield ModuleStar.find({
+    where: {
+      name: name,
+      user: user
+    }
+  });
+  if (row) {
+    return row;
+  }
+
+  row = ModuleStar.build({
+    name: name,
+    user: user
+  });
+  return yield row.save();
+};
+
+exports.removeStar = function* (name, user) {
+  return yield ModuleStar.destroy({
+    where: {
+      name: name,
+      user: user
+    }
+  });
+};
+
+exports.listStarUserNames = function* (name) {
+  var rows = yield ModuleStar.findAll({
+    where: {
+      name: name
+    }
+  });
+  return rows.map(function (row) {
+    return row.user;
+  });
+};
+
+exports.listUserStarModuleNames = function* (user) {
+  var rows = yield ModuleStar.findAll({
+    where: {
+      user: user
+    }
+  });
+  return rows.map(function (row) {
+    return row.name;
+  });
 };
