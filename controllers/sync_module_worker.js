@@ -30,10 +30,10 @@ var urllib = require('../common/urllib');
 var utility = require('utility');
 var urlparse = require('url').parse;
 var nfs = require('../common/nfs');
-var npm = require('../services/npm');
 var common = require('../lib/common');
+var npm = require('../services/npm');
 var Package = require('../services/package');
-var Log = require('./module_log');
+var Log = require('../services/module_log');
 var config = require('../config');
 var ModuleStar = require('./module_star');
 var User = require('./user');
@@ -90,7 +90,12 @@ SyncModuleWorker.prototype.finish = function () {
 SyncModuleWorker.prototype.log = function (format, arg1, arg2) {
   var str = '[' + utility.YYYYMMDDHHmmss() + '] ' + util.format.apply(util, arguments);
   debug(str);
-  this._logId && Log.append(this._logId, str, utility.noop);
+  var logId = this._logId;
+  if (logId) {
+    co(function* () {
+      yield* Log.append(logId, str);
+    })(utility.noop);
+  }
 };
 
 SyncModuleWorker.prototype.start = function () {
@@ -1010,7 +1015,7 @@ SyncModuleWorker.prototype._syncOneVersion = function *(versionIndex, sourcePack
 
 SyncModuleWorker.sync = function* (name, username, options) {
   options = options || {};
-  var result = yield Log.create({name: name, username: username});
+  var result = yield* Log.create({name: name, username: username});
   var worker = new SyncModuleWorker({
     logId: result.id,
     name: name,
