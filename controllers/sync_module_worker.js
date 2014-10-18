@@ -1,5 +1,5 @@
 /**!
- * cnpmjs.org - proxy/sync_module_worker.js
+ * cnpmjs.org - controllers/sync_module_worker.js
  *
  * Copyright(c) cnpmjs.org and other contributors.
  * MIT Licensed
@@ -30,10 +30,9 @@ var urllib = require('../common/urllib');
 var utility = require('utility');
 var urlparse = require('url').parse;
 var nfs = require('../common/nfs');
-var npm = require('./npm');
+var npm = require('../services/npm');
 var common = require('../lib/common');
-var Module = require('./module');
-var ModuleDeps = require('./module_deps');
+var Package = require('../services/package');
 var Log = require('./module_log');
 var config = require('../config');
 var ModuleStar = require('./module_star');
@@ -895,13 +894,7 @@ SyncModuleWorker.prototype._syncOneVersion = function *(versionIndex, sourcePack
   }
 
   // add module dependence
-  try {
-    yield dependencies.map(function (depName) {
-      return ModuleDeps.add(depName, sourcePackage.name);
-    });
-  } catch (err) {
-    // ignore
-  }
+  yield Package.addDependencies(sourcePackage.name, dependencies);
 
   var shasum = crypto.createHash('sha1');
   var dataSize = 0;

@@ -19,34 +19,37 @@ CREATE TABLE IF NOT EXISTS `module_deps` (
  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'primary key',
  `gmt_create` datetime NOT NULL COMMENT 'create time',
  `name` varchar(100) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL COMMENT 'module name',
- `deps` varchar(100) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL COMMENT 'which module depend on this module',
+ `deps` varchar(100) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL COMMENT '`name` dep on `deps`',
  PRIMARY KEY (`id`),
  UNIQUE KEY `module_deps_name_deps` (`name`,`deps`),
- KEY `name` (`module_deps_name`)
+ KEY `deps` (`module_deps_deps`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='module deps';
  */
 
 module.exports = function (sequelize, DataTypes) {
-  return sequelize.define('ModuleDeps', {
+  return sequelize.define('ModuleDependency', {
     name: {
       type: DataTypes.STRING(100),
       allowNull: false,
       comment: 'module name',
     },
-    deps: {
+    dependency: {
+      field: 'deps',
       type: DataTypes.STRING(100),
-      comment: 'which module depend on this module'
+      comment: '`name` dep on `deps`'
     }
   }, {
     tableName: 'module_deps',
     comment: 'module deps',
+    // no need update timestamp
+    updatedAt: false,
     indexes: [
       {
         unique: true,
         fields: ['name', 'deps']
       },
       {
-        fields: ['name']
+        fields: ['deps']
       }
     ],
     classMethods: {

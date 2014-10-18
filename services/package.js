@@ -20,6 +20,7 @@ var Module = models.Module;
 var ModuleKeyword = models.ModuleKeyword;
 var NpmModuleMaintainer = models.NpmModuleMaintainer;
 var ModuleMaintainer = models.ModuleMaintainer;
+var ModuleDependency = models.ModuleDependency;
 var Tag = models.Tag;
 
 // module
@@ -373,6 +374,54 @@ exports.removeModuleTagsByNames = function* (moduleName, tagNames) {
 
 exports.listModuleTags = function* (name) {
   return yield Tag.findAll({ where: { name: name } });
+};
+
+// dependencies
+
+exports.addDependency = function* (name, dependency) {
+  var row = yield ModuleDependency.find({
+    where: {
+      name: name,
+      dependency: dependency
+    }
+  });
+  if (row) {
+    return row;
+  }
+  return yield ModuleDependency.build({
+    name: name,
+    dependency: dependency
+  }).save();
+};
+
+exports.addDependencies = function* (name, dependencies) {
+  var tasks = [];
+  for (var i = 0; i < dependencies.length; i++) {
+    tasks.push(exports.addDependency(name, dependencies[i]));
+  }
+  return yield tasks;
+};
+
+exports.listDependencies = function* (name) {
+  var items = yield ModuleDependency.findAll({
+    where: {
+      name: name
+    }
+  });
+  return items.map(function (item) {
+    return item.dependency;
+  });
+};
+
+exports.listDependents = function* (dependency) {
+  var items = yield ModuleDependency.findAll({
+    where: {
+      dependency: dependency
+    }
+  });
+  return items.map(function (item) {
+    return item.name;
+  });
 };
 
 // maintainers

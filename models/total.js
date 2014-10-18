@@ -95,6 +95,7 @@ module.exports = function (sequelize, DataTypes) {
   }, {
     tableName: 'total',
     comment: 'total info',
+    createdAt: false,
     classMethods: {
       init: function (callback) {
         var that = this;

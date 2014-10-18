@@ -14,8 +14,6 @@
  * Module dependencies.
  */
 
-var utility = require('utility');
-
 // CREATE TABLE IF NOT EXISTS `download_total` (
 //  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'primary key',
 //  `gmt_create` datetime NOT NULL COMMENT 'create time',

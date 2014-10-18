@@ -41,6 +41,7 @@ module.exports = function (sequelize, DataTypes) {
   }, {
     tableName: 'module_star',
     comment: 'module star',
+    updatedAt: false,
     indexes: [
       {
         unique: true,

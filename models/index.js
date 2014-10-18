@@ -26,6 +26,7 @@ module.exports = {
   Module: load('module'),
   ModuleKeyword: load('module_keyword'),
   NpmModuleMaintainer: load('npm_module_maintainer'),
+  ModuleDependency: load('module_deps'),
   Tag: load('tag'),
   User: load('user'),
   Total: load('total'),

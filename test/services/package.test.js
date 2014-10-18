@@ -450,4 +450,41 @@ describe('services/package.test.js', function () {
       });
     });
   });
+
+  describe('addDependencies()', function () {
+    it('should add some module dependencies', function* () {
+      var rows = yield* Package.addDependencies('addDependencies-test-module', [
+        'addDependencies-dep1',
+        'addDependencies-dep2',
+        'addDependencies-dep3',
+        'addDependencies-dep4',
+      ]);
+      rows.should.length(4);
+      // again should work
+      rows = yield* Package.addDependencies('addDependencies-test-module', [
+        'addDependencies-dep1',
+        'addDependencies-dep2',
+        'addDependencies-dep3',
+        'addDependencies-dep4',
+      ]);
+      rows.should.length(4);
+
+      var dependencies = yield* Package.listDependencies('addDependencies-test-module');
+      dependencies.should.eql([
+        'addDependencies-dep1',
+        'addDependencies-dep2',
+        'addDependencies-dep3',
+        'addDependencies-dep4',
+      ]);
+
+      var names = yield* Package.listDependents('addDependencies-dep1');
+      names.should.eql(['addDependencies-test-module']);
+
+      yield* Package.addDependencies('addDependencies-test-module2', [
+        'addDependencies-dep1',
+      ]);
+      names = yield* Package.listDependents('addDependencies-dep1');
+      names.should.eql(['addDependencies-test-module', 'addDependencies-test-module2']);
+    });
+  });
 });

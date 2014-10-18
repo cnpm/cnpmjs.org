@@ -41,6 +41,7 @@ module.exports = function (sequelize, DataTypes) {
   }, {
     tableName: 'npm_module_maintainer',
     comment: 'npm original module maintainers',
+    updatedAt: false,
     indexes: [
       {
         unique: true,

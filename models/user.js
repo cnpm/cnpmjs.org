@@ -180,12 +180,12 @@ module.exports = function (sequelize, DataTypes) {
         var salt = data.salt || '0';
         var passwordSha = data.password_sha || '0';
         var ip = data.ip || '0';
-        var json = data.user;
 
         user.email = data.user.email;
         user.ip = ip;
         user.json = data.user;
         user.rev = rev;
+        user.salt = salt;
         user.password_sha = passwordSha;
         return yield user.save();
       },
