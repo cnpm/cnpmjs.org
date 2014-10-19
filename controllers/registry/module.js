@@ -555,7 +555,7 @@ exports.updateOrRemove = function* (next) {
   }
 };
 
-exports.updateMaintainers = function* (next) {
+exports.updateMaintainers = function* () {
   var name = this.params.name || this.params[0];
   var body = this.request.body;
   debug('updateMaintainers module %s, %j', name, body);
@@ -599,7 +599,7 @@ exports.updateMaintainers = function* (next) {
       }
     }
     if (newNames.length > 0) {
-      var users = yield* UserService.list(newNames);
+      var users = yield* userService.list(newNames);
       var map = {};
       for (var i = 0; i < users.length; i++) {
         var user = users[i];
@@ -616,7 +616,7 @@ exports.updateMaintainers = function* (next) {
         this.status = 403;
         this.body = {
           error: 'invalid user name',
-          reason: 'User: ' + invailds.join(', ') + ' not exists'
+          reason: 'User: `' + invailds.join(', ') + '` not exists'
         };
         return;
       }

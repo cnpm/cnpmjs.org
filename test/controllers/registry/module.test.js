@@ -23,11 +23,9 @@ var mm = require('mm');
 var pedding = require('pedding');
 var config = require('../../../config');
 var app = require('../../../servers/registry');
-var Module = require('../../../proxy/module');
-var Npm = require('../../../proxy/npm');
-var SyncModuleWorker = require('../../../proxy/sync_module_worker');
+var Npm = require('../../../services/npm');
+var SyncModuleWorker = require('../../../controllers/sync_module_worker');
 var utils = require('../../utils');
-var mysql = require('../../../common/mysql');
 
 var fixtures = path.join(path.dirname(path.dirname(__dirname)), 'fixtures');
 

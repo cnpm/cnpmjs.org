@@ -15,6 +15,8 @@
  */
 
 var config = require('../config');
+var User = require('../models').User;
+
 if (!config.userService) {
   var DefaultUserService = require('./default_user_service');
   config.userService = new DefaultUserService();
@@ -53,4 +55,35 @@ exports.list = function* (logins) {
 exports.search = function* (query, options) {
   var users = yield* config.userService.search(query, options);
   return users.map(convertUser);
+};
+
+exports.getAndSave = function* (login) {
+  if (config.customUserService) {
+    var user = yield* exports.get(login);
+    if (user) {
+      var data = {
+        user: user
+      };
+      yield* User.saveCustomUser(data);
+    }
+  }
+  return yield* User.findByName(login);
+};
+
+exports.authAndSave = function* (login, password) {
+  var user = yield* exports.auth(login, password);
+  if (user) {
+    if (config.customUserService) {
+      // make sure sync user meta to cnpm database
+      var data = user;
+      data.rev = Date.now() + '-' + user.login;
+      data.user = user;
+      yield* User.saveCustomUser(data);
+    }
+  }
+  return user;
+};
+
+exports.add = function* (user) {
+  return yield* User.add(user);
 };

@@ -18,29 +18,12 @@
 var debug = require('debug')('cnpmjs.org:controllers:registry:user');
 var utility = require('utility');
 var crypto = require('crypto');
-var UserService = require('../../services/user');
-var User = require('../../proxy/user');
+var userService = require('../../services/user');
 var config = require('../../config');
-var common = require('../../lib/common');
 
 exports.show = function* (next) {
   var name = this.params.name;
-  var isAdmin = common.isAdmin(name);
-  var scopes = config.scopes || [];
-  if (config.customUserService) {
-    var customUser = yield* UserService.get(name);
-    if (customUser) {
-      isAdmin = !!customUser.site_admin;
-      scopes = customUser.scopes;
-
-      var data = {
-        user: customUser
-      };
-      yield* User.saveCustomUser(data);
-    }
-  }
-
-  var user = yield* User.get(name);
+  var user = yield* userService.getAndSave(name);
   if (!user) {
     return yield* next;
   }
@@ -72,17 +55,17 @@ exports.show = function* (next) {
       avatar: data.avatar_url,
       fullname: data.name || data.login,
       homepage: data.html_url,
+      scopes: data.scopes,
+      site_admin: data.site_admin
     };
   }
 
   data._cnpm_meta = {
     id: user.id,
-    npm_user: user.npm_user === 1,
-    custom_user: user.npm_user === 2,
+    npm_user: user.isNpmUser,
+    custom_user: !!data.login,
     gmt_create: user.gmt_create,
     gmt_modified: user.gmt_modified,
-    admin: isAdmin,
-    scopes: scopes,
   };
 
   this.body = data;
@@ -156,7 +139,7 @@ exports.add = function* () {
 
   var loginedUser;
   try {
-    loginedUser = yield UserService.auth(body.name, body.password);
+    loginedUser = yield* userService.authAndSave(body.name, body.password);
   } catch (err) {
     this.status = err.status || 500;
     this.body = {
@@ -166,19 +149,11 @@ exports.add = function* () {
     return;
   }
   if (loginedUser) {
-    var rev = Date.now() + '-' + loginedUser.login;
-    if (config.customUserService) {
-      // make sure sync user meta to cnpm database
-      var data = user;
-      data.rev = rev;
-      data.user = loginedUser;
-      yield* User.saveCustomUser(data);
-    }
     this.status = 201;
     this.body = {
       ok: true,
       id: 'org.couchdb.user:' + loginedUser.login,
-      rev: rev,
+      rev: Date.now() + '-' + loginedUser.login
     };
     return;
   }
@@ -193,7 +168,7 @@ exports.add = function* () {
     return;
   }
 
-  var existUser = yield User.get(name);
+  var existUser = yield* userService.get(name);
   if (existUser) {
     this.status = 409;
     this.body = {
@@ -203,7 +178,8 @@ exports.add = function* () {
     return;
   }
 
-  var result = yield User.add(user);
+  // add new user
+  var result = yield* userService.add(user);
   this.etag = '"' + result.rev + '"';
   this.status = 201;
   this.body = {
@@ -230,7 +206,7 @@ exports.add = function* () {
 //    gmt_modified: '2014-08-05T15:46:58.000Z',
 //    admin: true,
 //    scopes: [ '@cnpm', '@cnpmtest' ] } }
-exports.update = function *(next) {
+exports.update = function* (next) {
   var name = this.params.name;
   var rev = this.params.rev;
   if (!name || !rev) {
@@ -272,7 +248,7 @@ exports.update = function *(next) {
     return;
   }
 
-  var result = yield User.update(user);
+  var result = yield* userService.update(user);
   if (!result) {
     this.status = 409;
     this.body = {
