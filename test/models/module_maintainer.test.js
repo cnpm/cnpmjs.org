@@ -1,5 +1,5 @@
 /**!
- * cnpmjs.org - test/proxy/module_maintainer.test.js
+ * cnpmjs.org - test/models/module_maintainer.test.js
  *
  * Copyright(c) fengmk2 and other contributors.
  * MIT Licensed
@@ -14,25 +14,24 @@
  * Module dependencies.
  */
 
-var should = require('should');
-var ModuleMaintainer = require('../../proxy/module_maintainer');
+var ModuleMaintainer = require('../../models').ModuleMaintainer;
 
-describe('proxy/module_maintainer.test.js', function () {
-  describe('update()', function () {
+describe('models/module_maintainer.test.js', function () {
+  describe('updateMaintainers()', function () {
     it('should update one maintainer', function* () {
-      var rs = yield* ModuleMaintainer.update('testfoo', ['fengmk2']);
+      var rs = yield* ModuleMaintainer.updateMaintainers('testfoo', ['fengmk2']);
       rs.should.eql({
         add: ['fengmk2'],
         remove: []
       });
       // again should be fine
-      var rs = yield* ModuleMaintainer.update('testfoo', ['fengmk2']);
+      var rs = yield* ModuleMaintainer.updateMaintainers('testfoo', ['fengmk2']);
       rs.should.eql({
-        add: ['fengmk2'],
+        add: [],
         remove: []
       });
       // remove the exists
-      var rs = yield* ModuleMaintainer.update('testfoo', ['fengmk2-1', 'foobar']);
+      var rs = yield* ModuleMaintainer.updateMaintainers('testfoo', ['fengmk2-1', 'foobar']);
       rs.should.eql({
         add: ['fengmk2-1', 'foobar'],
         remove: ['fengmk2']
@@ -40,26 +39,26 @@ describe('proxy/module_maintainer.test.js', function () {
     });
 
     it('should update multi maintainers', function* () {
-      var rs = yield* ModuleMaintainer.update('testfoo2', ['fengmk2', 'ok', 'foobar']);
+      var rs = yield* ModuleMaintainer.updateMaintainers('testfoo2', ['fengmk23', 'ok', 'foobar']);
       rs.should.eql({
-        add: ['fengmk2', 'ok', 'foobar'],
+        add: ['fengmk23', 'ok', 'foobar'],
         remove: []
       });
       // remove exists
-      var rs = yield* ModuleMaintainer.update('testfoo2', ['fengmk2']);
+      var rs = yield* ModuleMaintainer.updateMaintainers('testfoo2', ['fengmk23']);
       rs.should.eql({
-        add: ['fengmk2'],
+        add: [],
         remove: ['ok', 'foobar']
       });
-      var rs = yield* ModuleMaintainer.update('testfoo3', ['fengmk2', 'ok', 'foobar']);
+      var rs = yield* ModuleMaintainer.updateMaintainers('testfoo2', ['fengmk23', 'ok', 'foobar']);
       rs.should.eql({
-        add: ['fengmk2', 'ok', 'foobar'],
+        add: ['ok', 'foobar'],
         remove: []
       });
     });
 
     it('should add empty maintainers do nothing', function* () {
-      var rs = yield* ModuleMaintainer.update('tesfoobar', []);
+      var rs = yield* ModuleMaintainer.updateMaintainers('tesfoobar', []);
       rs.should.eql({
         add: [],
         remove: []

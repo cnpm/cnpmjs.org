@@ -28,12 +28,13 @@ module.exports = {
   ModuleStar: load('module_star'),
   ModuleKeyword: load('module_keyword'),
   ModuleDependency: load('module_deps'),
+  ModuleMaintainer: load('module_maintainer'),
   NpmModuleMaintainer: load('npm_module_maintainer'),
 
   Tag: load('tag'),
   User: load('user'),
   Total: load('total'),
-  Download: load('download_total'),
+  DownloadTotal: load('download_total'),
   DistFile: load('dist_file'),
   DistDir: load('dist_dir'),
 
