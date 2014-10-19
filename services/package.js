@@ -15,14 +15,15 @@
  */
 
 var models = require('../models');
-var Module = models.Module;
-var ModuleKeyword = models.ModuleKeyword;
-var NpmModuleMaintainer = models.NpmModuleMaintainer;
-var ModuleMaintainer = models.ModuleMaintainer;
-var ModuleDependency = models.ModuleDependency;
-var ModuleStar = models.ModuleStar;
 var Tag = models.Tag;
 var User = models.User;
+var Module = models.Module;
+var ModuleStar = models.ModuleStar;
+var ModuleKeyword = models.ModuleKeyword;
+var ModuleMaintainer = models.ModuleMaintainer;
+var ModuleDependency = models.ModuleDependency;
+var ModuleUnpublished = models.ModuleUnpublished;
+var NpmModuleMaintainer = models.NpmModuleMaintainer;
 
 // module
 
@@ -631,4 +632,13 @@ exports.listUserStarModuleNames = function* (user) {
   return rows.map(function (row) {
     return row.name;
   });
+};
+
+// unpublish info
+exports.saveUnpublishedModule = function* (name, pkg) {
+  return yield* ModuleUnpublished.save(name, pkg);
+};
+
+exports.getUnpublishedModule = function* (name) {
+  return yield* ModuleUnpublished.findByName(name);
 };

@@ -14,6 +14,8 @@
  * Module dependencies.
  */
 
+var utils = require('./utils');
+
 /*
 CREATE TABLE IF NOT EXISTS `module_unpublished` (
  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'primary key',
@@ -36,7 +38,9 @@ module.exports = function (sequelize, DataTypes) {
     },
     package: {
       type: DataTypes.LONGTEXT,
-      comment: 'base info: tags, time, maintainers, description, versions'
+      comment: 'base info: tags, time, maintainers, description, versions',
+      get: utils.JSONGetter('package'),
+      set: utils.JSONSetter('package'),
     }
   }, {
     tableName: 'module_unpublished',
@@ -51,6 +55,30 @@ module.exports = function (sequelize, DataTypes) {
       }
     ],
     classMethods: {
+      findByName: function* (name) {
+        return yield this.find({
+          where: {
+            name: name
+          }
+        });
+      },
+      save: function* (name, pkg) {
+        var row = yield this.find({
+          where: {
+            name: name
+          }
+        });
+        if (row) {
+          row.package = pkg;
+          return yield row.save(['package']);
+        }
+
+        row = this.build({
+          name: name,
+          package: pkg,
+        });
+        return yield row.save();
+      }
     }
   });
 };

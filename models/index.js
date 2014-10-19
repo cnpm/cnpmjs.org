@@ -29,6 +29,7 @@ module.exports = {
   ModuleKeyword: load('module_keyword'),
   ModuleDependency: load('module_deps'),
   ModuleMaintainer: load('module_maintainer'),
+  ModuleUnpublished: load('module_unpublished'),
   NpmModuleMaintainer: load('npm_module_maintainer'),
 
   Tag: load('tag'),

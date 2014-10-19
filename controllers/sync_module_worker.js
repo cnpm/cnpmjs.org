@@ -330,7 +330,7 @@ SyncModuleWorker.prototype._unpublished = function* (name, unpublishedInfo) {
     return [];
   }
 
-  var r = yield* ModuleUnpublished.add(name, unpublishedInfo);
+  var r = yield* packageService.saveUnpublishedModule(name, unpublishedInfo);
   this.log('    [%s] save unpublished info: %j to row#%s',
     name, unpublishedInfo, r.insertId);
   if (mods.length === 0) {

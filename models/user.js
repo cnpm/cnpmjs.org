@@ -15,6 +15,7 @@
  */
 
 var utility = require('utility');
+var utils = require('./utils');
 
 /*
 CREATE TABLE IF NOT EXISTS `user` (
@@ -76,19 +77,8 @@ module.exports = function (sequelize, DataTypes) {
     json: {
       type: DataTypes.LONGTEXT,
       allowNull: true,
-      get: function () {
-        var value = this.getDataValue('json');
-        if (value) {
-          value = JSON.parse(value);
-        }
-        return value;
-      },
-      set: function (value) {
-        if (typeof value !== 'string') {
-          value = JSON.stringify(value);
-        }
-        this.setDataValue('json', value);
-      }
+      get: utils.JSONGetter('json'),
+      set: utils.JSONSetter('json'),
     },
     isNpmUser: {
       field: 'npm_user',
