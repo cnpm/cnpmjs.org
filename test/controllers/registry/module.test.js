@@ -17,7 +17,6 @@
 
 var fs = require('fs');
 var path = require('path');
-var thunkify = require('thunkify-wrap');
 var should = require('should');
 var request = require('supertest');
 var mm = require('mm');
@@ -26,8 +25,6 @@ var config = require('../../../config');
 var app = require('../../../servers/registry');
 var Module = require('../../../proxy/module');
 var Npm = require('../../../proxy/npm');
-var controller = require('../../../controllers/registry/module');
-var ModuleDeps = require('../../../proxy/module_deps');
 var SyncModuleWorker = require('../../../proxy/sync_module_worker');
 var utils = require('../../utils');
 var mysql = require('../../../common/mysql');
@@ -803,20 +800,6 @@ describe('controllers/registry/module.test.js', function () {
         versions: {}
       })
       .expect(201, done);
-    });
-  });
-
-  describe('GET /:name/download/:filename', function () {
-    it('should download a file with 200', function (done) {
-      request(app)
-      .get('/mk2testmodule/download/mk2testmodule-0.0.1.tgz')
-      .expect(200, done);
-    });
-
-    it('should alias /:name/-/:filename to /:name/download/:filename', function (done) {
-      request(app)
-      .get('/mk2testmodule/-/mk2testmodule-0.0.1.tgz')
-      .expect(200, done);
     });
   });
 

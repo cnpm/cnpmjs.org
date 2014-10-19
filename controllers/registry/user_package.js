@@ -14,8 +14,8 @@
  * Module dependencies.
  */
 
-var Module = require('../../proxy/module');
-var NpmModuleMaintainer = require('../../proxy/npm_module_maintainer');
+var Package = require('../../services/package');
+// var NpmModuleMaintainer = require('../../proxy/npm_module_maintainer');
 
 exports.list = function* () {
   var users = this.params.user.split('|');

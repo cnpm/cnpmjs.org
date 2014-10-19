@@ -14,7 +14,6 @@
  * Module dependencies.
  */
 
-var User = require('../proxy/user');
 var models = require('../models');
 var Module = models.Module;
 var ModuleKeyword = models.ModuleKeyword;
@@ -23,6 +22,7 @@ var ModuleMaintainer = models.ModuleMaintainer;
 var ModuleDependency = models.ModuleDependency;
 var ModuleStar = models.ModuleStar;
 var Tag = models.Tag;
+var User = models.User;
 
 // module
 
@@ -64,6 +64,10 @@ exports.getModuleByTag = function* (name, tag) {
     return null;
   }
   return yield* exports.getModule(tag.name, tag.version);
+};
+
+exports.getLatestModule = function* (name) {
+  return yield* exports.getModuleTag(name, 'latest');
 };
 
 // module:list
@@ -347,9 +351,7 @@ exports.addModuleTag = function* (name, tag, version) {
   }
   row.module_id = mod.id;
   row.version = version;
-  yield row.save();
-
-  return {id: row.id, gmt_modified: row.gmt_modified, module_id: row.module_id};
+  return yield row.save();
 };
 
 exports.getModuleTag = function* (name, tag) {
@@ -428,11 +430,11 @@ exports.listDependents = function* (dependency) {
 // maintainers
 
 exports.listMaintainers = function* (name) {
-  var names = yield* ModuleMaintainer.get(name);
-  if (names.length === 0) {
-    return names;
+  var usernames = yield* ModuleMaintainer.listMaintainers(name);
+  if (usernames.length === 0) {
+    return usernames;
   }
-  var users = yield* User.listByNames(names);
+  var users = yield* User.listByNames(usernames);
   return users.map(function (user) {
     return {
       name: user.name,
@@ -442,29 +444,29 @@ exports.listMaintainers = function* (name) {
 };
 
 exports.listMaintainerNamesOnly = function* (name) {
-  return yield* ModuleMaintainer.get(name);
+  return yield* ModuleMaintainer.listMaintainers(name);
 };
 
 exports.addMaintainers = function* (name, usernames) {
-  return yield* ModuleMaintainer.addMulti(name, usernames);
+  return yield* ModuleMaintainer.addMaintainers(name, usernames);
 };
 
 exports.updateMaintainers = function* (name, usernames) {
-  var rs = yield [
-    ModuleMaintainer.update(name, usernames),
-    exports.updateModuleLastModified(name),
-  ];
-  return rs[0];
+  var result = yield* ModuleMaintainer.updateMaintainers(name, usernames);
+  if (result.add.length > 0 || result.remove.length > 0) {
+    yield* exports.updateModuleLastModified(name);
+  }
+  return result;
 };
 
 exports.removeAllMaintainers = function* (name) {
-  return yield* ModuleMaintainer.removeAll(name);
+  return yield* ModuleMaintainer.removeAllMaintainers(name);
 };
 
 exports.authMaintainer = function* (packageName, username) {
   var rs = yield [
-    ModuleMaintainer.get(packageName),
-    Module.getLatest(packageName)
+    ModuleMaintainer.listMaintainers(packageName),
+    exports.getLatestModule(packageName)
   ];
   var maintainers = rs[0];
   var latestMod = rs[1];

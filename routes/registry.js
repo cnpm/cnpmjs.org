@@ -23,6 +23,7 @@ var total = require('../controllers/total');
 var mod = require('../controllers/registry/module');
 var user = require('../controllers/registry/user');
 var sync = require('../controllers/sync');
+var download = require('../controllers/registry/download');
 var userPackage = require('../controllers/registry/user_package');
 
 function routes(app) {
@@ -63,10 +64,10 @@ function routes(app) {
   app.put('/:name/:tag', login, mod.updateTag);
 
   // need limit by ip
-  app.get(/^\/(@[\w\-\.]+\/[\w\-\.]+)\/download\/(@[\w\-\.]+\/[\w\-\.]+)$/, limit, mod.download);
-  app.get('/:name/download/:filename', limit, mod.download);
-  app.get(/^\/(@[\w\-\.]+\/[\w\-\.]+)\/\-\/(@[\w\-\.]+\/[\w\-\.]+)$/, limit, mod.download);
-  app.get('/:name/-/:filename', limit, mod.download);
+  app.get(/^\/(@[\w\-\.]+\/[\w\-\.]+)\/download\/(@[\w\-\.]+\/[\w\-\.]+)$/, limit, download);
+  app.get('/:name/download/:filename', limit, download);
+  app.get(/^\/(@[\w\-\.]+\/[\w\-\.]+)\/\-\/(@[\w\-\.]+\/[\w\-\.]+)$/, limit, download);
+  app.get('/:name/-/:filename', limit, download);
 
   // delete tarball
   app.delete(/^\/(@[\w\-\.]+\/[\w\-\.]+)\/download\/(@[\w\-\.]+\/[\w\-\.]+)\/\-rev\/([\w\-\.]+)$/,

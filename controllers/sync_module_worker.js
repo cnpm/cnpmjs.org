@@ -26,18 +26,18 @@ var fs = require('fs');
 var path = require('path');
 var crypto = require('crypto');
 var sleep = require('co-sleep');
-var urllib = require('../common/urllib');
 var utility = require('utility');
 var urlparse = require('url').parse;
+var urllib = require('../common/urllib');
+var config = require('../config');
 var nfs = require('../common/nfs');
 var common = require('../lib/common');
 var npm = require('../services/npm');
 var Package = require('../services/package');
 var Log = require('../services/module_log');
-var config = require('../config');
-var User = require('./user');
-var ModuleUnpublished = require('./module_unpublished');
-var NpmModuleMaintainer = require('./npm_module_maintainer');
+var User = require('../services/user');
+// var ModuleUnpublished = require('../module_unpublished');
+// var NpmModuleMaintainer = require('../npm_module_maintainer');
 
 var USER_AGENT = 'sync.cnpmjs.org/' + config.version + ' ' + urllib.USER_AGENT;
 
@@ -524,7 +524,7 @@ SyncModuleWorker.prototype._sync = function* (name, pkg) {
         },
       };
       try {
-        var result = yield* Package.addModule(nextMod);
+        var result = yield* packageService.saveModule(nextMod);
         that.log('  [%s] save next module, %j', name, result);
       } catch (err) {
         that.log('  [%s] save next module error %s', err.message);

@@ -50,7 +50,7 @@ exports.display = function* (next) {
     getPackageMethod = 'get';
     getPackageArgs = [name, version];
   } else {
-    getPackageMethod = 'getByTag';
+    getPackageMethod = 'getModuleByTag';
     getPackageArgs = [name, tag || 'latest'];
   }
 

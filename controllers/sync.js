@@ -16,7 +16,7 @@
 
 var debug = require('debug')('cnpmjs.org:controllers:sync');
 var Log = require('../services/module_log');
-var SyncModuleWorker = require('../proxy/sync_module_worker');
+var SyncModuleWorker = require('./sync_module_worker');
 
 exports.sync = function* () {
   var username = this.user.name || 'anonymous';

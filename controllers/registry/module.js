@@ -20,23 +20,18 @@ var util = require('util');
 var crypto = require('crypto');
 var utility = require('utility');
 var urlparse = require('url').parse;
-var mime = require('mime');
 var semver = require('semver');
 var config = require('../../config');
 var Total = require('../../services/total');
 var nfs = require('../../common/nfs');
 var common = require('../../lib/common');
-var DownloadTotal = require('../../proxy/download');
 var SyncModuleWorker = require('../sync_module_worker');
 var logger = require('../../common/logger');
-var ModuleDeps = require('../../proxy/module_deps');
-var ModuleStar = require('../../proxy/module_star');
-var ModuleUnpublished = require('../../proxy/module_unpublished');
+// var ModuleUnpublished = require('../../proxy/module_unpublished');
 var packageService = require('../../services/package');
-var UserService = require('../../services/user');
-var downloadAsReadStream = require('../utils').downloadAsReadStream;
+var userService = require('../../services/user');
 var deprecateVersions = require('./deprecate');
-var npm = require('../../proxy/npm');
+var npm = require('../../services/npm');
 
 /**
  * show all version of a module
@@ -264,7 +259,7 @@ exports.get = function* (next) {
   var name = this.params.name || this.params[0];
   var tag = this.params.version || this.params[1];
   var version = semver.valid(tag);
-  var method = version ? 'get' : 'getByTag';
+  var method = version ? 'get' : 'getModuleByTag';
   var queryLabel = version ? version : tag;
   var orginalName = name;
   var adaptDefaultScope = false;
@@ -326,101 +321,7 @@ exports.get = function* (next) {
   this.body = r.data;
 };
 
-var _downloads = {};
 
-exports.download = function *(next) {
-  var name = this.params.name || this.params[0];
-  var filename = this.params.filename || this.params[1];
-  var version = filename.slice(name.length + 1, -4);
-  var row = yield* Package.getModule(name, version);
-  // can not get dist
-  var url = null;
-
-  if (typeof nfs.url === 'function') {
-    url = nfs.url(common.getCDNKey(name, filename));
-  }
-
-  debug('download %s %s %s %s', name, filename, version, url);
-
-  if (!row || !row.package || !row.package.dist) {
-    if (!url) {
-      return yield* next;
-    }
-    this.status = 302;
-    this.set('Location', url);
-    _downloads[name] = (_downloads[name] || 0) + 1;
-    return;
-  }
-
-  var dist = row.package.dist;
-  if (!dist.key) {
-    debug('get tarball by 302, url: %s', dist.tarball || url);
-    this.status = 302;
-    this.set('Location', dist.tarball || url);
-    _downloads[name] = (_downloads[name] || 0) + 1;
-    return;
-  }
-
-  // else use `dist.key` to get tarball from nfs
-  if (!nfs.download) {
-    return yield* next;
-  }
-
-  _downloads[name] = (_downloads[name] || 0) + 1;
-
-  if (typeof dist.size === 'number' && dist.size > 0) {
-    this.length = dist.size;
-  }
-  this.type = mime.lookup(dist.key);
-  this.attachment(filename);
-  this.etag = dist.shasum;
-
-  this.body = yield* downloadAsReadStream(dist.key);
-};
-
-setInterval(function () {
-  // save download count
-  var totals = [];
-  for (var name in _downloads) {
-    var count = _downloads[name];
-    totals.push([name, count]);
-  }
-  _downloads = {};
-
-  if (totals.length === 0) {
-    return;
-  }
-
-  debug('save download total: %j', totals);
-
-  var date = utility.YYYYMMDD();
-  var next = function () {
-    var item = totals.shift();
-    if (!item) {
-      // done
-      return;
-    }
-
-    DownloadTotal.plusTotal({name: item[0], date: date, count: item[1]}, function (err) {
-      if (!err) {
-        return next();
-      }
-
-      logger.error(err);
-      debug('save download %j error: %s', item, err);
-
-      totals.push(item);
-      // save to _downloads
-      for (var i = 0; i < totals.length; i++) {
-        var v = totals[i];
-        var name = v[0];
-        _downloads[name] = (_downloads[name] || 0) + v[1];
-      }
-      // end
-    });
-  };
-  next();
-}, 5000);
 
 function _addDepsRelations(pkg) {
   var dependencies = Object.keys(pkg.dependencies || {});
@@ -441,7 +342,7 @@ function _addDepsRelations(pkg) {
 //
 // new flows: only one request
 // PUT /:name
-exports.addPackageAndDist = function *(next) {
+exports.addPackageAndDist = function* () {
   // 'dist-tags': { latest: '0.0.2' },
   //  _attachments:
   // { 'nae-sandbox-0.0.2.tgz':
@@ -526,6 +427,7 @@ exports.addPackageAndDist = function *(next) {
     return;
   }
 
+  // TODO: add this info into some table
   versionPackage._publish_on_cnpm = true;
   var distTags = pkg['dist-tags'] || {};
   var tags = []; // tag, version
@@ -545,7 +447,7 @@ exports.addPackageAndDist = function *(next) {
   debug('%s addPackageAndDist %s:%s, attachment size: %s, maintainers: %j, distTags: %j',
     username, name, version, attachment.length, versionPackage.maintainers, distTags);
 
-  var exists = yield* Module.getModule(name, version);
+  var exists = yield* packageService.getModule(name, version);
   var shasum;
   if (exists) {
     this.status = 403;
@@ -572,7 +474,7 @@ exports.addPackageAndDist = function *(next) {
 
   if (!distTags.latest) {
     // need to check if latest tag exists or not
-    var latest = yield Module.getByTag(name, 'latest');
+    var latest = yield packageService.getModuleByTag(name, 'latest');
     if (!latest) {
       // auto add latest
       tags.push(['latest', tags[0][1]]);
@@ -614,20 +516,22 @@ exports.addPackageAndDist = function *(next) {
   mod.package.dist = dist;
   _addDepsRelations(mod.package);
 
-  var addResult = yield* Package.addModule(mod);
+  var addResult = yield* packageService.saveModule(mod);
   debug('%s module: save file to %s, size: %d, sha1: %s, dist: %j, version: %s',
     addResult.id, dist.tarball, dist.size, shasum, dist, version);
 
   if (tags.length) {
     yield tags.map(function (tag) {
-      return Module.addTag(name, tag[0], tag[1]);
+      // tag: [tagName, version]
+      return packageService.addModuleTag(name, tag[0], tag[1]);
     });
   }
 
   // ensure maintainers exists
-  yield* packageService.addMaintainers(name, maintainers.map(function (item) {
+  var maintainerNames = maintainers.map(function (item) {
     return item.name;
-  }));
+  });
+  yield* packageService.addMaintainers(name, maintainerNames);
 
   this.status = 201;
   this.body = {

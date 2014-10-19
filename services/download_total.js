@@ -29,6 +29,24 @@ exports.getModuleTotal = function* (name, start, end) {
   });
 };
 
+exports.plusModuleTotal = function* (data) {
+  var row = yield DownloadTotal.find({
+    where: {
+      date: data.date,
+      name: data.name
+    }
+  });
+  if (!row) {
+    row = DownloadTotal.build({
+      date: data.date,
+      name: data.name
+    });
+  }
+  row.count += data.count;
+  return yield row.save();
+};
+
+
 exports.getTotal = function* (start, end) {
   var sql = 'SELECT date, sum(count) AS count FROM download_total \
     WHERE date>=? AND date<=? GROUP BY date;';
