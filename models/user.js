@@ -32,13 +32,10 @@ CREATE TABLE IF NOT EXISTS `user` (
  `json` longtext CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'json details',
  `npm_user` tinyint(1) DEFAULT '0' COMMENT 'user sync from npm or not, 1: true, other: false',
  PRIMARY KEY (`id`),
- UNIQUE KEY `name` (`name`),
- KEY `gmt_modified` (`gmt_modified`)
+ UNIQUE KEY `user_name` (`name`),
+ KEY `user_gmt_modified` (`gmt_modified`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='user base info';
--- ALTER TABLE `user`
---   ADD `json` longtext CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'json details',
---   ADD `npm_user` tinyint(1) DEFAULT '0' COMMENT 'user sync from npm or not, 1: true, other: false';
- */
+*/
 
 module.exports = function (sequelize, DataTypes) {
   return sequelize.define('User', {
@@ -151,6 +148,7 @@ module.exports = function (sequelize, DataTypes) {
             ip: '0',
           });
         }
+        user.isNpmUser = true;
         user.json = data;
         user.email = data.email || '';
         user.rev = data._rev || '';
@@ -171,6 +169,7 @@ module.exports = function (sequelize, DataTypes) {
         var passwordSha = data.password_sha || '0';
         var ip = data.ip || '0';
 
+        user.isNpmUser = false;
         user.email = data.user.email;
         user.ip = ip;
         user.json = data.user;
@@ -179,6 +178,64 @@ module.exports = function (sequelize, DataTypes) {
         user.password_sha = passwordSha;
         return yield user.save();
       },
+
+      // add cnpm user
+      add: function* (user) {
+        var roles = user.roles || [];
+        try {
+          roles = JSON.stringify(roles);
+        } catch (e) {
+          roles = '[]';
+        }
+        var rev = '1-' + utility.md5(JSON.stringify(user));
+
+        var row = this.build({
+          rev: rev,
+          name: user.name,
+          email: user.email,
+          salt: user.salt,
+          password_sha: user.password_sha,
+          ip: user.ip,
+          roles: roles,
+          isNpmUser: false,
+        });
+
+        return yield row.save();
+      },
+
+      update: function* (user) {
+        var rev = user.rev || user._rev;
+        var revNo = Number(rev.split('-', 1));
+        if (!revNo) {
+          var err = new Error(rev + ' format error');
+          err.name = 'RevFormatError';
+          err.data = {user: user};
+          throw err;
+        }
+        revNo++;
+        var newRev = revNo + '-' + utility.md5(JSON.stringify(user));
+        var roles = user.roles || [];
+        try {
+          roles = JSON.stringify(roles);
+        } catch (e) {
+          roles = '[]';
+        }
+
+        var row = yield* this.findByName(user.name);
+        if (!row) {
+          return null;
+        }
+
+        row.rev = newRev;
+        row.email = user.email;
+        row.salt = user.salt;
+        row.password_sha = user.password_sha;
+        row.ip = user.ip;
+        row.roles = roles;
+        row.isNpmUser = false;
+
+        return yield row.save(['rev', 'email', 'salt', 'password_sha', 'ip', 'roles', 'isNpmUser']);
+      }
     }
   });
 };

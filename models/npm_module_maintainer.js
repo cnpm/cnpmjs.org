@@ -51,14 +51,6 @@ module.exports = function (sequelize, DataTypes) {
         fields: ['name']
       }
     ],
-    classMethods: {
-      listByUser: function* (user) {
-        return yield this.findAll({
-          where: {
-            user: user
-          }
-        });
-      },
-    }
+    classMethods: require('./_module_maintainer_class_methods'),
   });
 };

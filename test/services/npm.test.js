@@ -1,5 +1,5 @@
 /**!
- * cnpmjs.org - test/proxy/npm.test.js
+ * cnpmjs.org - test/services/npm.test.js
  *
  * Copyright(c) cnpmjs.org and other contributors.
  * MIT Licensed
@@ -19,20 +19,20 @@ var mm = require('mm');
 var fs = require('fs');
 var path = require('path');
 var ChunkStream = require('chunkstream');
-var npm = require('../../proxy/npm');
+var npm = require('../../services/npm');
 
 var fixtures = path.join(path.dirname(__dirname), 'fixtures');
 
-describe('proxy/npm.test.js', function () {
+describe('services/npm.test.js', function () {
   afterEach(mm.restore);
 
   it('should return a module info from source npm', function *() {
-    var data = yield npm.get('pedding');
+    var data = yield* npm.get('pedding');
     data.name.should.equal('pedding');
   });
 
   it('should return null when module not exist', function *() {
-    var data = yield npm.get('pedding-not-exists');
+    var data = yield* npm.get('pedding-not-exists');
     should.not.exist(data);
   });
 
@@ -51,7 +51,7 @@ describe('proxy/npm.test.js', function () {
     mm.http.request(/\//, content, { statusCode: 500 });
     // http://registry.npmjs.org/octopie
     try {
-      var data = yield npm.get('octopie');
+      var data = yield* npm.get('octopie');
       throw new Error('should not run this');
     } catch (err) {
       err.name.should.equal('NPMServerError');
