@@ -24,7 +24,7 @@ cnpmjs.org
 [node-url]: http://nodejs.org/download/
 [download-image]: https://img.shields.io/npm/dm/cnpmjs.org.svg?style=flat-square
 [download-url]: https://npmjs.org/package/cnpmjs.org
-[gitter-image]: https://badges.gitter.im/Join Chat.svg
+[gitter-image]: https://badges.gitter.im/Join%20Chat.svg
 [gitter-url]: https://gitter.im/cnpm/cnpmjs.org?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge
 
 ![logo](https://raw.github.com/cnpm/cnpmjs.org/master/logo.png)
