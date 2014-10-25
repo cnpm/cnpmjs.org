@@ -8,6 +8,7 @@ cnpmjs.org
 [![David deps][david-image]][david-url]
 [![node version][node-image]][node-url]
 [![npm download][download-image]][download-url]
+[![gitter][gitter-image]][gitter-url]
 
 [npm-image]: http://cnpmjs.org/badge/v/cnpmjs.org.svg?style=flat-square
 [npm-url]: http://cnpmjs.org/package/cnpmjs.org
@@ -23,6 +24,8 @@ cnpmjs.org
 [node-url]: http://nodejs.org/download/
 [download-image]: https://img.shields.io/npm/dm/cnpmjs.org.svg?style=flat-square
 [download-url]: https://npmjs.org/package/cnpmjs.org
+[gitter-image]: https://badges.gitter.im/Join Chat.svg
+[gitter-url]: https://gitter.im/cnpm/cnpmjs.org?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge
 
 ![logo](https://raw.github.com/cnpm/cnpmjs.org/master/logo.png)
 
