@@ -15,13 +15,13 @@
  */
 
 var config = require('../../config');
-var Module = require('../../proxy/module');
+var packageService = require('../../services/package');
 
-exports.version = function* (next) {
+exports.version = function* () {
   var color = 'lightgrey';
   var version = 'invalid';
   var name = this.params[0];
-  var latestTag = yield* Module.getTag(name, 'latest');
+  var latestTag = yield* packageService.getModuleByTag(name, 'latest');
   if (latestTag) {
     version = latestTag.version;
     if (/^0\.0\./.test(version)) {

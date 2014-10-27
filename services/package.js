@@ -68,7 +68,7 @@ exports.getModuleByTag = function* (name, tag) {
 };
 
 exports.getLatestModule = function* (name) {
-  return yield* exports.getModuleTag(name, 'latest');
+  return yield* exports.getModuleByTag(name, 'latest');
 };
 
 // module:list
@@ -197,9 +197,16 @@ exports.listModulesByName = function* (moduleName) {
 };
 
 exports.getModuleLastModified = function* (name) {
-  var sql = 'SELECT gmt_modified FROM module WHERE name = ? ORDER BY gmt_modified DESC LIMIT 1';
-  var row = yield models.queryOne(sql, [name]);
-  return row && row.gmt_modified || null;
+  var mod = yield Module.find({
+    where: {
+      name: name,
+    },
+    order: [
+      ['gmt_modified', 'DESC']
+    ],
+    attributes: [ 'gmt_modified' ]
+  });
+  return mod && mod.gmt_modified || null;
 };
 
 // module:update
@@ -382,19 +389,20 @@ exports.listModuleTags = function* (name) {
 
 // dependencies
 
+// name => dependency
 exports.addDependency = function* (name, dependency) {
   var row = yield ModuleDependency.find({
     where: {
-      name: name,
-      dependency: dependency
+      name: dependency,
+      dependent: name
     }
   });
   if (row) {
     return row;
   }
   return yield ModuleDependency.build({
-    name: name,
-    dependency: dependency
+    name: dependency,
+    dependent: name
   }).save();
 };
 
@@ -406,25 +414,14 @@ exports.addDependencies = function* (name, dependencies) {
   return yield tasks;
 };
 
-exports.listDependencies = function* (name) {
-  var items = yield ModuleDependency.findAll({
-    where: {
-      name: name
-    }
-  });
-  return items.map(function (item) {
-    return item.dependency;
-  });
-};
-
 exports.listDependents = function* (dependency) {
   var items = yield ModuleDependency.findAll({
     where: {
-      dependency: dependency
+      name: dependency
     }
   });
   return items.map(function (item) {
-    return item.name;
+    return item.dependent;
   });
 };
 
@@ -482,7 +479,6 @@ exports.authMaintainer = function* (packageName, username) {
   }
 
   var isMaintainer = false;
-
   if (latestMod && !latestMod.package._publish_on_cnpm) {
     // no one can update public package maintainers
     // public package only sync from source npm registry

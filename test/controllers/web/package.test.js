@@ -17,17 +17,12 @@
 var should = require('should');
 var request = require('supertest');
 var mm = require('mm');
-var path = require('path');
 var pedding = require('pedding');
-var mysql = require('../../../common/mysql');
 var app = require('../../../servers/web');
 var registry = require('../../../servers/registry');
 var pkg = require('../../../controllers/web/package');
-var SyncModuleWorker = require('../../../proxy/sync_module_worker');
 var utils = require('../../utils');
 var config = require('../../../config');
-
-var fixtures = path.join(path.dirname(path.dirname(__dirname)), 'fixtures');
 
 describe('controllers/web/package.test.js', function () {
   before(function (done) {

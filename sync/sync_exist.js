@@ -14,13 +14,10 @@
  * Module dependencies.
  */
 
-var config = require('../config');
-var Npm = require('../proxy/npm');
-var Module = require('../proxy/module');
-var Total = require('../services/total');
-var SyncModuleWorker = require('../proxy/sync_module_worker');
 var debug = require('debug')('cnpmjs.org:sync:sync_exist');
-var utility = require('utility');
+var config = require('../config');
+var npmService = require('../services/npm');
+var packageSerivce = require('../services/package');
 var Status = require('./status');
 var ms = require('ms');
 var thunkify = require('thunkify-wrap');

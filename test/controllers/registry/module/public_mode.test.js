@@ -12,15 +12,11 @@
 
 var should = require('should');
 var request = require('supertest');
-var path = require('path');
 var mm = require('mm');
 var pedding = require('pedding');
 var config = require('../../../../config');
 var app = require('../../../../servers/registry');
 var utils = require('../../../utils');
-var Module = require('../../../../proxy/module');
-
-var fixtures = path.join(__dirname, '..', '..', '..', 'fixtures');
 
 describe('controllers/registry/module/public_module.test.js', function () {
   beforeEach(function () {

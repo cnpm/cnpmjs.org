@@ -13,12 +13,12 @@
 /**
  * Module dependencies.
  */
-var sync = require('../../sync/sync_all');
+
+var should = require('should');
 var mm = require('mm');
+var sync = require('../../sync/sync_all');
 var Npm = require('../../services/npm');
 var Total = require('../../services/total');
-var should = require('should');
-var Module = require('../../proxy/module');
 
 describe('sync/sync_all.test.js', function () {
   describe('sync()', function () {

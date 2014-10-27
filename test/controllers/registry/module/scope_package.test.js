@@ -20,7 +20,6 @@ var mm = require('mm');
 var config = require('../../../../config');
 var app = require('../../../../servers/registry');
 var utils = require('../../../utils');
-var Module = require('../../../../proxy/module');
 
 describe('controllers/registry/module/scope_package.test.js', function () {
   var pkgname = '@cnpm/test-scope-package';

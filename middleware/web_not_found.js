@@ -16,8 +16,8 @@
 
 var debug = require('debug')('cnpmjs.org:middleware:web_not_found');
 
-module.exports = function *notFound(next) {
-  yield *next;
+module.exports = function* notFound(next) {
+  yield* next;
 
   if (this.status && this.status !== 404) {
     return;

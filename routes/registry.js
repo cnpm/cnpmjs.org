@@ -21,6 +21,9 @@ var publishable = require('../middleware/publishable');
 var syncByInstall = require('../middleware/sync_by_install');
 var total = require('../controllers/total');
 var mod = require('../controllers/registry/module');
+var listAllPackages = require('../controllers/registry/package/list');
+var getOnePackage = require('../controllers/registry/package/show');
+var savePackage = require('../controllers/registry/package/save');
 var user = require('../controllers/registry/user');
 var sync = require('../controllers/sync');
 var download = require('../controllers/registry/download');
@@ -46,15 +49,16 @@ function routes(app) {
 
   // module
   // scope package: params: [$name]
-  app.get(/^\/(@[\w\-\.]+\/[\w\-\.]+)$/, syncByInstall, mod.show);
+  app.get(/^\/(@[\w\-\.]+\/[\w\-\.]+)$/, syncByInstall, listAllPackages);
   // scope package: params: [$name, $version]
-  app.get(/^\/(@[\w\-\.]+\/[\w\-\.]+)\/([\w\.\-]+)$/, syncByInstall, mod.get);
+  app.get(/^\/(@[\w\-\.]+\/[\w\-\.]+)\/([\w\.\-]+)$/, syncByInstall, getOnePackage);
 
-  app.get('/:name', syncByInstall, mod.show);
-  app.get('/:name/:version', syncByInstall, mod.get);
+  app.get('/:name', syncByInstall, listAllPackages);
+  app.get('/:name/:version', syncByInstall, getOnePackage);
+
   // try to add module
-  app.put(/^\/(@[\w\-\.]+\/[\w\-\.]+)$/, login, publishable, mod.addPackageAndDist);
-  app.put('/:name', login, publishable, mod.addPackageAndDist);
+  app.put(/^\/(@[\w\-\.]+\/[\w\-\.]+)$/, login, publishable, savePackage);
+  app.put('/:name', login, publishable, savePackage);
 
   // sync from source npm
   app.put('/:name/sync', sync.sync);

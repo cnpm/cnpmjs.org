@@ -47,7 +47,7 @@ exports.request = request;
 
 exports.getUser = function* (name) {
   var url = '/-/user/org.couchdb.user:' + name;
-  var r = yield *request(url);
+  var r = yield* request(url);
   var data = r.data;
   if (data && !data.name) {
     data = null;
@@ -56,7 +56,7 @@ exports.getUser = function* (name) {
 };
 
 exports.get = function* (name) {
-  var r = yield *request('/' + name);
+  var r = yield* request('/' + name);
   var data = r.data;
   if (r.status === 404) {
     data = null;
@@ -65,14 +65,14 @@ exports.get = function* (name) {
 };
 
 exports.getAllSince = function* (startkey) {
-  var r = yield *request('/-/all/since?stale=update_after&startkey=' + startkey, {
+  var r = yield* request('/-/all/since?stale=update_after&startkey=' + startkey, {
     timeout: 300000
   });
   return r.data;
 };
 
 exports.getShort = function* () {
-  var r = yield *request('/-/short', {
+  var r = yield* request('/-/short', {
     timeout: 300000,
     registry: 'http://r.cnpmjs.org', // registry.npmjs.org/-/short is 404 now.
   });

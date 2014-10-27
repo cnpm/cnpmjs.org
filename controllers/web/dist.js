@@ -17,7 +17,7 @@
 var debug = require('debug')('cnpmjs.org:controllers:web:dist');
 var mime = require('mime');
 var urlparse = require('url').parse;
-var Dist = require('../../proxy/dist');
+var Dist = require('../../services/dist');
 var config = require('../../config');
 var downloadAsReadStream = require('../utils').downloadAsReadStream;
 

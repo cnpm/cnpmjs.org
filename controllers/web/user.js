@@ -16,9 +16,8 @@
  */
 
 var config = require('../../config');
-var Module = require('../../proxy/module');
-var User = require('../../proxy/user');
-var UserService = require('../../services/user');
+var packageService = require('../../services/package');
+var userService = require('../../services/user');
 var common = require('../../lib/common');
 
 exports.display = function* (next) {
@@ -26,7 +25,7 @@ exports.display = function* (next) {
   var isAdmin = common.isAdmin(name);
   var scopes = config.scopes || [];
   if (config.customUserService) {
-    var customUser = yield* UserService.get(name);
+    var customUser = yield* userService.get(name);
     if (customUser) {
       isAdmin = !!customUser.site_admin;
       scopes = customUser.scopes;

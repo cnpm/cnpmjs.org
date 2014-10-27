@@ -14,10 +14,8 @@
  * Module dependencies.
  */
 
-var should = require('should');
 var mm = require('mm');
 var urllib = require('../../common/urllib');
-var Dist = require('../../proxy/dist');
 var distsync = require('../../sync/sync_dist');
 
 describe('sync/sync_dist.test.js', function () {

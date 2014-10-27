@@ -16,12 +16,10 @@
 
 var should = require('should');
 var request = require('supertest');
-var pedding = require('pedding');
 var mm = require('mm');
 var fs = require('fs');
 var nfs = require('../../../common/nfs');
 var app = require('../../../servers/web');
-var Dist = require('../../../proxy/dist');
 
 describe('controllers/web/dist.test.js', function () {
   before(function (done) {
@@ -30,7 +28,7 @@ describe('controllers/web/dist.test.js', function () {
 
   afterEach(mm.restore);
 
-  describe('GET /dist/*', function (done) {
+  describe('GET /dist/*', function () {
     it('should GET /dist redirect to /dist/', function (done) {
       request(app)
       .get('/dist')

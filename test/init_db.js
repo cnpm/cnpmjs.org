@@ -15,7 +15,6 @@
  */
 
 var crypto = require('crypto');
-var utility = require('utility');
 var path = require('path');
 var childProcess = require('child_process');
 var config = require('../config');
@@ -53,7 +52,7 @@ usernames.forEach(function (name) {
   });
   user.salt = crypto.randomBytes(30).toString('hex');
   user.password_sha = User.createPasswordSha(name, user.salt);
-  user.save().then(function (newUser) {
+  user.save().then(function () {
     count--;
     if (count === 0) {
       console.log('[test/init_db.js] init test users success');

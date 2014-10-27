@@ -17,7 +17,6 @@
 var debug = require('debug')('cnpmjs.org:sync:sync_dist');
 var fs = require('fs');
 var urllib = require('../common/urllib');
-var co = require('co');
 var bytes = require('bytes');
 var crypto = require('crypto');
 var utility = require('utility');
@@ -25,7 +24,7 @@ var thunkify = require('thunkify-wrap');
 var cheerio = require('cheerio');
 var urlResolve = require('url').resolve;
 var common = require('../lib/common');
-var Dist = require('../proxy/dist');
+var distService = require('../services/dist');
 var config = require('../config');
 var nfs = require('../common/nfs');
 var logger = require('../common/logger');

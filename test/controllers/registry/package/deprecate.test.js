@@ -1,5 +1,5 @@
 /**!
- * cnpmjs.org - test/controllers/registry/deprecate.test.js
+ * cnpmjs.org - test/controllers/registry/package/deprecate.test.js
  *
  * Copyright(c) cnpmjs.org and other contributors.
  * MIT Licensed
@@ -18,10 +18,10 @@ var should = require('should');
 var request = require('supertest');
 var mm = require('mm');
 var pedding = require('pedding');
-var app = require('../../../servers/registry');
-var utils = require('../../utils');
+var app = require('../../../../servers/registry');
+var utils = require('../../../utils');
 
-describe.only('controllers/registry/deprecate.test.js', function () {
+describe('controllers/registry/package/deprecate.test.js', function () {
   var pkgname = 'testmodule-deprecate';
   before(function (done) {
     done = pedding(2, done);
@@ -68,7 +68,7 @@ describe.only('controllers/registry/deprecate.test.js', function () {
       .expect({
         ok: true
       })
-      .expect(201, function (err, res) {
+      .expect(201, function (err) {
         should.not.exist(err);
         request(app.listen())
         .get('/' + pkgname + '/1.0.0')
@@ -126,7 +126,7 @@ describe.only('controllers/registry/deprecate.test.js', function () {
       .expect({
         ok: true
       })
-      .expect(201, function (err, res) {
+      .expect(201, function (err) {
         should.not.exist(err);
         done = pedding(3, done);
 

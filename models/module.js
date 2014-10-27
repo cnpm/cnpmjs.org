@@ -14,6 +14,8 @@
  * Module dependencies.
  */
 
+var utils = require('./utils');
+
 /*
 CREATE TABLE IF NOT EXISTS `module` (
   `id` INTEGER NOT NULL auto_increment ,
@@ -60,7 +62,7 @@ module.exports = function (sequelize, DataTypes) {
     },
     package: {
       type: DataTypes.LONGTEXT,
-      comment: 'package.json'
+      comment: 'package.json',
     },
     dist_shasum: {
       type: DataTypes.STRING(100),

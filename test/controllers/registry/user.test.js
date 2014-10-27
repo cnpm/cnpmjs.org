@@ -18,8 +18,6 @@ var should = require('should');
 var request = require('supertest');
 var mm = require('mm');
 var app = require('../../../servers/registry');
-var user = require('../../../proxy/user');
-var mysql = require('../../../common/mysql');
 var config = require('../../../config');
 var UserService = require('../../../services/user');
 

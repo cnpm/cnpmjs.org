@@ -1,5 +1,5 @@
 /**!
- * cnpmjs.org - test/proxy/sync_module_worker.test.js
+ * cnpmjs.org - test/controllers/sync_module_worker.test.js
  *
  * Copyright(c) cnpmjs.org and other contributors.
  * MIT Licensed
@@ -16,12 +16,9 @@
 
 var should = require('should');
 var mm = require('mm');
-var SyncModuleWorker = require('../../proxy/sync_module_worker');
-var mysql = require('../../common/mysql');
-var Log = require('../../proxy/module_log');
 var config = require('../../config');
 
-describe('proxy/sync_module_worker.test.js', function () {
+describe('controllers/sync_module_worker.test.js', function () {
   afterEach(mm.restore);
 
   it('should start a sync worker', function (done) {

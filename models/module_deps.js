@@ -19,7 +19,7 @@ CREATE TABLE IF NOT EXISTS `module_deps` (
  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'primary key',
  `gmt_create` datetime NOT NULL COMMENT 'create time',
  `name` varchar(100) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL COMMENT 'module name',
- `deps` varchar(100) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL COMMENT '`name` dep on `deps`',
+ `deps` varchar(100) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL COMMENT '`name` is deped by `deps`',
  PRIMARY KEY (`id`),
  UNIQUE KEY `module_deps_name_deps` (`name`,`deps`),
  KEY `deps` (`module_deps_deps`)
@@ -33,10 +33,10 @@ module.exports = function (sequelize, DataTypes) {
       allowNull: false,
       comment: 'module name',
     },
-    dependency: {
+    dependent: {
       field: 'deps',
       type: DataTypes.STRING(100),
-      comment: '`name` dep on `deps`'
+      comment: '`name` is depended by `deps`. `deps` == depend => `name`'
     }
   }, {
     tableName: 'module_deps',

@@ -15,11 +15,9 @@
  * Module dependencies.
  */
 
-var should = require('should');
 var request = require('supertest');
 var app = require('../../servers/registry');
 var mm = require('mm');
-var mysql = require('../../common/mysql');
 var config = require('../../config');
 var UserService = require('../../services/user');
 

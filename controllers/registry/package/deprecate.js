@@ -1,5 +1,5 @@
 /**!
- * cnpmjs.org - controllers/registry/deprecate.js
+ * cnpmjs.org - controllers/registry/package/deprecate.js
  *
  * Copyright(c) fengmk2 and other contributors.
  * MIT Licensed
@@ -14,7 +14,7 @@
  * Module dependencies.
  */
 
-var Package = require('../../services/package');
+var packageService = require('../../../services/package');
 
 module.exports = deprecateVersions;
 
@@ -27,7 +27,7 @@ function* deprecateVersions() {
 
   var tasks = [];
   for (var version in body.versions) {
-    tasks.push(Package.getModule(name, version));
+    tasks.push(packageService.getModule(name, version));
   }
   var rs = yield tasks;
 
@@ -46,12 +46,12 @@ function* deprecateVersions() {
     var data = body.versions[row.package.version];
     if (typeof data.deprecated === 'string') {
       row.package.deprecated = data.deprecated;
-      updateTasks.push(Package.updateModulePackage(row.id, row.package));
+      updateTasks.push(packageService.updateModulePackage(row.id, row.package));
     }
   }
   yield updateTasks;
   // update last modified
-  yield* Package.updateModuleLastModified(name);
+  yield* packageService.updateModuleLastModified(name);
 
   this.status = 201;
   this.body = {

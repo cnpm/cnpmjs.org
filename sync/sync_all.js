@@ -16,14 +16,11 @@
 
 var debug = require('debug')('cnpmjs.org:sync:sync_all');
 var ms = require('ms');
-var utility = require('utility');
+var thunkify = require('thunkify-wrap');
 var config = require('../config');
 var Status = require('./status');
-var Npm = require('../proxy/npm');
+var npmService = require('../services/npm');
 var Total = require('../services/total');
-var SyncModuleWorker = require('../proxy/sync_module_worker');
-var Module = require('../proxy/module');
-var thunkify = require('thunkify-wrap');
 
 function subtract(subtracter, minuend) {
   subtracter = subtracter || [];

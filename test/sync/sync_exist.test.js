@@ -14,7 +14,6 @@
  * Module dependencies.
  */
 
-var should = require('should');
 var mm = require('mm');
 var sync = require('../../sync/sync_exist');
 var Npm = require('../../services/npm');

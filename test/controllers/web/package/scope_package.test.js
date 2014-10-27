@@ -22,7 +22,6 @@ var config = require('../../../../config');
 var registry = require('../../../../servers/registry');
 var web = require('../../../../servers/web');
 var utils = require('../../../utils');
-var Module = require('../../../../proxy/module');
 
 describe('controllers/web/package/scope_package.test.js', function () {
   var pkgname = '@cnpm/test-web-scope-package';

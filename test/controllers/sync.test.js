@@ -20,7 +20,7 @@ var should = require('should');
 var pedding = require('pedding');
 var mm = require('mm');
 var path = require('path');
-var Npm = require('../../proxy/npm');
+var npmService = require('../../services/npm');
 var registryApp = require('../../servers/registry');
 var webApp = require('../../servers/web');
 

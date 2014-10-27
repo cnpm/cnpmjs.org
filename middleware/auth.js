@@ -22,7 +22,7 @@ var UserService = require('../services/user');
  * get the real user
  */
 
-module.exports = function (options) {
+module.exports = function () {
   return function* auth(next) {
     this.user = {};
 

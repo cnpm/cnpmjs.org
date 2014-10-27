@@ -19,8 +19,6 @@ var request = require('supertest');
 var pedding = require('pedding');
 var co = require('co');
 var app = require('../../../servers/registry');
-var SyncModuleWorker = require('../../../proxy/sync_module_worker');
-var NpmModuleMaintainer = require('../../../proxy/npm_module_maintainer');
 var utils = require('../../utils');
 
 describe('contributors/registry/user_package.test.js', function () {
