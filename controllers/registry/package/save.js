@@ -14,8 +14,8 @@
  * Module dependencies.
  */
 
-var crypto = require('crypto');
 var debug = require('debug')('cnpmjs.org:controllers:registry:package:save');
+var crypto = require('crypto');
 var deprecateVersions = require('./deprecate');
 var packageService = require('../../../services/package');
 var common = require('../../../lib/common');

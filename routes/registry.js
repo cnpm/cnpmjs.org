@@ -28,6 +28,7 @@ var user = require('../controllers/registry/user');
 var sync = require('../controllers/sync');
 var download = require('../controllers/registry/download');
 var userPackage = require('../controllers/registry/user_package');
+var tag = require('../controllers/registry/package/tag');
 
 function routes(app) {
 
@@ -64,8 +65,9 @@ function routes(app) {
   app.put('/:name/sync', sync.sync);
   app.get('/:name/sync/log/:id', sync.getSyncLog);
 
-  app.put(/^\/(@[\w\-\.]+\/[\w\-\.]+)\/([\w\-\.]+)$/, login, mod.updateTag);
-  app.put('/:name/:tag', login, mod.updateTag);
+  // add tag
+  app.put(/^\/(@[\w\-\.]+\/[\w\-\.]+)\/([\w\-\.]+)$/, login, tag);
+  app.put('/:name/:tag', login, tag);
 
   // need limit by ip
   app.get(/^\/(@[\w\-\.]+\/[\w\-\.]+)\/download\/(@[\w\-\.]+\/[\w\-\.]+)$/, limit, download);

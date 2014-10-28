@@ -366,7 +366,7 @@ exports.getModuleTag = function* (name, tag) {
   return yield Tag.findByNameAndTag(name, tag);
 };
 
-exports.removeModuleTagsByName = function* (name) {
+exports.removeModuleTags = function* (name) {
   return yield Tag.destroy({where: {name: name}});
 };
 
@@ -426,6 +426,18 @@ exports.listDependents = function* (dependency) {
 };
 
 // maintainers
+
+exports.listPublicModuleMaintainers = function* (name) {
+  return yield* NpmModuleMaintainer.listMaintainers(name);
+};
+
+exports.addPublicModuleMaintainer = function* (name, user) {
+  return yield* NpmModuleMaintainer.addMaintainer(name, user);
+};
+
+exports.removePublicModuleMaintainer = function* (name, user) {
+  return yield* NpmModuleMaintainer.removeMaintainers(name, user);
+};
 
 exports.listMaintainers = function* (name) {
   var usernames = yield* ModuleMaintainer.listMaintainers(name);
@@ -608,10 +620,10 @@ exports.removeStar = function* (name, user) {
   });
 };
 
-exports.listStarUserNames = function* (name) {
+exports.listStarUserNames = function* (moduleName) {
   var rows = yield ModuleStar.findAll({
     where: {
-      name: name
+      name: moduleName
     }
   });
   return rows.map(function (row) {

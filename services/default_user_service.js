@@ -43,7 +43,7 @@ function convertToUser(row) {
     avatar_url: '',
     im_url: '',
     site_admin: isAdmin(row.name),
-    scopes: config.scopes
+    scopes: config.scopes,
   };
   if (row.json) {
     var data = row.json;
