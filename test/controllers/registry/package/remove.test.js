@@ -20,6 +20,8 @@ var mm = require('mm');
 var app = require('../../../../servers/registry');
 var utils = require('../../../utils');
 var config = require('../../../../config');
+var packageService = require('../../../../services/package');
+var nfs = require('../../../../common/nfs');
 
 describe('controllers/registry/package/remove.test.js', function () {
   afterEach(mm.restore);
@@ -120,5 +122,63 @@ describe('controllers/registry/package/remove.test.js', function () {
       reason: 'cnpmjstest101 not authorized to modify @cnpmtest/testmodule-remove-1'
     })
     .expect(403, done);
+  });
+
+  it('should remove scoped package all versions ok', function (done) {
+    request(app)
+    .del('/@cnpmtest/testmodule-remove-1/-rev/1')
+    .set('authorization', utils.adminAuth)
+    .expect(200, function (err) {
+      should.not.exist(err);
+      request(app)
+      .get('/@cnpmtest/testmodule-remove-1')
+      .expect(404, done);
+    });
+  });
+
+  describe('mock error', function () {
+    beforeEach(function (done) {
+      var pkg = utils.getPackage('@cnpmtest/testmodule-remove-mock-1', '2.0.0', utils.admin);
+      request(app.listen())
+      .put('/' + pkg.name)
+      .set('authorization', utils.adminAuth)
+      .send(pkg)
+      .expect(201, done);
+    });
+
+    it('should mock key not exists', function (done) {
+      var listModulesByName = packageService.listModulesByName;
+      mm(packageService, 'listModulesByName', function* (name) {
+        var mods = yield* listModulesByName.call(packageService, name);
+        mods.forEach(function (mod) {
+          delete mod.package.dist.key;
+        });
+        return mods;
+      });
+      request(app)
+      .del('/@cnpmtest/testmodule-remove-mock-1/-rev/1')
+      .set('authorization', utils.adminAuth)
+      .expect(200, function (err) {
+        should.not.exist(err);
+        request(app)
+        .get('/@cnpmtest/testmodule-remove-mock-1')
+        .expect(404, done);
+      });
+    });
+
+    it('should mock nfs remove error', function (done) {
+      mm(nfs, 'remove', function* () {
+        throw new Error('mock nfs remove error');
+      });
+      request(app)
+      .del('/@cnpmtest/testmodule-remove-mock-1/-rev/1')
+      .set('authorization', utils.adminAuth)
+      .expect(200, function (err) {
+        should.not.exist(err);
+        request(app)
+        .get('/@cnpmtest/testmodule-remove-mock-1')
+        .expect(404, done);
+      });
+    });
   });
 });

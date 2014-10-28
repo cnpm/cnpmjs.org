@@ -19,6 +19,7 @@ var urlparse = require('url').parse;
 var packageService = require('../../../services/package');
 var totalService = require('../../../services/total');
 var nfs = require('../../../common/nfs');
+var logger = require('../../../common/logger');
 
 // DELETE /:name/-rev/:rev
 // https://github.com/npm/npm-registry-client/blob/master/lib/unpublish.js#L25
@@ -51,14 +52,12 @@ module.exports = function* remove(next) {
     key && keys.push(key);
   }
 
-  if (keys.length > 0) {
-    try {
-      yield keys.map(function (key) {
-        return nfs.remove(key);
-      });
-    } catch (err) {
-      // ignore error here
-    }
+  try {
+    yield keys.map(function (key) {
+      return nfs.remove(key);
+    });
+  } catch (err) {
+    logger.error(err);
   }
 
   // remove the maintainers
