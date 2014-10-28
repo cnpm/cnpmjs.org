@@ -22,9 +22,9 @@ var syncByInstall = require('../middleware/sync_by_install');
 var editable = require('../middleware/editable');
 
 var total = require('../controllers/total');
-var mod = require('../controllers/registry/module');
 
 var listAll = require('../controllers/registry/package/list_all');
+var listSince = require('../controllers/registry/package/list_since');
 var listAllVersions = require('../controllers/registry/package/list');
 var getOneVersion = require('../controllers/registry/package/show');
 var savePackage = require('../controllers/registry/package/save');
@@ -52,9 +52,9 @@ function routes(app) {
   // before /:name/:version
   // get all modules, for npm search
   app.get('/-/all', listAll);
-  app.get('/-/all/since', mod.listAllModulesSince);
-  //get all module names, for auto completion
-  app.get('/-/short', mod.listAllModuleNames);
+  app.get('/-/all/since', listSince);
+  // get all module names, for auto completion
+  // app.get('/-/short', mod.listAllModuleNames);
 
   // module
   // scope package: params: [$name]
