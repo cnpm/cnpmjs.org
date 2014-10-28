@@ -14,35 +14,27 @@
  * Module dependencies.
  */
 
-var should = require('should');
 var request = require('supertest');
 var pedding = require('pedding');
-var co = require('co');
 var app = require('../../../servers/registry');
 var utils = require('../../utils');
+var SyncModuleWorker = require('../../../controllers/sync_module_worker');
 
 describe('contributors/registry/user_package.test.js', function () {
   before(function (done) {
-    co(function* () {
-      yield* NpmModuleMaintainer.removeAll('pedding');
-    })(function (err) {
-      should.not.exist(err);
-
-      // sync pedding
-      var worker = new SyncModuleWorker({
-        name: 'pedding',
-        noDep: true,
-      });
-      worker.start();
-      worker.on('end', function () {
-        var pkg = utils.getPackage('test-user-package-module', '0.0.1', utils.otherAdmin2);
-
-        request(app)
-        .put('/' + pkg.name)
-        .set('authorization', utils.otherAdmin2Auth)
-        .send(pkg)
-        .expect(201, done);
-      });
+    // sync pedding
+    var worker = new SyncModuleWorker({
+      name: 'pedding',
+      noDep: true,
+    });
+    worker.start();
+    worker.on('end', function () {
+      var pkg = utils.getPackage('test-user-package-module', '0.0.1', utils.otherAdmin2);
+      request(app)
+      .put('/' + pkg.name)
+      .set('authorization', utils.otherAdmin2Auth)
+      .send(pkg)
+      .expect(201, done);
     });
   });
 

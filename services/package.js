@@ -144,10 +144,10 @@ exports.listPublicModuleNamesByUser = function* (username) {
   });
 
   // find from npm module maintainer table
-  var items = yield* NpmModuleMaintainer.listByUser(username);
-  items.forEach(function (item) {
-    if (!map[item.name]) {
-      names.push(item.name);
+  var moduleNames = yield* NpmModuleMaintainer.listModuleNamesByUser(username);
+  moduleNames.forEach(function (name) {
+    if (!map[name]) {
+      names.push(name);
     }
   });
   return names;

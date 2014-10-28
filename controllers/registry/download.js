@@ -22,8 +22,8 @@ var nfs = require('../../common/nfs');
 var logger = require('../../common/logger');
 var common = require('../../lib/common');
 var downloadAsReadStream = require('../utils').downloadAsReadStream;
-var Package = require('../../services/package');
-var DownloadTotal = require('../../services/download_total');
+var packageService = require('../../services/package');
+var downloadTotalService = require('../../services/download_total');
 
 var _downloads = {};
 
@@ -31,7 +31,7 @@ module.exports = function* download(next) {
   var name = this.params.name || this.params[0];
   var filename = this.params.filename || this.params[1];
   var version = filename.slice(name.length + 1, -4);
-  var row = yield* Package.getModule(name, version);
+  var row = yield* packageService.getModule(name, version);
   // can not get dist
   var url = null;
 
@@ -98,7 +98,7 @@ defer.setInterval(function* () {
     var name = item[0];
     var count = item[1];
     try {
-      yield* DownloadTotal.plusModuleTotal({ name: name, date: date, count: count });
+      yield* downloadTotalService.plusModuleTotal({ name: name, date: date, count: count });
     } catch (err) {
       err.message += '; name: ' + name + ', count: ' + count + ', date: ' + date;
       logger.error(err);

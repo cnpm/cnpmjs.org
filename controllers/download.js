@@ -15,7 +15,7 @@
  */
 
 var moment = require('moment');
-var DownloadTotal = require('../services/download_total');
+var downloadTotalService = require('../services/download_total');
 
 exports.total = function* (name) {
   var end = moment();
@@ -35,7 +35,7 @@ exports.total = function* (name) {
     args.unshift(name);
   }
 
-  var rows = yield* DownloadTotal[method].apply(DownloadTotal, args);
+  var rows = yield* downloadTotalService[method].apply(downloadTotalService, args);
   var download = {
     today: 0,
     thisweek: 0,

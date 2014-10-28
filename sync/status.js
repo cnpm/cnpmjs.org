@@ -15,7 +15,6 @@
  */
 
 var debug = require('debug')('cnpmjs.org:sync:status');
-var utility = require('utility');
 var co = require('co');
 var Total = require('../services/total');
 

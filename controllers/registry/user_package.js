@@ -14,9 +14,9 @@
  * Module dependencies.
  */
 
-var Package = require('../../services/package');
-// var NpmModuleMaintainer = require('../../proxy/npm_module_maintainer');
+var packageService = require('../../services/package');
 
+// GET /-/by-user/:user
 exports.list = function* () {
   var users = this.params.user.split('|');
   if (users.length > 20) {
@@ -35,36 +35,17 @@ exports.list = function* () {
     return;
   }
 
-  var data = {};
-  var r = yield [
-    NpmModuleMaintainer.listByUsers(users),
-    // get the first user module by author field
-    Package.listPublicModuleNamesByUser(firstUser),
-  ];
-  var rows = r[0];
-  var firstUserModuleNames = r[1];
-  for (var i = 0; i < rows.length; i++) {
-    var row = rows[i];
-    if (data[row.user]) {
-      data[row.user].push(row.name);
-    } else {
-      data[row.user] = [row.name];
-    }
+  var tasks = {};
+  for (var i = 0; i < users.length; i++) {
+    var username = users[i];
+    tasks[username] = packageService.listPublicModuleNamesByUser(username);
   }
 
-  if (firstUserModuleNames.length > 0) {
-    if (!data[firstUser]) {
-      data[firstUser] = firstUserModuleNames;
-    } else {
-      var items = data[firstUser];
-      for (var i = 0; i < firstUserModuleNames.length; i++) {
-        var name = firstUserModuleNames[i];
-        if (items.indexOf(name) === -1) {
-          items.push(name);
-        }
-      }
+  var data = yield tasks;
+  for (var k in data) {
+    if (data[k].length === 0) {
+      data[k] = undefined;
     }
   }
-
   this.body = data;
 };

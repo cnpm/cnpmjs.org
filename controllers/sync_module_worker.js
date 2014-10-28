@@ -15,11 +15,11 @@
  * Module dependencies.
  */
 
+var debug = require('debug')('cnpmjs.org:proxy:sync_module_worker');
 var co = require('co');
 var gather = require('co-gather');
 var defer = require('co-defer');
 var thunkify = require('thunkify-wrap');
-var debug = require('debug')('cnpmjs.org:proxy:sync_module_worker');
 var EventEmitter = require('events').EventEmitter;
 var util = require('util');
 var fs = require('fs');
@@ -32,9 +32,9 @@ var urllib = require('../common/urllib');
 var config = require('../config');
 var nfs = require('../common/nfs');
 var common = require('../lib/common');
-var npm = require('../services/npm');
+var npmSerivce = require('../services/npm');
 var packageService = require('../services/package');
-var Log = require('../services/module_log');
+var logService = require('../services/module_log');
 var User = require('../models').User;
 
 var USER_AGENT = 'sync.cnpmjs.org/' + config.version + ' ' + urllib.USER_AGENT;
@@ -46,19 +46,19 @@ function SyncModuleWorker(options) {
     options.name = [options.name];
   }
 
-  this.names = options.name || [];
+  this.names = options.name;
   this.startName = this.names[0];
 
   this.username = options.username;
   this.concurrency = options.concurrency || 1;
-  this._publish = options.publish; // _publish_on_cnpm
+  this._publish = options.publish === true; // _publish_on_cnpm
 
   this.syncingNames = {};
   this.nameMap = {};
   this.names.forEach(function (name) {
     this.nameMap[name] = true;
   }.bind(this));
-  this.noDep = options.noDep; //do not sync dependences
+  this.noDep = options.noDep === true; // do not sync dependences
   this.syncDevDependencies = config.syncDevDependencies;
 
   this.successes = [];
@@ -84,13 +84,14 @@ SyncModuleWorker.prototype.finish = function () {
   this.removeAllListeners();
 };
 
-SyncModuleWorker.prototype.log = function (format, arg1, arg2) {
+// log(format, arg1, arg2, ...)
+SyncModuleWorker.prototype.log = function () {
   var str = '[' + utility.YYYYMMDDHHmmss() + '] ' + util.format.apply(util, arguments);
   debug(str);
   var logId = this._logId;
   if (logId) {
     co(function* () {
-      yield* Log.append(logId, str);
+      yield* logService.append(logId, str);
     })(utility.noop);
   }
 };
@@ -144,8 +145,8 @@ SyncModuleWorker.prototype._doneOne = function* (concurrencyId, name, success) {
   delete this.syncingNames[name];
   var that = this;
   // relase the stack: https://github.com/cnpm/cnpmjs.org/issues/328
-  defer.setImmediate(function *() {
-    yield *that.next(concurrencyId);
+  defer.setImmediate(function* () {
+    yield* that.next(concurrencyId);
   });
 };
 
@@ -229,9 +230,17 @@ SyncModuleWorker.prototype.next = function *(concurrencyId) {
 
   this.log('----------------- Syncing %s -------------------', name);
 
+  // ignore scoped package
+  if (name[0] === '@') {
+    this.log('[c#%d] [%s] ignore sync scoped package',
+      concurrencyId, name);
+    yield* this._doneOne(concurrencyId, name, true);
+    return;
+  }
+
   // get from npm
   try {
-    var result = yield npm.request('/' + name);
+    var result = yield* npmSerivce.request('/' + name);
     pkg = result.data;
     status = result.status;
   } catch (err) {
@@ -289,7 +298,7 @@ SyncModuleWorker.prototype.next = function *(concurrencyId) {
   yield* this._doneOne(concurrencyId, name, true);
 };
 
-function *_listStarUsers(modName) {
+function* _listStarUsers(modName) {
   var users = yield packageService.listStarUserNames(modName);
   var userMap = {};
   users.forEach(function (user) {
@@ -298,16 +307,12 @@ function *_listStarUsers(modName) {
   return userMap;
 }
 
-function* _addStar(modName, username) {
-  yield ModuleStar.add(modName, username);
-}
-
 function* _saveNpmUser(username) {
-  var user = yield *npm.getUser(username);
+  var user = yield* npmSerivce.getUser(username);
   if (!user) {
     return;
   }
-  yield User.saveNpmUser(user);
+  yield* User.saveNpmUser(user);
 }
 
 function* _saveMaintainer(modName, username, action) {
@@ -346,18 +351,16 @@ SyncModuleWorker.prototype._unpublished = function* (name, unpublishedInfo) {
     key && keys.push(key);
   }
 
-  if (keys.length === 0) {
-    return;
-  }
-
-  try {
-    yield keys.map(function (key) {
-      return nfs.remove(key);
-    });
-  } catch (err) {
-    // ignore error here
-    this.log('    [%s] delete nfs files: %j error: %s: %s',
-      name, keys, err.name, err.message);
+  if (keys.length > 0) {
+    try {
+      yield keys.map(function (key) {
+        return nfs.remove(key);
+      });
+    } catch (err) {
+      // ignore error here
+      this.log('    [%s] delete nfs files: %j error: %s: %s',
+        name, keys, err.name, err.message);
+    }
   }
   this.log('    [%s] delete nfs files: %j success', name, keys);
 };
@@ -373,9 +376,7 @@ SyncModuleWorker.prototype._isLocalModule = function (mods) {
 };
 
 SyncModuleWorker.prototype._sync = function* (name, pkg) {
-  var username = this.username;
   var that = this;
-
   var hasModules = false;
   var result = yield [
     packageService.listModulesByName(name),
@@ -401,10 +402,6 @@ SyncModuleWorker.prototype._sync = function* (name, pkg) {
     var r = moduleRows[i];
     if (!r.package || !r.package.dist) {
       // package json parse error
-      continue;
-    }
-
-    if (r.version === 'next') {
       continue;
     }
     if (!map.latest) {
@@ -468,21 +465,20 @@ SyncModuleWorker.prototype._sync = function* (name, pkg) {
   // find out all user names
   for (var v in pkg.versions) {
     var p = pkg.versions[v];
-
     var maintainers = p.maintainers || [];
-    if (maintainers && !Array.isArray(maintainers)) {
+    if (!Array.isArray(maintainers)) {
       // http://r.cnpmjs.org/jasmine-node
       // TODO: "maintainers": "Martin H膫陇ger <martin.haeger@gmail.com>",
       maintainers = [maintainers];
     }
-
-    maintainers.forEach(pushName);
-  }
-  function pushName(m) {
-    if (m.name) {
-      npmUsernames[m.name.toLowerCase()] = 1;
+    for (var i = 0; i < maintainers.length; i++) {
+      var m = maintainers[i];
+      if (m.name) {
+        npmUsernames[m.name.toLowerCase()] = 1;
+      }
     }
   }
+
   // get the missing star users
   var starUsers = pkg.users || {};
   for (var k in starUsers) {
@@ -496,40 +492,6 @@ SyncModuleWorker.prototype._sync = function* (name, pkg) {
   var times = pkg.time || {};
   pkg.versions = pkg.versions || {};
   var remoteVersionNames = Object.keys(pkg.versions);
-  if (remoteVersionNames.length === 0) {
-    that.log('  [%s] no times and no versions, hasModules: %s', name, hasModules);
-    if (!hasModules) {
-      // save a next module
-      var maintainer = pkg.maintainers && pkg.maintainers[0];
-      if (maintainer && maintainer.name) {
-        maintainer = maintainer.name;
-      }
-      if (!maintainer) {
-        maintainer = '-';
-      }
-      var nextMod = {
-        name: name,
-        version: 'next',
-        author: maintainer,
-        package: {
-          name: name,
-          version: 'next',
-          description: pkg.description || '',
-          readme: pkg.readme || '',
-          maintainers: pkg.maintainers || {
-            name: maintainer
-          },
-        },
-      };
-      try {
-        var result = yield* packageService.saveModule(nextMod);
-        that.log('  [%s] save next module, %j', name, result);
-      } catch (err) {
-        that.log('  [%s] save next module error %s', err.message);
-      }
-    }
-  }
-
   var remoteVersionNameMap = {};
 
   // find out missing versions
@@ -638,7 +600,7 @@ SyncModuleWorker.prototype._sync = function* (name, pkg) {
       continue;
     }
     try {
-      var result = yield* that._syncOneVersion(index, syncModule);
+      yield* that._syncOneVersion(index, syncModule);
       syncedVersionNames.push(syncModule.version);
     } catch (err) {
       that.log('    [%s:%d] sync error, version: %s, %s: %s',
@@ -652,22 +614,21 @@ SyncModuleWorker.prototype._sync = function* (name, pkg) {
   } else {
     that.log('  [%s] %d versions: %j need to deleted',
       name, deletedVersionNames.length, deletedVersionNames);
-
     try {
-      yield* Module.removeByNameAndVersions(name, deletedVersionNames);
+      yield* packageService.removeModulesByNameAndVersions(name, deletedVersionNames);
     } catch (err) {
       that.log('    [%s] delete error, %s: %s', name, err.name, err.message);
     }
   }
 
   // sync missing descriptions
-  function *syncDes() {
+  function* syncDes() {
     if (missingDescriptions.length === 0) {
       return;
     }
     that.log('  [%s] saving %d descriptions', name, missingDescriptions.length);
     var res = yield gather(missingDescriptions.map(function (item) {
-      return Module.updateDescription(item.id, item.description);
+      return packageService.updateModuleDescription(item.id, item.description);
     }));
 
     for (var i = 0; i < res.length; i++) {
@@ -714,14 +675,14 @@ SyncModuleWorker.prototype._sync = function* (name, pkg) {
   }
 
   // sycn missing readme
-  function *syncReadme() {
+  function* syncReadme() {
     if (missingReadmes.length === 0) {
       return;
     }
     that.log('  [%s] saving %d readmes', name, missingReadmes.length);
 
     var res = yield gather(missingReadmes.map(function (item) {
-      return Module.updateReadme(item.id, item.readme);
+      return packageService.updateModuleReadme(item.id, item.readme);
     }));
 
     for (var i = 0; i < res.length; i++) {
@@ -742,7 +703,7 @@ SyncModuleWorker.prototype._sync = function* (name, pkg) {
     that.log('  [%s] saving %d Deprecated fields', name, missingDeprecateds.length);
 
     var res = yield gather(missingDeprecateds.map(function (item) {
-      return Module.updatePackageFields(item.id, {
+      return packageService.updateModulePackageFields(item.id, {
         deprecated: item.deprecated
       });
     }));
@@ -758,7 +719,7 @@ SyncModuleWorker.prototype._sync = function* (name, pkg) {
     }
   }
 
-  function *syncMissingUsers() {
+  function* syncMissingUsers() {
     var missingUsers = [];
     var names = Object.keys(npmUsernames);
     if (names.length === 0) {
@@ -796,20 +757,20 @@ SyncModuleWorker.prototype._sync = function* (name, pkg) {
   }
 
   // sync missing star users
-  function *syncMissingStarUsers() {
+  function* syncMissingStarUsers() {
     if (missingStarUsers.length === 0) {
       return;
     }
 
     that.log('  [%s] saving %d star users', name, missingStarUsers.length);
     var res = yield gather(missingStarUsers.map(function (username) {
-      return _addStar(name, username);
+      return packageService.addStar(name, username);
     }));
 
     for (var i = 0; i < res.length; i++) {
       var r = res[i];
       if (r.error) {
-        that.log('    add star user error, %s', r.error.message);
+        that.log('    add star user error, %s', r.error.stack);
       }
     }
   }
@@ -895,7 +856,7 @@ SyncModuleWorker.prototype._syncOneVersion = function *(versionIndex, sourcePack
   }
 
   // add module dependence
-  yield packageService.addDependencies(sourcePackage.name, dependencies);
+  yield* packageService.addDependencies(sourcePackage.name, dependencies);
 
   var shasum = crypto.createHash('sha1');
   var dataSize = 0;
@@ -1011,7 +972,7 @@ SyncModuleWorker.prototype._syncOneVersion = function *(versionIndex, sourcePack
 
 SyncModuleWorker.sync = function* (name, username, options) {
   options = options || {};
-  var result = yield* Log.create({name: name, username: username});
+  var result = yield* logService.create({name: name, username: username});
   var worker = new SyncModuleWorker({
     logId: result.id,
     name: name,

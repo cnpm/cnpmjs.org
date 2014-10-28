@@ -20,7 +20,7 @@ var ModuleLog = models.ModuleLog;
 exports.create = function* (data) {
   var row = ModuleLog.build({
     name: data.name,
-    username: data.username,
+    username: data.username || 'anonymous',
     log: ''
   });
   return yield row.save();

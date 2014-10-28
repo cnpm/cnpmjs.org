@@ -15,6 +15,17 @@
  */
 
 module.exports = {
+  listModuleNamesByUser: function* (user) {
+    var rows = yield this.findAll({
+      attributrs: ['name'],
+      where: {
+        user: user
+      }
+    });
+    return rows.map(function (row) {
+      return row.name;
+    });
+  },
   listMaintainers: function* (name) {
     var rows = yield this.findAll({
       attributrs: ['user'],
