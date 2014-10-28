@@ -24,7 +24,7 @@ var utils = require('../../../utils');
 describe('controllers/registry/package/deprecate.test.js', function () {
   var pkgname = 'testmodule-deprecate';
   before(function (done) {
-    done = pedding(3, done);
+    done = pedding(2, done);
     var pkg = utils.getPackage(pkgname, '0.0.1', utils.admin);
 
     request(app.listen())
@@ -39,15 +39,16 @@ describe('controllers/registry/package/deprecate.test.js', function () {
       .put('/' + pkgname)
       .set('authorization', utils.adminAuth)
       .send(pkg)
-      .expect(201, done);
+      .expect(201, function (err) {
+        should.not.exist(err);
+        pkg = utils.getPackage(pkgname, '1.0.0', utils.admin);
+        request(app.listen())
+        .put('/' + pkgname)
+        .set('authorization', utils.adminAuth)
+        .send(pkg)
+        .expect(201, done);
+      });
     });
-
-    pkg = utils.getPackage(pkgname, '1.0.0', utils.admin);
-    request(app.listen())
-    .put('/' + pkgname)
-    .set('authorization', utils.adminAuth)
-    .send(pkg)
-    .expect(201, done);
 
     pkg = utils.getPackage('@cnpmtest/testmodule-deprecate', '1.0.0', utils.admin);
     request(app.listen())

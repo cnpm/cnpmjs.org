@@ -38,16 +38,6 @@ exports.updateOrRemove = function* (next) {
   }
 };
 
-exports.listAllModules = function *() {
-  var updated = Date.now();
-  var mods = yield Module.listAllNames();
-  var result = { _updated: updated };
-  mods.forEach(function (mod) {
-    result[mod.name] = true;
-  });
-  this.body = result;
-};
-
 var A_WEEK_MS = 3600000 * 24 * 7;
 
 exports.listAllModulesSince = function *() {

@@ -24,8 +24,9 @@ var editable = require('../middleware/editable');
 var total = require('../controllers/total');
 var mod = require('../controllers/registry/module');
 
-var listAllPackages = require('../controllers/registry/package/list');
-var getOnePackage = require('../controllers/registry/package/show');
+var listAll = require('../controllers/registry/package/list_all');
+var listAllVersions = require('../controllers/registry/package/list');
+var getOneVersion = require('../controllers/registry/package/show');
 var savePackage = require('../controllers/registry/package/save');
 var tag = require('../controllers/registry/package/tag');
 var removePackage = require('../controllers/registry/package/remove');
@@ -50,19 +51,19 @@ function routes(app) {
 
   // before /:name/:version
   // get all modules, for npm search
-  app.get('/-/all', mod.listAllModules);
+  app.get('/-/all', listAll);
   app.get('/-/all/since', mod.listAllModulesSince);
   //get all module names, for auto completion
   app.get('/-/short', mod.listAllModuleNames);
 
   // module
   // scope package: params: [$name]
-  app.get(/^\/(@[\w\-\.]+\/[\w\-\.]+)$/, syncByInstall, listAllPackages);
+  app.get(/^\/(@[\w\-\.]+\/[\w\-\.]+)$/, syncByInstall, listAllVersions);
   // scope package: params: [$name, $version]
-  app.get(/^\/(@[\w\-\.]+\/[\w\-\.]+)\/([\w\.\-]+)$/, syncByInstall, getOnePackage);
+  app.get(/^\/(@[\w\-\.]+\/[\w\-\.]+)\/([\w\.\-]+)$/, syncByInstall, getOneVersion);
 
-  app.get('/:name', syncByInstall, listAllPackages);
-  app.get('/:name/:version', syncByInstall, getOnePackage);
+  app.get('/:name', syncByInstall, listAllVersions);
+  app.get('/:name/:version', syncByInstall, getOneVersion);
 
   // try to add module
   app.put(/^\/(@[\w\-\.]+\/[\w\-\.]+)$/, login, publishable, savePackage);
