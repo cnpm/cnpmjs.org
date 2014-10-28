@@ -62,7 +62,7 @@ module.exports = function* tag() {
 
   // check permission
   var isMaintainer = yield* packageService.isMaintainer(name, this.user.name);
-  if (!isMaintainer && !this.user.isAdmin) {
+  if (!isMaintainer) {
     this.status = 403;
     this.body = {
       error: 'forbidden user',

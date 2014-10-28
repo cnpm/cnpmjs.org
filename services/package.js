@@ -470,7 +470,10 @@ exports.updateMaintainers = function* (name, usernames) {
 };
 
 exports.removeAllMaintainers = function* (name) {
-  return yield* ModuleMaintainer.removeAllMaintainers(name);
+  return yield [
+    ModuleMaintainer.removeAllMaintainers(name),
+    NpmModuleMaintainer.removeAllMaintainers(name),
+  ];
 };
 
 exports.authMaintainer = function* (packageName, username) {

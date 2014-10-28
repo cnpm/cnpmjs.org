@@ -30,6 +30,7 @@ var userService = require('../../services/user');
 
 
 // PUT /:name/-rev/:rev
+// https://github.com/npm/npm-registry-client/blob/master/lib/unpublish.js#L63
 exports.updateOrRemove = function* (next) {
   var name = this.params.name || this.params[0];
   debug('updateOrRemove module %s, %s, %j', this.url, name, this.request.body);
@@ -271,59 +272,7 @@ exports.removeTar = function* (next) {
   this.body = { ok: true };
 };
 
-exports.removeAll = function* (next) {
-  var name = this.params.name || this.params[0];
-  var username = this.user.name;
-  var rev = this.params.rev || this.params[1];
-  debug('remove all the module with name: %s, id: %s', name, rev);
 
-  var mods = yield Module.listByName(name);
-  debug('removeAll module %s: %d', name, mods.length);
-  var mod = mods[0];
-  if (!mod) {
-    return yield* next;
-  }
-
-  var isMaintainer = yield* packageService.isMaintainer(name, username);
-  // admin can delete the module
-  if (!isMaintainer && !this.user.isAdmin) {
-    this.status = 403;
-    this.body = {
-      error: 'forbidden user',
-      reason: username + ' not authorized to modify ' + name
-    };
-    return;
-  }
-  yield [
-    Module.removeByName(name),
-    Module.removeTags(name),
-    Total.plusDeleteModule(),
-  ];
-  var keys = [];
-  for (var i = 0; i < mods.length; i++) {
-    var row = mods[i];
-    var dist = row.package.dist;
-    var key = dist.key;
-    if (!key) {
-      key = urlparse(dist.tarball).pathname;
-    }
-    key && keys.push(key);
-  }
-  if (keys.length > 0) {
-    try {
-      yield keys.map(function (key) {
-        return nfs.remove(key);
-      });
-    } catch (err) {
-      // ignore error here
-    }
-  }
-
-  // remove the maintainers
-  yield* packageService.removeAllMaintainers(name);
-
-  this.body = { ok: true };
-};
 
 function parseModsForList(updated, mods, ctx) {
   var results = {

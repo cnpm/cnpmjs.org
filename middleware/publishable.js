@@ -21,7 +21,6 @@ var debug = require('debug')('cnpmjs.org:middlewares/publishable');
 module.exports = function *publishable(next) {
   // private mode, only admin user can publish
   if (config.enablePrivate && !this.user.isAdmin) {
-
     this.status = 403;
     this.body = {
       error: 'no_perms',
@@ -71,7 +70,7 @@ function checkScope(name, ctx) {
     ctx.status = 400;
     ctx.body = {
       error: 'invalid scope',
-      reason: util.format('scope %s not match legal scopes %j', scope, ctx.user.scopes)
+      reason: util.format('scope %s not match legal scopes: %s', scope, ctx.user.scopes.join(', '))
     };
     return false;
   }
@@ -98,6 +97,6 @@ function checkNoneScope(ctx) {
   ctx.status = 403;
   ctx.body = {
     error: 'no_perms',
-    reason: 'only allow publish with ' + ctx.user.scopes.join(',') + ' scope(s)'
+    reason: 'only allow publish with ' + ctx.user.scopes.join(', ') + ' scope(s)'
   };
 }

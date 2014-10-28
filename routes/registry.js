@@ -21,14 +21,17 @@ var publishable = require('../middleware/publishable');
 var syncByInstall = require('../middleware/sync_by_install');
 var total = require('../controllers/total');
 var mod = require('../controllers/registry/module');
+
 var listAllPackages = require('../controllers/registry/package/list');
 var getOnePackage = require('../controllers/registry/package/show');
 var savePackage = require('../controllers/registry/package/save');
+var tag = require('../controllers/registry/package/tag');
+var removePackage = require('../controllers/registry/package/remove');
+
 var user = require('../controllers/registry/user');
 var sync = require('../controllers/sync');
 var download = require('../controllers/registry/download');
 var userPackage = require('../controllers/registry/user_package');
-var tag = require('../controllers/registry/package/tag');
 
 function routes(app) {
 
@@ -41,8 +44,8 @@ function routes(app) {
 
   app.get('/', jsonp, total.show);
 
-  //before /:name/:version
-  //get all modules, for npm search
+  // before /:name/:version
+  // get all modules, for npm search
   app.get('/-/all', mod.listAllModules);
   app.get('/-/all/since', mod.listAllModulesSince);
   //get all module names, for auto completion
@@ -82,9 +85,11 @@ function routes(app) {
 
   // update module, unpublish will PUT this
   app.put(/^\/(@[\w\-\.]+\/[\w\-\.]+)\/\-rev\/([\w\-\.]+)$/, login, publishable, mod.updateOrRemove);
-  app.delete(/^\/(@[\w\-\.]+\/[\w\-\.]+)\/\-rev\/([\w\-\.]+)$/, login, publishable, mod.removeAll);
   app.put('/:name/-rev/:rev', login, publishable, mod.updateOrRemove);
-  app.delete('/:name/-rev/:rev', login, publishable, mod.removeAll);
+
+  // remove package
+  app.delete(/^\/(@[\w\-\.]+\/[\w\-\.]+)\/\-rev\/([\w\-\.]+)$/, login, publishable, removePackage);
+  app.delete('/:name/-rev/:rev', login, publishable, removePackage);
 
   // try to create a new user
   // https://registry.npmjs.org/-/user/org.couchdb.user:fengmk2
