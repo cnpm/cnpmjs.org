@@ -29,6 +29,7 @@ var config = require('../../../config');
 //
 // new flows: only one request
 // PUT /:name
+// https://github.com/npm/npm-registry-client/blob/master/lib/publish.js#L84
 module.exports = function* save(next) {
   // 'dist-tags': { latest: '0.0.2' },
   //  _attachments:

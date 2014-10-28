@@ -28,7 +28,7 @@ describe('controllers/registry/package/save.test.js', function () {
     before(function (done) {
       var pkg = utils.getPackage('testmodule-new-1', '0.0.1', utils.admin);
       pkg.versions['0.0.1'].dependencies = {
-        bytetest: '~0.0.1',
+        'bytetest-1': '~0.0.1',
         mocha: '~1.0.0'
       };
       request(app.listen())
@@ -39,7 +39,7 @@ describe('controllers/registry/package/save.test.js', function () {
         should.not.exist(err);
         var pkg = utils.getPackage('testmodule-new-2', '1.0.0', utils.admin);
         pkg.versions['1.0.0'].dependencies = {
-          bytetest: '~0.0.1',
+          'bytetest-1': '~0.0.1',
           mocha: '~1.0.0'
         };
         request(app.listen())
@@ -59,7 +59,7 @@ describe('controllers/registry/package/save.test.js', function () {
         data.name.should.equal('testmodule-new-1');
         Object.keys(data.versions).should.eql(['0.0.1']);
         data.versions['0.0.1'].dependencies.should.eql({
-          bytetest: '~0.0.1',
+          'bytetest-1': '~0.0.1',
           mocha: '~1.0.0'
         });
         done();
@@ -67,7 +67,7 @@ describe('controllers/registry/package/save.test.js', function () {
     });
 
     it('should save dependents', function* () {
-      var names = yield* packageService.listDependents('bytetest');
+      var names = yield* packageService.listDependents('bytetest-1');
       names.should.length(2);
       names.should.eql(['testmodule-new-1', 'testmodule-new-2']);
 

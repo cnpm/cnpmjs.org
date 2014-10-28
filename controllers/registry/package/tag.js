@@ -60,17 +60,6 @@ module.exports = function* tag() {
     return;
   }
 
-  // check permission
-  var isMaintainer = yield* packageService.isMaintainer(name, this.user.name);
-  if (!isMaintainer) {
-    this.status = 403;
-    this.body = {
-      error: 'forbidden user',
-      reason: this.user.name + ' not authorized to modify ' + name
-    };
-    return;
-  }
-
   var row = yield* packageService.addModuleTag(name, tag, version);
   this.status = 201;
   this.body = {

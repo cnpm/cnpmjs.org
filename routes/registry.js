@@ -19,6 +19,8 @@ var limit = require('../middleware/limit');
 var login = require('../middleware/login');
 var publishable = require('../middleware/publishable');
 var syncByInstall = require('../middleware/sync_by_install');
+var editable = require('../middleware/editable');
+
 var total = require('../controllers/total');
 var mod = require('../controllers/registry/module');
 
@@ -27,6 +29,8 @@ var getOnePackage = require('../controllers/registry/package/show');
 var savePackage = require('../controllers/registry/package/save');
 var tag = require('../controllers/registry/package/tag');
 var removePackage = require('../controllers/registry/package/remove');
+var removeOneVersion = require('../controllers/registry/package/remove_version');
+var updatePackage = require('../controllers/registry/package/update');
 
 var user = require('../controllers/registry/user');
 var sync = require('../controllers/sync');
@@ -69,8 +73,8 @@ function routes(app) {
   app.get('/:name/sync/log/:id', sync.getSyncLog);
 
   // add tag
-  app.put(/^\/(@[\w\-\.]+\/[\w\-\.]+)\/([\w\-\.]+)$/, login, tag);
-  app.put('/:name/:tag', login, tag);
+  app.put(/^\/(@[\w\-\.]+\/[\w\-\.]+)\/([\w\-\.]+)$/, login, editable, tag);
+  app.put('/:name/:tag', login, editable, tag);
 
   // need limit by ip
   app.get(/^\/(@[\w\-\.]+\/[\w\-\.]+)\/download\/(@[\w\-\.]+\/[\w\-\.]+)$/, limit, download);
@@ -78,18 +82,18 @@ function routes(app) {
   app.get(/^\/(@[\w\-\.]+\/[\w\-\.]+)\/\-\/(@[\w\-\.]+\/[\w\-\.]+)$/, limit, download);
   app.get('/:name/-/:filename', limit, download);
 
-  // delete tarball
+  // delete tarball and remove one version
   app.delete(/^\/(@[\w\-\.]+\/[\w\-\.]+)\/download\/(@[\w\-\.]+\/[\w\-\.]+)\/\-rev\/([\w\-\.]+)$/,
-    login, publishable, mod.removeTar);
-  app.delete('/:name/download/:filename/-rev/:rev', login, publishable, mod.removeTar);
+    login, publishable, editable, removeOneVersion);
+  app.delete('/:name/download/:filename/-rev/:rev', login, publishable, editable, removeOneVersion);
 
   // update module, unpublish will PUT this
-  app.put(/^\/(@[\w\-\.]+\/[\w\-\.]+)\/\-rev\/([\w\-\.]+)$/, login, publishable, mod.updateOrRemove);
-  app.put('/:name/-rev/:rev', login, publishable, mod.updateOrRemove);
+  app.put(/^\/(@[\w\-\.]+\/[\w\-\.]+)\/\-rev\/([\w\-\.]+)$/, login, publishable, editable, updatePackage);
+  app.put('/:name/-rev/:rev', login, publishable, editable, updatePackage);
 
-  // remove package
-  app.delete(/^\/(@[\w\-\.]+\/[\w\-\.]+)\/\-rev\/([\w\-\.]+)$/, login, publishable, removePackage);
-  app.delete('/:name/-rev/:rev', login, publishable, removePackage);
+  // remove all versions
+  app.delete(/^\/(@[\w\-\.]+\/[\w\-\.]+)\/\-rev\/([\w\-\.]+)$/, login, publishable, editable, removePackage);
+  app.delete('/:name/-rev/:rev', login, publishable, editable, removePackage);
 
   // try to create a new user
   // https://registry.npmjs.org/-/user/org.couchdb.user:fengmk2

@@ -37,6 +37,7 @@ var User = models.User;
 var usernames = [
   'cnpmjstest101',
   'cnpmjstest102',
+  'cnpmjstest103',
   'cnpmjstest10', // admin
   'cnpmjstestAdmin2', // other admin
   'cnpmjstestAdmin3', // other admin

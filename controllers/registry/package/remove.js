@@ -19,11 +19,11 @@ var urlparse = require('url').parse;
 var packageService = require('../../../services/package');
 var totalService = require('../../../services/total');
 var nfs = require('../../../common/nfs');
-var common = require('./common');
 
+// DELETE /:name/-rev/:rev
+// https://github.com/npm/npm-registry-client/blob/master/lib/unpublish.js#L25
 module.exports = function* remove(next) {
   var name = this.params.name || this.params[0];
-  var username = this.user.name;
   var rev = this.params.rev || this.params[1];
   debug('remove all the module with name: %s, id: %s', name, rev);
 
@@ -32,16 +32,6 @@ module.exports = function* remove(next) {
   var mod = mods[0];
   if (!mod) {
     return yield* next;
-  }
-
-  var isMaintainerOrAdmin = yield* common.isMaintainerOrAdmin(name, this.user);
-  if (!isMaintainerOrAdmin) {
-    this.status = 403;
-    this.body = {
-      error: 'forbidden user',
-      reason: username + ' not authorized to modify ' + name
-    };
-    return;
   }
 
   yield [
