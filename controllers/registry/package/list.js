@@ -76,12 +76,6 @@ module.exports = function* list() {
   }
   starUsers = starUserMap;
 
-  var allowSync = this.allowSync;
-  // scoped package dont sync
-  if (name[0] === '@') {
-    allowSync = false;
-  }
-
   if (rows.length === 0) {
     // check if unpublished
     var unpublishedInfo = yield* packageService.getUnpublishedModule(name);
@@ -104,7 +98,7 @@ module.exports = function* list() {
   // if module not exist in this registry,
   // sync the module backend and return package info from official registry
   if (rows.length === 0) {
-    if (!allowSync) {
+    if (!this.allowSync) {
       this.status = 404;
       this.body = {
         error: 'not_found',

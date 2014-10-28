@@ -156,7 +156,7 @@ var config = {
     // the storage engine for 'sqlite'
     storage: path.join(root, 'database.sqlite'),
 
-    // logging: false,
+    logging: !!process.env.SQL_DEBUG,
   },
 
   // forward Compat with old style

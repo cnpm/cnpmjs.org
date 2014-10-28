@@ -21,6 +21,7 @@ var config = require('../config');
  */
 
 module.exports = function* syncByInstall(next) {
+  this.allowSync = false;
   if (!config.syncByInstall || !config.enablePrivate) {
     // only config.enablePrivate should enable sync on install
     return yield* next;
@@ -33,6 +34,13 @@ module.exports = function* syncByInstall(next) {
 
   // if request with `/xxx?write=true`, meaning the read request using for write
   if (this.query.write) {
+    return yield* next;
+  }
+
+  var name = this.params.name || this.params[0];
+
+  // scoped package dont sync
+  if (name && name[0] === '@') {
     return yield* next;
   }
 

@@ -23,6 +23,8 @@ var SyncModuleWorker = require('../../sync_module_worker');
 var config = require('../../../config');
 
 /**
+ * [deprecate] api
+ *
  * get the special version or tag of a module
  *
  * GET /:name/:version
@@ -64,12 +66,12 @@ module.exports = function* show() {
   debug('start sync %s, get log id %s', name, logId);
 
   // rty to get package from official registry
-  var r = yield npmService.request('/' + name + '/' + version, {
+  var r = yield npmService.request('/' + name + '/' + tag, {
     registry: config.officialNpmRegistry
   });
 
-  if (r.statusCode !== 200) {
-    debug('requet from officialNpmRegistry response %s', r.statusCode);
+  if (r.status !== 200) {
+    debug('requet from officialNpmRegistry response %s', r.status);
     this.status = 404;
     this.body = {
       error: 'not exist',
