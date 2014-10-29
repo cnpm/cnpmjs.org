@@ -18,12 +18,12 @@
 var pkg = require('../controllers/web/package');
 var user = require('../controllers/web/user');
 var sync = require('../controllers/sync');
-var total = require('../controllers/total');
+var showTotal = require('../controllers/total');
 var dist = require('../controllers/web/dist');
 var badge = require('../controllers/web/badge');
 
 function routes(app) {
-  app.get('/total', total.show);
+  app.get('/total', showTotal);
 
   // scope package without version
   app.get(/\/package\/(@[\w\-\.]+\/[\w\-\.]+)$/, pkg.display);

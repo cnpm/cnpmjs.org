@@ -21,7 +21,7 @@ var publishable = require('../middleware/publishable');
 var syncByInstall = require('../middleware/sync_by_install');
 var editable = require('../middleware/editable');
 
-var total = require('../controllers/total');
+var showTotal = require('../controllers/total');
 
 var listAll = require('../controllers/registry/package/list_all');
 var listSince = require('../controllers/registry/package/list_since');
@@ -50,7 +50,7 @@ function routes(app) {
     }
   }
 
-  app.get('/', jsonp, total.show);
+  app.get('/', jsonp, showTotal);
 
   // before /:name/:version
   // get all modules, for npm search
