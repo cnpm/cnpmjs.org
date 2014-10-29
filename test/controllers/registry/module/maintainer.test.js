@@ -14,7 +14,6 @@
  * Module dependencies.
  */
 
-var should = require('should');
 var request = require('supertest');
 var mm = require('mm');
 var config = require('../../../../config');
@@ -72,7 +71,7 @@ describe('controllers/registry/module/maintainer.test.js', function () {
       })
       .expect({
         error: 'invalid user name',
-        reason: 'User: new-maintainer-not-exists, new-maintainer-not-exists2 not exists'
+        reason: 'User: `new-maintainer-not-exists, new-maintainer-not-exists2` not exists'
       })
       .expect(403, done);
     });

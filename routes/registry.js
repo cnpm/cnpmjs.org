@@ -33,7 +33,10 @@ var removePackage = require('../controllers/registry/package/remove');
 var removeOneVersion = require('../controllers/registry/package/remove_version');
 var updatePackage = require('../controllers/registry/package/update');
 
-var user = require('../controllers/registry/user');
+var addUser = require('../controllers/registry/user/add');
+var showUser = require('../controllers/registry/user/show');
+var updateUser = require('../controllers/registry/user/update');
+
 var sync = require('../controllers/sync');
 var download = require('../controllers/registry/download');
 var userPackage = require('../controllers/registry/user_package');
@@ -98,9 +101,9 @@ function routes(app) {
 
   // try to create a new user
   // https://registry.npmjs.org/-/user/org.couchdb.user:fengmk2
-  app.put('/-/user/org.couchdb.user::name', user.add);
-  app.get('/-/user/org.couchdb.user::name', user.show);
-  app.put('/-/user/org.couchdb.user::name/-rev/:rev', login, user.update);
+  app.put('/-/user/org.couchdb.user::name', addUser);
+  app.get('/-/user/org.couchdb.user::name', showUser);
+  app.put('/-/user/org.couchdb.user::name/-rev/:rev', login, updateUser);
 
   // list all packages of user
   app.get('/-/by-user/:user', userPackage.list);

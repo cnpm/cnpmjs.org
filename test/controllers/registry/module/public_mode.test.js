@@ -188,8 +188,6 @@ describe('controllers/registry/module/public_module.test.js', function () {
     });
 
     it('should remove with version ok', function (done) {
-      mm.empty(Module, 'removeByNameAndVersions');
-      mm.empty(Module, 'removeTagsByIds');
       request(app)
       .put('/publicremovemodule/-rev/' + withoutScopeRev)
       .set('authorization', utils.otherUserAuth)
@@ -202,8 +200,6 @@ describe('controllers/registry/module/public_module.test.js', function () {
     });
 
     it('should no auth user remove 403', function (done) {
-      mm.empty(Module, 'removeByNameAndVersions');
-      mm.empty(Module, 'removeTagsByIds');
       request(app)
       .put('/publicremovemodule/-rev/' + withoutScopeRev)
       .set('authorization', utils.secondUserAuth)
@@ -216,8 +212,6 @@ describe('controllers/registry/module/public_module.test.js', function () {
     });
 
     it('should admin remove ok', function (done) {
-      mm.empty(Module, 'removeByNameAndVersions');
-      mm.empty(Module, 'removeTagsByIds');
       request(app)
       .put('/publicremovemodule/-rev/' + withoutScopeRev)
       .set('authorization', utils.adminAuth)
@@ -259,8 +253,6 @@ describe('controllers/registry/module/public_module.test.js', function () {
 
       it('should remove without scope 403', function (done) {
         mm(config, 'forcePublishWithScope', true);
-        mm.empty(Module, 'removeByNameAndVersions');
-        mm.empty(Module, 'removeTagsByIds');
         request(app)
         .put('/publicremovemodule/-rev/' + withoutScopeRev)
         .set('authorization', utils.otherUserAuth)
@@ -274,8 +266,6 @@ describe('controllers/registry/module/public_module.test.js', function () {
 
       it('should admin remove without scope ok', function (done) {
         mm(config, 'forcePublishWithScope', true);
-        mm.empty(Module, 'removeByNameAndVersions');
-        mm.empty(Module, 'removeTagsByIds');
         request(app)
         .put('/publicremovemodule/-rev/' + withoutScopeRev)
         .set('authorization', utils.adminAuth)
@@ -289,8 +279,6 @@ describe('controllers/registry/module/public_module.test.js', function () {
 
       it('should remove with scope ok', function (done) {
         mm(config, 'forcePublishWithScope', true);
-        mm.empty(Module, 'removeByNameAndVersions');
-        mm.empty(Module, 'removeTagsByIds');
         request(app)
         .put('/@cnpm/publicremovemodule/-rev/' + withScopeRev)
         .set('authorization', utils.otherUserAuth)
@@ -304,8 +292,6 @@ describe('controllers/registry/module/public_module.test.js', function () {
 
       it('should admin remove with scope ok', function (done) {
         mm(config, 'forcePublishWithScope', true);
-        mm.empty(Module, 'removeByNameAndVersions');
-        mm.empty(Module, 'removeTagsByIds');
         request(app)
         .put('/@cnpm/publicremovemodule/-rev/' + withScopeRev)
         .set('authorization', utils.adminAuth)
@@ -424,8 +410,7 @@ describe('controllers/registry/module/public_module.test.js', function () {
       .set('content-type', 'application/json')
       .set('authorization', utils.otherUserAuth)
       .send('"0.0.1"')
-      .expect(201)
-      .expect({"ok":true}, done);
+      .expect(201, done);
     });
 
     it('shold update tag not maintainer 403', function (done) {
@@ -462,10 +447,19 @@ describe('controllers/registry/module/public_module.test.js', function () {
         .set('content-type', 'application/json')
         .set('authorization', utils.otherUserAuth)
         .send(pkg)
-        .expect(201, done);
+        .expect(201, function (err) {
+          should.not.exist(err);
+          var pkg = utils.getPackage('public-remove-all-module-admin', '0.0.1', utils.otherUser);
+          request(app)
+          .put('/public-remove-all-module-admin')
+          .set('content-type', 'application/json')
+          .set('authorization', utils.otherUserAuth)
+          .send(pkg)
+          .expect(201, done);
+        });
       });
 
-      it('shold fail when user not maintainer', function (done) {
+      it('should fail when user not maintainer', function (done) {
         request(app)
         .del('/public-remove-all-module/-rev/1')
         .set('authorization', utils.secondUserAuth)
@@ -479,9 +473,7 @@ describe('controllers/registry/module/public_module.test.js', function () {
         });
       });
 
-      it('shold maintainer remove ok', function (done) {
-        mm.empty(Module, 'removeByName');
-        mm.empty(Module, 'removeTags');
+      it('should maintainer remove ok', function (done) {
         request(app)
         .del('/public-remove-all-module/-rev/1')
         .set('authorization', utils.otherUserAuth)
@@ -492,11 +484,9 @@ describe('controllers/registry/module/public_module.test.js', function () {
         });
       });
 
-      it('shold admin remove ok', function (done) {
-        mm.empty(Module, 'removeByName');
-        mm.empty(Module, 'removeTags');
+      it('should admin remove ok', function (done) {
         request(app)
-        .del('/public-remove-all-module/-rev/1')
+        .del('/public-remove-all-module-admin/-rev/1')
         .set('authorization', utils.adminAuth)
         .expect(200, function (err, res) {
           should.not.exist(err);
@@ -515,7 +505,25 @@ describe('controllers/registry/module/public_module.test.js', function () {
           .set('content-type', 'application/json')
           .set('authorization', utils.otherUserAuth)
           .send(pkg)
-          .expect(201, done);
+          .expect(201, function (err) {
+            should.not.exist(err);
+            var pkg = utils.getPackage('@cnpm/public-remove-all-module-admin', '0.0.1', utils.otherUser);
+            request(app)
+            .put('/@cnpm/public-remove-all-module-admin')
+            .set('content-type', 'application/json')
+            .set('authorization', utils.otherUserAuth)
+            .send(pkg)
+            .expect(201, function (err) {
+              should.not.exist(err);
+              var pkg = utils.getPackage('public-remove-all-module-admin', '0.1.1', utils.admin);
+              request(app)
+              .put('/public-remove-all-module-admin')
+              .set('content-type', 'application/json')
+              .set('authorization', utils.adminAuth)
+              .send(pkg)
+              .expect(201, done);
+            });
+          });
         });
 
         it('should fail when user remove module without scope', function (done) {
@@ -526,20 +534,16 @@ describe('controllers/registry/module/public_module.test.js', function () {
           .expect(403, done);
         });
 
-        it('shold admin remove module without scope ok', function (done) {
+        it('should admin remove module without scope ok', function (done) {
           mm(config, 'forcePublishWithScope', true);
-          mm.empty(Module, 'removeByName');
-          mm.empty(Module, 'removeTags');
           request(app)
-          .del('/public-remove-all-module/-rev/1')
+          .del('/public-remove-all-module-admin/-rev/1')
           .set('authorization', utils.adminAuth)
           .expect(200, done);
         });
 
-        it('shold maintainer remove ok', function (done) {
+        it('should maintainer remove ok', function (done) {
           mm(config, 'forcePublishWithScope', true);
-          mm.empty(Module, 'removeByName');
-          mm.empty(Module, 'removeTags');
           request(app)
           .del('/@cnpm/public-remove-all-module/-rev/1')
           .set('authorization', utils.otherUserAuth)
@@ -550,12 +554,10 @@ describe('controllers/registry/module/public_module.test.js', function () {
           });
         });
 
-        it('shold admin remove ok', function (done) {
+        it('should admin remove ok', function (done) {
           mm(config, 'forcePublishWithScope', true);
-          mm.empty(Module, 'removeByName');
-          mm.empty(Module, 'removeTags');
           request(app)
-          .del('/@cnpm/public-remove-all-module/-rev/1')
+          .del('/@cnpm/public-remove-all-module-admin/-rev/1')
           .set('authorization', utils.adminAuth)
           .expect(200, function (err, res) {
             should.not.exist(err);

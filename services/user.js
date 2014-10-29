@@ -75,9 +75,10 @@ exports.authAndSave = function* (login, password) {
   if (user) {
     if (config.customUserService) {
       // make sure sync user meta to cnpm database
-      var data = user;
-      data.rev = Date.now() + '-' + user.login;
-      data.user = user;
+      var data = {
+        rev: Date.now() + '-' + user.login,
+        user: user
+      };
       yield* User.saveCustomUser(data);
     }
   }
@@ -86,4 +87,8 @@ exports.authAndSave = function* (login, password) {
 
 exports.add = function* (user) {
   return yield* User.add(user);
+};
+
+exports.update = function* (user) {
+  return yield* User.update(user);
 };
