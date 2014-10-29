@@ -98,8 +98,7 @@ exports.listPrivateModulesByScope = function* (scope) {
   });
 };
 
-exports.listPublicModulesByUser = function* (username) {
-  var names = yield* exports.listPublicModuleNamesByUser(username);
+exports.listModules = function* (names) {
   if (names.length === 0) {
     return [];
   }
@@ -126,6 +125,42 @@ exports.listPublicModulesByUser = function* (username) {
       'name', 'description'
     ]
   });
+};
+
+exports.listModulesByUser = function* (username) {
+  var names = yield* exports.listModuleNamesByUser(username);
+  return yield* exports.listModules(names);
+};
+
+exports.listModuleNamesByUser = function* (username) {
+  var sql = 'SELECT distinct(name) AS name FROM module WHERE author=?;';
+  var rows = yield* models.query(sql, [username]);
+  var map = {};
+  var names = rows.map(function (r) {
+    return r.name;
+  });
+
+  // find from npm module maintainer table
+  var moduleNames = yield* NpmModuleMaintainer.listModuleNamesByUser(username);
+  moduleNames.forEach(function (name) {
+    if (!map[name]) {
+      names.push(name);
+    }
+  });
+
+  // find from private module maintainer table
+  moduleNames = yield* ModuleMaintainer.listModuleNamesByUser(username);
+  moduleNames.forEach(function (name) {
+    if (!map[name]) {
+      names.push(name);
+    }
+  });
+  return names;
+};
+
+exports.listPublicModulesByUser = function* (username) {
+  var names = yield* exports.listPublicModuleNamesByUser(username);
+  return yield* exports.listModules(names);
 };
 
 // return user all public package names

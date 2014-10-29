@@ -14,6 +14,7 @@
  * Module dependencies.
  */
 
+var should = require('should');
 var request = require('supertest');
 var pedding = require('pedding');
 var app = require('../../../servers/registry');
@@ -42,12 +43,12 @@ describe('contributors/registry/user_package.test.js', function () {
     it('should return one user\'s all package names', function (done) {
       request(app.listen())
       .get('/-/by-user/fengmk2')
-      .expect(200)
-      .expect({
-        fengmk2: [
-          'pedding',
-        ]
-      }, done);
+      .expect(200, function (err, res) {
+        should.not.exist(err);
+        res.body.fengmk2.should.be.an.Array;
+        res.body.fengmk2.should.containEql('pedding');
+        done();
+      });
     });
 
     it('should return {} when user not exists', function (done) {
@@ -64,27 +65,25 @@ describe('contributors/registry/user_package.test.js', function () {
 
       request(app.listen())
       .get('/-/by-user/' + encodeURIComponent('fengmk2|dead-horse'))
-      .expect(200)
-      .expect({
-        fengmk2: [
-          'pedding',
-        ],
-        'dead-horse': [
-          'pedding'
-        ]
-      }, done);
+      .expect(200, function (err, res) {
+        should.not.exist(err);
+        res.body.fengmk2.should.be.an.Array;
+        res.body.fengmk2.should.containEql('pedding');
+        res.body['dead-horse'].should.be.an.Array;
+        res.body['dead-horse'].should.containEql('pedding');
+        done();
+      });
 
       request(app.listen())
       .get('/-/by-user/fengmk2|dead-horse')
-      .expect(200)
-      .expect({
-        fengmk2: [
-          'pedding',
-        ],
-        'dead-horse': [
-          'pedding'
-        ]
-      }, done);
+      .expect(200, function (err, res) {
+        should.not.exist(err);
+        res.body.fengmk2.should.be.an.Array;
+        res.body.fengmk2.should.containEql('pedding');
+        res.body['dead-horse'].should.be.an.Array;
+        res.body['dead-horse'].should.containEql('pedding');
+        done();
+      });
     });
 
     it('should return some exists user\'s all package names', function (done) {
@@ -92,24 +91,23 @@ describe('contributors/registry/user_package.test.js', function () {
 
       request(app.listen())
       .get('/-/by-user/' + encodeURIComponent('fengmk2|user-not-exists'))
-      .expect(200)
-      .expect({
-        fengmk2: [
-          'pedding'
-        ]
-      }, done);
+      .expect(200, function (err, res) {
+        should.not.exist(err);
+        res.body.fengmk2.should.be.an.Array;
+        res.body.fengmk2.should.containEql('pedding');
+        done();
+      });
 
       request(app.listen())
       .get('/-/by-user/' + utils.otherAdmin2 + '|fengmk2|user-not-exists|')
-      .expect(200)
-      .expect({
-        cnpmjstestAdmin2: [
-          'test-user-package-module'
-        ],
-        fengmk2: [
-          'pedding'
-        ]
-      }, done);
+      .expect(200, function (err, res) {
+        should.not.exist(err);
+        res.body.fengmk2.should.be.an.Array;
+        res.body.fengmk2.should.containEql('pedding');
+        res.body.cnpmjstestAdmin2.should.be.an.Array;
+        res.body.cnpmjstestAdmin2.should.containEql('test-user-package-module');
+        done();
+      });
     });
 
     it('should return {} when users not exists', function (done) {

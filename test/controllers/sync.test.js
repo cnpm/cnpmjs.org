@@ -19,39 +19,35 @@ var request = require('supertest');
 var should = require('should');
 var pedding = require('pedding');
 var mm = require('mm');
+var fs = require('fs');
 var path = require('path');
 var npmService = require('../../services/npm');
 var registryApp = require('../../servers/registry');
 var webApp = require('../../servers/web');
+var utils = require('../utils');
 
 describe('controllers/sync.test.js', function () {
-  before(function (done) {
-    done = pedding(2, done);
-    registryApp = registryApp.listen(0, done);
-    webApp = webApp.listen(0, done);
-  });
-
   afterEach(mm.restore);
 
-  var baseauth = 'Basic ' + new Buffer('cnpmjstest10:cnpmjstest10').toString('base64');
-  var baseauthOther = 'Basic ' + new Buffer('cnpmjstest101:cnpmjstest101').toString('base64');
   var fixtures = path.join((path.dirname(__dirname)), 'fixtures');
+  var mockPackage = JSON.parse(fs.readFileSync(path.join(fixtures, 'utility.json')));
 
   describe('sync source npm package', function () {
     var logIdRegistry;
     var logIdWeb;
 
     it('should sync as publish success', function (done) {
-      request(registryApp)
+      request(registryApp.listen())
       .del('/pedding/-rev/123')
-      .set('authorization', baseauth)
-      .end(function (err, res) {
+      .set('authorization', utils.adminAuth)
+      .end(function (err) {
         should.not.exist(err);
-
-        mm.data(Npm, 'get', require(path.join(fixtures, 'utility.json')));
+        mm(npmService, 'get', function* () {
+          return mockPackage;
+        });
         request(registryApp)
         .put('/pedding/sync?publish=true&nodeps=true')
-        .set('authorization', baseauth)
+        .set('authorization', utils.adminAuth)
         .end(function (err, res) {
           should.not.exist(err);
           res.body.should.have.keys('ok', 'logId');
@@ -62,8 +58,10 @@ describe('controllers/sync.test.js', function () {
     });
 
     it('should sync as publish 403 when user not admin', function (done) {
-      mm.data(Npm, 'get', require(path.join(fixtures, 'utility.json')));
-      request(registryApp)
+      mm(npmService, 'get', function* () {
+        return mockPackage;
+      });
+      request(registryApp.listen())
       .put('/utility_unit_test/sync?publish=true&nodeps=true')
       .expect(403)
       .expect({
@@ -73,8 +71,10 @@ describe('controllers/sync.test.js', function () {
     });
 
     it('should sync through web success', function (done) {
-      mm.data(Npm, 'get', require(path.join(fixtures, 'utility.json')));
-      request(webApp)
+      mm(npmService, 'get', function* () {
+        return mockPackage;
+      });
+      request(webApp.listen())
       .put('/sync/pedding')
       .end(function (err, res) {
         should.not.exist(err);
@@ -85,10 +85,12 @@ describe('controllers/sync.test.js', function () {
     });
 
     it('should sync through registry success', function (done) {
-      mm.data(Npm, 'get', require(path.join(fixtures, 'utility.json')));
-      request(registryApp)
+      mm(npmService, 'get', function* () {
+        return mockPackage;
+      });
+      request(registryApp.listen())
       .put('/pedding/sync')
-      .set('authorization', baseauth)
+      .set('authorization', utils.adminAuth)
       .end(function (err, res) {
         should.not.exist(err);
         res.body.should.have.keys('ok', 'logId');
@@ -99,27 +101,33 @@ describe('controllers/sync.test.js', function () {
 
     it('should get sync log', function (done) {
       done = pedding(2, done);
-      request(registryApp)
+      request(registryApp.listen())
       .get('/pedding/sync/log/' + logIdRegistry)
-      .end(function (err, res) {
+      .expect(200, function (err, res) {
         should.not.exist(err);
         res.body.should.have.keys('ok', 'log');
         done();
       });
 
-      request(webApp)
-      .get('/sync/pedding/log/' + logIdWeb)
-      .end(function (err, res) {
+      request(webApp.listen())
+      .get('/sync/pedding/log/' + logIdWeb + '?offset=1')
+      .expect(200, function (err, res) {
         should.not.exist(err);
         res.body.should.have.keys('ok', 'log');
         done();
       });
     });
+
+    it('should 404 when log id not exists', function (done) {
+      request(webApp.listen())
+      .get('/sync/pedding/log/123123123')
+      .expect(404, done);
+    });
   });
 
   describe('scope package', function () {
     it('should sync scope package not found', function (done) {
-      request(webApp)
+      request(webApp.listen())
       .put('/sync/@cnpm/not-exists-package')
       .expect(404, done);
     });

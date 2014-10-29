@@ -48,10 +48,7 @@ function routes(app) {
   app.get('/sync', showSync);
   app.put('/sync/:name', sync.sync);
 
-  // params: [$name, $id]
-  app.get(/\/sync\/(@[\w\-\.]+\/[\w\-\.]+)\/log\/(\d+)$/, sync.getSyncLog);
   app.get('/sync/:name/log/:id', sync.getSyncLog);
-
 
   app.get('/_list/search/search', searchRange);
 
