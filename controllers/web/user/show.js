@@ -1,5 +1,5 @@
 /**!
- * cnpmjs.org - controllers/web/package.js
+ * cnpmjs.org - controllers/web/user/show.js
  *
  * Copyright(c) cnpmjs.org and other contributors.
  * MIT Licensed
@@ -15,29 +15,18 @@
  * Module dependencies.
  */
 
-var config = require('../../config');
-var packageService = require('../../services/package');
-var userService = require('../../services/user');
-var common = require('../../lib/common');
+var config = require('../../../config');
+var packageService = require('../../../services/package');
+var userService = require('../../../services/user');
+var common = require('../../../lib/common');
 
-exports.display = function* (next) {
+module.exports = function* showUser(next) {
   var name = this.params.name;
   var isAdmin = common.isAdmin(name);
   var scopes = config.scopes || [];
-  if (config.customUserService) {
-    var customUser = yield* userService.get(name);
-    if (customUser) {
-      isAdmin = !!customUser.site_admin;
-      scopes = customUser.scopes;
-      var data = {
-        user: customUser
-      };
-      yield* User.saveCustomUser(data);
-    }
-  }
-
-  var r = yield [Module.listByAuthor(name), User.get(name)];
-  var packages = r[0] || [];
+  var user;
+  var r = yield [packageService.listModulesByUser(name), userService.getAndSave(name)];
+  var packages = r[0];
   var user = r[1];
   if (!user && !packages.length) {
     return yield* next;
@@ -74,7 +63,7 @@ exports.display = function* (next) {
     title: 'User - ' + name,
     packages: packages,
     user: data,
-    lastModified: user && user.gmt_modified,
+    lastModified: user.gmt_modified,
     isAdmin: isAdmin,
     scopes: scopes
   });

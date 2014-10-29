@@ -20,6 +20,7 @@ var mm = require('mm');
 var fs = require('fs');
 var nfs = require('../../../common/nfs');
 var app = require('../../../servers/web');
+var distService = require('../../../services/dist');
 
 describe('controllers/web/dist.test.js', function () {
   before(function (done) {
@@ -48,7 +49,7 @@ describe('controllers/web/dist.test.js', function () {
     });
 
     it('should mock return files and dirs', function (done) {
-      mm(Dist, 'listdir', function* () {
+      mm(distService, 'listdir', function* () {
         return [
           {name: 'ooxx/', date: '02-May-2014 00:54'},
           {name: 'foo.txt', size: 1024, date: '02-May-2014 00:54'},
@@ -68,7 +69,7 @@ describe('controllers/web/dist.test.js', function () {
     });
 
     it('should list files and dirs', function (done) {
-      mm(Dist, 'listdir', function* () {
+      mm(distService, 'listdir', function* () {
         return [
           {name: 'npm/', date: '02-May-2014 00:54'},
           {name: 'npm-versions.txt', size: 1676, date: '02-May-2014 00:54'},
@@ -90,7 +91,7 @@ describe('controllers/web/dist.test.js', function () {
 
   describe('GET /dist/ files', function () {
     it('should pipe txt', function (done) {
-      mm(Dist, 'getfile', function* () {
+      mm(distService, 'getfile', function* () {
         return {
           name: 'foo.txt', size: 1024, date: '02-May-2014 00:54',
           url: 'http://mock.com/dist/v0.10.28/SHASUMS.txt'
@@ -109,7 +110,7 @@ describe('controllers/web/dist.test.js', function () {
     });
 
     it('should pipe html', function (done) {
-      mm(Dist, 'getfile', function* () {
+      mm(distService, 'getfile', function* () {
         return {
           name: 'foo.html', size: 1024, date: '02-May-2014 00:54',
           url: 'http://mock.com/dist/v0.10.28/foo.html'
@@ -129,7 +130,7 @@ describe('controllers/web/dist.test.js', function () {
     });
 
     it('should pipe json', function (done) {
-      mm(Dist, 'getfile', function* () {
+      mm(distService, 'getfile', function* () {
         return {
           name: 'foo.json', date: '02-May-2014 00:54',
           url: 'http://mock.com/dist/v0.10.28/foo.json'
@@ -149,7 +150,7 @@ describe('controllers/web/dist.test.js', function () {
     });
 
     it('should GET /dist/npm-versions.tgz redirect to nfs url', function (done) {
-      mm(Dist, 'getfile', function* (fullname) {
+      mm(distService, 'getfile', function* (fullname) {
         fullname.should.equal('/npm-versions.tgz');
         return {
           name: 'npm-versions.txt', size: 1024, date: '02-May-2014 00:54',
@@ -164,7 +165,7 @@ describe('controllers/web/dist.test.js', function () {
     });
 
     it('should download nfs txt file and send it', function (done) {
-      mm(Dist, 'getfile', function* () {
+      mm(distService, 'getfile', function* () {
         return {
           name: 'foo.txt',
           size: 1264,
@@ -180,7 +181,7 @@ describe('controllers/web/dist.test.js', function () {
     });
 
     it('should download nfs tgz file and send it', function (done) {
-      mm(Dist, 'getfile', function* () {
+      mm(distService, 'getfile', function* () {
         return {
           name: 'foo.tgz',
           size: 1264,
@@ -196,7 +197,7 @@ describe('controllers/web/dist.test.js', function () {
     });
 
     it.skip('should download nfs no-ascii attachment file name', function (done) {
-      mm(Dist, 'getfile', function* () {
+      mm(distService, 'getfile', function* () {
         return {
           name: '中文名.tgz',
           size: 1264,

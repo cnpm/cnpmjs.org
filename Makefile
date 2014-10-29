@@ -1,4 +1,4 @@
-TESTS = $(shell ls -S `find test/controllers/registry -type f -name "*.test.js" -print`)
+TESTS = $(shell ls -S `find test/controllers -type f -name "*.test.js" -print`)
 REPORTER = spec
 TIMEOUT = 30000
 MOCHA_OPTS =

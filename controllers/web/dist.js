@@ -17,7 +17,7 @@
 var debug = require('debug')('cnpmjs.org:controllers:web:dist');
 var mime = require('mime');
 var urlparse = require('url').parse;
-var Dist = require('../../services/dist');
+var distService = require('../../services/dist');
 var config = require('../../config');
 var downloadAsReadStream = require('../utils').downloadAsReadStream;
 
@@ -44,7 +44,7 @@ exports.list = function* (next) {
     return yield* download.call(this, next);
   }
 
-  var items = yield* Dist.listdir(url);
+  var items = yield* distService.listdir(url);
   if (url === '/') {
     // phantomjs/
     items.push({
@@ -64,7 +64,7 @@ exports.list = function* (next) {
 
 function* download(next) {
   var fullname = this.params[0];
-  var info = yield* Dist.getfile(fullname);
+  var info = yield* distService.getfile(fullname);
   debug('download %s got %j', fullname, info);
   if (!info || !info.url) {
     return yield* next;

@@ -98,6 +98,8 @@ exports.listPrivateModulesByScope = function* (scope) {
   });
 };
 
+exports.listModulesByUser = 
+
 exports.listPublicModulesByUser = function* (username) {
   var names = yield* exports.listPublicModuleNamesByUser(username);
   if (names.length === 0) {

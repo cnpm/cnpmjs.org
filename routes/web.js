@@ -15,8 +15,9 @@
  * Module dependencies.
  */
 
+var showPackage = require('../controllers/web/package/show');
 var pkg = require('../controllers/web/package');
-var user = require('../controllers/web/user');
+var showUser = require('../controllers/web/user/show');
 var sync = require('../controllers/sync');
 var showTotal = require('../controllers/total');
 var dist = require('../controllers/web/dist');
@@ -26,18 +27,18 @@ function routes(app) {
   app.get('/total', showTotal);
 
   // scope package without version
-  app.get(/\/package\/(@[\w\-\.]+\/[\w\-\.]+)$/, pkg.display);
+  app.get(/\/package\/(@[\w\-\.]+\/[\w\-\.]+)$/, showPackage);
   // scope package with version
-  app.get(/\/package\/(@[\w\-\.]+\/[\w\-\.]+)\/([\w\d\.]+)$/, pkg.display);
-  app.get('/package/:name', pkg.display);
-  app.get('/package/:name/:version', pkg.display);
+  app.get(/\/package\/(@[\w\-\.]+\/[\w\-\.]+)\/([\w\d\.]+)$/, showPackage);
+  app.get('/package/:name', showPackage);
+  app.get('/package/:name/:version', showPackage);
 
   app.get('/privates', pkg.listPrivates);
 
   app.get(/\/browse\/keyword\/(@[\w\-\.]+\/[\w\-\.]+)$/, pkg.search);
   app.get('/browse/keyword/:word', pkg.search);
 
-  app.get('/~:name', user.display);
+  app.get('/~:name', showUser);
 
   app.get('/sync/:name', pkg.displaySync);
 
