@@ -11,23 +11,26 @@
 
 </style>
 <div id="private">
-  <% if (!packages.length) { %>
+  <% for (var scope in scopes) {
+    var packages = scopes[scope];
+  %>
+    <h1>
+      Private packages in <%= scope %>
+    </h1>
+    <hr />
+    <% if (!packages.length) { %>
     <div class="alert alert-warning">
       Can not found private package
     </div>
-  <% } else {%>
-    <h1>
-      Private packages in this registry
-    </h1>
-    <hr />
-
-    <% for (var i = 0; i < packages.length; i++) {
-      var item = packages[i];
-    %>
+    <% } else {%>
+      <% for (var i = 0; i < packages.length; i++) {
+        var item = packages[i];
+      %>
       <div class="package">
         <a href="/package/<%= item.name %>" class="package-name"><%= item.name %></a>
         <span class="package-description"><%= item.description %></span>
       </div>
+      <% } %>
     <% } %>
   <% } %>
 </div>

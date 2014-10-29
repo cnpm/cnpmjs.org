@@ -78,7 +78,7 @@ exports.listPrivateModulesByScope = function* (scope) {
     where: {
       tag: 'latest',
       name: {
-        like: scope + '%'
+        like: scope + '/%'
       }
     }
   });
@@ -97,8 +97,6 @@ exports.listPrivateModulesByScope = function* (scope) {
     }
   });
 };
-
-exports.listModulesByUser = 
 
 exports.listPublicModulesByUser = function* (username) {
   var names = yield* exports.listPublicModuleNamesByUser(username);
