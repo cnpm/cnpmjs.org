@@ -1,5 +1,5 @@
 /**!
- * cnpmjs.org - controllers/registry/download.js
+ * cnpmjs.org - controllers/registry/package/download.js
  *
  * Copyright(c) fengmk2 and other contributors.
  * MIT Licensed
@@ -18,12 +18,12 @@ var debug = require('debug')('cnpmjs.org:controllers:registry:download');
 var mime = require('mime');
 var utility = require('utility');
 var defer = require('co-defer');
-var nfs = require('../../common/nfs');
-var logger = require('../../common/logger');
-var common = require('../../lib/common');
-var downloadAsReadStream = require('../utils').downloadAsReadStream;
-var packageService = require('../../services/package');
-var downloadTotalService = require('../../services/download_total');
+var nfs = require('../../../common/nfs');
+var logger = require('../../../common/logger');
+var common = require('../../../lib/common');
+var downloadAsReadStream = require('../../utils').downloadAsReadStream;
+var packageService = require('../../../services/package');
+var downloadTotalService = require('../../../services/download_total');
 
 var _downloads = {};
 

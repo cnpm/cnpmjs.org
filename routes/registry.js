@@ -32,13 +32,13 @@ var tag = require('../controllers/registry/package/tag');
 var removePackage = require('../controllers/registry/package/remove');
 var removeOneVersion = require('../controllers/registry/package/remove_version');
 var updatePackage = require('../controllers/registry/package/update');
+var downloadPackage = require('../controllers/registry/package/download');
 
 var addUser = require('../controllers/registry/user/add');
 var showUser = require('../controllers/registry/user/show');
 var updateUser = require('../controllers/registry/user/update');
 
 var sync = require('../controllers/sync');
-var download = require('../controllers/registry/download');
 var userPackage = require('../controllers/registry/user_package');
 
 function routes(app) {
@@ -81,10 +81,10 @@ function routes(app) {
   app.put('/:name/:tag', login, editable, tag);
 
   // need limit by ip
-  app.get(/^\/(@[\w\-\.]+\/[\w\-\.]+)\/download\/(@[\w\-\.]+\/[\w\-\.]+)$/, limit, download);
-  app.get('/:name/download/:filename', limit, download);
-  app.get(/^\/(@[\w\-\.]+\/[\w\-\.]+)\/\-\/(@[\w\-\.]+\/[\w\-\.]+)$/, limit, download);
-  app.get('/:name/-/:filename', limit, download);
+  app.get(/^\/(@[\w\-\.]+\/[\w\-\.]+)\/download\/(@[\w\-\.]+\/[\w\-\.]+)$/, limit, downloadPackage);
+  app.get('/:name/download/:filename', limit, downloadPackage);
+  app.get(/^\/(@[\w\-\.]+\/[\w\-\.]+)\/\-\/(@[\w\-\.]+\/[\w\-\.]+)$/, limit, downloadPackage);
+  app.get('/:name/-/:filename', limit, downloadPackage);
 
   // delete tarball and remove one version
   app.delete(/^\/(@[\w\-\.]+\/[\w\-\.]+)\/download\/(@[\w\-\.]+\/[\w\-\.]+)\/\-rev\/([\w\-\.]+)$/,

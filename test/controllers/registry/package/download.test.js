@@ -1,5 +1,5 @@
 /**!
- * cnpmjs.org - test/controllers/registry/download.test.js
+ * cnpmjs.org - test/controllers/registry/package/download.test.js
  *
  * Copyright(c) fengmk2 and other contributors.
  * MIT Licensed
@@ -15,10 +15,10 @@
  */
 
 var request = require('supertest');
-var app = require('../../../servers/registry');
-var utils = require('../../utils');
+var app = require('../../../../servers/registry');
+var utils = require('../../../utils');
 
-describe('controllers/registry/download.test.js', function () {
+describe('controllers/registry/package/download.test.js', function () {
   before(function (done) {
     var pkg = utils.getPackage('download-test-module', '1.0.0', utils.admin);
     request(app.listen())
@@ -39,6 +39,12 @@ describe('controllers/registry/download.test.js', function () {
       request(app.listen())
       .get('/download-test-module/-/download-test-module-1.0.0.tgz')
       .expect(200, done);
+    });
+
+    it('should 404 when package not exists', function (done) {
+      request(app.listen())
+      .get('/download-test-module-not-exists/download/download-test-module-not-exists-1.0.0.tgz')
+      .expect(404, done);
     });
   });
 });
