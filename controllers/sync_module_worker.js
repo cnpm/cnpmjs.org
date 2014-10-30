@@ -31,6 +31,7 @@ var urlparse = require('url').parse;
 var urllib = require('../common/urllib');
 var config = require('../config');
 var nfs = require('../common/nfs');
+var logger = require('../common/logger');
 var common = require('../lib/common');
 var npmSerivce = require('../services/npm');
 var packageService = require('../services/package');
@@ -42,6 +43,8 @@ var USER_AGENT = 'sync.cnpmjs.org/' + config.version + ' ' + urllib.USER_AGENT;
 function SyncModuleWorker(options) {
   EventEmitter.call(this);
   this._logId = options.logId;
+  this._log = '';
+  this._loging = false;
   if (!Array.isArray(options.name)) {
     options.name = [options.name];
   }
@@ -90,10 +93,30 @@ SyncModuleWorker.prototype.log = function () {
   debug(str);
   var logId = this._logId;
   if (logId) {
-    co(function* () {
-      yield* logService.append(logId, str);
-    })(utility.noop);
+    this._log += '\n' + str;
+    this._saveLog();
   }
+};
+
+SyncModuleWorker.prototype._saveLog = function () {
+  var that = this;
+  if (that._loging) {
+    return;
+  }
+  that._loging = true;
+  var logstr = that._log;
+  that._log = '';
+  co(function* () {
+    yield* logService.append(that._logId, logstr);
+  })(function (err) {
+    if (err) {
+      logger.error(err);
+    }
+    that._loging = false;
+    if (that._log) {
+      that._saveLog();
+    }
+  });
 };
 
 SyncModuleWorker.prototype.start = function () {
