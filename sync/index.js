@@ -1,4 +1,4 @@
-/*!
+/**!
  * cnpmjs.org - sync/index.js
  *
  * Copyright(c) cnpmjs.org and other contributors.
@@ -20,7 +20,7 @@ var ms = require('humanize-ms');
 var util = require('util');
 var config = require('../config');
 var mail = require('../common/mail');
-var Total = require('../proxy/total');
+var totalService = require('../services/total');
 var logger = require('../common/logger');
 var syncDistWorker = require('./sync_dist');
 
@@ -45,13 +45,13 @@ console.log('[%s] [sync_worker:%s] syncing with %s mode',
 
 //set sync_status = 0 at first
 co(function* () {
-  yield* Total.updateSyncStatus(0);
+  yield* totalService.updateSyncStatus(0);
 })();
 
 // the same time only sync once
 var syncing = false;
 
-var handleSync = co(function *() {
+var handleSync = co(function* () {
   debug('mode: %s, syncing: %s', config.syncModel, syncing);
   if (!syncing) {
     syncing = true;
@@ -122,7 +122,7 @@ var syncPopular = co(function* syncPopular() {
   var data;
   var error;
   try {
-    data = yield *require('./sync_popular');
+    data = yield* require('./sync_popular');
   } catch (err) {
     error = err;
     error.message += ' (sync package error)';

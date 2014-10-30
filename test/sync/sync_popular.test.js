@@ -23,7 +23,7 @@ describe('sync/sync_popular.test.js', function () {
   describe('sync()', function () {
     it('should sync popular modules ok', function* () {
       mm.data(npmService, 'getPopular', ['mk2testmodule']);
-      var data = yield* syncPopular;
+      var data = yield* syncPopular();
       data.successes.should.eql(['mk2testmodule']);
       mm.restore();
     });

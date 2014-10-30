@@ -61,7 +61,7 @@ describe('services/npm.test.js', function () {
 
   describe('getPopular()', function () {
     it('should return popular modules', function* () {
-      var names = yield npm.getPopular(10);
+      var names = yield* npm.getPopular(10);
       names.should.have.a.lengthOf(10);
       names[0].should.equal('underscore');
     });
