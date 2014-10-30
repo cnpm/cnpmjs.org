@@ -93,7 +93,10 @@ SyncModuleWorker.prototype.log = function () {
   debug(str);
   var logId = this._logId;
   if (logId) {
-    this._log += '\n' + str;
+    if (this._log) {
+      this._log += '\n';
+    }
+    this._log += str;
     this._saveLog();
   }
 };
