@@ -29,7 +29,6 @@ module.exports = function* showTotal() {
 
   total.download = download;
   total.db_name = 'registry';
-  total.db_engine = config.database.dialect;
   total.instance_start_time = startTime;
   total.node_version = process.version;
   total.app_version = version;

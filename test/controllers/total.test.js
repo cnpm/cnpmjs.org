@@ -27,7 +27,7 @@ describe('controllers/total.test.js', function () {
       .expect(200, function (err, res) {
         should.not.exist(err);
         res.body.db_name.should.equal('registry');
-        res.body.db_engine.should.be.a.String;
+        res.body.store_engine.should.be.a.String;
         res.body.node_version.should.equal(process.version);
         done();
       });
