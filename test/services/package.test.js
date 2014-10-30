@@ -49,13 +49,11 @@ describe('services/package.test.js', function () {
       var r = yield* createModule('test-addModuleTag-module-name', '1.0.0');
       var tag = yield* Package.addModuleTag(r.name, 'latest', r.version);
       should.exist(tag);
-      tag.should.have.keys('id', 'module_id', 'gmt_modified');
       tag.id.should.above(0);
 
       r = yield* createModule('test-addModuleTag-module-name', '1.1.0');
       var tag2 = yield* Package.addModuleTag(r.name, 'latest', r.version);
       should.exist(tag2);
-      tag2.should.have.keys('id', 'module_id', 'gmt_modified');
       tag.id.should.equal(tag2.id);
 
       var tag3 = yield* Package.getModuleTag(r.name, 'latest');
@@ -155,9 +153,9 @@ describe('services/package.test.js', function () {
 
   describe('listPublicModuleNamesSince(), listAllPublicModuleNames()', function () {
     it('should got those module names', function* () {
-      var start = Date.now();
       yield* createModule('test-listPublicModuleNamesSince-module-0', '1.0.0');
       yield sleep(1100);
+      var start = Date.now() - 1000;
       yield* createModule('test-listPublicModuleNamesSince-module-1', '1.0.0');
       yield* createModule('test-listPublicModuleNamesSince-module-1', '1.0.1', null, 'beta');
       yield* createModule('test-listPublicModuleNamesSince-module-2', '1.0.0');
@@ -221,7 +219,7 @@ describe('services/package.test.js', function () {
     });
   });
 
-  describe('removeModuleTagsByName()', function () {
+  describe('removeModuleTags()', function () {
     it('should remove all tags by name', function* () {
       var r2 = yield* createModule('test-removeModuleTagsByName2-module-name', '1.0.0');
       var tag = yield* Package.addModuleTag(r2.name, 'latest', r2.version);
@@ -235,7 +233,7 @@ describe('services/package.test.js', function () {
 
       var tags = yield* Package.listModuleTags(r.name);
       tags.should.length(2);
-      yield* Package.removeModuleTagsByName(r.name);
+      yield* Package.removeModuleTags(r.name);
       var tags = yield* Package.listModuleTags(r.name);
       tags.should.eql([]);
 
@@ -469,12 +467,9 @@ describe('services/package.test.js', function () {
       ]);
       rows.should.length(4);
 
-      var dependencies = yield* Package.listDependencies('addDependencies-test-module');
-      dependencies.should.eql([
-        'addDependencies-dep1',
-        'addDependencies-dep2',
-        'addDependencies-dep3',
-        'addDependencies-dep4',
+      var dependents = yield* Package.listDependents('addDependencies-dep1');
+      dependents.should.eql([
+        'addDependencies-test-module',
       ]);
 
       var names = yield* Package.listDependents('addDependencies-dep1');

@@ -154,7 +154,8 @@ var config = {
     },
 
     // the storage engine for 'sqlite'
-    storage: path.join(root, 'database.sqlite'),
+    // default store into ~/cnpmjs.org.sqlite
+    storage: path.join(process.env.HOME || root, 'cnpmjs.org.sqlite'),
 
     logging: !!process.env.SQL_DEBUG,
   },

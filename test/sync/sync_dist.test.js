@@ -17,6 +17,7 @@
 var mm = require('mm');
 var urllib = require('../../common/urllib');
 var distsync = require('../../sync/sync_dist');
+var distService = require('../../services/dist');
 
 describe('sync/sync_dist.test.js', function () {
   afterEach(mm.restore);
@@ -55,9 +56,7 @@ describe('sync/sync_dist.test.js', function () {
         };
       });
 
-      mm(Dist, 'listdir', function* () {
-        return [];
-      });
+      mm.data(distService, 'listdir', []);
 
       var items = yield* distsync.listdiff('/');
       items.should.eql([
@@ -83,21 +82,19 @@ describe('sync/sync_dist.test.js', function () {
         };
       });
 
-      mm(Dist, 'listdir', function* () {
-        return [
-          {
-            name: 'npm/',
-            date: '06-May-2014 01:18',
-            parent: '/'
-          },
-          {
-            name: 'npm-versions.txt',
-            date: '27-Feb-2014 00:01',
-            size: 1676,
-            parent: '/'
-          },
-        ];
-      });
+      mm.data(distService, 'listdir', [
+        {
+          name: 'npm/',
+          date: '06-May-2014 01:18',
+          parent: '/'
+        },
+        {
+          name: 'npm-versions.txt',
+          date: '27-Feb-2014 00:01',
+          size: 1676,
+          parent: '/'
+        },
+      ]);
 
       var items = yield* distsync.listdiff('/');
       items.should.length(0);
@@ -112,21 +109,19 @@ describe('sync/sync_dist.test.js', function () {
         };
       });
 
-      mm(Dist, 'listdir', function* () {
-        return [
-          {
-            name: 'npm/',
-            date: '06-May-2014 01:17',
-            parent: '/'
-          },
-          {
-            name: 'npm-versions.txt',
-            date: '27-Feb-2014 00:01',
-            size: 1676,
-            parent: '/'
-          },
-        ];
-      });
+      mm.data(distService, 'listdir', [
+        {
+          name: 'npm/',
+          date: '06-May-2014 01:17',
+          parent: '/'
+        },
+        {
+          name: 'npm-versions.txt',
+          date: '27-Feb-2014 00:01',
+          size: 1676,
+          parent: '/'
+        },
+      ]);
 
       var items = yield* distsync.listdiff('/');
       items.should.eql([

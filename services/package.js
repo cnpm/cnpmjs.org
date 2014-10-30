@@ -117,7 +117,8 @@ exports.listModules = function* (names) {
   var ids = tags.map(function (tag) {
     return tag.module_id;
   });
-  return yield Module.findAll({
+
+  var rows = yield Module.findAll({
     where: {
       id: ids
     },
@@ -125,6 +126,7 @@ exports.listModules = function* (names) {
       'name', 'description'
     ]
   });
+  return rows;
 };
 
 exports.listModulesByUser = function* (username) {

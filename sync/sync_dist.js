@@ -70,7 +70,7 @@ function* syncDir(fullname, info) {
 
   if (info) {
     logger.syncInfo('Save dir:%s %j to database', fullname, info);
-    yield* Dist.savedir(info);
+    yield* distService.savedir(info);
   }
 
   logger.syncInfo('Sync %s finished, %d dirs, %d files',
@@ -166,7 +166,7 @@ function* syncFile(info) {
   }
 
   logger.syncInfo('Sync dist file: %j done', info);
-  yield* Dist.savefile(info);
+  yield* distService.savefile(info);
 }
 
 // <a href="latest/">latest/</a>                                            02-May-2014 14:45                   -
@@ -319,7 +319,7 @@ sync.listdiff = function* (fullname) {
   if (items.length === 0) {
     return items;
   }
-  var exists = yield* Dist.listdir(fullname);
+  var exists = yield* distService.listdir(fullname);
   debug('listdiff %s got %s exists items', fullname, exists.length);
   var map = {};
   for (var i = 0; i < exists.length; i++) {
@@ -421,7 +421,7 @@ sync.listPhantomjsDiff = function* (fullname) {
   if (items.length === 0) {
     return items;
   }
-  var exists = yield* Dist.listdir(fullname);
+  var exists = yield* distService.listdir(fullname);
   debug('listdiff %s got %s exists items', fullname, exists.length);
   var map = {};
   for (var i = 0; i < exists.length; i++) {

@@ -15,12 +15,14 @@
  */
 
 var debug = require('debug')('cnpmjs.org:sync:sync_exist');
-var config = require('../config');
-var npmService = require('../services/npm');
-var packageSerivce = require('../services/package');
-var Status = require('./status');
 var ms = require('ms');
 var thunkify = require('thunkify-wrap');
+var config = require('../config');
+var npmService = require('../services/npm');
+var packageService = require('../services/package');
+var totalService = require('../services/total');
+var Status = require('./status');
+var SyncModuleWorker = require('../controllers/sync_module_worker');
 
 function intersection(arrOne, arrTwo) {
   arrOne = arrOne || [];
@@ -39,10 +41,8 @@ function intersection(arrOne, arrTwo) {
 module.exports = function* sync() {
   var syncTime = Date.now();
 
-  var r = yield [Module.listShort(), Total.getTotalInfo()];
-  var existPackages = r[0].map(function (p) {
-    return p.name;
-  });
+  var r = yield [packageService.listAllPublicModuleNames(), totalService.getTotalInfo()];
+  var existPackages = r[0];
   var info = r[1];
   if (!info) {
     throw new Error('can not found total info');
@@ -50,20 +50,20 @@ module.exports = function* sync() {
 
   var allPackages;
   if (!info.last_exist_sync_time) {
-    debug('First time sync all packages from official registry');
-    var pkgs = yield Npm.getShort();
-
+    var pkgs = yield* npmService.getShort();
+    debug('First time sync all packages from official registry, got %d packages', pkgs.length);
     if (info.last_sync_module) {
       // start from last success
       var lastIndex = pkgs.indexOf(info.last_sync_module);
       if (lastIndex > 0) {
         pkgs = pkgs.slice(lastIndex);
+        debug('recover from %d: %s', lastIndex, info.last_sync_module);
       }
     }
     allPackages = pkgs;
   } else {
     debug('sync new module from last exist sync time: %s', info.last_sync_time);
-    var data = yield Npm.getAllSince(info.last_exist_sync_time - ms('10m'));
+    var data = yield* npmService.getAllSince(info.last_exist_sync_time - ms('10m'));
     if (!data) {
       allPackages = [];
     }
@@ -77,7 +77,10 @@ module.exports = function* sync() {
   var packages = intersection(existPackages, allPackages);
   if (!packages.length) {
     debug('no packages need be sync');
-    return;
+    return {
+      successes: [],
+      fails: []
+    };
   }
   debug('Total %d packages to sync', packages.length);
 
@@ -94,7 +97,7 @@ module.exports = function* sync() {
   debug('All packages sync done, successes %d, fails %d',
     worker.successes.length, worker.fails.length);
 
-  yield* Total.setLastExistSyncTime(syncTime);
+  yield* totalService.setLastExistSyncTime(syncTime);
   return {
     successes: worker.successes,
     fails: worker.fails
