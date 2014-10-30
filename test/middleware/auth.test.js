@@ -15,13 +15,11 @@
  * Module dependencies.
  */
 
-var should = require('should');
 var request = require('supertest');
 var app = require('../../servers/registry');
 var mm = require('mm');
-var mysql = require('../../common/mysql');
 var config = require('../../config');
-var UserService = require('../../services/user');
+var userService = require('../../services/user');
 
 describe('middleware/auth.test.js', function () {
   before(function (done) {
@@ -55,21 +53,13 @@ describe('middleware/auth.test.js', function () {
       .expect(200, done);
     });
 
-    it('should 500 with authorization and mysql error', function (done) {
-      mm.error(mysql, 'query', 'mock error');
-      request(app)
-      .get('/-/user/org.couchdb.user:cnpmjstest10')
-      .set('authorization', 'basic ' + new Buffer('cnpmjstest10:cnpmjstest10').toString('base64'))
-      .expect(500, done);
-    });
-
     describe('config.customUserService = true', function () {
       beforeEach(function () {
         mm(config, 'customUserService', true);
       });
 
       it('should 401 when user service auth throw error', function (done) {
-        mm(UserService, 'auth', function* () {
+        mm(userService, 'auth', function* () {
           var err = new Error('mock user service auth error, please visit http://ooxx.net/user to sigup first');
           err.name = 'UserSeriveAuthError';
           err.status = 401;

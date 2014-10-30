@@ -20,3 +20,4 @@ coverage/
 config/web_readme.md
 .dist/
 config/config.js
+*.sqlite

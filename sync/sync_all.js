@@ -16,48 +16,20 @@
 
 var debug = require('debug')('cnpmjs.org:sync:sync_all');
 var ms = require('humanize-ms');
-var utility = require('utility');
+var thunkify = require('thunkify-wrap');
 var config = require('../config');
 var Status = require('./status');
-var Npm = require('../proxy/npm');
-var Total = require('../proxy/total');
-var SyncModuleWorker = require('../proxy/sync_module_worker');
-var Module = require('../proxy/module');
-var thunkify = require('thunkify-wrap');
-
-function subtract(subtracter, minuend) {
-  subtracter = subtracter || [];
-  minuend = minuend || [];
-  var map = {};
-  var results = [];
-  minuend.forEach(function (name) {
-    map[name] = true;
-  });
-  subtracter.forEach(function (name) {
-    if (!map[name]) {
-      results.push(name);
-    }
-  });
-  return results;
-}
-
-function union(arrOne, arrTwo) {
-  arrOne = arrOne || [];
-  arrTwo = arrTwo || [];
-  var map = {};
-  arrOne.concat(arrTwo).forEach(function (name) {
-    map[name] = true;
-  });
-  return Object.keys(map);
-}
+var npmService = require('../services/npm');
+var totalService = require('../services/total');
+var SyncModuleWorker = require('../controllers/sync_module_worker');
 
 /**
  * when sync from official at the first time
  * get all packages by short and restart from last synced module
  * @param {String} lastSyncModule
  */
-function *getFirstSyncPackages(lastSyncModule) {
-  var pkgs = yield Npm.getShort();
+function* getFirstSyncPackages(lastSyncModule) {
+  var pkgs = yield* npmService.getShort();
   if (!lastSyncModule) {
     return pkgs;
   }
@@ -72,8 +44,8 @@ function *getFirstSyncPackages(lastSyncModule) {
  * get all the packages that update time > lastSyncTime
  * @param {Number} lastSyncTime
  */
-function *getCommonSyncPackages(lastSyncTime) {
-  var data = yield Npm.getAllSince(lastSyncTime);
+function* getCommonSyncPackages(lastSyncTime) {
+  var data = yield* npmService.getAllSince(lastSyncTime);
   if (!data) {
     return [];
   }
@@ -81,22 +53,9 @@ function *getCommonSyncPackages(lastSyncTime) {
   return Object.keys(data);
 }
 
-/**
- * get all the missing packages
- * @param {Function} callback
- */
-function *getMissPackages(callback) {
-  var r = yield [Npm.getShort(), Module.listAllModuleNames];
-  var allPackages = r[0];
-  var existPackages = r[1].map(function (row) {
-    return row.name;
-  });
-  return subtract(allPackages, existPackages);
-}
-
 module.exports = function *sync() {
   var syncTime = Date.now();
-  var info = yield Total.getTotalInfo();
+  var info = yield* totalService.getTotalInfo();
   if (!info) {
     throw new Error('can not found total info');
   }
@@ -132,7 +91,7 @@ module.exports = function *sync() {
       worker.successes.length, worker.fails.length);
   //only when all succss, set last sync time
   if (!worker.fails.length) {
-    Total.setLastSyncTime(syncTime, utility.noop);
+    yield* totalService.setLastSyncTime(syncTime);
   }
   return {
     successes: worker.successes,

@@ -16,9 +16,7 @@
 
 var debug = require('debug');
 debug.enable('cnpmjs.org*');
-var SyncModuleWorker = require('../proxy/sync_module_worker');
-var mysql = require('../common/mysql');
-var Log = require('../proxy/module_log');
+var SyncModuleWorker = require('../controllers/sync_module_worker');
 var config = require('../config');
 
 config.sourceNpmRegistry = 'https://registry.npm.taobao.org';
@@ -26,25 +24,15 @@ config.sourceNpmRegistry = 'https://registry.npm.taobao.org';
 var names = process.argv[2] || 'byte';
 names = names.split(',');
 
-Log.create({
-  name: names[0],
+var worker = new SyncModuleWorker({
+  name: names,
   username: 'fengmk2',
-  noDep: true,
-}, function (err, result) {
-  if (err) {
-    throw err;
-  }
-  var worker = new SyncModuleWorker({
-    logId: result.id,
-    name: names,
-    username: 'fengmk2',
-    concurrency: names.length,
-    // noDep: true,
-    // publish: true,
-  });
+  concurrency: names.length,
+  // noDep: true,
+  // publish: true,
+});
 
-  worker.start();
-  worker.on('end', function () {
-    process.exit(0);
-  });
+worker.start();
+worker.on('end', function () {
+  process.exit(0);
 });

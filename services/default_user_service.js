@@ -15,7 +15,8 @@
  */
 
 var gravatar = require('gravatar');
-var User = require('../proxy/user');
+// var User = require('../proxy/user');
+var User = require('../models').User;
 var isAdmin = require('../lib/common').isAdmin;
 var config = require('../config');
 
@@ -42,7 +43,7 @@ function convertToUser(row) {
     avatar_url: '',
     im_url: '',
     site_admin: isAdmin(row.name),
-    scopes: config.scopes
+    scopes: config.scopes,
   };
   if (row.json) {
     var data = row.json;
@@ -95,7 +96,7 @@ proto.auth = function* (login, password) {
  * @return {User}
  */
 proto.get = function* (login) {
-  var row = yield* User.get(login);
+  var row = yield User.findByName(login);
   if (!row) {
     return null;
   }

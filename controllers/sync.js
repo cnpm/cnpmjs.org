@@ -15,12 +15,12 @@
  */
 
 var debug = require('debug')('cnpmjs.org:controllers:sync');
-var Log = require('../proxy/module_log');
-var SyncModuleWorker = require('../proxy/sync_module_worker');
+var Log = require('../services/module_log');
+var SyncModuleWorker = require('./sync_module_worker');
 
 exports.sync = function* () {
   var username = this.user.name || 'anonymous';
-  var name = this.params.name || this.params[0];
+  var name = this.params.name;
   var publish = this.query.publish === 'true';
   var noDep = this.query.nodeps === 'true';
   debug('sync %s with query: %j', name, this.query);
@@ -49,10 +49,9 @@ exports.sync = function* () {
 };
 
 exports.getSyncLog = function* (next) {
-  // params: [$name, $id] on scope package
-  var logId = this.params.id || this.params[1];
+  var logId = this.params.id;
   var offset = Number(this.query.offset) || 0;
-  var row = yield Log.get(logId);
+  var row = yield* Log.get(logId);
   if (!row) {
     return yield* next;
   }

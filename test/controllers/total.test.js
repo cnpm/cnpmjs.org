@@ -17,20 +17,12 @@
 
 var should = require('should');
 var request = require('supertest');
-var pedding = require('pedding');
-var registryApp = require('../../servers/registry');
-var webApp = require('../../servers/web');
+var app = require('../../servers/registry');
 
 describe('controllers/total.test.js', function () {
-  before(function (done) {
-    done = pedding(2, done);
-    registryApp.listen(0, done);
-    webApp.listen(0, done);
-  });
-
   describe('GET / in registry', function () {
     it('should return total info', function (done) {
-      request(registryApp)
+      request(app.listen())
       .get('/')
       .expect(200, function (err, res) {
         should.not.exist(err);
@@ -41,23 +33,10 @@ describe('controllers/total.test.js', function () {
     });
 
     it('should return total info by jsonp', function (done) {
-      request(registryApp)
+      request(app.listen())
       .get('?callback=totalCallback')
       .expect(200)
       .expect(/totalCallback\({.*}\)/, done);
-    });
-  });
-
-  describe.skip('GET /total in web', function () {
-    it('should return total info', function (done) {
-      request(webApp)
-      .get('/total')
-      .expect(200, function (err, res) {
-        should.not.exist(err);
-        res.body.db_name.should.equal('registry');
-        res.body.node_version.should.equal(process.version);
-        done();
-      });
     });
   });
 });

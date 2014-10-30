@@ -18,7 +18,6 @@ var debug = require('debug')('cnpmjs.org:sync:index');
 var co = require('co');
 var ms = require('humanize-ms');
 var util = require('util');
-var utility = require('utility');
 var config = require('../config');
 var mail = require('../common/mail');
 var Total = require('../proxy/total');
@@ -45,7 +44,9 @@ console.log('[%s] [sync_worker:%s] syncing with %s mode',
   Date(), process.pid, config.syncModel);
 
 //set sync_status = 0 at first
-Total.updateSyncStatus(0, utility.noop);
+co(function* () {
+  yield* Total.updateSyncStatus(0);
+})();
 
 // the same time only sync once
 var syncing = false;

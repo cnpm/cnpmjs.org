@@ -13,18 +13,17 @@
 /**
  * Module dependencies.
  */
-var sync = require('../../sync/sync_popular');
+
 var mm = require('mm');
-var Npm = require('../../proxy/npm');
-var Total = require('../../proxy/total');
-var should = require('should');
+var npmService = require('../../services/npm');
+var syncPopular = require('../../sync/sync_popular');
 
 describe('sync/sync_popular.test.js', function () {
+  afterEach(mm.restore);
   describe('sync()', function () {
-    afterEach(mm.restore);
-    it('should sync popular modules ok', function *() {
-      mm.data(Npm, 'getPopular', ['mk2testmodule']);
-      var data = yield sync;
+    it('should sync popular modules ok', function* () {
+      mm.data(npmService, 'getPopular', ['mk2testmodule']);
+      var data = yield* syncPopular;
       data.successes.should.eql(['mk2testmodule']);
       mm.restore();
     });
