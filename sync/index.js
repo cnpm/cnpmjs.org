@@ -59,7 +59,7 @@ var handleSync = co(function* () {
     var data;
     var error;
     try {
-      data = yield *sync();
+      data = yield* sync();
     } catch (err) {
       error = err;
       error.message += ' (sync package error)';
@@ -75,7 +75,12 @@ var handleSync = co(function* () {
 
 if (sync) {
   handleSync();
-  setInterval(handleSync, ms(config.syncInterval));
+  var syncInterval = ms(config.syncInterval);
+  var minSyncInterval = ms('5m');
+  if (!syncInterval || syncInterval < minSyncInterval) {
+    syncInterval = minSyncInterval;
+  }
+  setInterval(handleSync, syncInterval);
 }
 
 /**
