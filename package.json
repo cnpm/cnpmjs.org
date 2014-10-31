@@ -1,6 +1,6 @@
 {
   "name": "cnpmjs.org",
-  "version": "1.7.1",
+  "version": "1.7.2",
   "description": "Private npm registry and web for Enterprise, base on MySQL and Simple Store Service",
   "main": "index.js",
   "scripts": {
@@ -90,5 +90,8 @@
     "fengmk2 <fengmk2@gmail.com> (http://fengmk2.github.com)",
     "dead_horse <dead_horse@qq.com> (http://deadhorse.me)"
   ],
+  "publishConfig": {
+    "tag": "v1"
+  },
   "license": "MIT"
 }
