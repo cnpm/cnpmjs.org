@@ -119,9 +119,6 @@ var config = {
    */
 
   database: {
-    // sync database before app start, defaul is false
-    syncFirst: false,
-
     db: 'cnpmjs_test',
     username: 'root',
     password: '',
@@ -135,15 +132,6 @@ var config = {
 
     // custom port; default: 3306
     port: 3306,
-
-    // you can also pass any dialect options to the underlying dialect library
-    // - default is empty
-    // - currently supported: 'mysql', 'mariadb'
-    dialectOptions: {
-      multipleStatements: true,
-    //   supportBigNumbers: true,
-    //   bigNumberStrings: true
-    },
 
     // use pooling in order to reduce db connection overload and to increase speed
     // currently only for mysql and postgresql (since v1.5.0)
@@ -159,19 +147,6 @@ var config = {
 
     logging: !!process.env.SQL_DEBUG,
   },
-
-  // forward Compat with old style
-  // mysqlServers: [
-  //   {
-  //     host: '127.0.0.1',
-  //     port: 3306,
-  //     user: 'root',
-  //     password: ''
-  //   }
-  // ],
-  // mysqlDatabase: 'cnpmjs_test',
-  // mysqlMaxConnections: 4,
-  // mysqlQueryTimeout: 5000,
 
   // redis config
   // use for koa-limit module as storage

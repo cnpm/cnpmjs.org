@@ -60,6 +60,9 @@ And it easy to wrap for your own registry which build with `cnpmjs.org`.
 only need to change the registry in config. Even include manual synchronization (through `install` command).
 * **Version badge**: base on [shields.io](http://shields.io/) ![cnpm-badge](http://cnpmjs.org/badge/v/cnpmjs.org.svg?style=flat-square)
 
+**PROTIP** Be sure to read [Migrating from 1.x to 2.x](https://github.com/cnpm/cnpmjs.org/wiki/Migrating-from-1.x-to-2.x)
+as well as [New features in 2.x](https://github.com/cnpm/cnpmjs.org/wiki/New-features-in-2.x).
+
 ## Getting Start
 
 * @[dead-horse](https://github.com/dead-horse): [What is cnpm?](http://deadhorse.me/slides/cnpmjs.html)

@@ -17,12 +17,8 @@
 var crypto = require('crypto');
 var path = require('path');
 var childProcess = require('child_process');
+require('./init');
 var config = require('../config');
-
-config.database.logging = console.log;
-if (process.env.DB) {
-  config.database.dialect = process.env.DB;
-}
 
 // init db first
 var initscript = path.join(__dirname, '..', 'models', 'init_script.js');
