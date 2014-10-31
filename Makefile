@@ -9,6 +9,9 @@ install:
 	@npm install --build-from-source $(REGISTRY) \
 		--disturl=https://npm.taobao.org/dist
 
+install-production production:
+	@NODE_ENV=production $(MAKE) install
+
 jshint: install
 	@-node_modules/.bin/jshint ./
 
