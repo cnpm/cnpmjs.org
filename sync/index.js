@@ -1,4 +1,4 @@
-/*!
+/**!
  * cnpmjs.org - sync/index.js
  *
  * Copyright(c) cnpmjs.org and other contributors.
@@ -18,10 +18,9 @@ var debug = require('debug')('cnpmjs.org:sync:index');
 var co = require('co');
 var ms = require('humanize-ms');
 var util = require('util');
-var utility = require('utility');
 var config = require('../config');
 var mail = require('../common/mail');
-var Total = require('../proxy/total');
+var totalService = require('../services/total');
 var logger = require('../common/logger');
 var syncDistWorker = require('./sync_dist');
 
@@ -45,12 +44,14 @@ console.log('[%s] [sync_worker:%s] syncing with %s mode',
   Date(), process.pid, config.syncModel);
 
 //set sync_status = 0 at first
-Total.updateSyncStatus(0, utility.noop);
+co(function* () {
+  yield* totalService.updateSyncStatus(0);
+})();
 
 // the same time only sync once
 var syncing = false;
 
-var handleSync = co(function *() {
+var handleSync = co(function* () {
   debug('mode: %s, syncing: %s', config.syncModel, syncing);
   if (!syncing) {
     syncing = true;
@@ -58,7 +59,7 @@ var handleSync = co(function *() {
     var data;
     var error;
     try {
-      data = yield *sync();
+      data = yield* sync();
     } catch (err) {
       error = err;
       error.message += ' (sync package error)';
@@ -74,7 +75,12 @@ var handleSync = co(function *() {
 
 if (sync) {
   handleSync();
-  setInterval(handleSync, ms(config.syncInterval));
+  var syncInterval = ms(config.syncInterval);
+  var minSyncInterval = ms('5m');
+  if (!syncInterval || syncInterval < minSyncInterval) {
+    syncInterval = minSyncInterval;
+  }
+  setInterval(handleSync, syncInterval);
 }
 
 /**
@@ -121,7 +127,7 @@ var syncPopular = co(function* syncPopular() {
   var data;
   var error;
   try {
-    data = yield *require('./sync_popular');
+    data = yield* require('./sync_popular');
   } catch (err) {
     error = err;
     error.message += ' (sync package error)';

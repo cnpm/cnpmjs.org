@@ -47,7 +47,8 @@ Our goal is to provide a low cost maintenance and easy to use solution for priva
 * **Support "scoped" packages**: [npm/npm#5239](https://github.com/npm/npm/issues/5239)
 * **Simple to deploy**: only need `mysql` and a [simple store system](https://github.com/cnpm/cnpmjs.org/wiki/NFS-Guide).
 You can get the source code through `npm` or `git`.
-* **Low cost and easy maintenance**: `package.json` info store in MySQL, tarball(tgz file) store in CDN or other store systems.
+* **Low cost and easy maintenance**: `package.json` info store in MySQL, MariaDB, SQLite or PostgreSQL databases,
+tarball(tgz file) store in CDN or other store systems.
 * **Automatic synchronization**: automatic synchronization from any registry specified, support two sync modes:
   - Sync all modules from a specified registry, like [npm registry](http://registry.npmjs.org).
   - Only sync the modules that exists in your own registry.
@@ -73,13 +74,11 @@ only need to change the registry in config. Even include manual synchronization 
 ### Dependencies
 
 * [node](http://nodejs.org) >=0.11.12, use `--harmony`
-* [mysql](http://dev.mysql.com/downloads/) >= 0.5.0, include `mysqld` and `mysql cli`. I test on `mysql@5.6.16`.
-
-### Start MySQL
-
-```bash
-$ nohup mysqld &
-```
+* Databases: only required one type
+  * [sqlite3](https://npm.taobao.org/package/sqlite3) >= 3.0.2, we use `sqlite3` by default
+  * [MySQL](http://dev.mysql.com/downloads/) >= 0.5.0, include `mysqld` and `mysql cli`. I test on `mysql@5.6.16`.
+  * MariaDB
+  * PostgreSQL
 
 ### Clone codes and run test
 

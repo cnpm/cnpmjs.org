@@ -17,7 +17,6 @@
 var debug = require('debug')('cnpmjs.org:sync:sync_dist');
 var fs = require('fs');
 var urllib = require('../common/urllib');
-var co = require('co');
 var bytes = require('bytes');
 var crypto = require('crypto');
 var utility = require('utility');
@@ -25,7 +24,7 @@ var thunkify = require('thunkify-wrap');
 var cheerio = require('cheerio');
 var urlResolve = require('url').resolve;
 var common = require('../lib/common');
-var Dist = require('../proxy/dist');
+var distService = require('../services/dist');
 var config = require('../config');
 var nfs = require('../common/nfs');
 var logger = require('../common/logger');
@@ -71,7 +70,7 @@ function* syncDir(fullname, info) {
 
   if (info) {
     logger.syncInfo('Save dir:%s %j to database', fullname, info);
-    yield* Dist.savedir(info);
+    yield* distService.savedir(info);
   }
 
   logger.syncInfo('Sync %s finished, %d dirs, %d files',
@@ -167,7 +166,7 @@ function* syncFile(info) {
   }
 
   logger.syncInfo('Sync dist file: %j done', info);
-  yield* Dist.savefile(info);
+  yield* distService.savefile(info);
 }
 
 // <a href="latest/">latest/</a>                                            02-May-2014 14:45                   -
@@ -320,7 +319,7 @@ sync.listdiff = function* (fullname) {
   if (items.length === 0) {
     return items;
   }
-  var exists = yield* Dist.listdir(fullname);
+  var exists = yield* distService.listdir(fullname);
   debug('listdiff %s got %s exists items', fullname, exists.length);
   var map = {};
   for (var i = 0; i < exists.length; i++) {
@@ -422,7 +421,7 @@ sync.listPhantomjsDiff = function* (fullname) {
   if (items.length === 0) {
     return items;
   }
-  var exists = yield* Dist.listdir(fullname);
+  var exists = yield* distService.listdir(fullname);
   debug('listdiff %s got %s exists items', fullname, exists.length);
   var map = {};
   for (var i = 0; i < exists.length; i++) {

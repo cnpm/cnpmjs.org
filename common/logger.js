@@ -17,10 +17,10 @@
 
 var formater = require('error-formater');
 var Logger = require('mini-logger');
-var config = require('../config');
 var utility = require('utility');
-var mail = require('./mail');
 var util = require('util');
+var config = require('../config');
+var mail = require('./mail');
 
 var isTEST = process.env.NODE_ENV === 'test';
 var categories = ['sync_info', 'sync_error'];

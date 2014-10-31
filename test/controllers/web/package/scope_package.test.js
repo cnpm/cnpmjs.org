@@ -22,7 +22,6 @@ var config = require('../../../../config');
 var registry = require('../../../../servers/registry');
 var web = require('../../../../servers/web');
 var utils = require('../../../utils');
-var Module = require('../../../../proxy/module');
 
 describe('controllers/web/package/scope_package.test.js', function () {
   var pkgname = '@cnpm/test-web-scope-package';
@@ -115,63 +114,5 @@ describe('controllers/web/package/scope_package.test.js', function () {
     .get('/' + pkgname)
     .expect('Location', '/package/' + pkgname)
     .expect(302, done);
-  });
-
-  describe('support adapt scope', function () {
-    before(function (done) {
-      var pkg = utils.getPackage('test-default-web-scope-package', '0.0.1', utils.admin);
-      request(registry)
-      .put('/' + pkg.name)
-      .set('authorization', utils.adminAuth)
-      .send(pkg)
-      .expect(201, done);
-    });
-
-    it('should adapt /@cnpm/test-default-web-scope-package => /test-default-web-scope-package', function (done) {
-      mm(config, 'adaptScope', true);
-      request(web)
-      .get('/package/@cnpm/test-default-web-scope-package')
-      .expect(200, function (err, res) {
-        should.not.exist(err);
-        var body = res.text;
-        body.should.containEql('@cnpm/test-default-web-scope-package');
-        body.should.containEql('/test-default-web-scope-package/download/test-default-web-scope-package-0.0.1.tgz');
-        done();
-      });
-    });
-
-    it('should not adapt /@cnpm123/test-default-web-scope-package', function (done) {
-      mm(config, 'adaptScope', true);
-      request(web)
-      .get('/package/@cnpm123/test-default-web-scope-package')
-      .expect(404, done);
-    });
-
-    it('should not adapt', function (done) {
-      mm(config, 'adaptScope', false);
-      request(web)
-      .get('/package/@cnpm/test-default-web-scope-package')
-      .expect(404, done);
-    });
-
-    it('should 404 when pkg not exists', function (done) {
-      mm(config, 'adaptScope', true);
-      request(web)
-      .get('/package/@cnpm/test-default-web-scope-package-not-exists')
-      .expect(404, done);
-    });
-
-    it('should 404 when pkg is not private package', function (done) {
-      var getByTag = Module.getByTag;
-      mm(Module, 'getByTag', function* (name, tag) {
-        var pkg = yield getByTag.call(Module, name, tag);
-        pkg && delete pkg.package._publish_on_cnpm;
-        return pkg;
-      });
-      mm(config, 'adaptScope', true);
-      request(web)
-      .get('/package/@cnpm/test-default-web-scope-package')
-      .expect(404, done);
-    });
   });
 });

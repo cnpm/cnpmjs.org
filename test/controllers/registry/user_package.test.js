@@ -17,34 +17,25 @@
 var should = require('should');
 var request = require('supertest');
 var pedding = require('pedding');
-var co = require('co');
 var app = require('../../../servers/registry');
-var SyncModuleWorker = require('../../../proxy/sync_module_worker');
-var NpmModuleMaintainer = require('../../../proxy/npm_module_maintainer');
 var utils = require('../../utils');
+var SyncModuleWorker = require('../../../controllers/sync_module_worker');
 
 describe('contributors/registry/user_package.test.js', function () {
   before(function (done) {
-    co(function* () {
-      yield* NpmModuleMaintainer.removeAll('pedding');
-    })(function (err) {
-      should.not.exist(err);
-
-      // sync pedding
-      var worker = new SyncModuleWorker({
-        name: 'pedding',
-        noDep: true,
-      });
-      worker.start();
-      worker.on('end', function () {
-        var pkg = utils.getPackage('test-user-package-module', '0.0.1', utils.otherAdmin2);
-
-        request(app)
-        .put('/' + pkg.name)
-        .set('authorization', utils.otherAdmin2Auth)
-        .send(pkg)
-        .expect(201, done);
-      });
+    // sync pedding
+    var worker = new SyncModuleWorker({
+      name: 'pedding',
+      noDep: true,
+    });
+    worker.start();
+    worker.on('end', function () {
+      var pkg = utils.getPackage('test-user-package-module', '0.0.1', utils.otherAdmin2);
+      request(app)
+      .put('/' + pkg.name)
+      .set('authorization', utils.otherAdmin2Auth)
+      .send(pkg)
+      .expect(201, done);
     });
   });
 
@@ -52,12 +43,12 @@ describe('contributors/registry/user_package.test.js', function () {
     it('should return one user\'s all package names', function (done) {
       request(app.listen())
       .get('/-/by-user/fengmk2')
-      .expect(200)
-      .expect({
-        fengmk2: [
-          'pedding',
-        ]
-      }, done);
+      .expect(200, function (err, res) {
+        should.not.exist(err);
+        res.body.fengmk2.should.be.an.Array;
+        res.body.fengmk2.should.containEql('pedding');
+        done();
+      });
     });
 
     it('should return {} when user not exists', function (done) {
@@ -74,27 +65,25 @@ describe('contributors/registry/user_package.test.js', function () {
 
       request(app.listen())
       .get('/-/by-user/' + encodeURIComponent('fengmk2|dead-horse'))
-      .expect(200)
-      .expect({
-        fengmk2: [
-          'pedding',
-        ],
-        'dead-horse': [
-          'pedding'
-        ]
-      }, done);
+      .expect(200, function (err, res) {
+        should.not.exist(err);
+        res.body.fengmk2.should.be.an.Array;
+        res.body.fengmk2.should.containEql('pedding');
+        res.body['dead-horse'].should.be.an.Array;
+        res.body['dead-horse'].should.containEql('pedding');
+        done();
+      });
 
       request(app.listen())
       .get('/-/by-user/fengmk2|dead-horse')
-      .expect(200)
-      .expect({
-        fengmk2: [
-          'pedding',
-        ],
-        'dead-horse': [
-          'pedding'
-        ]
-      }, done);
+      .expect(200, function (err, res) {
+        should.not.exist(err);
+        res.body.fengmk2.should.be.an.Array;
+        res.body.fengmk2.should.containEql('pedding');
+        res.body['dead-horse'].should.be.an.Array;
+        res.body['dead-horse'].should.containEql('pedding');
+        done();
+      });
     });
 
     it('should return some exists user\'s all package names', function (done) {
@@ -102,24 +91,23 @@ describe('contributors/registry/user_package.test.js', function () {
 
       request(app.listen())
       .get('/-/by-user/' + encodeURIComponent('fengmk2|user-not-exists'))
-      .expect(200)
-      .expect({
-        fengmk2: [
-          'pedding'
-        ]
-      }, done);
+      .expect(200, function (err, res) {
+        should.not.exist(err);
+        res.body.fengmk2.should.be.an.Array;
+        res.body.fengmk2.should.containEql('pedding');
+        done();
+      });
 
       request(app.listen())
       .get('/-/by-user/' + utils.otherAdmin2 + '|fengmk2|user-not-exists|')
-      .expect(200)
-      .expect({
-        cnpmjstestAdmin2: [
-          'test-user-package-module'
-        ],
-        fengmk2: [
-          'pedding'
-        ]
-      }, done);
+      .expect(200, function (err, res) {
+        should.not.exist(err);
+        res.body.fengmk2.should.be.an.Array;
+        res.body.fengmk2.should.containEql('pedding');
+        res.body.cnpmjstestAdmin2.should.be.an.Array;
+        res.body.cnpmjstestAdmin2.should.containEql('test-user-package-module');
+        done();
+      });
     });
 
     it('should return {} when users not exists', function (done) {

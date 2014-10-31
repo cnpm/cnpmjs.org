@@ -14,31 +14,47 @@
  * Module dependencies.
  */
 
-var should = require('should');
 var mm = require('mm');
 var sync = require('../../sync/sync_exist');
-var Npm = require('../../proxy/npm');
-var Total = require('../../proxy/total');
+var npmService = require('../../services/npm');
+var totalService = require('../../services/total');
+var SyncModuleWorker = require('../../controllers/sync_module_worker');
 
 describe('sync/sync_exist.test.js', function () {
   describe('sync()', function () {
     afterEach(mm.restore);
 
+    before(function (done) {
+      var worker = new SyncModuleWorker({
+        name: 'pedding',
+        username: 'admin',
+        noDep: true
+      });
+      worker.start();
+      worker.on('end', done);
+    });
+
     it('should sync first time ok', function *() {
-      mm.data(Npm, 'getShort', ['mk2testmodule']);
-      mm.data(Total, 'getTotalInfo', {last_exist_sync_time: 0});
-      var data = yield sync();
-      data.successes.should.eql(['mk2testmodule']);
+      mm.data(npmService, 'getShort', ['pedding']);
+      mm.data(totalService, 'getTotalInfo', {last_exist_sync_time: 0});
+      var data = yield* sync();
+      data.successes.should.eql(['pedding']);
     });
 
     it('should sync common ok', function *() {
-      mm.data(Npm, 'getAllSince', {
+      mm.data(npmService, 'getAllSince', {
         _updated: Date.now(),
-        'mk2testmodule': {},
+        'pedding': {},
       });
-      mm.data(Total, 'getTotalInfo', {last_exist_sync_time: Date.now()});
-      var data = yield sync();
-      data.successes.should.eql(['mk2testmodule']);
+      mm.data(totalService, 'getTotalInfo', {last_exist_sync_time: Date.now()});
+      var data = yield* sync();
+      data.successes.should.eql(['pedding']);
+
+      mm.data(npmService, 'getAllSince', {
+        _updated: Date.now(),
+      });
+      var data = yield* sync();
+      data.successes.should.eql([]);
     });
   });
 });

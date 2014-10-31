@@ -31,7 +31,6 @@ module.exports = function *login(next) {
   }
 
   if (!this.user.name) {
-
     this.status = 401;
     this.body = {
       error: 'unauthorized',

@@ -16,8 +16,8 @@
 
 var should = require('should');
 var mm = require('mm');
-var npm = require('../../proxy/npm');
-var User = require('../../proxy/user');
+var User = require('../../models').User;
+var npm = require('../../services/npm');
 var DefaultUserService = require('../../services/default_user_service');
 var config = require('../../config');
 

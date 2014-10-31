@@ -15,15 +15,15 @@
  * Module dependencies.
  */
 
-var Total = require('../proxy/total');
-var Download = require('./download');
+var Total = require('../services/total');
 var version = require('../package.json').version;
 var config = require('../config');
+var getDownloadTotal = require('./utils').getDownloadTotal;
 
 var startTime = '' + Date.now();
 
-exports.show = function *() {
-  var r = yield [Total.get(), Download.total()];
+module.exports = function* showTotal() {
+  var r = yield [Total.get(), getDownloadTotal()];
   var total = r[0];
   var download = r[1];
 

@@ -15,13 +15,12 @@
  * Module dependencies.
  */
 
+var childProcess = require('child_process');
 var path = require('path');
 var util = require('util');
-var cluster = require('cluster');
 var cfork = require('cfork');
 var config = require('./config');
 var workerPath = path.join(__dirname, 'worker.js');
-var childProcess = require('child_process');
 var syncPath = path.join(__dirname, 'sync');
 
 if (config.enableCluster) {

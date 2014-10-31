@@ -12,15 +12,11 @@
 
 var should = require('should');
 var request = require('supertest');
-var path = require('path');
 var mm = require('mm');
 var pedding = require('pedding');
 var config = require('../../../../config');
 var app = require('../../../../servers/registry');
 var utils = require('../../../utils');
-var Module = require('../../../../proxy/module');
-
-var fixtures = path.join(__dirname, '..', '..', '..', 'fixtures');
 
 describe('controllers/registry/module/public_module.test.js', function () {
   beforeEach(function () {
@@ -60,237 +56,6 @@ describe('controllers/registry/module/public_module.test.js', function () {
     });
   });
   afterEach(mm.restore);
-
-  describe('PUT /:name/-rev/id updateMaintainers() in public mode', function () {
-    beforeEach(function () {
-      mm(config, 'forcePublishWithScope', false);
-    });
-
-    before(function (done) {
-      mm(config, 'enablePrivate', false);
-      mm(config, 'forcePublishWithScope', false);
-      request(app)
-      .put('/publictestmodule/-rev/1')
-      .send({
-        maintainers: [{
-          name: 'cnpmjstest101',
-          email: 'fengmk2@cnpmjs.org'
-        }]
-      })
-      .set('authorization', utils.otherUserAuth)
-      .expect({"ok":true,"id":"publictestmodule","rev":"1"}, done);
-    });
-
-    it('should add new maintainers', function (done) {
-      request(app)
-      .put('/publictestmodule/-rev/1')
-      .send({
-        maintainers: [{
-          name: 'cnpmjstest10',
-          email: 'fengmk2@cnpmjs.org'
-        }, {
-          name: 'cnpmjstest101',
-          email: 'fengmk2@cnpmjs.org'
-        }]
-      })
-      .set('authorization', utils.otherUserAuth)
-      .expect(201)
-      .expect({
-        ok: true, id: 'publictestmodule', rev: '1'
-      }, function (err) {
-        should.not.exist(err);
-        done = pedding(2, done);
-        // check maintainers update
-        request(app)
-        .get('/publictestmodule')
-        .expect(200, function (err, res) {
-          should.not.exist(err);
-          var pkg = res.body;
-          pkg.maintainers.should.length(2);
-          pkg.maintainers.should.eql(pkg.versions['0.0.1'].maintainers);
-          pkg.maintainers.sort(function (a, b) {
-            return a.name > b.name ? 1 : -1;
-          });
-          pkg.maintainers.should.eql([
-            { name: 'cnpmjstest10', email: 'fengmk2@gmail.com' },
-            { name: 'cnpmjstest101', email: 'fengmk2@gmail.com' },
-          ]);
-          done();
-        });
-
-        // /pkg/0.0.1
-        request(app)
-        .get('/publictestmodule/0.0.1')
-        .expect(200, function (err, res) {
-          should.not.exist(err);
-          var pkg = res.body;
-          pkg.maintainers.should.length(2);
-          pkg.maintainers.sort(function (a, b) {
-            return a.name > b.name ? 1 : -1;
-          });
-          pkg.maintainers.should.eql([
-            { name: 'cnpmjstest10', email: 'fengmk2@gmail.com' },
-            { name: 'cnpmjstest101', email: 'fengmk2@gmail.com' },
-          ]);
-          done();
-        });
-      });
-    });
-
-    it('should add again new maintainers', function (done) {
-      request(app)
-      .put('/publictestmodule/-rev/1')
-      .send({
-        maintainers: [{
-          name: 'cnpmjstest101',
-          email: 'cnpmjstest101@cnpmjs.org'
-        }, {
-          name: 'fengmk2',
-          email: 'fengmk2@cnpmjs.org'
-        }]
-      })
-      .set('authorization', utils.otherUserAuth)
-      .expect(201)
-      .expect('content-type', 'application/json; charset=utf-8', done);
-    });
-
-    it('should add new maintainers by admin', function (done) {
-      request(app)
-      .put('/publictestmodule/-rev/1')
-      .send({
-        maintainers: [{
-          name: 'cnpmjstest101',
-          email: 'cnpmjstest101@cnpmjs.org'
-        }, {
-          name: 'fengmk2',
-          email: 'fengmk2@cnpmjs.org'
-        }]
-      })
-      .set('authorization', utils.adminAuth)
-      .expect(201)
-      .expect('content-type', 'application/json; charset=utf-8', done);
-    });
-
-    it('should rm maintainers', function (done) {
-      request(app)
-      .put('/publictestmodule/-rev/1')
-      .send({
-        maintainers: [{
-          name: 'cnpmjstest101',
-          email: 'cnpmjstest101@cnpmjs.org'
-        }]
-      })
-      .set('authorization', utils.otherUserAuth)
-      .expect(201)
-      .expect('content-type', 'application/json; charset=utf-8', done);
-    });
-
-    it('should rm again maintainers', function (done) {
-      request(app)
-      .put('/publictestmodule/-rev/1')
-      .send({
-        maintainers: [{
-          name: 'cnpmjstest101',
-          email: 'cnpmjstest101@cnpmjs.org'
-        }]
-      })
-      .set('authorization', utils.otherUserAuth)
-      .expect(201)
-      .expect({
-        id: 'publictestmodule',
-        rev: '1',
-        ok: true
-      }, done);
-    });
-
-    it('should rm all maintainers forbidden 403', function (done) {
-      request(app)
-      .put('/publictestmodule/-rev/1')
-      .send({
-        maintainers: []
-      })
-      .set('authorization', utils.otherUserAuth)
-      .expect(403)
-      .expect({error: 'invalid operation', reason: 'Can not remove all maintainers'})
-      .expect('content-type', 'application/json; charset=utf-8', done);
-    });
-
-    it('should 403 when not maintainer update', function (done) {
-      request(app)
-      .put('/publictestmodule/-rev/1')
-      .send({
-        maintainers: [{
-          name: 'cnpmjstest10',
-          email: 'cnpmjstest10@cnpmjs.org'
-        }]
-      })
-      .set('authorization', utils.secondUserAuth)
-      .expect(403)
-      .expect({
-        error: 'forbidden user',
-        reason: 'cnpmjstest102 not authorized to modify publictestmodule'
-      }, done);
-    });
-
-    describe('forcePublishWithScope = true', function () {
-      beforeEach(function () {
-        mm(config, 'forcePublishWithScope', true);
-      });
-
-      before(function (done) {
-        mm(config, 'forcePublishWithScope', true);
-        mm(config, 'enablePrivate', false);
-        var pkg = utils.getPackage('@cnpm/publictestmodule', '0.0.1', utils.otherUser);
-        request(app)
-        .put('/' + pkg.name)
-        .set('authorization', utils.otherUserAuth)
-        .send(pkg)
-        .expect(201, function (err, res) {
-          should.not.exist(err);
-          pkg = utils.getPackage(pkg.name, '0.0.2', utils.otherUser);
-          // publish 0.0.2
-          request(app)
-          .put('/' + pkg.name)
-          .set('authorization', utils.otherUserAuth)
-          .send(pkg)
-          .expect(201, done);
-        });
-      });
-
-      it('should 403 add maintainers without scope', function (done) {
-        request(app)
-        .put('/publictestmodule/-rev/1')
-        .send({
-          maintainers: [{
-            name: 'cnpmjstest101',
-            email: 'cnpmjstest101@cnpmjs.org'
-          }, {
-            name: 'fengmk2',
-            email: 'fengmk2@cnpmjs.org'
-          }]
-        })
-        .set('authorization', utils.otherUserAuth)
-        .expect(403, done);
-      });
-
-      it('should add maintainers ok with scope', function (done) {
-        request(app)
-        .put('/@cnpm/publictestmodule/-rev/1')
-        .send({
-          maintainers: [{
-            name: 'cnpmjstest101',
-            email: 'cnpmjstest101@cnpmjs.org'
-          }, {
-            name: 'fengmk2',
-            email: 'fengmk2@cnpmjs.org'
-          }]
-        })
-        .set('authorization', utils.otherUserAuth)
-        .expect( { ok: true, id: '@cnpm/publictestmodule', rev: '1' })
-        .expect(201, done);
-      });
-    });
-  });
 
   describe('PUT /:name publish new flow addPackageAndDist()', function () {
     beforeEach(function () {
@@ -423,8 +188,6 @@ describe('controllers/registry/module/public_module.test.js', function () {
     });
 
     it('should remove with version ok', function (done) {
-      mm.empty(Module, 'removeByNameAndVersions');
-      mm.empty(Module, 'removeTagsByIds');
       request(app)
       .put('/publicremovemodule/-rev/' + withoutScopeRev)
       .set('authorization', utils.otherUserAuth)
@@ -437,8 +200,6 @@ describe('controllers/registry/module/public_module.test.js', function () {
     });
 
     it('should no auth user remove 403', function (done) {
-      mm.empty(Module, 'removeByNameAndVersions');
-      mm.empty(Module, 'removeTagsByIds');
       request(app)
       .put('/publicremovemodule/-rev/' + withoutScopeRev)
       .set('authorization', utils.secondUserAuth)
@@ -451,8 +212,6 @@ describe('controllers/registry/module/public_module.test.js', function () {
     });
 
     it('should admin remove ok', function (done) {
-      mm.empty(Module, 'removeByNameAndVersions');
-      mm.empty(Module, 'removeTagsByIds');
       request(app)
       .put('/publicremovemodule/-rev/' + withoutScopeRev)
       .set('authorization', utils.adminAuth)
@@ -494,8 +253,6 @@ describe('controllers/registry/module/public_module.test.js', function () {
 
       it('should remove without scope 403', function (done) {
         mm(config, 'forcePublishWithScope', true);
-        mm.empty(Module, 'removeByNameAndVersions');
-        mm.empty(Module, 'removeTagsByIds');
         request(app)
         .put('/publicremovemodule/-rev/' + withoutScopeRev)
         .set('authorization', utils.otherUserAuth)
@@ -509,8 +266,6 @@ describe('controllers/registry/module/public_module.test.js', function () {
 
       it('should admin remove without scope ok', function (done) {
         mm(config, 'forcePublishWithScope', true);
-        mm.empty(Module, 'removeByNameAndVersions');
-        mm.empty(Module, 'removeTagsByIds');
         request(app)
         .put('/publicremovemodule/-rev/' + withoutScopeRev)
         .set('authorization', utils.adminAuth)
@@ -524,8 +279,6 @@ describe('controllers/registry/module/public_module.test.js', function () {
 
       it('should remove with scope ok', function (done) {
         mm(config, 'forcePublishWithScope', true);
-        mm.empty(Module, 'removeByNameAndVersions');
-        mm.empty(Module, 'removeTagsByIds');
         request(app)
         .put('/@cnpm/publicremovemodule/-rev/' + withScopeRev)
         .set('authorization', utils.otherUserAuth)
@@ -539,8 +292,6 @@ describe('controllers/registry/module/public_module.test.js', function () {
 
       it('should admin remove with scope ok', function (done) {
         mm(config, 'forcePublishWithScope', true);
-        mm.empty(Module, 'removeByNameAndVersions');
-        mm.empty(Module, 'removeTagsByIds');
         request(app)
         .put('/@cnpm/publicremovemodule/-rev/' + withScopeRev)
         .set('authorization', utils.adminAuth)
@@ -659,8 +410,7 @@ describe('controllers/registry/module/public_module.test.js', function () {
       .set('content-type', 'application/json')
       .set('authorization', utils.otherUserAuth)
       .send('"0.0.1"')
-      .expect(201)
-      .expect({"ok":true}, done);
+      .expect(201, done);
     });
 
     it('shold update tag not maintainer 403', function (done) {
@@ -697,10 +447,19 @@ describe('controllers/registry/module/public_module.test.js', function () {
         .set('content-type', 'application/json')
         .set('authorization', utils.otherUserAuth)
         .send(pkg)
-        .expect(201, done);
+        .expect(201, function (err) {
+          should.not.exist(err);
+          var pkg = utils.getPackage('public-remove-all-module-admin', '0.0.1', utils.otherUser);
+          request(app)
+          .put('/public-remove-all-module-admin')
+          .set('content-type', 'application/json')
+          .set('authorization', utils.otherUserAuth)
+          .send(pkg)
+          .expect(201, done);
+        });
       });
 
-      it('shold fail when user not maintainer', function (done) {
+      it('should fail when user not maintainer', function (done) {
         request(app)
         .del('/public-remove-all-module/-rev/1')
         .set('authorization', utils.secondUserAuth)
@@ -714,9 +473,7 @@ describe('controllers/registry/module/public_module.test.js', function () {
         });
       });
 
-      it('shold maintainer remove ok', function (done) {
-        mm.empty(Module, 'removeByName');
-        mm.empty(Module, 'removeTags');
+      it('should maintainer remove ok', function (done) {
         request(app)
         .del('/public-remove-all-module/-rev/1')
         .set('authorization', utils.otherUserAuth)
@@ -727,11 +484,9 @@ describe('controllers/registry/module/public_module.test.js', function () {
         });
       });
 
-      it('shold admin remove ok', function (done) {
-        mm.empty(Module, 'removeByName');
-        mm.empty(Module, 'removeTags');
+      it('should admin remove ok', function (done) {
         request(app)
-        .del('/public-remove-all-module/-rev/1')
+        .del('/public-remove-all-module-admin/-rev/1')
         .set('authorization', utils.adminAuth)
         .expect(200, function (err, res) {
           should.not.exist(err);
@@ -750,7 +505,25 @@ describe('controllers/registry/module/public_module.test.js', function () {
           .set('content-type', 'application/json')
           .set('authorization', utils.otherUserAuth)
           .send(pkg)
-          .expect(201, done);
+          .expect(201, function (err) {
+            should.not.exist(err);
+            var pkg = utils.getPackage('@cnpm/public-remove-all-module-admin', '0.0.1', utils.otherUser);
+            request(app)
+            .put('/@cnpm/public-remove-all-module-admin')
+            .set('content-type', 'application/json')
+            .set('authorization', utils.otherUserAuth)
+            .send(pkg)
+            .expect(201, function (err) {
+              should.not.exist(err);
+              var pkg = utils.getPackage('public-remove-all-module-admin', '0.1.1', utils.admin);
+              request(app)
+              .put('/public-remove-all-module-admin')
+              .set('content-type', 'application/json')
+              .set('authorization', utils.adminAuth)
+              .send(pkg)
+              .expect(201, done);
+            });
+          });
         });
 
         it('should fail when user remove module without scope', function (done) {
@@ -761,20 +534,16 @@ describe('controllers/registry/module/public_module.test.js', function () {
           .expect(403, done);
         });
 
-        it('shold admin remove module without scope ok', function (done) {
+        it('should admin remove module without scope ok', function (done) {
           mm(config, 'forcePublishWithScope', true);
-          mm.empty(Module, 'removeByName');
-          mm.empty(Module, 'removeTags');
           request(app)
-          .del('/public-remove-all-module/-rev/1')
+          .del('/public-remove-all-module-admin/-rev/1')
           .set('authorization', utils.adminAuth)
           .expect(200, done);
         });
 
-        it('shold maintainer remove ok', function (done) {
+        it('should maintainer remove ok', function (done) {
           mm(config, 'forcePublishWithScope', true);
-          mm.empty(Module, 'removeByName');
-          mm.empty(Module, 'removeTags');
           request(app)
           .del('/@cnpm/public-remove-all-module/-rev/1')
           .set('authorization', utils.otherUserAuth)
@@ -785,12 +554,10 @@ describe('controllers/registry/module/public_module.test.js', function () {
           });
         });
 
-        it('shold admin remove ok', function (done) {
+        it('should admin remove ok', function (done) {
           mm(config, 'forcePublishWithScope', true);
-          mm.empty(Module, 'removeByName');
-          mm.empty(Module, 'removeTags');
           request(app)
-          .del('/@cnpm/public-remove-all-module/-rev/1')
+          .del('/@cnpm/public-remove-all-module-admin/-rev/1')
           .set('authorization', utils.adminAuth)
           .expect(200, function (err, res) {
             should.not.exist(err);

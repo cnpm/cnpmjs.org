@@ -22,8 +22,6 @@ var template = '<?xml version="1.0" encoding="UTF-8"?>\
     <Url method="get" type="text/html" template="http://${host}/browse/keyword/{searchTerms}"/>\
  </OpenSearchDescription>';
 
-var lastModifyDate = new Date();
-
 module.exports = function *publishable(next) {
   if (this.path === '/opensearch.xml') {
     this.type = 'text/xml';
