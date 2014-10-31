@@ -18,7 +18,7 @@ var Sequelize = require('sequelize');
 var DataTypes = require('sequelize/lib/data-types');
 var config = require('../config');
 
-if (!config.database) {
+if (config.mysqlServers && config.database.dialect === 'sqlite') {
   // https://github.com/cnpm/cnpmjs.org/wiki/Migrating-from-1.x-to-2.x
   // forward compat with old style on 1.x
   // mysqlServers: [
@@ -33,10 +33,7 @@ if (!config.database) {
   // mysqlMaxConnections: 4,
   // mysqlQueryTimeout: 5000,
 
-  if (!config.mysqlServers) {
-    throw new TypeError('config.js format error, please @see https://github.com/cnpm/cnpmjs.org/wiki/Migrating-from-1.x-to-2.x');
-  }
-
+  console.warn('[WARNNING] your config.js was too old, please @see https://github.com/cnpm/cnpmjs.org/wiki/Migrating-from-1.x-to-2.x');
   var server = config.mysqlServers[0];
   config.database = {
     db: config.mysqlDatabase,
