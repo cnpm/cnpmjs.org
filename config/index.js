@@ -173,10 +173,6 @@ var config = {
     '@cnpmtest'
   ],
 
-  // redirect @cnpm/private-package => private-package
-  // forward compatbility for update from lower version cnpmjs.org
-  adaptScope: true,
-
   // force user publish with scope
   // but admins still can publish without scope
   forcePublishWithScope: true,
@@ -184,7 +180,7 @@ var config = {
   // some registry already have some private packages in global scope
   // but we want to treat them as scoped private packages,
   // so you can use this white list.
-  privatePackages: ['private-package'],
+  privatePackages: [],
 
   /**
    * sync configs
