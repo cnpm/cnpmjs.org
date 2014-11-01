@@ -38,7 +38,7 @@ exports.sync = function* () {
     noDep: noDep,
   };
 
-  var logId = yield SyncModuleWorker.sync(name, username, options);
+  var logId = yield* SyncModuleWorker.sync(name, username, options);
   debug('sync %s got log id %j', name, logId);
 
   this.status = 201;
