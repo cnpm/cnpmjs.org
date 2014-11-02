@@ -1,5 +1,18 @@
 
-1.7.1 / 2014-10-15 
+2.0.0-beta0 / 2014-11-02
+==================
+
+ * ungrade koa-markdown to use remarkable, close #482
+ * fix(module_log): limit module sync log size to 1MB
+ * refactor(config): remove adaptScope config key
+ * chore(Makefile): $ make install-production
+ * fix(sequelize): show warnning message when using old config.js
+ * docs(readme): Migrating from 1.x to 2.x
+ * feat(sync): add min sync interval time detect
+ * refactor(dispatch): remove unused codes
+ * use sequelize to connect database
+
+1.7.1 / 2014-10-15
 ==================
 
   * fix typo in sync popular, fix [#477](https://github.com/cnpm/cnpmjs.org/issues/477)
@@ -54,7 +67,7 @@
 
  * support im url on user profile page; update bootstrap to 3.2.0
 
-1.5.1 / 2014-09-23 
+1.5.1 / 2014-09-23
 ==================
 
   * search support case insensitive, close [#450](https://github.com/cnpm/cnpmjs.org/issues/450)
