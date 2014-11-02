@@ -97,7 +97,7 @@ autod: install
 		--prefix "~" \
 		--exclude public,view,docs,backup,coverage \
 		--dep bluebird,mysql \
-		--devdep mocha,should,istanbul-harmony,jshint
+		--keep should,supertest,should-http,chunkstream,mm,pedding
 	@$(MAKE) install
 
 .PHONY: test

@@ -13,7 +13,7 @@
     "agentkeepalive": "~1.2.0",
     "bluebird": "~2.3.10",
     "bytes": "~1.0.0",
-    "cfork": "~1.2.0",
+    "cfork": "~1.2.1",
     "cheerio": "~0.17.0",
     "co": "~3.1.0",
     "co-defer": "~0.1.1",
@@ -43,8 +43,8 @@
     "redis": "~0.12.1",
     "semver": "~4.1.0",
     "sequelize": "~2.0.0-rc2",
-    "thunkify-wrap": "~1.0.2",
-    "urllib": "~2.0.1",
+    "thunkify-wrap": "~1.0.3",
+    "urllib": "~2.0.2",
     "utility": "~1.2.0"
   },
   "devDependencies": {
