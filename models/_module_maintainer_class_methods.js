@@ -148,7 +148,6 @@ exports.updateMaintainers = function* (name, users) {
 
   yield [
     this.addMaintainers(name, addUsers),
-    // make sure all add users success then remove users
     this.removeMaintainers(name, removeUsers),
   ];
 
