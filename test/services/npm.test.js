@@ -61,8 +61,28 @@ describe('services/npm.test.js', function () {
 
   describe('getPopular()', function () {
     it('should return popular modules', function* () {
+      mm.http.request(/\//, JSON.stringify({
+        rows: [
+          { key: ['foo0'], value: 1 },
+          { key: ['foo1'], value: 1 },
+          { key: ['foo2'], value: 1 },
+          { key: ['foo3'], value: 1 },
+          { key: ['foo4'], value: 1 },
+          { key: ['foo5'], value: 1 },
+          { key: ['foo6'], value: 1 },
+          { key: ['foo7'], value: 1 },
+          { key: ['foo8'], value: 1 },
+          { key: ['foo9'], value: 1 },
+          { key: ['foo10'], value: 1 },
+          { key: ['underscore'], value: 100 },
+          { key: ['foo12'], value: 1 },
+          { key: ['foo13'], value: 1 },
+          { key: ['foo14'], value: 1 },
+          { key: ['foo15'], value: 1 },
+        ]
+      }));
       var names = yield* npm.getPopular(10);
-      names.should.have.a.lengthOf(10);
+      names.should.length(10);
       names[0].should.equal('underscore');
     });
   });

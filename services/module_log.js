@@ -26,6 +26,8 @@ exports.create = function* (data) {
   return yield row.save();
 };
 
+var ONE_MB = 1024 * 1024;
+
 exports.append = function* (id, log) {
   if (!log) {
     return null;
@@ -35,7 +37,15 @@ exports.append = function* (id, log) {
   if (!row) {
     return null;
   }
-  row.log += '\n' + log;
+
+  if (row.log) {
+    row.log += '\n' + log;
+  } else {
+    row.log = log;
+  }
+  if (row.log.length >= ONE_MB) {
+    row.log = '...\n' + row.log.substring(ONE_MB / 2);
+  }
   return yield row.save(['log']);
 };
 

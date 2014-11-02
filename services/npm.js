@@ -31,7 +31,7 @@ function* request(url, options) {
   url = registry + url;
   var r;
   try {
-    r = yield urllib.request(url, options);
+    r = yield urllib.requestThunk(url, options);
   } catch (err) {
     var statusCode = err.status || -1;
     var data = err.data || '[empty]';
@@ -73,7 +73,7 @@ exports.getAllSince = function* (startkey, timeout) {
 };
 
 exports.getShort = function* (timeout) {
-  var r = yield *request('/-/short', {
+  var r = yield* request('/-/short', {
     timeout: timeout || 300000,
     // registry.npmjs.org/-/short is 404 now therefore have a fallback
     registry: config.sourceNpmRegistryIsCNpm ? config.sourceNpmRegistry : 'http://r.cnpmjs.org',
@@ -82,7 +82,7 @@ exports.getShort = function* (timeout) {
 };
 
 exports.getPopular = function* (top, timeout) {
-  var r = yield *request('/-/_view/dependedUpon?group_level=1', {
+  var r = yield* request('/-/_view/dependedUpon?group_level=1', {
     registry: config.officialNpmRegistry,
     timeout: timeout || 60000
   });

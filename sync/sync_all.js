@@ -53,7 +53,7 @@ function* getCommonSyncPackages(lastSyncTime) {
   return Object.keys(data);
 }
 
-module.exports = function *sync() {
+module.exports = function* sync() {
   var syncTime = Date.now();
   var info = yield* totalService.getTotalInfo();
   if (!info) {
@@ -64,9 +64,9 @@ module.exports = function *sync() {
   debug('Last sync time %s', new Date(info.last_sync_time));
   if (!info.last_sync_time) {
     debug('First time sync all packages from official registry');
-    packages = yield getFirstSyncPackages(info.last_sync_module);
+    packages = yield* getFirstSyncPackages(info.last_sync_module);
   } else {
-    packages = yield getCommonSyncPackages(info.last_sync_time - ms('10m'));
+    packages = yield* getCommonSyncPackages(info.last_sync_time - ms('10m'));
   }
 
   packages = packages || [];
