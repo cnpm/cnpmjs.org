@@ -88,7 +88,8 @@ module.exports = function* sync() {
   var worker = new SyncModuleWorker({
     username: 'admin',
     name: packages,
-    concurrency: config.syncConcurrency
+    concurrency: config.syncConcurrency,
+    syncUpstreamFirst: false,
   });
   Status.init({need: packages.length}, worker);
   worker.start();

@@ -17,6 +17,7 @@
 var debug = require('debug')('cnpmjs.org:controllers:sync');
 var Log = require('../services/module_log');
 var SyncModuleWorker = require('./sync_module_worker');
+var config = require('../config');
 
 exports.sync = function* () {
   var username = this.user.name || 'anonymous';
@@ -36,6 +37,7 @@ exports.sync = function* () {
   var options = {
     publish: publish,
     noDep: noDep,
+    syncUpstreamFirst: config.sourceNpmRegistryIsCNpm,
   };
 
   var logId = yield* SyncModuleWorker.sync(name, username, options);
