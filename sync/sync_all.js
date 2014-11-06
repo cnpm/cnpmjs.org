@@ -14,7 +14,6 @@
  * Module dependencies.
  */
 
-var debug = require('debug')('cnpmjs.org:sync:sync_all');
 var ms = require('humanize-ms');
 var thunkify = require('thunkify-wrap');
 var config = require('../config');
@@ -22,6 +21,7 @@ var Status = require('./status');
 var npmService = require('../services/npm');
 var totalService = require('../services/total');
 var SyncModuleWorker = require('../controllers/sync_module_worker');
+var logger = require('../common/logger');
 
 /**
  * when sync from official at the first time
@@ -61,9 +61,9 @@ module.exports = function* sync() {
   }
 
   var packages;
-  debug('Last sync time %s', new Date(info.last_sync_time));
+  logger.syncInfo('Last sync time %s', new Date(info.last_sync_time));
   if (!info.last_sync_time) {
-    debug('First time sync all packages from official registry');
+    logger.syncInfo('First time sync all packages from official registry');
     packages = yield* getFirstSyncPackages(info.last_sync_module);
   } else {
     packages = yield* getCommonSyncPackages(info.last_sync_time - ms('10m'));
@@ -71,10 +71,10 @@ module.exports = function* sync() {
 
   packages = packages || [];
   if (!packages.length) {
-    debug('no packages need be sync');
+    logger.syncInfo('no packages need be sync');
     return;
   }
-  debug('Total %d packages to sync', packages.length);
+  logger.syncInfo('Total %d packages to sync: %j', packages.length, packages);
 
   var worker = new SyncModuleWorker({
     username: 'admin',
@@ -87,7 +87,7 @@ module.exports = function* sync() {
   var end = thunkify.event(worker);
   yield end();
 
-  debug('All packages sync done, successes %d, fails %d',
+  logger.syncInfo('All packages sync done, successes %d, fails %d',
       worker.successes.length, worker.fails.length);
   //only when all succss, set last sync time
   if (!worker.fails.length) {

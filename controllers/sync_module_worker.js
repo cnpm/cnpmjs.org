@@ -129,7 +129,11 @@ SyncModuleWorker.prototype.start = function () {
   co(function *() {
     // sync upstream
     if (config.sourceNpmRegistryIsCNpm) {
-      yield* that.syncUpstream(that.startName);
+      try {
+        yield* that.syncUpstream(that.startName);
+      } catch (err) {
+        logger.error(err);
+      }
     }
 
     var arr = [];
@@ -137,11 +141,7 @@ SyncModuleWorker.prototype.start = function () {
       arr.push(that.next(i));
     }
     yield arr;
-  })(function (err) {
-    if (err) {
-      logger.error(err);
-    }
-  });
+  })();
 };
 
 SyncModuleWorker.prototype.pushSuccess = function (name) {
