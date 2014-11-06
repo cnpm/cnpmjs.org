@@ -46,7 +46,11 @@ console.log('[%s] [sync_worker:%s] syncing with %s mode',
 //set sync_status = 0 at first
 co(function* () {
   yield* totalService.updateSyncStatus(0);
-})();
+})(function (err) {
+  if (err) {
+    logger.error(err);
+  }
+});
 
 // the same time only sync once
 var syncing = false;

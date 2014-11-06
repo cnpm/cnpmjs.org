@@ -137,7 +137,11 @@ SyncModuleWorker.prototype.start = function () {
       arr.push(that.next(i));
     }
     yield arr;
-  })();
+  })(function (err) {
+    if (err) {
+      logger.error(err);
+    }
+  });
 };
 
 SyncModuleWorker.prototype.pushSuccess = function (name) {
@@ -243,7 +247,7 @@ SyncModuleWorker.prototype.syncUpstream = function* (name) {
   this.log('----------------- Synced upstream %s -------------------', logURL);
 };
 
-SyncModuleWorker.prototype.next = function *(concurrencyId) {
+SyncModuleWorker.prototype.next = function* (concurrencyId) {
   var name = this.names.shift();
   if (!name) {
     return setImmediate(this.finish.bind(this));
