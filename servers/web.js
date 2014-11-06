@@ -77,7 +77,10 @@ app.use(markdown({
   layout: layoutFile,
   titleHolder: '<%- locals.title %>',
   bodyHolder: '<%- locals.body %>',
-  indexName: '_readme'
+  indexName: '_readme',
+  remarkableOptions: {
+    html: true
+  }
 }));
 
 var locals = {
