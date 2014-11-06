@@ -52,9 +52,14 @@ co(function* () {
   }
 });
 
+var syncInterval = ms(config.syncInterval);
+var minSyncInterval = ms('5m');
+if (!syncInterval || syncInterval < minSyncInterval) {
+  syncInterval = minSyncInterval;
+}
+
 // the same time only sync once
 var syncing = false;
-
 var handleSync = co(function* () {
   debug('mode: %s, syncing: %s', config.syncModel, syncing);
   if (!syncing) {
@@ -79,11 +84,6 @@ var handleSync = co(function* () {
 
 if (sync) {
   handleSync();
-  var syncInterval = ms(config.syncInterval);
-  var minSyncInterval = ms('5m');
-  if (!syncInterval || syncInterval < minSyncInterval) {
-    syncInterval = minSyncInterval;
-  }
   setInterval(handleSync, syncInterval);
 }
 
@@ -116,7 +116,7 @@ var syncDist = co(function* () {
 
 if (config.syncDist) {
   syncDist();
-  setInterval(syncDist, ms(config.syncInterval));
+  setInterval(syncDist, syncInterval);
 } else {
   logger.syncInfo('sync dist disable');
 }
@@ -149,7 +149,7 @@ var syncPythonDist = co(function* () {
 
 if (config.syncPythonDist) {
   syncPythonDist();
-  setInterval(syncPythonDist, ms(config.syncInterval));
+  setInterval(syncPythonDist, syncInterval);
 } else {
   logger.syncInfo('sync python dist disable');
 }

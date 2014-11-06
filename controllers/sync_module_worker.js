@@ -55,6 +55,7 @@ function SyncModuleWorker(options) {
   this.username = options.username;
   this.concurrency = options.concurrency || 1;
   this._publish = options.publish === true; // _publish_on_cnpm
+  this.syncUpstreamFirst = options.syncUpstreamFirst;
 
   this.syncingNames = {};
   this.nameMap = {};
@@ -128,7 +129,7 @@ SyncModuleWorker.prototype.start = function () {
   var that = this;
   co(function *() {
     // sync upstream
-    if (config.sourceNpmRegistryIsCNpm) {
+    if (that.syncUpstreamFirst) {
       try {
         yield* that.syncUpstream(that.startName);
       } catch (err) {

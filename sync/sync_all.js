@@ -81,6 +81,7 @@ module.exports = function* sync() {
     name: packages,
     noDep: true,
     concurrency: config.syncConcurrency,
+    syncUpstreamFirst: false,
   });
   Status.init({need: packages.length}, worker);
   worker.start();
