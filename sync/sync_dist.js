@@ -16,7 +16,6 @@
 
 var debug = require('debug')('cnpmjs.org:sync:sync_dist');
 var fs = require('fs');
-var urllib = require('../common/urllib');
 var bytes = require('bytes');
 var crypto = require('crypto');
 var utility = require('utility');
@@ -28,22 +27,32 @@ var distService = require('../services/dist');
 var config = require('../config');
 var nfs = require('../common/nfs');
 var logger = require('../common/logger');
+var urllib = require('../common/urllib');
 
-var disturl = config.disturl;
 var USER_AGENT = 'distsync.cnpmjs.org/' + config.version + ' ' + urllib.USER_AGENT;
 
-module.exports = sync;
+module.exports = DistSyncer;
 
-function* sync(name) {
+function DistSyncer(options) {
+  var disturl = options.disturl;
+  if (disturl[disturl.length - 1] === '/') {
+    disturl = disturl.replace(/(\/+)$/, '');
+  }
+  this._disturl = disturl;
+}
+
+var proto = DistSyncer.prototype;
+
+proto.start = function* (name) {
   name = name || '/';
   if (name[name.length - 1] !== '/') {
     name += '/';
   }
-  yield* syncDir(name);
-}
+  yield* this.syncDir(name);
+};
 
-function* syncDir(fullname, info) {
-  var news = yield* sync.listdiff(fullname);
+proto.syncDir = function* (fullname, info) {
+  var news = yield* this.listdiff(fullname);
   var files = [];
   var dirs = [];
 
@@ -56,16 +65,16 @@ function* syncDir(fullname, info) {
     }
   }
 
-  logger.syncInfo('sync remote:%s got %d new items, %d dirs, %d files to sync',
-    fullname, news.length, dirs.length, files.length);
+  logger.syncInfo('sync %s:%s got %d new items, %d dirs, %d files to sync',
+    this._disturl, fullname, news.length, dirs.length, files.length);
 
   for (var i = 0; i < files.length; i++) {
-    yield* syncFile(files[i]);
+    yield* this.syncFile(files[i]);
   }
 
   for (var i = 0; i < dirs.length; i++) {
     var dir = dirs[i];
-    yield* syncDir(dir.parent + dir.name, dir);
+    yield* this.syncDir(dir.parent + dir.name, dir);
   }
 
   if (info) {
@@ -75,13 +84,13 @@ function* syncDir(fullname, info) {
 
   logger.syncInfo('Sync %s finished, %d dirs, %d files',
     fullname, dirs.length, files.length);
-}
+};
 
-function* syncFile(info) {
+proto.syncFile = function* (info) {
   var name = info.parent + info.name;
   name = process.pid + name.replace(/\//g, '_'); // make sure no parent dir
   var isPhantomjsURL = false;
-  var downurl = disturl + info.parent + info.name;
+  var downurl = this._disturl + info.parent + info.name;
   if (info.downloadURL) {
     downurl = info.downloadURL;
     isPhantomjsURL = true;
@@ -102,7 +111,7 @@ function* syncFile(info) {
     logger.syncInfo('downloading %s %s to %s, isPhantomjsURL: %s',
       bytes(info.size), downurl, filepath, isPhantomjsURL);
     // get tarball
-    var r = yield urllib.request(downurl, options);
+    var r = yield urllib.requestThunk(downurl, options);
     var statusCode = r.status || -1;
     logger.syncInfo('download %s got status %s, headers: %j',
       downurl, statusCode, r.headers);
@@ -167,7 +176,7 @@ function* syncFile(info) {
 
   logger.syncInfo('Sync dist file: %j done', info);
   yield* distService.savefile(info);
-}
+};
 
 // <a href="latest/">latest/</a>                                            02-May-2014 14:45                   -
 // <a href="node-v0.4.10.tar.gz">node-v0.4.10.tar.gz</a>                                26-Aug-2011 16:22            12410018
@@ -192,14 +201,14 @@ var DOC_API_RE = /\/docs\/api\/$/;
 var DOC_API_FILE_ALL_RE = /<a[^"]+\"(\w+\.(?:html|json))\"[^>]*>[^<]+<\/a>/gm;
 var DOC_API_FILE_RE = /<a[^"]+\"(\w+\.(?:html|json))\"[^>]*>[^<]+<\/a>/;
 
-function* listdir(fullname) {
-  var url = disturl + fullname;
+proto.listdir = function* (fullname) {
+  var url = this._disturl + fullname;
   var isDocPath = false;
   if (DOC_API_RE.test(fullname)) {
     isDocPath = true;
     url += 'index.html';
   }
-  var result = yield urllib.request(url, {
+  var result = yield urllib.requestThunk(url, {
     timeout: 60000,
   });
   debug('listdir %s got %s, %j', url, result.status, result.headers);
@@ -311,11 +320,10 @@ function* listdir(fullname) {
   }
 
   return items;
-}
-sync.listdir = listdir;
+};
 
-sync.listdiff = function* (fullname) {
-  var items = yield* listdir(fullname);
+proto.listdiff = function* (fullname) {
+  var items = yield* this.listdir(fullname);
   if (items.length === 0) {
     return items;
   }
@@ -345,21 +353,20 @@ sync.listdiff = function* (fullname) {
   return news;
 };
 
-function* syncPhantomjsDir() {
+proto.syncPhantomjsDir = function* () {
   var fullname = '/phantomjs/';
-  var files = yield* sync.listPhantomjsDiff(fullname);
+  var files = yield* this.listPhantomjsDiff(fullname);
 
   logger.syncInfo('sync remote:%s got %d files to sync',
     fullname, files.length);
 
   for (var i = 0; i < files.length; i++) {
-    yield* syncFile(files[i]);
+    yield* this.syncFile(files[i]);
   }
 
   logger.syncInfo('SyncPhantomjsDir %s finished, %d files',
     fullname, files.length);
-}
-sync.syncPhantomjsDir = syncPhantomjsDir;
+};
 
 // <tr class="iterable-item" id="download-301626">
 //   <td class="name"><a class="execute" href="/ariya/phantomjs/downloads/phantomjs-1.9.7-windows.zip">phantomjs-1.9.7-windows.zip</a></td>
@@ -376,7 +383,7 @@ sync.syncPhantomjsDir = syncPhantomjsDir;
 //   </td>
 // </tr>
 
-function* listPhantomjsDir(fullname) {
+proto.listPhantomjsDir = function* (fullname) {
   var url = 'https://bitbucket.org/ariya/phantomjs/downloads';
   var result = yield urllib.request(url, {
     timeout: 60000,
@@ -385,7 +392,7 @@ function* listPhantomjsDir(fullname) {
   var html = result.data && result.data.toString() || '';
   var $ = cheerio.load(html);
   var items = [];
-  $('tr.iterable-item').each(function (i, el) {
+  $('tr.iterable-item').each(function (_, el) {
     var $el = $(this);
     var $link = $el.find('.name a');
     var name = $link.text();
@@ -413,11 +420,10 @@ function* listPhantomjsDir(fullname) {
     });
   });
   return items;
-}
-sync.listPhantomjsDir = listPhantomjsDir;
+};
 
-sync.listPhantomjsDiff = function* (fullname) {
-  var items = yield* listPhantomjsDir(fullname);
+proto.listPhantomjsDiff = function* (fullname) {
+  var items = yield* this.listPhantomjsDir(fullname);
   if (items.length === 0) {
     return items;
   }

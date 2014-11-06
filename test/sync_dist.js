@@ -17,11 +17,19 @@
 var debug = require('debug');
 debug.enable('cnpmjs.org*');
 var co = require('co');
-var syncdist = require('../sync/sync_dist');
+var config = require('../config');
+var DistSyncer = require('../sync/sync_dist');
 
-var dir = process.argv[2] || '/v0.11.13/docs/api/';
+var dir = process.argv[2] || '/v0.11.14/docs/api/';
 
 co(function* () {
-  yield* syncdist(dir);
-  // yield* syncdist.syncPhantomjsDir();
+  var distsyncer = new DistSyncer({
+    disturl: config.disturl
+  });
+  // yield* distsyncer.syncPhantomjsDir();
+  yield* distsyncer.start(dir);
+
+  yield* new DistSyncer({
+    disturl: config.pythonDisturl
+  }).start('/python/3.4.2/');
 })();

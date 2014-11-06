@@ -192,6 +192,9 @@ var config = {
   disturl: 'http://nodejs.org/dist',
   syncDist: false,
 
+  pythonDisturl: 'https://www.python.org/ftp',
+  syncPythonDist: false,
+
   // the official npm registry
   // cnpm wont directly sync from this one
   // but sometimes will request it for some package infomations
