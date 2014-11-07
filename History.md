@@ -1,4 +1,16 @@
 
+2.0.0-beta1 / 2014-11-07
+==================
+
+ * refactor(sync_worker): only sync request need to sync upstream first
+ * fix(sync_worker): make sure end event will emit
+ * fix: mv readme.md script to public/js/readme.js
+ * fix(sync): hotfix co uncaughtException
+ * feat(sync): sync python dist
+ * pin autod@1
+ * remove useless comment
+ * refactor models/_module_maintainer_class_methods.js
+
 2.0.0-beta0 / 2014-11-02
 ==================
 
