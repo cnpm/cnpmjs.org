@@ -15,13 +15,12 @@
  * Module dependencies.
  */
 
+var mkdirp = require('mkdirp');
+var copy = require('copy-to');
 var path = require('path');
 var fs = require('fs');
 var os = require('os');
-var mkdirp = require('mkdirp');
-var copy = require('copy-to');
 
-fs.existsSync = fs.existsSync || path.existsSync;
 var version = require('../package.json').version;
 
 var root = path.dirname(__dirname);
@@ -51,7 +50,7 @@ var config = {
   // max request json body size
   jsonLimit: '10mb',
   // log dir name
-  logdir: path.join(root, '.tmp', 'logs'),
+  logdir: path.join(root, '.tmp/logs'),
   // update file template dir
   uploadDir: path.join(root, '.dist'),
   // web page viewCache
