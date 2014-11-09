@@ -1,4 +1,9 @@
 
+2.0.0-beta2 / 2014-11-09
+==================
+
+ * fix(sync): add missing syncUpstreamFirst argument
+
 2.0.0-beta1 / 2014-11-07
 ==================
 
