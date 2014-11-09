@@ -1010,6 +1010,7 @@ SyncModuleWorker.sync = function* (name, username, options) {
     username: username,
     noDep: options.noDep,
     publish: options.publish,
+    syncUpstreamFirst: options.syncUpstreamFirst,
   });
   worker.start();
   return result.id;
