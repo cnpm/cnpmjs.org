@@ -168,7 +168,7 @@ function* updateMaintainers() {
     }
   }
 
-  var r = yield* packageService.updateMaintainers(name, usernames);
+  var r = yield* packageService.updatePrivateModuleMaintainers(name, usernames);
   debug('result: %j', r);
 
   this.status = 201;

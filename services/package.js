@@ -21,7 +21,7 @@ var User = models.User;
 var Module = models.Module;
 var ModuleStar = models.ModuleStar;
 var ModuleKeyword = models.ModuleKeyword;
-var ModuleMaintainer = models.ModuleMaintainer;
+var PrivateModuleMaintainer = models.ModuleMaintainer;
 var ModuleDependency = models.ModuleDependency;
 var ModuleUnpublished = models.ModuleUnpublished;
 var NpmModuleMaintainer = models.NpmModuleMaintainer;
@@ -152,7 +152,7 @@ exports.listModuleNamesByUser = function* (username) {
   });
 
   // find from private module maintainer table
-  moduleNames = yield* ModuleMaintainer.listModuleNamesByUser(username);
+  moduleNames = yield* PrivateModuleMaintainer.listModuleNamesByUser(username);
   moduleNames.forEach(function (name) {
     if (!map[name]) {
       names.push(name);
@@ -477,6 +477,24 @@ exports.removePublicModuleMaintainer = function* (name, user) {
   return yield* NpmModuleMaintainer.removeMaintainers(name, user);
 };
 
+// only can add to cnpm maintainer table
+exports.addPrivateModuleMaintainers = function* (name, usernames) {
+  return yield* PrivateModuleMaintainer.addMaintainers(name, usernames);
+};
+
+exports.updatePrivateModuleMaintainers = function* (name, usernames) {
+  var result = yield* PrivateModuleMaintainer.updateMaintainers(name, usernames);
+  if (result.add.length > 0 || result.remove.length > 0) {
+    yield* exports.updateModuleLastModified(name);
+  }
+  return result;
+};
+
+function* getMaintainerModel(name) {
+  var isPrivatePackage = yield* common.isPrivatePackage(name);
+  return isPrivatePackage ? PrivateModuleMaintainer : NpmModuleMaintainer;
+}
+
 exports.listMaintainers = function* (name) {
   var mod = yield* getMaintainerModel(name);
   var usernames = yield* mod.listMaintainers(name);
@@ -497,28 +515,9 @@ exports.listMaintainerNamesOnly = function* (name) {
   return yield* mod.listMaintainers(name);
 };
 
-exports.addMaintainers = function* (name, usernames) {
-  var mod = yield* getMaintainerModel(name);
-  return yield* mod.addMaintainers(name, usernames);
-};
-
-exports.updateMaintainers = function* (name, usernames) {
-  var mod = yield* getMaintainerModel(name);
-  var result = yield* mod.updateMaintainers(name, usernames);
-  if (result.add.length > 0 || result.remove.length > 0) {
-    yield* exports.updateModuleLastModified(name);
-  }
-  return result;
-};
-
-function* getMaintainerModel(name) {
-  var isPrivatePackage = yield* common.isPrivatePackage(name);
-  return isPrivatePackage ? ModuleMaintainer : NpmModuleMaintainer;
-}
-
 exports.removeAllMaintainers = function* (name) {
   return yield [
-    ModuleMaintainer.removeAllMaintainers(name),
+    PrivateModuleMaintainer.removeAllMaintainers(name),
     NpmModuleMaintainer.removeAllMaintainers(name),
   ];
 };

@@ -219,7 +219,7 @@ module.exports = function* save(next) {
   var maintainerNames = maintainers.map(function (item) {
     return item.name;
   });
-  yield* packageService.addMaintainers(name, maintainerNames);
+  yield* packageService.addPrivateModuleMaintainers(name, maintainerNames);
 
   this.status = 201;
   this.body = {

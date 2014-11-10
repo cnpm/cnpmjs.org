@@ -330,7 +330,7 @@ SyncModuleWorker.prototype.next = function* (concurrencyId) {
 };
 
 function* _listStarUsers(modName) {
-  var users = yield packageService.listStarUserNames(modName);
+  var users = yield* packageService.listStarUserNames(modName);
   var userMap = {};
   users.forEach(function (user) {
     userMap[user] = true;
