@@ -477,7 +477,11 @@ exports.removePublicModuleMaintainer = function* (name, user) {
 };
 
 exports.listMaintainers = function* (name) {
-  var usernames = yield* ModuleMaintainer.listMaintainers(name);
+  var mod = NpmModuleMaintainer;
+  if (name[0] === '@') {
+    mod = ModuleMaintainer;
+  }
+  var usernames = yield* mod.listMaintainers(name);
   if (usernames.length === 0) {
     return usernames;
   }

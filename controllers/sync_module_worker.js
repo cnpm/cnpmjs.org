@@ -474,6 +474,7 @@ SyncModuleWorker.prototype._sync = function* (name, pkg) {
     for (var i = 0; i < pkgMaintainers.length; i++) {
       var item = pkgMaintainers[i];
       originalMap[item.name] = item;
+      npmUsernames[item.name.toLowerCase()] = 1;
     }
 
     // find add users
