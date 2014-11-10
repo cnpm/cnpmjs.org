@@ -94,8 +94,10 @@ describe('controllers/registry/package/update.test.js', function () {
     });
 
     it('should add new maintainers', function (done) {
+      done = pedding(2, done);
+
       request(app)
-      .put('/testmodule-update-1/-rev/1')
+      .put('/testmodule-update-1/-rev/2')
       .send({
         maintainers: [{
           name: 'cnpmjstest10',
@@ -110,10 +112,9 @@ describe('controllers/registry/package/update.test.js', function () {
       .expect({
         ok: true,
         id: 'testmodule-update-1',
-        rev: '1'
+        rev: '2'
       }, function (err) {
         should.not.exist(err);
-        done = pedding(2, done);
         // check maintainers update
         request(app)
         .get('/testmodule-update-1')

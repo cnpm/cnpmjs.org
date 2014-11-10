@@ -15,6 +15,7 @@
  */
 
 var models = require('../models');
+var common = require('./common');
 var Tag = models.Tag;
 var User = models.User;
 var Module = models.Module;
@@ -477,10 +478,7 @@ exports.removePublicModuleMaintainer = function* (name, user) {
 };
 
 exports.listMaintainers = function* (name) {
-  var mod = NpmModuleMaintainer;
-  if (name[0] === '@') {
-    mod = ModuleMaintainer;
-  }
+  var mod = yield* getMaintainerModel(name);
   var usernames = yield* mod.listMaintainers(name);
   if (usernames.length === 0) {
     return usernames;
@@ -495,20 +493,28 @@ exports.listMaintainers = function* (name) {
 };
 
 exports.listMaintainerNamesOnly = function* (name) {
-  return yield* ModuleMaintainer.listMaintainers(name);
+  var mod = yield* getMaintainerModel(name);
+  return yield* mod.listMaintainers(name);
 };
 
 exports.addMaintainers = function* (name, usernames) {
-  return yield* ModuleMaintainer.addMaintainers(name, usernames);
+  var mod = yield* getMaintainerModel(name);
+  return yield* mod.addMaintainers(name, usernames);
 };
 
 exports.updateMaintainers = function* (name, usernames) {
-  var result = yield* ModuleMaintainer.updateMaintainers(name, usernames);
+  var mod = yield* getMaintainerModel(name);
+  var result = yield* mod.updateMaintainers(name, usernames);
   if (result.add.length > 0 || result.remove.length > 0) {
     yield* exports.updateModuleLastModified(name);
   }
   return result;
 };
+
+function* getMaintainerModel(name) {
+  var isPrivatePackage = yield* common.isPrivatePackage(name);
+  return isPrivatePackage ? ModuleMaintainer : NpmModuleMaintainer;
+}
 
 exports.removeAllMaintainers = function* (name) {
   return yield [
@@ -518,8 +524,9 @@ exports.removeAllMaintainers = function* (name) {
 };
 
 exports.authMaintainer = function* (packageName, username) {
+  var mod = yield* getMaintainerModel(packageName);
   var rs = yield [
-    ModuleMaintainer.listMaintainers(packageName),
+    mod.listMaintainers(packageName),
     exports.getLatestModule(packageName)
   ];
   var maintainers = rs[0];
