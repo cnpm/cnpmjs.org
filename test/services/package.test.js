@@ -17,6 +17,7 @@
 var should = require('should');
 var sleep = require('co-sleep');
 var Package = require('../../services/package');
+var SyncModuleWorker = require('../../controllers/sync_module_worker');
 
 describe('services/package.test.js', function () {
   function* createModule(name, version, user, tag) {
@@ -82,6 +83,35 @@ describe('services/package.test.js', function () {
     it('should return null when tag not exists', function* () {
       var r = yield* Package.getModuleByTag('some', 'not-exists');
       should.not.exist(r);
+    });
+  });
+
+  describe('listMaintainers()', function () {
+    before(function (done) {
+      var worker = new SyncModuleWorker({
+        name: ['enable'],
+        username: 'fengmk2',
+        noDep: true
+      });
+
+      worker.start();
+      worker.on('end', function () {
+        var names = worker.successes.concat(worker.fails);
+        names.sort();
+        names.should.eql(['enable']);
+        done();
+      });
+    });
+
+    it('should show public package maintainers', function* () {
+      var users = yield* Package.listMaintainers('enable');
+      users.length.should.above(0);
+      users[0].should.have.keys('name', 'email');
+    });
+
+    it('should show private package maintainers', function* () {
+      var users = yield* Package.listMaintainers('@cnpmtest/enable');
+      users.should.be.an.Array;
     });
   });
 

@@ -108,6 +108,13 @@ module.exports = function* show(next) {
     }
   }
 
+  if (pkg._npmUser) {
+    pkg.lastPublishedUser = pkg._npmUser;
+    if (pkg.lastPublishedUser.email) {
+      pkg.lastPublishedUser.gravatar = gravatar.url(pkg.lastPublishedUser.email, {s: '50', d: 'retro'}, true);
+    }
+  }
+
   if (pkg.contributors) {
     // registry.cnpmjs.org/compressible
     if (!Array.isArray(pkg.contributors)) {

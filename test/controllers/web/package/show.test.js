@@ -166,6 +166,8 @@ describe('controllers/web/package/show.test.js', function () {
       request(app)
       .get('/package/pedding')
       .expect(200)
+      // https://github.com/cnpm/cnpmjs.org/issues/497
+      .expect(/<th>Last Published By<\/th>/)
       .expect(/pedding/, done);
     });
   });

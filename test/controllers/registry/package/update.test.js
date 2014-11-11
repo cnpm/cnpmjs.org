@@ -72,7 +72,7 @@ describe('controllers/registry/package/update.test.js', function () {
     .expect(404, done);
   });
 
-  describe('PUT /:name/-rev/:rev updateMaintainers()', function () {
+  describe('PUT /:name/-rev/:rev updatePrivateModuleMaintainers()', function () {
     before(function (done) {
       mm(config, 'enablePrivate', false);
       mm(config, 'forcePublishWithScope', false);
@@ -93,9 +93,11 @@ describe('controllers/registry/package/update.test.js', function () {
       }, done);
     });
 
-    it('should add new maintainers', function (done) {
+    it('should add new maintainers by normal users', function (done) {
+      done = pedding(2, done);
+
       request(app)
-      .put('/testmodule-update-1/-rev/1')
+      .put('/@cnpmtest/testmodule-update-1/-rev/2')
       .send({
         maintainers: [{
           name: 'cnpmjstest10',
@@ -109,19 +111,18 @@ describe('controllers/registry/package/update.test.js', function () {
       .expect(201)
       .expect({
         ok: true,
-        id: 'testmodule-update-1',
-        rev: '1'
+        id: '@cnpmtest/testmodule-update-1',
+        rev: '2'
       }, function (err) {
         should.not.exist(err);
-        done = pedding(2, done);
         // check maintainers update
         request(app)
-        .get('/testmodule-update-1')
+        .get('/@cnpmtest/testmodule-update-1')
         .expect(200, function (err, res) {
           should.not.exist(err);
           var pkg = res.body;
           pkg.maintainers.should.length(2);
-          pkg.maintainers.should.eql(pkg.versions['0.0.1'].maintainers);
+          pkg.maintainers.should.eql(pkg.versions['1.0.0'].maintainers);
           pkg.maintainers.sort(function (a, b) {
             return a.name > b.name ? 1 : -1;
           });
@@ -133,7 +134,7 @@ describe('controllers/registry/package/update.test.js', function () {
         });
 
         request(app)
-        .get('/testmodule-update-1/0.0.1')
+        .get('/@cnpmtest/testmodule-update-1/1.0.0')
         .expect(200, function (err, res) {
           should.not.exist(err);
           var pkg = res.body;

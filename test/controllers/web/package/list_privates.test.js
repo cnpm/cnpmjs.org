@@ -30,7 +30,15 @@ describe('controllers/web/package/list_privates.test.js', function () {
     .put('/' + pkg.name)
     .set('authorization', utils.adminAuth)
     .send(pkg)
-    .expect(201, done);
+    .expect(201, function (err) {
+      (err === null).should.equal(true);
+      var pkg = utils.getPackage('testmodule-web-list_privates-no-scoped', '0.0.1', utils.admin);
+      request(registry.listen())
+      .put('/' + pkg.name)
+      .set('authorization', utils.adminAuth)
+      .send(pkg)
+      .expect(201, done);
+    });
   });
 
   describe('GET /privates', function () {
@@ -47,6 +55,15 @@ describe('controllers/web/package/list_privates.test.js', function () {
       .get('/privates')
       .expect(/Private packages in @cnpm/)
       .expect(/@cnpm\/testmodule\-web\-list_privates/)
+      .expect(200, done);
+    });
+
+    it('should show contain no scoped private packages', function (done) {
+      mm(config, 'privatePackages', ['testmodule-web-list_privates-no-scoped', 'hsf-haha']);
+      request(app.listen())
+      .get('/privates')
+      .expect(/Private packages in no scoped/)
+      .expect(/testmodule-web-list_privates-no-scoped/)
       .expect(200, done);
     });
   });

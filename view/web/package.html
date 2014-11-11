@@ -57,6 +57,24 @@
       </table>
 
       <table class="metadata">
+        <% if (package.lastPublishedUser) {
+          var m = package.lastPublishedUser;
+        %>
+        <tr>
+          <th>Last Published By</th>
+          <td>
+            <span class="user">
+              <a class="username" href="/~<%= m.name %>">
+                <% if (m.gravatar) { %>
+                <img src="<%- m.gravatar %>" class="avatar">
+                <% } %>
+                <%= m.name %>
+              </a>
+            </span>
+          </td>
+        </tr>
+        <% } %>
+
         <% if (Array.isArray(package.maintainers) && package.maintainers.length > 0) { %>
         <tr>
           <th>Maintainers</th>
