@@ -1,4 +1,11 @@
 
+2.0.0-beta3 / 2014-11-12
+==================
+
+ * fix(sync): should not sync package when maintainers sort change
+ * fix(package): detect package is private or not
+ * fix(maintainer): fix missing maintainers
+
 2.0.0-beta2 / 2014-11-09
 ==================
 
