@@ -544,13 +544,8 @@ SyncModuleWorker.prototype._sync = function* (name, pkg) {
     if (!version.maintainers || !version.maintainers[0]) {
       version.maintainers = pkg.maintainers;
     }
-    var sourceAuthor = version.maintainers && version.maintainers[0] &&
-      version.maintainers[0].name || exists.author;
-
     if (exists.package &&
-        exists.package.dist.shasum === version.dist.shasum &&
-        exists.author === sourceAuthor) {
-      // * author make sure equal
+        exists.package.dist.shasum === version.dist.shasum) {
       // * shasum make sure equal
       if ((version.publish_time === exists.publish_time) ||
           (!version.publish_time && exists.publish_time)) {
