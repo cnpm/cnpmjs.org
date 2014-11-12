@@ -21,6 +21,7 @@ var fs = require('fs');
 var koa = require('koa');
 var middlewares = require('koa-middlewares');
 var markdown = require('koa-markdown');
+var block = require('../middleware/block');
 var opensearch = require('../middleware/opensearch');
 var notFound = require('../middleware/web_not_found');
 var staticCache = require('../middleware/static');
@@ -33,6 +34,7 @@ var app = koa();
 
 var rootdir = path.dirname(__dirname);
 
+app.use(block());
 app.use(middlewares.rt({headerName: 'X-ReadTime'}));
 app.use(middlewares.rewrite('/favicon.ico', '/favicon.png'));
 app.use(staticCache);
