@@ -1,4 +1,9 @@
 
+1.7.3 / 2014-11-12
+==================
+
+ * fix(sync): should not sync package when maintainers sort change
+
 1.7.2 / 2014-10-31
 ==================
 
