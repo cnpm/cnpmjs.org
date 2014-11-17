@@ -57,9 +57,10 @@ describe('controllers/web/package/show.test.js', function () {
       .get('/package/testmodule-web-show')
       .expect(200)
       .expect('content-type', 'text/html; charset=utf-8')
-      .expect(/<div id="package">/)
-      .expect(/<th>Maintainers<\/th>/)
-      .expect(/<th>Version<\/th>/, function (err, res) {
+      .expect(/testmodule-web-show/)
+      .expect(/Maintainers/)
+      .expect(/Dependencies/)
+      .expect(/Downloads/, function (err, res) {
         should.not.exist(err);
         res.should.have.header('etag');
         res.text.should.containEql('<meta charset="utf-8">');
@@ -72,9 +73,10 @@ describe('controllers/web/package/show.test.js', function () {
       .get('/package/@cnpmtest/testmodule-web-show')
       .expect(200)
       .expect('content-type', 'text/html; charset=utf-8')
-      .expect(/<div id="package">/)
-      .expect(/<th>Maintainers<\/th>/)
-      .expect(/<th>Version<\/th>/, function (err, res) {
+      .expect(/testmodule-web-show/)
+      .expect(/Maintainers/)
+      .expect(/Dependencies/)
+      .expect(/Downloads/, function (err, res) {
         should.not.exist(err);
         res.should.have.header('etag');
         res.text.should.containEql('<meta charset="utf-8">');
@@ -94,18 +96,20 @@ describe('controllers/web/package/show.test.js', function () {
       request(app)
       .get('/package/testmodule-web-show/0.0.1')
       .expect(200)
-      .expect(/<div id="package">/)
-      .expect(/<th>Maintainers<\/th>/)
-      .expect(/<th>Version<\/th>/, done);
+      .expect(/testmodule-web-show/)
+      .expect(/Maintainers/)
+      .expect(/Dependencies/)
+      .expect(/Downloads/, done);
     });
 
     it('should 200 when get by tag', function (done) {
       request(app)
       .get('/package/testmodule-web-show/latest')
       .expect(200)
-      .expect(/<div id="package">/)
-      .expect(/<th>Maintainers<\/th>/)
-      .expect(/<th>Version<\/th>/, done);
+      .expect(/testmodule-web-show/)
+      .expect(/Maintainers/)
+      .expect(/Dependencies/)
+      .expect(/Downloads/, done);
     });
 
     it('should 404 when get by version not exist', function (done) {
@@ -167,7 +171,7 @@ describe('controllers/web/package/show.test.js', function () {
       .get('/package/pedding')
       .expect(200)
       // https://github.com/cnpm/cnpmjs.org/issues/497
-      .expect(/<th>Last Published By<\/th>/)
+      .expect(/by <a href="\/\~fengmk2">fengmk2<\/a>/)
       .expect(/pedding/, done);
     });
   });

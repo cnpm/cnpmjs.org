@@ -62,7 +62,7 @@ describe('controllers/web/package/scope_package.test.js', function () {
       should.not.exist(err);
       var body = res.text;
       body.should.containEql('$ cnpm install @cnpm/test-web-scope-package');
-      body.should.containEql('/@cnpm/test-web-scope-package/download/@cnpm/test-web-scope-package-0.0.2.tgz');
+      body.should.containEql('Private package');
       done();
     });
   });
@@ -74,7 +74,7 @@ describe('controllers/web/package/scope_package.test.js', function () {
       should.not.exist(err);
       var body = res.text;
       body.should.containEql('$ cnpm install @cnpm/test-web-scope-package');
-      body.should.containEql('/@cnpm/test-web-scope-package/download/@cnpm/test-web-scope-package-0.0.2.tgz');
+      body.should.containEql('Private package');
       done();
     });
   });
@@ -86,7 +86,7 @@ describe('controllers/web/package/scope_package.test.js', function () {
       should.not.exist(err);
       var body = res.text;
       body.should.containEql('$ cnpm install @cnpm/test-web-scope-package');
-      body.should.containEql('/@cnpm/test-web-scope-package/download/@cnpm/test-web-scope-package-0.0.2.tgz');
+      body.should.containEql('Private package');
       done();
     });
   });
@@ -104,7 +104,7 @@ describe('controllers/web/package/scope_package.test.js', function () {
       should.not.exist(err);
       var body = res.text;
       body.should.containEql('$ cnpm install @cnpm/test-web-scope-package');
-      body.should.containEql('/@cnpm/test-web-scope-package/download/@cnpm/test-web-scope-package-0.0.2.tgz');
+      body.should.containEql('Private package');
       done();
     });
   });
