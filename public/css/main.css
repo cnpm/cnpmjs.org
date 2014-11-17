@@ -138,6 +138,12 @@ ul {
 .pack-dep-ver, .pack-download-num {
   float: right;
 }
+.pack-lastup, .pack-sync {
+  margin-top: 10px;
+}
+.pack-sync a {
+  font-size: 23px;
+}
 .maintainers .row {
   display: -moz-box;
   display: -webkit-box;
