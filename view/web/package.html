@@ -1,278 +1,168 @@
-  <div id="package">
-    <h1>
-      <%= package.name %>
-      <img title="<%= package.version %>" src="/badge/v/<%= package.name %>.svg?style=flat-square">
-      <small>
-      <% if (package._publish_on_cnpm) { %>
-      (Private package)
-      <% } else { %>
-      (<a href="/sync/<%= package.name %>" target="_blank">SYNC</a> missed versions from official npm registry)
-      <% } %>
-      </small>
-    </h1>
-
-    <% if (package.deprecated) { %>
-      <p class="deprecated">[DEPRECATED] <%= package.deprecated %></p>
-    <% } %>
-
-    <% if (package.description) { %>
-      <p class="description"><%= package.description %></p>
-    <% } %>
-
-    <pre class="sh"><code>$ <%- config.npmClientName %> install <%= package.name %> <% if (package.preferGlobal) { %>-g<% } %></code></pre>
-
-    <ul class="nav nav-tabs">
-      <% if (package.readme) { %>
-        <li class="active"><a href="#readme">Readme.md</a></li>
-        <li><a href="#meta">package.json</a></li>
-      <% } else { %>
-        <li class="active"><a href="#meta">package.json</a></li>
-      <% } %>
-    </ul>
-
-    <% if (package.readme) { %>
-    <div class="nav-cont active">
-      <div class="details">
-        <section id="readme">
-        <%- package.readme %>
-        </section>
-      </div>
-    </div>
-    <% } %>
-
-    <div class="nav-cont">
-      <table class="downloads">
-        <tbody>
-          <tr>
-            <td class="count"><%- download.today %></td><td> downloads today</td>
-            <td class="count"><%- download.thisweek %></td><td> downloads in this week</td>
-            <td class="count"><%- download.thismonth %></td><td> downloads in this month</td>
-          </tr>
-          <tr>
-            <td class="count"><%- download.lastday %></td><td> downloads in the last day</td>
-            <td class="count"><%- download.lastweek %></td><td> downloads in the last week</td>
-            <td class="count"><%- download.lastmonth %></td><td> downloads in the last month</td>
-          </tr>
-        </tbody>
-      </table>
-
-      <table class="metadata">
-        <% if (package.lastPublishedUser) {
-          var m = package.lastPublishedUser;
-        %>
-        <tr>
-          <th>Last Published By</th>
-          <td>
-            <span class="user">
-              <a class="username" href="/~<%= m.name %>">
-                <% if (m.gravatar) { %>
-                <img src="<%- m.gravatar %>" class="avatar">
-                <% } %>
-                <%= m.name %>
-              </a>
-            </span>
-          </td>
-        </tr>
+ <div class="pack-overview-background"></div>
+ <div class="pack-overview">
+    <div class="pack-info">
+      <% if (package.deprecated) { %>
+        <div class="pack-name deprecated"><%= package.name %></div>
+        <% if (package.description) {%>
+          <div class="pack-description deprecated"><%= package.description %></div>
         <% } %>
-
-        <% if (Array.isArray(package.maintainers) && package.maintainers.length > 0) { %>
-        <tr>
-          <th>Maintainers</th>
-          <td>
-          <% package.maintainers.forEach(function (m) { %>
-            <span class="user">
-              <a class="username" href="/~<%= m.name %>">
-                <% if (m.gravatar) { %>
-                <img src="<%- m.gravatar %>" class="avatar">
-                <% } %>
-                <%= m.name %>
-              </a>
-            </span>
-          <% }) %>
-          </td>
-        </tr>
+        <div class="deprecated-content" title="<%= package.deprecated %>"><%= package.deprecated %></div>
+      <% } else { %>
+        <div class="pack-name"><%= package.name %></div>
+        <% if (package.description) {%>
+          <div class="pack-description" title="<%= package.description %>"><%= package.description %></div>
         <% } %>
-        <tr>
-          <th>Version</th>
-          <td>
-            <img title="<%= package.version %>" src="/badge/v/<%= package.name %>.svg?style=flat-square">
-            <% if (package.fromNow) { %>
-            last updated
-            <%= package.fromNow %>
-            <% } %>
-          </td>
-        </tr>
+      <% } %>
+      <div class="pack-ver">
+        <img title="<%= package.version %>" src="/badge/v/<%= package.name %>.svg?style=flat-square">
         <% if (package.engines) {%>
-        <tr>
-          <th>Engines</th>
-          <td>
           <% for (var k in package.engines) {
             var engine = package.engines[k];
           %>
             <img title="<%= engine.title %>" src="<%- engine.badgeURL %>">
+        <% }
+        }%>
+      </div>
+      <% if (package.fromNow) { %>
+        <div class="pack-lastup">
+          Last updated <%= package.fromNow %>
+          <% if (package.lastPublishedUser) {
+            var name = package.lastPublishedUser.name;
+          %>
+            by <a href="/~<% name %>"><%= name %></a>
           <% } %>
-          </td>
-        </tr>
+          .
+          </div>
+      <% } %>
+      <div class="pack-sync">
+        <% if (package._publish_on_cnpm) { %>
+          Private package
+        <% } else { %>
+          <a href="/sync/<%= package.name %>" target="_blank">SYNC</a> missed versions from official npm registry.
         <% } %>
+      </div>
+      <div class="pack-repo">
         <% if (package.license) { %>
-        <tr>
-          <th>License</th>
-          <td>
-            <a href="<%= package.license.url %>" target="_blank"><%= package.license.name %></a>
-          </td>
-        </tr>
+          <a href="<%= package.license.url %>" target="_blank"><%= package.license.name %></a>
         <% } %>
-        <%
-        if (typeof package.keywords === 'string') {
-          package.keywords = package.keywords.split(/\s*,?\s*/)
-        }
-        if (Array.isArray(package.keywords)) {
-        %>
-        <tr>
-          <th>Keywords</th>
-          <td><%-
-            package.keywords.map(function (kw) {
-              kw = kw.replace(/</g, '&lt;').replace(/"/g, '&quot;')
-              return '<a href="/browse/keyword/' + kw + '">' + kw + '</a>'
-            }).join(', ')
-            %></td>
-        </tr>
-        <% } %>
+
         <% if (package.repository && package.repository !== 'undefined') { %>
-        <tr>
-          <th>Repository</td>
-          <td>
-            <a href="<%= package.repository.weburl || package.repository.url %>" target="_blank">
-              <%= package.repository.url %>
-            </a>
-            (<%= package.repository.type %>)
-          </td>
-        </tr>
+          <% if (package.license) {%> | <% } %>
+          <a href="<%= package.repository.weburl || package.repository.url %>" target="_blank">Reopsitory</a>
         <% } %>
-        <% if (typeof package.homepage === 'string') { %>
-        <tr>
-          <th>Homepage</td>
-          <td>
-            <a href="<%= encodeURI(package.homepage) %>" target="_blank"><%= package.homepage.replace(/</g, '&lt;') %></a>
-          </td>
-        </tr>
-        <% } %>
+
         <% if (package.bugs && package.bugs.url) { %>
-        <tr>
-          <th>Bugs</td>
-          <td>
-            <a href="<%= package.bugs.url %>" target="_blank"><%= package.bugs.url %></a>
-          </td>
-        </tr>
+          <% if (package.license || (package.repository && package.repository !== 'undefined')) {%> | <% } %>
+          <a href="<%= package.bugs.url %>" target="_blank">Bugs</a>
         <% } %>
-        <tr>
-          <%
-            var deps = Object.keys(package.dependencies || {})
-            var l = deps.length
-          %>
-          <th>Dependencies<%= l > 0 ? ' (' + l + ')' : '' %></th>
-          <td>
-            <%
-            if (l === 0) {
-              %>None<%
-            } else {
-              var m = 200
-              if (l > m) deps = deps.slice(0, m)
-              deps.forEach(function(pkg, i) {
-                if (i > 0) { %>, <% }
-                %>
-                <a href="/package/<%= pkg %>"><%= pkg %></a><%
-              })
-              if (l > m) {
-                %>, and <%= l-m %> more<%
-              }
-            }
-            %>
-          </td>
-        </tr>
-
-        <tr>
-          <%
-            var deps = package.dependents || [];
-            var l = deps.length
-          %>
-          <th>Dependents<%= l > 0 ? ' (' + l + ')' : '' %></th>
-          <td>
-            <%
-            if (l === 0) {
-              %>None<%
-            } else {
-              var m = 200
-              if (l > m) deps = deps.slice(0, m)
-              deps.forEach(function(pkg, i) {
-                if (i > 0) { %>, <% }
-                %>
-                <a href="/package/<%= pkg %>"><%= pkg %></a><%
-              })
-              if (l > m) {
-                %>, and <%= l-m %> more<%
-              }
-            }
-            %>
-          </td>
-        </tr>
-
-        <% if (package.users.length > 0) {
-          var users = package.users
-          var l = users.length
-        %>
-        <tr>
-          <th>Starred by (<%= l %>)</th>
-          <td>
-            <%
-            var max = 20
-            if (l > max) {
-              users = users.sort(function (a, b) {
-                return Math.random() * 2 - 1
-              }).slice(0, max)
-            }
-            users.forEach(function (user, i) {
-              if (i > 0) { %>, <% }
-              %><a href="/~<%= user %>"><%= user %></a><%
-            })
-            if (l > max) {
-              %><br><a href="/browse/star/<%= package.name %>">and
-              <%= (l - max) %> more</a><%
-            }
-            %>
-          </td>
-        </tr>
-        <% } %>
-
-        <% if (Array.isArray(package.contributors) && package.contributors.length > 0) { %>
-        <tr>
-          <th>Contributors</th>
-          <td>
-          <% package.contributors.forEach(function (m) { %>
-            <span class="user">
-              <a class="username" target="_blank" href="<%= m.url %>">
-                <% if (m.gravatar) { %>
-                <img src="<%- m.gravatar %>" class="avatar">
-                <% } %>
-                <%= m.name %>
-              </a>
-            </span>
-          <% }) %>
-          </td>
-        </tr>
-        <% } %>
-
-        <% if (package.dist && package.dist.tarball) { %>
-        <tr>
-          <th>Download</th>
-          <td>
-            <a class="downloadlink" target="_blank" href="<%= package.dist.tarball %>">
-              <%= package.dist.tarball %>
-            </a>
-            (<%- package.dist.size %>)
-          </td>
-        </tr>
-        <% } %>
-      </table>
+      </div>
+      <div class="pack-install">
+        <pre class="sh">$ <%- config.npmClientName %> install <%= package.name %> <% if (package.preferGlobal) { %>-g<% } %></pre>
+      </div>
     </div>
   </div>
+</div>
+
+<div class="pack-details cols-box">
+  <div class="pack-dep cols-box-item">
+    <div class="cols-box-title">
+      <%
+        var deps = Object.keys(package.dependencies || {})
+        var l = deps.length
+        var m = 8
+      %>
+      Dependencies<%= ' (' + l + ')' %>
+      <% if (l > m) { %>
+        <a class="more-item" href="<%= package.registryUrl %>" target="_blank">+<%= l-m %> more</a>
+      <% } %>
+    </div>
+    <% if (l) { %>
+      <ul>
+      <% if (l > m) deps = deps.slice(0, m)
+      deps.forEach(function(pkg, i) {
+        %>
+      <li>
+        <a class="pack-dep-name" target="_blank" href="/package/<%= pkg %>"><%= pkg %></a>
+         <span class="pack-dep-ver"><%= package.dependencies[pkg]%></span>
+      </li>
+      <% }) %>
+    </ul>
+    <% } else { %>
+      None
+    <% } %>
+  </div>
+
+  <div class="pack-maintainers cols-box-item">
+    <div class="cols-box-title">
+      <%
+        var maintainers = package.maintainers || [];
+        var l = maintainers.length
+        var m = 6
+      %>
+      Maintainers <%= l > 0 ? ' (' + l + ')' : '' %>
+      <% if (l > m) { %>
+        <a class="more-item" href="<%= package.registryUrl %>" target="_blank">+<%= l-m %> more</a>
+      <% } %>
+    </div>
+    <div class="maintainers">
+      <% if (l > m) maintainers = maintainers.slice(0, m) %>
+      <% for (var i = 0; i < maintainers.length; i += 2) { %>
+        <div class="row">
+          <div class="maintainer">
+            <a class="username" href="/~<%= maintainers[i].name %>">
+              <img src="<%= maintainers[i].gravatar %>" class="avatar">
+              <%= maintainers[i].name %>
+            </a>
+          </div>
+          <% if (maintainers[i + 1]) { %>
+            <div class="maintainer">
+              <a class="username" href="/~<%= maintainers[i + 1].name %>">
+                <img src="<%= maintainers[i + 1].gravatar %>" class="avatar">
+                <%= maintainers[i + 1].name %>
+              </a>
+            </div>
+          <% } %>
+        </div>
+      <% } %>
+    </div>
+  </div>
+
+  <div class="pack-downloads cols-box-item">
+    <div class="cols-box-title">
+      Downloads
+    </div>
+    <div class="downloads">
+      <div class="row">
+        Today
+        <span class="pack-download-num"><%= download.today %></span>
+      </div>
+      <div class="row">
+        This Week
+        <span class="pack-download-num"><%= download.thisweek %></span>
+      </div>
+      <div class="row">
+        This Month
+        <span class="pack-download-num"><%= download.thismonth %></span>
+      </div>
+      <div class="row">
+        Last Day
+        <span class="pack-download-num"><%= download.lastday %></span>
+      </div>
+      <div class="row">
+        Last Week
+        <span class="pack-download-num"><%= download.lastweek %></span>
+      </div>
+      <div class="row">
+        Last Month
+        <span class="pack-download-num"><%= download.lastmonth %></span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="pack-readme">
+  <div class="title">README</div>
+  <section id="readme">
+    <%- package.readme %>
+  </section>
+</div>

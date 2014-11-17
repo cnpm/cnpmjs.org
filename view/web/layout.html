@@ -3,11 +3,15 @@
   <head>
     <meta charset="utf-8">
     <title><%- locals.title %></title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
     <link rel="shortcut icon" href="/favicon.png">
     <!-- Bootstrap -->
     <link href="//dn-staticfile.qbox.me/twitter-bootstrap/3.2.0/css/bootstrap.min.css" rel="stylesheet" media="screen">
-    <link href="//dn-staticfile.qbox.me/prettify/r298/prettify.min.css" rel="stylesheet" media="screen">
+    <link href="/css/main.css" rel="stylesheet" media="screen">
+    <link href="/css/github.css" rel="stylesheet" media="screen">
     <!-- JavaScript plugins (requires jQuery) -->
     <script src="//dn-staticfile.qbox.me/jquery/2.0.3/jquery.min.js"></script>
     <link rel="search" type="application/opensearchdescription+xml" href="/opensearch.xml" title="CNPM" />
@@ -21,7 +25,7 @@
       /*#wrapper{padding:5% 8%;min-width:480px;}*/
       #tagline{font:0.8em serif;color:#888;display:inline-block;margin:0.1em 0 1.2em;}
       #fork{position:fixed;top:0;right:0;_position:absolute;}
-      #search-input {width: 600px; height: 50px; display: inline; font-size: 30px;}
+      .bottom{text-align: center;}
       #content-header {margin: 20px 0 50px 0;}
       .user .avatar {
         width: 32px;
@@ -35,7 +39,6 @@
       .nav-tabs{margin:20px 0;}
       .nav-cont{display:none;}
       .nav-cont.active{display:block;}
-      .deprecated{color:red;}
     </style>
     <script>
       $(function () {
@@ -63,20 +66,23 @@
   </head>
   <body>
     <div class="container">
-      <div id="content-header">
-        <a href="/"><img src="{{logoURL}}"></a>
+      <header>
+        <div class="logo">
+          <a href="/"><img src="{{logoURL}}"></a>
+        </div>
         <input type="text" id="search-input" class="form-control" placeholder="Search Packages">
+      </header>
+
+      <%- locals.body %>
+      <div class="bottom">
+        <hr/>
+        <p>
+          {{footer}}
+        </p>
+        <a href="https://github.com/cnpm/cnpmjs.org" id="fork" target="_blank">
+          <img alt="Fork me on GitHub" src="//s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png">
+      </a>
       </div>
-      <div id="content-body"><%- locals.body %></div>
-    <div class="bottom">
-      <hr/>
-      <p>
-        {{footer}}
-      </p>
-      <a href="https://github.com/cnpm/cnpmjs.org" id="fork" target="_blank">
-        <img alt="Fork me on GitHub" src="//s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png">
-    </a>
-    </div>
     </div>
     <!-- Include all compiled plugins (below), or include individual files as needed -->
     <script src="//dn-staticfile.qbox.me/twitter-bootstrap/3.2.0/js/bootstrap.min.js"></script>
