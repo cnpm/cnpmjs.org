@@ -32,6 +32,7 @@ describe('models/module_maintainer.test.js', function () {
       });
       // remove the exists
       var rs = yield* ModuleMaintainer.updateMaintainers('testfoo', ['fengmk2-1', 'foobar']);
+      rs.add.sort();
       rs.should.eql({
         add: ['fengmk2-1', 'foobar'],
         remove: ['fengmk2']
@@ -40,19 +41,22 @@ describe('models/module_maintainer.test.js', function () {
 
     it('should update multi maintainers', function* () {
       var rs = yield* ModuleMaintainer.updateMaintainers('testfoo2', ['fengmk23', 'ok', 'foobar']);
+      rs.add.sort();
       rs.should.eql({
-        add: ['fengmk23', 'ok', 'foobar'],
+        add: ['fengmk23', 'foobar', 'ok'],
         remove: []
       });
       // remove exists
       var rs = yield* ModuleMaintainer.updateMaintainers('testfoo2', ['fengmk23']);
+      rs.remove.sort();
       rs.should.eql({
         add: [],
-        remove: ['ok', 'foobar']
+        remove: ['foobar', 'ok']
       });
       var rs = yield* ModuleMaintainer.updateMaintainers('testfoo2', ['fengmk23', 'ok', 'foobar']);
+      rs.add.sort();
       rs.should.eql({
-        add: ['ok', 'foobar'],
+        add: ['foobar', 'ok'],
         remove: []
       });
     });

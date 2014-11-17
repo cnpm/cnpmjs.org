@@ -15,20 +15,20 @@
  * Module dependencies.
  */
 
-var path = require('path');
-var http = require('http');
-var fs = require('fs');
-var koa = require('koa');
-var middlewares = require('koa-middlewares');
-var markdown = require('koa-markdown');
-var block = require('../middleware/block');
 var opensearch = require('../middleware/opensearch');
 var notFound = require('../middleware/web_not_found');
 var staticCache = require('../middleware/static');
-var auth = require('../middleware/auth');
-var routes = require('../routes/web');
+var middlewares = require('koa-middlewares');
+var block = require('../middleware/block');
 var logger = require('../common/logger');
+var auth = require('../middleware/auth');
+var markdown = require('koa-markdown');
+var routes = require('../routes/web');
 var config = require('../config');
+var path = require('path');
+var http = require('http');
+var koa = require('koa');
+var fs = require('fs');
 
 var app = koa();
 

@@ -152,6 +152,8 @@ module.exports = function* show(next) {
     pkg.name = orginalName;
   }
 
+  pkg.registryUrl = '//' + config.registryHost + '/' + pkg.name;
+
   // pkg.engines = {
   //   "python": ">= 0.11.9",
   //   "node": ">= 0.11.9",
