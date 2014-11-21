@@ -87,7 +87,7 @@ test-travis-mysql: init-mysql
 test-travis-all: test-travis-sqlite test-travis-mysql
 
 dev:
-	@node_modules/.bin/node-dev --harmony dispatch.js
+	@NODE_ENV=development node_modules/.bin/node-dev --harmony dispatch.js
 
 contributors: install
 	@node_modules/.bin/contributors -f plain -o AUTHORS
