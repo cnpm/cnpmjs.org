@@ -1,4 +1,13 @@
 
+2.0.0-beta4 / 2014-11-21
+==================
+
+ * fix(registry): add missing /-/short api
+ * zoom sync link
+ * new design for package page
+ * image max width, fixed #505
+ * feat(middleware): block Ruby user-agent
+
 2.0.0-beta3 / 2014-11-12
 ==================
 
