@@ -24,6 +24,7 @@ var editable = require('../middleware/editable');
 var showTotal = require('../controllers/total');
 
 var listAll = require('../controllers/registry/package/list_all');
+var listShorts = require('../controllers/registry/package/list_shorts');
 var listSince = require('../controllers/registry/package/list_since');
 var listAllVersions = require('../controllers/registry/package/list');
 var getOneVersion = require('../controllers/registry/package/show');
@@ -57,7 +58,7 @@ function routes(app) {
   app.get('/-/all', listAll);
   app.get('/-/all/since', listSince);
   // get all module names, for auto completion
-  // app.get('/-/short', mod.listAllModuleNames);
+  app.get('/-/short', listShorts);
 
   // module
   // scope package: params: [$name]
