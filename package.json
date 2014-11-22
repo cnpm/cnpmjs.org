@@ -54,6 +54,7 @@
     "contributors": "*",
     "istanbul-harmony": "*",
     "jshint": "*",
+    "koa-mock": "^1.0.2",
     "mm": "*",
     "mocha": "*",
     "node-dev": "*",
