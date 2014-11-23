@@ -20,6 +20,7 @@ module.exports = {
     },
     license: {
       name: 'MIT',
+      url: 'http://opensource.org/licenses/MIT'
     },
     repository: {
       weburl: 'https://github.com/koajs/koa',

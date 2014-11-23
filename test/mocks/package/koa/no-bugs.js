@@ -1,7 +1,9 @@
 module.exports = {
   package: {
     name: 'no-bugs',
-    bugs: null,
+    bugs: {
+      url: null,
+    },
   },
   __requires: ['./default']
 };
