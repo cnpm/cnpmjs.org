@@ -131,8 +131,14 @@ module.exports = function* show(next) {
     }
   }
 
+  if (pkg.repository === 'undefined') {
+    pkg.repository = null;
+  }
   if (pkg.repository && pkg.repository.url) {
     pkg.repository.weburl = giturl.parse(pkg.repository.url) || pkg.repository.url;
+  }
+  if (!pkg.bugs) {
+    pkg.bugs = {};
   }
 
   utils.setLicense(pkg);

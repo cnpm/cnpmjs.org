@@ -34,30 +34,35 @@
           .
           </div>
       <% } %>
-      <div class="pack-sync">
-        <% if (package._publish_on_cnpm) { %>
-          Private package
-        <% } else { %>
-          <a href="/sync/<%= package.name %>" target="_blank">SYNC</a> missed versions from official npm registry.
-        <% } %>
-      </div>
+
       <div class="pack-repo">
         <% if (package.license) { %>
           <a href="<%= package.license.url %>" target="_blank"><%= package.license.name %></a>
         <% } %>
 
-        <% if (package.repository && package.repository !== 'undefined') { %>
+        <% if (package.repository) { %>
           <% if (package.license) {%> | <% } %>
-          <a href="<%= package.repository.weburl || package.repository.url %>" target="_blank">Reopsitory</a>
+          <a href="<%= package.repository.weburl %>" target="_blank">Reopsitory</a>
         <% } %>
 
-        <% if (package.bugs && package.bugs.url) { %>
-          <% if (package.license || (package.repository && package.repository !== 'undefined')) {%> | <% } %>
+        <% if (package.bugs.url) { %>
+          <% if (package.license || package.repository) {%> | <% } %>
           <a href="<%= package.bugs.url %>" target="_blank">Bugs</a>
         <% } %>
+
+        <% if (package.license || package.repository || package.bug.surl) {%> | <% } %>
+        <a href="https://www.npmjs.org/package/<%= package.name %>" target="_blank">Original npm</a>
       </div>
       <div class="pack-install">
         <pre class="sh">$ <%- config.npmClientName %> install <%= package.name %> <% if (package.preferGlobal) { %>-g<% } %></pre>
+        <div class="pack-sync">
+          <% if (package._publish_on_cnpm) { %>
+            Private package
+          <% } else { %>
+            <a href="/sync/<%= package.name %>" target="_blank">SYNC</a> missed versions from
+              <a href="<%= package.registryUrl %>" target="_blank">official npm registry</a>.
+          <% } %>
+        </div>
       </div>
     </div>
   </div>
@@ -162,7 +167,7 @@
 
 <div class="pack-readme">
   <div class="title">README</div>
-  <section id="readme">
+  <section id="readme" class="markdown-body">
     <%- package.readme %>
   </section>
 </div>

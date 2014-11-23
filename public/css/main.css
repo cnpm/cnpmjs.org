@@ -21,11 +21,11 @@ header #search-input {
 .pack-overview {
   min-width: 960px;
   color: #f1f1f1;
-  height: 350px;
+  height: 300px;
   width: 100%;
 }
 .pack-overview-background {
-  height: 350px;
+  height: 300px;
   background: #428bca url(http://rockdai.u.qiniudn.com/bs-docs-masthead-pattern.png) repeat center center;
   position: absolute;
   width: 100%;
@@ -82,7 +82,7 @@ header #search-input {
 }
 .pack-install {
   position: absolute;
-  top: 70px;
+  top: 85px;
   right: 0px;
 }
 .pack-install pre {
@@ -105,6 +105,11 @@ header #search-input {
   display: -webkit-box;
   display: box;
   -webkit-box-pack: center;
+}
+.cols-box ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
 }
 .cols-box-item {
   -moz-box-flex: 1;
@@ -129,11 +134,6 @@ header #search-input {
   color: #428bca;
   text-decoration: underline;
   float: right;
-}
-ul {
-  list-style: none;
-  margin: 0;
-  padding: 0;
 }
 .pack-dep-ver, .pack-download-num {
   float: right;

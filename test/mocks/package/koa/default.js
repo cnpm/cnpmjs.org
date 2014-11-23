@@ -20,9 +20,10 @@ module.exports = {
     },
     license: {
       name: 'MIT',
+      url: 'http://opensource.org/licenses/MIT'
     },
     repository: {
-      weburl: 'http://npm.taobao.org/package/koa',
+      weburl: 'https://github.com/koajs/koa',
     },
     bugs: {
       url: 'https://github.com/koajs/koa/issues'
