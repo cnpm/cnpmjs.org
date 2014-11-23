@@ -22,7 +22,7 @@ module.exports = {
       name: 'MIT',
     },
     repository: {
-      weburl: 'http://npm.taobao.org/package/koa',
+      weburl: 'https://github.com/koajs/koa',
     },
     bugs: {
       url: 'https://github.com/koajs/koa/issues'
