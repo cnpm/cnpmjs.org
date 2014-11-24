@@ -641,6 +641,19 @@ exports.search = function* (word, options) {
   return data;
 };
 
+exports.searchByKeyword = function* (keyword, options) {
+  var limit = options.limit || 100;
+  var pkgs = yield ModuleKeyword.findAll({
+    attributes: [ 'name', 'description' ],
+    where: {
+      keyword: keyword
+    },
+    limit: limit,
+    order: [ [ 'id', 'DESC' ] ]
+  });
+  return pkgs;
+};
+
 // module star
 
 exports.addStar = function* add(name, user) {
