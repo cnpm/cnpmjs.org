@@ -572,6 +572,13 @@ exports.search = function (word, options, callback) {
   });
 };
 
+exports.searchByKeyword = function (keyword, options, callback) {
+  var limit = options.limit || 100;
+  mysql.query(SEARCH_MODULES_BY_KEYWORD_SQL, [ keyword, limit ], function(err, rows) {
+    callback(null, rows);
+  });
+};
+
 thunkify(exports);
 
 var GET_LAST_MODIFIED_MODULE_SQL = multiline(function () {;/*

@@ -1059,3 +1059,10 @@ exports.updateTag = function* () {
     ok: true
   };
 };
+
+exports.searchByKeyword = function* () {
+  var packages = yield Module.searchByKeyword(this.params.keyword, {});
+  this.body = {
+    packages: packages
+  };
+};
