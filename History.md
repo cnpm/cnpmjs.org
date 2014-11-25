@@ -1,5 +1,4 @@
-
-1.7.4 / 2014-11-25 
+1.7.4 / 2014-11-25
 ==================
 
   * Merge pull request [#516](https://github.com/cnpm/cnpmjs.org/issues/516) from CatTail/1.x
