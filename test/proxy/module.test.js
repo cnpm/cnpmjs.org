@@ -100,6 +100,36 @@ describe('proxy/module.test.js', function () {
     });
   });
 
+  describe('searchByKeyword()', function () {
+    before(function (done) {
+      Module.addKeywords('bbbb', 'mock bbbbbb', ['aa', 'bb', 'cc'], function (err, results) {
+        should.not.exist(err);
+        results.should.be.an.Array;
+        results.should.length(3);
+        done();
+      });
+    });
+
+    it('should search match keywords modules', function(done) {
+      Module.searchByKeyword('aa', {}, function (err, data) {
+        should.not.exist(err);
+        data.length.should.above(0);
+        data.forEach(function (row) {
+          row.should.have.keys('name', 'description');
+        });
+        done();
+      });
+    });
+
+    it('should return empty array if not match found', function (done) {
+      Module.searchByKeyword('notexistkeyword', {}, function (err, data) {
+        should.not.exist(err);
+        data.should.eql([]);
+        done();
+      });
+    });
+  });
+
   var mockName = 'aa' + Date.now();
   describe('addKeywords()', function () {
     it('should add diff keywords to module', function (done) {
