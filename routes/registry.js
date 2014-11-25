@@ -87,6 +87,9 @@ function routes(app) {
 
   // list all packages of user
   app.get('/-/by-user/:user', userPackage.list);
+
+  // search package by keyword
+  app.get('/-/by-keyword/:keyword', mod.searchByKeyword);
 }
 
 module.exports = routes;
