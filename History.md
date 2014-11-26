@@ -1,3 +1,10 @@
+
+1.7.5 / 2014-11-26
+==================
+
+  * Merge pull request [#518](https://github.com/cnpm/cnpmjs.org/issues/518) from CatTail/1.x
+  * Fix `Module.add` don't add keyword into `module_keyword` table
+
 1.7.4 / 2014-11-25
 ==================
 
