@@ -92,7 +92,7 @@ exports.add = function (mod, callback) {
     }
 
     // add keywords
-    exports.addKeywords(mod, description, words, utility.noop);
+    exports.addKeywords(mod.name, description, words, utility.noop);
   });
 };
 

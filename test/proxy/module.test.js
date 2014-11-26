@@ -184,7 +184,15 @@ describe('proxy/module.test.js', function () {
         Module.getById(result.id, function (err, row) {
           should.not.exist(err);
           row.package.readme.should.equal(sourcePackage.readme);
-          done();
+          // check if keyword added into module_keyword
+          var keyword = sourcePackage.keywords[0];
+          Module.searchByKeyword(keyword, {}, function(err, pkgs) {
+              var isFound = pkgs.some(function(pkg) {
+                  return pkg.name == sourcePackage.name;
+              });
+              isFound.should.be.ok;
+              done();
+          });
         });
       });
     });
