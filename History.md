@@ -1,4 +1,13 @@
 
+2.0.0-beta5 / 2014-12-05
+==================
+
+ * hotfix package.html typo. Closes #521
+ * Add editorconfig
+ * fix(web/package): package name to long cause style problem fix
+ * fix(css): use github-markdown-css for markdown body
+ * feat(mock): use koa-mock for front end dev
+
 2.0.0-beta4 / 2014-11-21
 ==================
 
