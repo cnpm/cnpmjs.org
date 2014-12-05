@@ -50,7 +50,7 @@
           <a href="<%= package.bugs.url %>" target="_blank">Bugs</a>
         <% } %>
 
-        <% if (package.license || package.repository || package.bug.surl) {%> | <% } %>
+        <% if (package.license || package.repository || package.bugs.url) {%> | <% } %>
         <a href="https://www.npmjs.org/package/<%= package.name %>" target="_blank">Original npm</a>
       </div>
       <div class="pack-install">
