@@ -14,6 +14,8 @@
  * Module dependencies.
  */
 
+var utility = require('utility');
+var util = require('util');
 var config = require('../../config');
 var packageService = require('../../services/package');
 
@@ -21,9 +23,10 @@ exports.version = function* () {
   var color = 'lightgrey';
   var version = 'invalid';
   var name = this.params[0];
-  var latestTag = yield* packageService.getModuleByTag(name, 'latest');
-  if (latestTag) {
-    version = latestTag.version;
+  var tag = this.query.tag || 'latest';
+  var info = yield* packageService.getModuleByTag(name, tag);
+  if (info) {
+    version = info.version;
     if (/^0\.0\./.test(version)) {
       // <0.1.0 & >=0.0.0
       color = 'red';
@@ -38,12 +41,8 @@ exports.version = function* () {
 
   var subject = config.badgeSubject.replace(/\-/g, '--');
   version = version.replace(/\-/g, '--');
-  var url = 'https://img.shields.io/badge/' + subject + '-' + version + '-' + color + '.svg';
-  if (this.querystring) {
-    url += '?' + this.querystring;
-  } else {
-    url += '?style=flat-square';
-  }
-
+  var style = this.query.style || 'flat-square';
+  var url = util.format('https://img.shields.io/badge/%s-%s-%s.svg?style=%s',
+    subject, version, color, utility.encodeURIComponent(style));
   this.redirect(url);
 };

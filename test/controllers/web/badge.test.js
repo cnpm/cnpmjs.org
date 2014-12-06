@@ -17,18 +17,11 @@
 var should = require('should');
 var request = require('supertest');
 var mm = require('mm');
-var pedding = require('pedding');
 var app = require('../../../servers/web');
 var registry = require('../../../servers/registry');
 var utils = require('../../utils');
 
 describe('controllers/web/badge.test.js', function () {
-  before(function (done) {
-    done = pedding(2, done);
-    registry = registry.listen(0, done);
-    app = app.listen(0, done);
-  });
-
   afterEach(mm.restore);
 
   describe('GET /badge/v/:name.svg', function () {
@@ -43,6 +36,21 @@ describe('controllers/web/badge.test.js', function () {
         request(app)
         .get('/badge/v/badge-test-module.svg?style=flat-square')
         .expect('Location', 'https://img.shields.io/badge/cnpm-1.0.1-blue.svg?style=flat-square')
+        .expect(302, done);
+      });
+    });
+
+    it('should show tag', function (done) {
+      var pkg = utils.getPackage('badge-test-module', '2.0.1', utils.admin, 'v2');
+      request(registry)
+      .put('/' + pkg.name)
+      .set('authorization', utils.adminAuth)
+      .send(pkg)
+      .end(function (err) {
+        should.not.exists(err);
+        request(app)
+        .get('/badge/v/badge-test-module.svg?style=flat-square&tag=v2')
+        .expect('Location', 'https://img.shields.io/badge/cnpm-2.0.1-blue.svg?style=flat-square')
         .expect(302, done);
       });
     });
