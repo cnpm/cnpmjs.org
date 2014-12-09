@@ -83,7 +83,7 @@ app.use(markdown({
   baseUrl: '/',
   root: docDir,
   layout: layoutFile,
-  titleHolder: '<%- locals.title %>',
+  titleHolder: '<%= locals.title %>',
   bodyHolder: '<%- locals.body %>',
   indexName: '_readme',
   remarkableOptions: {
