@@ -1,4 +1,10 @@
 
+2.0.0-rc.1 / 2014-12-09
+==================
+
+ * fix xss on title
+ * feat(badge): support badge image url with tag
+
 2.0.0-beta5 / 2014-12-05
 ==================
 
