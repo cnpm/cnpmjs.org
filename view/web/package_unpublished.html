@@ -36,7 +36,7 @@
     <tr>
       <th>Unpublished On</th>
       <td>
-        <%- package.unpublished.time %>
+        <%= package.unpublished.time %>
       </td>
     </tr>
 
@@ -48,7 +48,7 @@
         <span class="user">
           <a class="username" href="/~<%= m.name %>">
             <% if (m.gravatar) { %>
-            <img src="<%- m.gravatar %>" class="avatar">
+            <img src="<%= m.gravatar %>" class="avatar">
             <% } %>
             <%= m.name %>
           </a>
@@ -60,9 +60,9 @@
 
     <% if (package.unpublished.versions) { %>
     <tr>
-      <th>Versions (<%- package.unpublished.versions.length %>)</th>
+        <th>Versions (<%= package.unpublished.versions.length %>)</th>
       <td>
-      <%- package.unpublished.versions.reverse().slice(0, 20).join(', ') %> ...
+      <%= package.unpublished.versions.reverse().slice(0, 20).join(', ') %> ...
       </td>
     </tr>
     <% } %>
