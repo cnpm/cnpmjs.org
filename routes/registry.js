@@ -34,6 +34,7 @@ var removePackage = require('../controllers/registry/package/remove');
 var removeOneVersion = require('../controllers/registry/package/remove_version');
 var updatePackage = require('../controllers/registry/package/update');
 var downloadPackage = require('../controllers/registry/package/download');
+var downloadTotal = require('../controllers/registry/package/download_total');
 
 var addUser = require('../controllers/registry/user/add');
 var showUser = require('../controllers/registry/user/show');
@@ -108,6 +109,10 @@ function routes(app) {
 
   // list all packages of user
   app.get('/-/by-user/:user', userPackage.list);
+
+  // download times
+  app.get('/downloads/range/:range/:name', downloadTotal);
+  app.get('/downloads/range/:range', downloadTotal);
 }
 
 module.exports = routes;
