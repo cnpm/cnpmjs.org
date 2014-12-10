@@ -1,4 +1,11 @@
 
+2.0.0-rc.2 / 2014-12-11
+==================
+
+ * add download API, closes #529
+ * fix missing home page title (@rockdai)
+ * Fix typo in view/web/package.html (@LoicMahieu)
+
 2.0.0-rc.1 / 2014-12-09
 ==================
 
