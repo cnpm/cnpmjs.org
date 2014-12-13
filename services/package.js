@@ -276,10 +276,12 @@ exports.saveModule = function* (mod) {
   item.dist_size = dist.size;
   item.description = description;
 
-  var newItem = yield item.save();
+  if (item.isDirty) {
+    item = yield item.save();
+  }
   var result = {
-    id: newItem.id,
-    gmt_modified: newItem.gmt_modified
+    id: item.id,
+    gmt_modified: item.gmt_modified
   };
 
   if (!Array.isArray(keywords)) {
@@ -397,7 +399,10 @@ exports.addModuleTag = function* (name, tag, version) {
   }
   row.module_id = mod.id;
   row.version = version;
-  return yield row.save();
+  if (row.isDirty) {
+    return yield row.save();
+  }
+  return row;
 };
 
 exports.getModuleTag = function* (name, tag) {
@@ -571,7 +576,12 @@ exports.addKeyword = function* (data) {
     item = ModuleKeyword.build(data);
   }
   item.description = data.description;
-  return yield item.save();
+  if (item.isDirty) {
+    // make sure object will change, otherwise will cause empty sql error
+    // @see https://github.com/cnpm/cnpmjs.org/issues/533
+    return yield item.save();
+  }
+  return item;
 };
 
 exports.addKeywords = function* (name, description, keywords) {

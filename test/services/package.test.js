@@ -445,6 +445,33 @@ describe('services/package.test.js', function () {
     });
   });
 
+  describe('addKeyword()', function () {
+    it('should add duplicat keywords', function* () {
+      var r = yield* Package.addKeyword({
+        name: 'addKeyword-test-name',
+        keyword: 'addKeyword-test-keyword',
+        description: 'addKeyword-test-description',
+      });
+      should.exist(r);
+
+      var r2 = yield* Package.addKeyword({
+        name: 'addKeyword-test-name',
+        keyword: 'addKeyword-test-keyword',
+        description: 'addKeyword-test-description',
+      });
+      should.exist(r2);
+      r2.id.should.equal(r.id);
+
+      var r3 = yield* Package.addKeyword({
+        name: 'addKeyword-test-name',
+        keyword: 'addKeyword-test-keyword',
+        description: 'addKeyword-test-description2',
+      });
+      should.exist(r3);
+      r3.id.should.equal(r.id);
+    });
+  });
+
   describe('search()', function () {
     before(function* () {
       yield* Package.addKeywords('aaaa', 'mock aaaaaa', ['aa', 'bb', 'cc']);

@@ -152,7 +152,10 @@ module.exports = function (sequelize, DataTypes) {
         user.json = data;
         user.email = data.email || '';
         user.rev = data._rev || '';
-        return yield user.save();
+        if (user.isDirty) {
+          user = yield user.save();
+        }
+        return user;
       },
       saveCustomUser: function* (data) {
         var name = data.user.login;
@@ -176,7 +179,10 @@ module.exports = function (sequelize, DataTypes) {
         user.rev = rev;
         user.salt = salt;
         user.password_sha = passwordSha;
-        return yield user.save();
+        if (user.isDirty) {
+          user = yield user.save();
+        }
+        return user;
       },
 
       // add cnpm user
