@@ -43,7 +43,10 @@ exports.plusModuleTotal = function* (data) {
     });
   }
   row.count += data.count;
-  return yield row.save();
+  if (row.isDirty) {
+    return yield row.save();
+  }
+  return row;
 };
 
 

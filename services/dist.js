@@ -37,7 +37,10 @@ exports.savefile = function* (info) {
   row.size = info.size;
   row.url = info.url;
   row.sha1 = info.sha1;
-  return yield row.save();
+  if (row.isDirty) {
+    return yield row.save();
+  }
+  return row;
 };
 
 exports.savedir = function* (info) {
@@ -54,7 +57,10 @@ exports.savedir = function* (info) {
     });
   }
   row.date = info.date;
-  return yield row.save();
+  if (row.isDirty) {
+    return yield row.save();
+  }
+  return row;
 };
 
 exports.listdir = function* (name) {

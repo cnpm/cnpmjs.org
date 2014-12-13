@@ -26,7 +26,7 @@ describe('sync/sync_exist.test.js', function () {
 
     before(function (done) {
       var worker = new SyncModuleWorker({
-        name: 'pedding',
+        name: 'byte',
         username: 'admin',
         noDep: true
       });
@@ -35,20 +35,20 @@ describe('sync/sync_exist.test.js', function () {
     });
 
     it('should sync first time ok', function *() {
-      mm.data(npmService, 'getShort', ['pedding']);
+      mm.data(npmService, 'getShort', ['byte']);
       mm.data(totalService, 'getTotalInfo', {last_exist_sync_time: 0});
       var data = yield* sync();
-      data.successes.should.eql(['pedding']);
+      data.successes.should.eql(['byte']);
     });
 
     it('should sync common ok', function *() {
       mm.data(npmService, 'getAllSince', {
         _updated: Date.now(),
-        'pedding': {},
+        'byte': {},
       });
       mm.data(totalService, 'getTotalInfo', {last_exist_sync_time: Date.now()});
       var data = yield* sync();
-      data.successes.should.eql(['pedding']);
+      data.successes.should.eql(['byte']);
 
       mm.data(npmService, 'getAllSince', {
         _updated: Date.now(),
