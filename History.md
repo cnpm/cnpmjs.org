@@ -1,4 +1,9 @@
 
+2.0.0-rc.3 / 2014-12-14
+==================
+
+ * fix(services): need to detect instance isDirty or not before save()
+
 2.0.0-rc.2 / 2014-12-11
 ==================
 
