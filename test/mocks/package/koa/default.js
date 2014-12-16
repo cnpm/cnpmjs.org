@@ -112,8 +112,8 @@ module.exports = {
 };
 
 function readme() {
-  var marked = require('marked');
+  var renderMarkdown = require('../../../common/markdown').render;
   var fs = require('fs');
   var path = require('path');
-  return marked(fs.readFileSync(path.join(__dirname, 'readme.md'), 'utf8'));
+  return renderMarkdown(fs.readFileSync(path.join(__dirname, 'readme.md'), 'utf8'));
 }
