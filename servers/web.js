@@ -19,10 +19,11 @@ var opensearch = require('../middleware/opensearch');
 var notFound = require('../middleware/web_not_found');
 var staticCache = require('../middleware/static');
 var middlewares = require('koa-middlewares');
+var markdownMiddleware = require('koa-markdown');
 var block = require('../middleware/block');
 var logger = require('../common/logger');
+var renderMarkdown = require('../common/markdown').render;
 var auth = require('../middleware/auth');
-var markdown = require('koa-markdown');
 var routes = require('../routes/web');
 var config = require('../config');
 var path = require('path');
@@ -79,16 +80,15 @@ if (config.customReadmeFile) {
 }
 fs.writeFileSync(readmeFile, readmeContent);
 
-app.use(markdown({
+app.use(markdownMiddleware({
   baseUrl: '/',
   root: docDir,
   layout: layoutFile,
   titleHolder: '<%= locals.title %>',
   bodyHolder: '<%- locals.body %>',
   indexName: '_readme',
-  remarkableOptions: {
-    html: true
-  }
+  cache: true,
+  render: renderMarkdown,
 }));
 
 var locals = {

@@ -20,12 +20,12 @@ var bytes = require('bytes');
 var giturl = require('giturl');
 var moment = require('moment');
 var semver = require('semver');
-var marked = require('marked');
 var gravatar = require('gravatar');
 var humanize = require('humanize-number');
 var config = require('../../../config');
 var utils = require('../../utils');
 var setDownloadURL = require('../../../lib/common').setDownloadURL;
+var renderMarkdown = require('../../../common/markdown').render;
 var packageService = require('../../../services/package');
 
 module.exports = function* show(next) {
@@ -90,7 +90,7 @@ module.exports = function* show(next) {
   pkg.package.fromNow = moment(pkg.publish_time).fromNow();
   pkg = pkg.package;
   pkg.users = users;
-  pkg.readme = marked(pkg.readme || '');
+  pkg.readme = renderMarkdown(pkg.readme || '');
   if (!pkg.readme) {
     pkg.readme = pkg.description || '';
   }
