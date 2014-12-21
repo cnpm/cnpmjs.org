@@ -19,15 +19,18 @@ var models = require('../models');
 var DownloadTotal = models.DownloadTotal;
 
 exports.getModuleTotal = function* (name, start, end) {
-  var dates = getDateRanges(start, end);
-  return yield DownloadTotal.findAll({
+  start += ' 00:00:00';
+  end += ' 23:59:59';
+  var rows = yield DownloadTotal.findAll({
     where: {
       date: {
-        in: dates
+        gte: start,
+        lte: end
       },
       name: name
     }
   });
+  return formatRows(rows);
 };
 
 exports.plusModuleTotal = function* (data) {
@@ -50,26 +53,21 @@ exports.plusModuleTotal = function* (data) {
   return row;
 };
 
-
 exports.getTotal = function* (start, end) {
+  start += ' 00:00:00';
+  end += ' 23:59:59';
   var sql = 'SELECT date, sum(count) AS count FROM download_total \
-    WHERE date in (?) GROUP BY date';
-  return yield models.query(sql, [getDateRanges(start, end)]);
+    WHERE date>=? AND date<=?  GROUP BY date;';
+  var rows = yield models.query(sql, [start, end]);
+  return formatRows(rows);
 };
 
-function getDateRanges(start, end) {
-  var startDate = moment(start, 'YYYY-MM-DD');
-  var ranges = [start];
-  if (start < end) {
-    var next;
-    while (true) {
-      next = startDate.add(1, 'days').format('YYYY-MM-DD');
-      if (next >= end) {
-        break;
-      }
-      ranges.push(next);
-    }
-    ranges.push(end);
-  }
-  return ranges;
+function formatRows(rows) {
+  return rows.map(function (row) {
+    return {
+      name: row.name,
+      count: row.count,
+      date: moment(row.date).format('YYYY-MM-DD'),
+    };
+  });
 }
