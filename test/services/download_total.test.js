@@ -37,12 +37,15 @@ describe('services/download_total.test.js', function () {
         'plusModuleTotal-module', '2014-10-21', '2014-10-21');
       rows.should.length(1);
       rows[0].count.should.equal(1000);
+      rows[0].date.should.equal('2014-10-21');
 
       rows = yield* DownloadTotal.getModuleTotal(
         'plusModuleTotal-module', '2014-10-21', '2014-10-22');
       rows.should.length(2);
       rows[0].count.should.equal(1000);
+      rows[0].date.should.equal('2014-10-21');
       rows[1].count.should.equal(2);
+      rows[1].date.should.equal('2014-10-22');
 
       // save again
       data = {
@@ -55,6 +58,7 @@ describe('services/download_total.test.js', function () {
         'plusModuleTotal-module', '2014-10-21', '2014-10-21');
       rows.should.length(1);
       rows[0].count.should.equal(1003);
+      rows[0].date.should.equal('2014-10-21');
 
       data = {
         date: '2014-10-22',
