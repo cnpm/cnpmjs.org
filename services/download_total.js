@@ -14,15 +14,16 @@
  * Module dependencies.
  */
 
+var moment = require('moment');
 var models = require('../models');
 var DownloadTotal = models.DownloadTotal;
 
 exports.getModuleTotal = function* (name, start, end) {
+  var dates = getDateRanges(start, end);
   return yield DownloadTotal.findAll({
     where: {
       date: {
-        gte: start,
-        lte: end
+        in: dates
       },
       name: name
     }
@@ -52,6 +53,23 @@ exports.plusModuleTotal = function* (data) {
 
 exports.getTotal = function* (start, end) {
   var sql = 'SELECT date, sum(count) AS count FROM download_total \
-    WHERE date>=? AND date<=? GROUP BY date;';
-  return yield models.query(sql, [start, end]);
+    WHERE date in (?) GROUP BY date';
+  return yield models.query(sql, [getDateRanges(start, end)]);
 };
+
+function getDateRanges(start, end) {
+  var startDate = moment(start, 'YYYY-MM-DD');
+  var ranges = [start];
+  if (start < end) {
+    var next;
+    while (true) {
+      next = startDate.add(1, 'days').format('YYYY-MM-DD');
+      if (next >= end) {
+        break;
+      }
+      ranges.push(next);
+    }
+    ranges.push(end);
+  }
+  return ranges;
+}
