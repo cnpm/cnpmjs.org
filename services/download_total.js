@@ -15,39 +15,39 @@
  */
 
 var moment = require('moment');
-var models = require('../models');
-var DownloadTotal = models.DownloadTotal;
+var DownloadTotal = require('../models').DownloadTotal;
 
 exports.getModuleTotal = function* (name, start, end) {
-  start += ' 00:00:00';
-  end += ' 23:59:59';
+  var startMonth = parseYearMonth(start);
+  var endMonth = parseYearMonth(end);
   var rows = yield DownloadTotal.findAll({
     where: {
       date: {
-        gte: start,
-        lte: end
+        gte: startMonth,
+        lte: endMonth
       },
       name: name
     }
   });
-  return formatRows(rows);
+  return formatRows(rows, start, end);
 };
 
 exports.plusModuleTotal = function* (data) {
-  data.date = new Date(data.date);
+  var yearMonth = parseYearMonth(data.date);
   var row = yield DownloadTotal.find({
     where: {
-      date: data.date,
-      name: data.name
+      name: data.name,
+      date: yearMonth,
     }
   });
   if (!row) {
     row = DownloadTotal.build({
-      date: data.date,
-      name: data.name
+      name: data.name,
+      date: yearMonth,
     });
   }
-  row.count += data.count;
+  var field = 'd' + data.date.substring(8, 10);
+  row[field] += data.count;
   if (row.isDirty) {
     return yield row.save();
   }
@@ -55,28 +55,90 @@ exports.plusModuleTotal = function* (data) {
 };
 
 exports.getTotal = function* (start, end) {
-  start += ' 00:00:00';
-  end += ' 23:59:59';
-  var sql = 'SELECT date, sum(count) AS count FROM download_total \
-    WHERE date >= ? AND date <= ? GROUP BY date;';
-  var rows = yield models.query(sql, [start, end]);
-  return formatRows(rows);
+  var startMonth = parseYearMonth(start);
+  var endMonth = parseYearMonth(end);
+  var rows = yield DownloadTotal.findAll({
+    where: {
+      date: {
+        gte: startMonth,
+        lte: endMonth
+      },
+    }
+  });
+  var map = {};
+  var downloads = [];
+  rows.forEach(function (row) {
+    var date = String(row.date);
+    var month = date.substring(4, 6);
+    var year = date.substring(0, 4);
+    var yearMonth = year + '-' + month;
+    var days = MONTHS[month];
+    if (month === '02' && moment([Number(year)]).isLeapYear()) {
+      days += 1;
+    }
+    for (var i = 1; i <= days; i++) {
+      var day = i < 10 ? '0' + i : String(i);
+      var field = 'd' + day;
+      var d = yearMonth + '-' + day;
+      var count = row[field];
+      if (d >= start && d <= end && count > 0) {
+        var item = map[d];
+        if (!item) {
+          map[d] = item = {
+            count: 0,
+            date: d
+          };
+          downloads.push(item);
+        }
+        item.count += row[field];
+      }
+    }
+  });
+  return downloads;
 };
 
-function formatRows(rows) {
-  return rows.map(function (row) {
-    var date = row.date;
-    if (typeof date === 'string') {
-      // sqlite raw datetime is string format ...
-      date = date.substring(0, 10);
-    } else {
-      // mysql return DateTime
-      date = moment(row.date).format('YYYY-MM-DD');
+var MONTHS = {
+  '01': 31,
+  '02': 28, // leap year: 29
+  '03': 31,
+  '04': 30,
+  '05': 31,
+  '06': 30,
+  '07': 31,
+  '08': 31,
+  '09': 30,
+  '10': 31,
+  '11': 30,
+  '12': 31
+};
+
+function parseYearMonth(date) {
+  return Number(date.substring(0, 7).replace('-', ''));
+}
+
+function formatRows(rows, startDate, endDate) {
+  var dates = [];
+  rows.forEach(function (row) {
+    var date = String(row.date);
+    var month = date.substring(4, 6);
+    var year = date.substring(0, 4);
+    var yearMonth = year + '-' + month;
+    var days = MONTHS[month];
+    if (month === '02' && moment([Number(year)]).isLeapYear()) {
+      days += 1;
     }
-    return {
-      name: row.name,
-      count: row.count,
-      date: date,
-    };
+    for (var i = 1; i <= days; i++) {
+      var day = i < 10 ? '0' + i : String(i);
+      var field = 'd' + day;
+      var d = yearMonth + '-' + day;
+      if (d >= startDate && d <= endDate) {
+        dates.push({
+          name: row.name,
+          count: row[field],
+          date: d
+        });
+      }
+    }
   });
+  return dates;
 }
