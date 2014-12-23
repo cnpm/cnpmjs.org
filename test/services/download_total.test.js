@@ -66,13 +66,27 @@ describe('services/download_total.test.js', function () {
         count: 3
       };
       yield* DownloadTotal.plusModuleTotal(data);
+      data = {
+        date: '2014-12-22',
+        name: 'plusModuleTotal-module2',
+        count: 3
+      };
+      yield* DownloadTotal.plusModuleTotal(data);
+      data = {
+        date: '2014-12-21',
+        name: 'plusModuleTotal-module2',
+        count: 3
+      };
+      yield* DownloadTotal.plusModuleTotal(data);
 
       rows = yield DownloadTotal.getTotal('2014-10-21', '2014-12-21');
-      rows.length.should.above(1);
+      rows.should.length(3);
       rows[0].date.should.equal('2014-10-21');
       rows[0].count.should.equal(1003);
       rows[1].date.should.equal('2014-10-22');
       rows[1].count.should.equal(5);
+      rows[2].date.should.equal('2014-12-21');
+      rows[2].count.should.equal(3);
     });
   });
 });

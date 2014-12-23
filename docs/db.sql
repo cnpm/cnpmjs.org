@@ -151,18 +151,60 @@ INSERT INTO total(name, gmt_modified) VALUES('total', now())
 -- ALTER TABLE `total` ADD `left_sync_num` int unsigned NOT NULL DEFAULT '0' COMMENT 'how many packages left to be sync'
 -- ALTER TABLE `total` ADD `last_sync_module` varchar(100) NOT NULL COMMENT 'last sync success module name';
 
-CREATE TABLE IF NOT EXISTS `download_total` (
- `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'primary key',
- `gmt_create` datetime NOT NULL COMMENT 'create time',
- `gmt_modified` datetime NOT NULL COMMENT 'modified time',
- `date` datetime NOT NULL COMMENT 'YYYY-MM-DD format',
- `name` varchar(100) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL COMMENT 'module name',
- `count` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT 'download count',
- PRIMARY KEY (`id`),
- UNIQUE KEY `date_name` (`date`, `name`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='module download total info';
+-- CREATE TABLE IF NOT EXISTS `download_total` (
+--  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'primary key',
+--  `gmt_create` datetime NOT NULL COMMENT 'create time',
+--  `gmt_modified` datetime NOT NULL COMMENT 'modified time',
+--  `date` datetime NOT NULL COMMENT 'YYYY-MM-DD format',
+--  `name` varchar(100) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL COMMENT 'module name',
+--  `count` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT 'download count',
+--  PRIMARY KEY (`id`),
+--  UNIQUE KEY `date_name` (`date`, `name`)
+-- ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='module download total info';
 -- ALTER TABLE  `download_total` CHANGE  `name`  `name` VARCHAR(100) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL COMMENT  'module name';
 -- ALTER TABLE  `download_total` CHANGE `date` `date` datetime NOT NULL COMMENT 'YYYY-MM-DD format';
+
+CREATE TABLE IF NOT EXISTS `downloads` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'primary key',
+  `gmt_create` datetime NOT NULL COMMENT 'create time',
+  `gmt_modified` datetime NOT NULL COMMENT 'modified time',
+  `name` varchar(100) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL COMMENT 'module name',
+  `date` int unsigned NOT NULL COMMENT 'YYYYMM format',
+  `d01` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT '01 download count',
+  `d02` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT '02 download count',
+  `d03` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT '03 download count',
+  `d04` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT '04 download count',
+  `d05` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT '05 download count',
+  `d06` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT '06 download count',
+  `d07` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT '07 download count',
+  `d08` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT '08 download count',
+  `d09` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT '09 download count',
+  `d10` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT '10 download count',
+  `d11` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT '11 download count',
+  `d12` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT '12 download count',
+  `d13` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT '13 download count',
+  `d14` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT '14 download count',
+  `d15` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT '15 download count',
+  `d16` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT '16 download count',
+  `d17` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT '17 download count',
+  `d18` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT '18 download count',
+  `d19` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT '19 download count',
+  `d20` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT '20 download count',
+  `d21` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT '21 download count',
+  `d22` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT '22 download count',
+  `d23` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT '23 download count',
+  `d24` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT '24 download count',
+  `d25` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT '25 download count',
+  `d26` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT '26 download count',
+  `d27` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT '27 download count',
+  `d28` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT '28 download count',
+  `d29` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT '29 download count',
+  `d30` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT '30 download count',
+  `d31` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT '31 download count',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `name_date` (`name`, `date`),
+  KEY `date` (`date`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='module download total info';
 
 CREATE TABLE IF NOT EXISTS `module_deps` (
  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'primary key',

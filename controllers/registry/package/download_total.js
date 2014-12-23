@@ -14,10 +14,7 @@
  * Module dependencies.
  */
 
-var debug = require('debug')('cnpmjs.org:controllers:registry:package:download_total');
 var DownloadTotal = require('../../../services/download_total');
-var moment = require('moment');
-
 var DATE_REG = /^\d{4}-\d{2}-\d{2}$/;
 
 module.exports = function* downloadTotal () {
@@ -39,7 +36,7 @@ module.exports = function* downloadTotal () {
   this.body = name
     ? yield getPackageTotal(name, range[0], range[1])
     : yield getTotal(range[0], range[1]);
-}
+};
 
 function* getPackageTotal(name, start, end) {
   var res = yield DownloadTotal.getModuleTotal(name, start, end);
