@@ -53,9 +53,11 @@ module.exports = function* download(next) {
 
   var dist = row.package.dist;
   if (!dist.key) {
-    debug('get tarball by 302, url: %s', dist.tarball || url);
+    // try to use nsf.url() first
+    url = url || dist.tarball;
+    debug('get tarball by 302, url: %s', url);
     this.status = 302;
-    this.set('Location', dist.tarball || url);
+    this.set('Location', url);
     _downloads[name] = (_downloads[name] || 0) + 1;
     return;
   }
