@@ -1,7 +1,33 @@
 var co = require('co');
 var moment = require('moment');
 var models = require('../models');
-var DownloadTotal = require('../services/download_total');
+var DownloadTotal = models.DownloadTotal;
+
+function parseYearMonth(date) {
+  return Number(date.substring(0, 7).replace('-', ''));
+}
+
+function* plusModuleTotal(data) {
+  var yearMonth = parseYearMonth(data.date);
+  row = yield DownloadTotal.find({
+    where: {
+      name: data.name,
+      date: yearMonth,
+    }
+  });
+  if (!row) {
+    row = DownloadTotal.build({
+      name: data.name,
+      date: yearMonth,
+    });
+  }
+  var field = 'd' + data.date.substring(8, 10);
+  row[field] += data.count;
+  if (row.isDirty) {
+    return yield row.save();
+  }
+  return row;
+}
 
 co(function* () {
   var result = yield models.query('select count(*) as count from downloads;');
@@ -21,6 +47,7 @@ co(function* () {
     console.log('%j', rows[0]);
     var tasks = [];
     var currentDate = null;
+    var allCount = 0;
     for (var i = 0; i < rows.length; i++) {
       var row = rows[i];
       lastId = row.id;
@@ -31,23 +58,50 @@ co(function* () {
       if (!currentDate) {
         currentDate = date;
       }
-      if (currentDate === date) {
-        tasks.push(DownloadTotal.plusModuleTotal({
-          date: date,
-          name: row.name,
-          count: row.count,
-        }));
-        if (tasks.length >= 100) {
-          yield tasks;
-          tasks = [];
-        }
-      } else {
+      if (currentDate !== date) {
+        console.log('saving %s %d rows, total count %d', currentDate, tasks.length, allCount);
         // date change, flush tasks
+        tasks.push(plusModuleTotal({
+          date: currentDate,
+          name: '__all__',
+          count: allCount
+        }));
+        allCount = 0;
         yield tasks;
+        tasks = [];
+        currentDate = null;
+      }
+
+      tasks.push(plusModuleTotal({
+        date: date,
+        name: row.name,
+        count: row.count,
+      }));
+      allCount += row.count;
+
+      if (tasks.length >= 100) {
+        console.log('saving %s %d rows, total count %d', currentDate, tasks.length, allCount);
+        tasks.push(plusModuleTotal({
+          date: currentDate,
+          name: '__all__',
+          count: allCount
+        }));
+        allCount = 0;
+        yield tasks;
+        tasks = [];
         currentDate = null;
       }
     }
+
+    if (allCount > 0) {
+      tasks.push({
+        date: currentDate,
+        name: '__all__',
+        count: allCount
+      });
+    }
     if (tasks.length > 0) {
+      console.log('saving %s %d rows, total count %d', currentDate, tasks.length, allCount);
       yield tasks;
     }
   }
