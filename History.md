@@ -1,4 +1,15 @@
 
+2.0.0-rc.4 / 2014-12-25
+==================
+
+ * refactor(download): try to use nsf.url() first
+ * use __all__ for full downloads
+ * refactor(download_total): optimize download total
+ * fix sqlite raw sql return datetime is string format
+ * fix(download_total): change column date to DateTime
+ * fix(services/download_total): fix download_total slow sql on `date >= $start and date <= $end`
+ * fix(markdown): replace marked use remarkable
+
 2.0.0-rc.3 / 2014-12-14
 ==================
 
