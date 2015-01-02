@@ -90,7 +90,12 @@ module.exports = function* show(next) {
   pkg.package.fromNow = moment(pkg.publish_time).fromNow();
   pkg = pkg.package;
   pkg.users = users;
-  pkg.readme = renderMarkdown(pkg.readme || '');
+  if (pkg.readme && typeof pkg.readme !== 'string') {
+    pkg.readme = 'readme is not string: ' + JSON.stringify(pkg.readme);
+  } else {
+    pkg.readme = renderMarkdown(pkg.readme || '');
+  }
+
   if (!pkg.readme) {
     pkg.readme = pkg.description || '';
   }
