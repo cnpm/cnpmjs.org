@@ -23,7 +23,7 @@ describe('controllers/web/package/show_sync.test.js', function () {
       request(app.listen())
       .get('/sync/cutter')
       .expect(200)
-      .expect(/Sync Package/)
+      .expect(/Sync package/)
       .expect(/Log/, done);
     });
   });

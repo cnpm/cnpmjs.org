@@ -49,6 +49,7 @@ function SyncModuleWorker(options) {
     options.name = [options.name];
   }
 
+  this.type = options.type || 'package';
   this.names = options.name;
   this.startName = this.names[0];
 
@@ -79,8 +80,9 @@ SyncModuleWorker.prototype.finish = function () {
     return;
   }
   this._finished = true;
-  this.log('[done] Sync %s module finished, %d success, %d fail\nSuccess: [ %s ]\nFail: [ %s ]',
+  this.log('[done] Sync %s %s finished, %d success, %d fail\nSuccess: [ %s ]\nFail: [ %s ]',
     this.startName,
+    this.type,
     this.successes.length, this.fails.length,
     this.successes.join(', '), this.fails.join(', '));
   this.emit('end');
@@ -137,6 +139,11 @@ SyncModuleWorker.prototype.start = function () {
       }
     }
 
+    if (that.type === 'user') {
+      yield that.syncUser();
+      return;
+    }
+
     var arr = [];
     for (var i = 0; i < that.concurrency; i++) {
       arr.push(that.next(i));
@@ -182,7 +189,11 @@ SyncModuleWorker.prototype._doneOne = function* (concurrencyId, name, success) {
 };
 
 SyncModuleWorker.prototype.syncUpstream = function* (name) {
-  var url = config.sourceNpmRegistry + '/' + name + '/sync';
+  var syncname = name;
+  if (this.type === 'user') {
+    syncname = this.type + ':' + syncname;
+  }
+  var url = config.sourceNpmRegistry + '/' + syncname + '/sync';
   if (this.noDep) {
     url += '?nodeps=true';
   }
@@ -246,6 +257,21 @@ SyncModuleWorker.prototype.syncUpstream = function* (name) {
     yield sleep(2000);
   }
   this.log('----------------- Synced upstream %s -------------------', logURL);
+};
+
+SyncModuleWorker.prototype.syncUser = function* () {
+  for (var i = 0; i < this.names.length; i++) {
+    var username = this.names[i];
+    try {
+      var user = yield _saveNpmUser(username);
+      this.pushSuccess(username);
+      this.log('[c#%s] [%s] sync success: %j', 0, username, user);
+    } catch (err) {
+      this.pushFail(username);
+      this.log('[c#%s] [error] [%s] sync error: %s', 0, username, err.stack);
+    }
+  }
+  this.finish();
 };
 
 SyncModuleWorker.prototype.next = function* (concurrencyId) {
@@ -344,6 +370,7 @@ function* _saveNpmUser(username) {
     return;
   }
   yield* User.saveNpmUser(user);
+  return user;
 }
 
 function* _saveMaintainer(modName, username, action) {
@@ -1002,6 +1029,7 @@ SyncModuleWorker.sync = function* (name, username, options) {
   var result = yield* logService.create({name: name, username: username});
   var worker = new SyncModuleWorker({
     logId: result.id,
+    type: options.type,
     name: name,
     username: username,
     noDep: options.noDep,
