@@ -1,4 +1,11 @@
 
+2.0.0-rc.5 / 2015-01-03
+==================
+
+ * fix(markdown): use marked instead of remarkable
+ * fix(package): pkg.readme is not a string, dont remarkable it
+ * feat(sync): sync user profile
+
 2.0.0-rc.4 / 2014-12-25
 ==================
 
