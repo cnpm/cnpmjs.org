@@ -1,5 +1,5 @@
 <div id="sync">
-  <h1>Sync Package <span style="color:#09f;"><%= name %></span></h1>
+  <h1>Sync <%= type %> <span style="color:#09f;"><%= name %></span></h1>
   <div id="sync-notify">
     <div class="alert alert-success">Sync started, please wait patiently.</div>
   </div>
@@ -10,7 +10,7 @@
   var $log = $('#sync-log');
   var $notify = $('#sync-notify');
   var timer;
-  var name = '<%= name %>';
+  var name = '<%= type %>:<%= name %>';
   var resourceURL = '/sync/' + name;
   $(function() {
     var checkLogId = location.hash.match(/logid=(\d+)/);
@@ -27,7 +27,7 @@
         var alert = $('<div class="alert alert-error"></div>');
         var message = 'Sync request error. ';
         if (err.status === 404) {
-          message += 'Package ' + name + ' not exist in official registry.';
+          message += name + ' not exist in official registry.';
         }
         if (err.status === 500) {
           message += 'Please refresh to sync one more time.';
@@ -73,7 +73,7 @@
           }
         }
         if (syncDone) {
-          logs += '\nSync package ' + name + ' complete!';
+          logs += '\nSync ' + name + ' complete!';
           if (hasFail) {
             logs += ' But some packages sync failed, you can refresh to sync again.';
             location.hash = '';

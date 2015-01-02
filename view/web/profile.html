@@ -26,6 +26,8 @@
     <% if (user.email) { %>
       <small>(<a href="mailto:<%= user.email %>"><%= user.email %></a>)</small>
     <% } %>
+
+    <small>(<a href="/sync/user:<%= user.name %>" target="_blank">SYNC</a> profile)</small>
   </h1>
   <table class="downloads">
     <tbody>

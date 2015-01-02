@@ -245,4 +245,17 @@ describe('controllers/sync_module_worker.test.js', function () {
       ];
     });
   });
+
+  describe('sync user', function () {
+    it('should sync fengmk2', function* () {
+      var worker = new SyncModuleWorker({
+        type: 'user',
+        name: 'fengmk2',
+        username: 'fengmk2',
+      });
+      worker.start();
+      var end = thunkify.event(worker, 'end');
+      yield end();
+    });
+  });
 });

@@ -1,5 +1,5 @@
 /**!
- * cnpmjs.org - controllers/web/package/show_sync.js
+ * cnpmjs.org - controllers/web/show_sync.js
  *
  * Copyright(c) cnpmjs.org and other contributors.
  * MIT Licensed
@@ -20,8 +20,15 @@ module.exports = function* showSync() {
   if (!name) {
     return this.redirect('/');
   }
+  var type = 'package';
+  if (name.indexOf(':') > 0) {
+    var splits = name.split(':');
+    name = splits[1];
+    type = splits[0];
+  }
   yield this.render('sync', {
+    type: type,
     name: name,
-    title: 'Sync - ' + name,
+    title: 'Sync ' + type + ' - ' + name,
   });
 };

@@ -51,7 +51,10 @@
         <% } %>
 
         <% if (package.license || package.repository || package.bugs.url) {%> | <% } %>
+
+        <% if (!package._publish_on_cnpm) { %>
         <a href="https://www.npmjs.org/package/<%= package.name %>" target="_blank">Original npm</a>
+        <% } %>
       </div>
       <div class="pack-install">
         <pre class="sh">$ <%- config.npmClientName %> install <%= package.name %> <% if (package.preferGlobal) { %>-g<% } %></pre>

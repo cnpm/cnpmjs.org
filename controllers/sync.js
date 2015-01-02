@@ -22,10 +22,18 @@ var config = require('../config');
 exports.sync = function* () {
   var username = this.user.name || 'anonymous';
   var name = this.params.name;
+  var type = 'package';
+  if (name.indexOf(':') > 0) {
+    // user:fengmk2
+    // package:pedding
+    var splits = name.split(':');
+    type = splits[0];
+    name = splits[1];
+  }
   var publish = this.query.publish === 'true';
   var noDep = this.query.nodeps === 'true';
   debug('sync %s with query: %j', name, this.query);
-  if (publish && !this.user.isAdmin) {
+  if (type === 'package' && publish && !this.user.isAdmin) {
     this.status = 403;
     this.body = {
       error: 'no_perms',
@@ -35,6 +43,7 @@ exports.sync = function* () {
   }
 
   var options = {
+    type: type,
     publish: publish,
     noDep: noDep,
     syncUpstreamFirst: config.sourceNpmRegistryIsCNpm,
