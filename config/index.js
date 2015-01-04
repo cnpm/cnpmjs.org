@@ -235,6 +235,9 @@ var config = {
 
   // badge subject on http://shields.io/
   badgeSubject: 'cnpm',
+
+  // custom user service, @see https://github.com/cnpm/cnpmjs.org/wiki/Use-Your-Own-User-Authorization
+  userService: null,
 };
 
 // load config/config.js, everything in config.js will cover the same key in index.js
