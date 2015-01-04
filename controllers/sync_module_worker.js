@@ -966,6 +966,7 @@ SyncModuleWorker.prototype._syncOneVersion = function *(versionIndex, sourcePack
       shasum: shasum
     };
     // upload to NFS
+    logger.syncInfo('[sync_module_worker] uploading %j to nfs', options);
     var result = yield nfs.upload(filepath, options);
     return yield *afterUpload(result);
   } finally {
