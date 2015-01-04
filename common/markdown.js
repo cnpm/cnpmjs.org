@@ -14,19 +14,13 @@
  * Module dependencies.
  */
 
-// var Remarkable = require('remarkable');
-//
-// var md = new Remarkable();
-// md.set({
-//   html: true
-// });
+var MarkdownIt = require('markdown-it');
 
-var marked = require('marked');
-// marked.setOptions({
-//
-// });
+var md = new MarkdownIt({
+  html: true,
+  linkify: true,
+});
 
 exports.render = function (content) {
-  // return md.render(content);
-  return marked(content);
+  return md.render(content);
 };
