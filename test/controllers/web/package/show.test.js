@@ -149,6 +149,28 @@ describe('controllers/web/package/show.test.js', function () {
     });
   });
 
+  describe('xss filter', function () {
+    before(function (done) {
+      var pkg = utils.getPackage('xss-test-ut', '0.0.1', utils.admin, null, '[xss link](javascript:alert(2)) \n\nfoo<script>alert(1)</script>/xss\'"&#');
+      request(registry.listen())
+      .put('/' + pkg.name)
+      .set('authorization', utils.adminAuth)
+      .send(pkg)
+      .end(done);
+    });
+
+    it('should filter xss content', function (done) {
+      request(app.listen())
+      .get('/package/xss-test-ut')
+      .expect(200, function (err, res) {
+        should.not.exist(err);
+        res.text.should.not.containEql('<script>alert(1)</script>');
+        res.text.should.not.containEql('alert(2)"');
+        done();
+      });
+    });
+  });
+
   describe('show npm package', function () {
     before(function (done) {
       var worker = new SyncModuleWorker({

@@ -43,7 +43,7 @@ exports.thirdUserAuth = 'Basic ' + new Buffer(thirdUser + ':' + thirdUser).toStr
 
 var _pkg = fs.readFileSync(path.join(fixtures, 'package_and_tgz.json'));
 
-exports.getPackage = function (name, version, user, tag) {
+exports.getPackage = function (name, version, user, tag, readme) {
   // name: mk2testmodule
   name = name || 'mk2testmodule';
   version = version || '0.0.1';
@@ -63,5 +63,8 @@ exports.getPackage = function (name, version, user, tag) {
   pkg.versions[version]._id = name + '@' + version;
   pkg.name = name;
   pkg['dist-tags'] = tags;
+  if (readme) {
+    pkg.versions[version].readme = pkg.readme = readme;
+  }
   return pkg;
 };

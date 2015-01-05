@@ -14,6 +14,7 @@
  * Module dependencies.
  */
 
+var xss = require('xss');
 var MarkdownIt = require('markdown-it');
 
 var md = new MarkdownIt({
@@ -22,5 +23,5 @@ var md = new MarkdownIt({
 });
 
 exports.render = function (content) {
-  return md.render(content);
+  return md.render(xss(content));
 };
