@@ -1,4 +1,11 @@
 
+2.0.0-rc.6 / 2015-01-05
+==================
+
+ * fix(markdown): use markdown-it
+ * add userService options on config
+ * add upload to nfs sync info log
+
 2.0.0-rc.5 / 2015-01-03
 ==================
 
