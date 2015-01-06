@@ -1,4 +1,10 @@
 
+2.0.0-rc.7 / 2015-01-07
+==================
+
+ * install sync dont check `enablePrivate`
+ * fix(markdown): filter xss readme before markdown render
+
 2.0.0-rc.6 / 2015-01-05
 ==================
 
