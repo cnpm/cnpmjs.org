@@ -22,17 +22,17 @@ var config = require('../config');
 
 module.exports = function* syncByInstall(next) {
   this.allowSync = false;
-  if (!config.syncByInstall || !config.enablePrivate) {
+  if (!config.syncByInstall) {
     // only config.enablePrivate should enable sync on install
     return yield* next;
   }
-  // request not by node, consider it request from web
+  // request not by node, consider it request from web, dont sync
   var ua = this.get('user-agent');
   if (!ua || ua.indexOf('node') < 0) {
     return yield* next;
   }
 
-  // if request with `/xxx?write=true`, meaning the read request using for write
+  // if request with `/xxx?write=true`, meaning the read request using for write, dont sync
   if (this.query.write) {
     return yield* next;
   }
