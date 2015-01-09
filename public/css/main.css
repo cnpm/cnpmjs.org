@@ -101,9 +101,7 @@ header #search-input {
   color: #333333;
 }
 .cols-box {
-  display: -moz-box;
-  display: -webkit-box;
-  display: box;
+  display: flex;
   -webkit-box-pack: center;
 }
 .cols-box ul {
@@ -112,9 +110,7 @@ header #search-input {
   padding: 0;
 }
 .cols-box-item {
-  -moz-box-flex: 1;
-  -webkit-box-flex: 1;
-  box-flex: 1;
+  flex: 1;
   height: 250px;
   margin-right: 30px;
 }
