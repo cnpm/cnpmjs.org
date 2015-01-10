@@ -88,7 +88,9 @@ app.use(markdownMiddleware({
   bodyHolder: '<%- locals.body %>',
   indexName: '_readme',
   cache: true,
-  render: renderMarkdown,
+  render: function (content) {
+    return renderMarkdown(content, false);
+  },
 }));
 
 var locals = {

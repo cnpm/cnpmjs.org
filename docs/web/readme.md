@@ -137,4 +137,4 @@ Release [History](/history).
 
 ## npm and cnpm relation
 
-![npm&cnpm](https://docs.google.com/drawings/d/12QeQfGalqjsB77mRnf5Iq5oSXHCIUTvZTwECMonqCmw/pub?w=383&h=284)
+![npm&cnpm](https://dn-cnpm.qbox.me/cnpm-npm-relation.png)

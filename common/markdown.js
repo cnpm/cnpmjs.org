@@ -22,6 +22,6 @@ var md = new MarkdownIt({
   linkify: true,
 });
 
-exports.render = function (content) {
-  return md.render(xss(content));
+exports.render = function (content, filterXss) {
+  return md.render(filterXss === false ? content : xss(content));
 };
