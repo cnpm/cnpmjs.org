@@ -1,4 +1,11 @@
 
+2.0.0-rc.8 / 2015-01-10
+==================
+
+ * fix(markdown): readme.md allow scripts
+ * fix(style) flexbox compatibility for both chrome and firefox (@afc163)
+ * feat(sync): default sync exist packages
+
 2.0.0-rc.7 / 2015-01-07
 ==================
 
