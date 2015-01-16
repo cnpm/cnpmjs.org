@@ -19,22 +19,20 @@ All data is sent and received as JSON.
 $ curl -i https://registry.npmjs.org
 
 HTTP/1.1 200 OK
-Date: Tue, 05 Aug 2014 10:53:24 GMT
-Server: CouchDB/1.5.0 (Erlang OTP/R16B03)
-Content-Type: text/plain; charset=utf-8
-Cache-Control: max-age=60
-Content-Length: 258
-Accept-Ranges: bytes
-Via: 1.1 varnish
-Age: 11
-X-Served-By: cache-ty67-TYO
-X-Cache: HIT
-X-Cache-Hits: 1
-X-Timer: S1407236004.867906,VS0,VE0
 
-{"db_name":"registry","doc_count":90789,"doc_del_count":381,"update_seq":137250,"purge_seq":0,
-"compact_running":false,"disk_size":436228219,"data_size":332875061,
-"instance_start_time":"1405721973718703","disk_format_version":6,"committed_update_seq":137250}
+{
+  "db_name": "registry",
+  "doc_count": 123772,
+  "doc_del_count": 377,
+  "update_seq": 685591,
+  "purge_seq": 0,
+  "compact_running": false,
+  "disk_size": 634187899,
+  "data_size": 445454185,
+  "instance_start_time": "1420670152481614",
+  "disk_format_version": 6,
+  "committed_update_seq": 685591
+}
 ```
 
 ## Client Errors
@@ -61,22 +59,10 @@ $ curl -u "username:password" https://registry.npmjs.org
 ## Failed login limit
 
 ```bash
-$ curl -i -X PUT -u foo:pwd \
-  -d '{"name":"foo","email":"foo@bar.com","type":"user","roles":[]}' \
-  https://registry.npmjs.org/-/user/org.couchdb.user:foo/-rev/11-d226c6afa9286ab5b9eb858c429bdabf
+$ curl -i -X "GET" -u "foo:pwd" \
+    "https://registry.npmjs.com/-/user/org.couchdb.user:npm-user-service-testuser?write=true"
 
 HTTP/1.1 401 Unauthorized
-Date: Tue, 05 Aug 2014 15:33:25 GMT
-Server: CouchDB/1.5.0 (Erlang OTP/R14B04)
-Content-Type: text/plain; charset=utf-8
-Cache-Control: max-age=60
-Content-Length: 67
-Accept-Ranges: bytes
-Via: 1.1 varnish
-X-Served-By: cache-ty66-TYO
-X-Cache: MISS
-X-Cache-Hits: 0
-X-Timer: S1407252805.261390,VS0,VE434
 
 {"error":"unauthorized","reason":"Name or password is incorrect."}
 ```
@@ -101,14 +87,11 @@ X-Timer: S1407252805.261390,VS0,VE434
 GET /:package
 ```
 
-#### Response
+#### Response 200
 
 ```json
 HTTP/1.1 200 OK
 Etag: "8UDCP753LFXOG42NMX88JAN40"
-Content-Type: application/json
-Cache-Control: max-age=60
-Content-Length: 2243
 
 {
   "_id": "pedding",
@@ -246,6 +229,17 @@ Content-Length: 2243
 }
 ```
 
+#### Response 404
+
+```json
+HTTP/1.1 404 Object Not Found
+
+{
+  "error": "not_found",
+  "reason": "document not found"
+}
+```
+
 ### ~~Get a special version or tag package~~
 
 __deprecated__
@@ -254,7 +248,7 @@ __deprecated__
 GET /:package/:tag_or_version
 ```
 
-#### Reponse
+#### Reponse 200
 
 ```json
 HTTP/1.1 200 OK
@@ -745,9 +739,52 @@ HTTP/1.1 200 OK
 
 ## User
 
-* [Get a single user](/docs/registry-api.md#get-a-single-user)
-* [Add a new user](/docs/registry-api.md#add-a-new-user)
-* [Update a exists user](/docs/registry-api.md#update-a-exists-user)
+- [Auth user](/docs/registry-api.md#auth-user)
+- [Get a single user](/docs/registry-api.md#get-a-single-user)
+- [Add a new user](/docs/registry-api.md#add-a-new-user)
+- [Update a exists user](/docs/registry-api.md#update-a-exists-user)
+
+### Auth user
+
+* Authentication required.
+
+```
+GET /-/user/org.couchdb.user::username?write=true
+```
+
+#### Response 200
+
+```json
+HTTP/1.1 200 OK
+ETag: "5-a31b61ba3c50b50f7fcaf185e079e17a"
+
+{
+  "_id": "org.couchdb.user:npm-user-service-testuser",
+  "_rev": "5-a31b61ba3c50b50f7fcaf185e079e17a",
+  "password_scheme": "pbkdf2",
+  "iterations": 10,
+  "name": "npm-user-service-testuser",
+  "email": "fengmk2@gmail.com",
+  "type": "user",
+  "roles": [],
+  "date": "2015-01-04T08:28:51.378Z",
+  "password_scheme": "pbkdf2",
+  "iterations": 10,
+  "derived_key": "644157c126b93356e6eba2c59fdf1b7ec644ebf2",
+  "salt": "5d13874c0aa10751e35743bacd6eedd5"
+}
+```
+
+#### Response 401
+
+```json
+HTTP/1.1 401 Unauthorized
+
+{
+  "error": "unauthorized",
+  "reason": "Name or password is incorrect."
+}
+```
 
 ### Get a single user
 
@@ -755,7 +792,7 @@ HTTP/1.1 200 OK
 GET /-/user/org.couchdb.user::username
 ```
 
-#### Response
+#### Response 200
 
 ```json
 HTTP/1.1 200 OK
@@ -825,6 +862,17 @@ ETag: "32-984ee97e01aea166dcab6d1517c730e3"
 }
 ```
 
+#### Response 404
+
+```json
+HTTP/1.1 404 Object Not Found
+
+{
+  "error": "not_found",
+  "reason": "missing"
+}
+```
+
 ### Add a new user
 
 ```
@@ -845,7 +893,7 @@ PUT /-/user/org.couchdb.user::username
 }
 ```
 
-#### Response
+#### Response 201
 
 ```json
 Status: 201 Created
@@ -854,6 +902,19 @@ Status: 201 Created
   "ok": true,
   "id": "org.couchdb.user:fengmk2",
   "rev": "32-984ee97e01aea166dcab6d1517c730e3"
+}
+```
+
+#### Response 409
+
+User already exists
+
+```json
+HTTP/1.1 409 Conflict
+
+{
+  "error": "conflict",
+  "reason": "Document update conflict."
 }
 ```
 
