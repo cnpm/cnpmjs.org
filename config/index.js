@@ -50,9 +50,9 @@ var config = {
   // max request json body size
   jsonLimit: '10mb',
   // log dir name
-  logdir: path.join(root, '.tmp/logs'),
+  logdir: path.join(root, '.tmp', 'logs'),
   // update file template dir
-  uploadDir: path.join(root, '.dist'),
+  uploadDir: path.join(root, '.tmp', 'downloads'),
   // web page viewCache
   viewCache: false,
 
@@ -153,7 +153,7 @@ var config = {
 
   // package tarball store in local filesystem by default
   nfs: require('fs-cnpm')({
-    dir: path.join(root, '.tmp', 'dist')
+    dir: path.join(root, '.tmp', 'nfs')
   }),
 
   // registry url name
