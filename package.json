@@ -46,7 +46,7 @@
     "thunkify-wrap": "~1.0.4",
     "urllib": "~2.2.1",
     "utility": "~1.2.1",
-    "xss": "~0.1.15"
+    "xss": "0.1.15"
   },
   "devDependencies": {
     "autod": "*",
