@@ -1,4 +1,10 @@
 
+2.0.0-rc.9 / 2015-01-22 
+==================
+
+  * hotfix reame render error, pin xss
+  * fix registry user auth api
+
 2.0.0-rc.8 / 2015-01-10
 ==================
 
@@ -45,7 +51,7 @@
 2.0.0-rc.2 / 2014-12-11
 ==================
 
- * add download API, closes #529
+ * add download API, closes [#529](https://github.com/cnpm/cnpmjs.org/issues/529)
  * fix missing home page title (@rockdai)
  * Fix typo in view/web/package.html (@LoicMahieu)
 
@@ -58,7 +64,7 @@
 2.0.0-beta5 / 2014-12-05
 ==================
 
- * hotfix package.html typo. Closes #521
+ * hotfix package.html typo. Closes [#521](https://github.com/cnpm/cnpmjs.org/issues/521)
  * Add editorconfig
  * fix(web/package): package name to long cause style problem fix
  * fix(css): use github-markdown-css for markdown body
@@ -70,7 +76,7 @@
  * fix(registry): add missing /-/short api
  * zoom sync link
  * new design for package page
- * image max width, fixed #505
+ * image max width, fixed [#505](https://github.com/cnpm/cnpmjs.org/issues/505)
  * feat(middleware): block Ruby user-agent
 
 2.0.0-beta3 / 2014-11-12
@@ -100,7 +106,7 @@
 2.0.0-beta0 / 2014-11-02
 ==================
 
- * ungrade koa-markdown to use remarkable, close #482
+ * ungrade koa-markdown to use remarkable, close [#482](https://github.com/cnpm/cnpmjs.org/issues/482)
  * fix(module_log): limit module sync log size to 1MB
  * refactor(config): remove adaptScope config key
  * chore(Makefile): $ make install-production
