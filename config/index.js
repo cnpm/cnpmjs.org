@@ -147,10 +147,6 @@ var config = {
     logging: !!process.env.SQL_DEBUG,
   },
 
-  // redis config
-  // use for koa-limit module as storage
-  redis: null,
-
   // package tarball store in local filesystem by default
   nfs: require('fs-cnpm')({
     dir: path.join(root, '.tmp', 'nfs')
