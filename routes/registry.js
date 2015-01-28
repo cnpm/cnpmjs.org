@@ -20,6 +20,7 @@ var login = require('../middleware/login');
 var publishable = require('../middleware/publishable');
 var syncByInstall = require('../middleware/sync_by_install');
 var editable = require('../middleware/editable');
+var existsPackage = require('../middleware/exists_package');
 
 var showTotal = require('../controllers/total');
 
@@ -42,6 +43,7 @@ var updateUser = require('../controllers/registry/user/update');
 
 var sync = require('../controllers/sync');
 var userPackage = require('../controllers/registry/user_package');
+var tags = require('../controllers/registry/package/dist_tag');
 
 function routes(app) {
 
@@ -113,6 +115,28 @@ function routes(app) {
   // download times
   app.get('/downloads/range/:range/:name', downloadTotal);
   app.get('/downloads/range/:range', downloadTotal);
+
+  // GET /-/package/:pkg/dist-tags -- returns the package's dist-tags
+  app.get('/-/package/:name/dist-tags', existsPackage, tags.index);
+  app.get(/^\/\-\/package\/(@[\w\-\.]+\/[\w\-\.]+)\/dist\-tags$/, existsPackage, tags.index);
+
+  // PUT /-/package/:pkg/dist-tags -- Set package's dist-tags to provided object body (removing missing)
+  app.put('/-/package/:name/dist-tags', login, existsPackage, editable, tags.save);
+  app.put(/^\/\-\/package\/(@[\w\-\.]+\/[\w\-\.]+)\/dist\-tags$/, login, existsPackage, editable, tags.save);
+
+  // POST /-/package/:pkg/dist-tags -- Add/modify dist-tags from provided object body (merge)
+  app.post('/-/package/:name/dist-tags', login, existsPackage, editable, tags.update);
+  app.post(/^\/\-\/package\/(@[\w\-\.]+\/[\w\-\.]+)\/dist\-tags$/, login, existsPackage, editable, tags.update);
+
+  // PUT /-/package/:pkg/dist-tags/:tag -- Set package's dist-tags[tag] to provided string body
+  app.put('/-/package/:name/dist-tags/:tag', login, existsPackage, editable, tags.set);
+  app.put(/^\/\-\/package\/(@[\w\-\.]+\/[\w\-\.]+)\/dist\-tags\/([\w\-\.]+)$/, login, existsPackage, editable, tags.set);
+  // POST /-/package/:pkg/dist-tags/:tag -- Same as PUT /-/package/:pkg/dist-tags/:tag
+  app.post('/-/package/:name/dist-tags/:tag', login, existsPackage, editable, tags.set);
+
+  // DELETE /-/package/:pkg/dist-tags/:tag -- Remove tag from dist-tags
+  app.delete('/-/package/:name/dist-tags/:tag', login, existsPackage, editable, tags.destroy);
+  app.delete(/^\/\-\/package\/(@[\w\-\.]+\/[\w\-\.]+)\/dist\-tags\/([\w\-\.]+)$/, login, existsPackage, editable, tags.destroy);
 }
 
 module.exports = routes;
