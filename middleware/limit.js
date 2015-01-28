@@ -16,7 +16,6 @@
 
 var config = require('../config');
 var limit = require('koa-limit');
-var store = require('../common/redis');
 
 var limitConfig = config.limit;
 
@@ -25,10 +24,5 @@ if (!limitConfig.enable) {
     yield *next;
   };
 } else {
-
-  if (!config.debug) {
-    limitConfig.store = store;
-  }
-
   module.exports = limit(limitConfig);
 }
