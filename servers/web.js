@@ -40,7 +40,7 @@ app.use(middlewares.rt({headerName: 'X-ReadTime'}));
 app.use(middlewares.rewrite('/favicon.ico', '/favicon.png'));
 app.use(staticCache);
 
-if (process.env.NODE_ENV === 'development') {
+if (config.pagemock) {
   app.use(require('koa-mock')({
     datadir: path.join(rootdir, 'test', 'mocks')
   }));

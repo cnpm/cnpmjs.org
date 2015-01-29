@@ -22,7 +22,6 @@ var config = require('../config');
 var mail = require('../common/mail');
 var logger = require('../common/logger');
 var totalService = require('../services/total');
-var DistSyncer = require('./sync_dist');
 
 var sync = null;
 
@@ -85,73 +84,6 @@ var handleSync = co(function* () {
 if (sync) {
   handleSync();
   setInterval(handleSync, syncInterval);
-}
-
-/**
- * sync dist(node.js and phantomjs)
- */
-
-var syncingDist = false;
-var syncDist = co(function* () {
-  if (syncingDist) {
-    return;
-  }
-  syncingDist = true;
-  logger.syncInfo('Start syncing dist...');
-  var distSyncer = new DistSyncer({
-    disturl: config.disturl
-  });
-  try {
-    yield* distSyncer.start();
-    yield* distSyncer.syncPhantomjsDir();
-  } catch (err) {
-    err.message += ' (sync dist error)';
-    logger.syncError(err);
-    if (config.noticeSyncDistError) {
-      sendMailToAdmin(err, null, new Date());
-    }
-  }
-  syncingDist = false;
-});
-
-if (config.syncDist) {
-  syncDist();
-  setInterval(syncDist, syncInterval);
-} else {
-  logger.syncInfo('sync dist disable');
-}
-
-/**
- * sync python dist
- */
-
-var syncingPythonDist = false;
-var syncPythonDist = co(function* () {
-  if (syncingPythonDist) {
-    return;
-  }
-  syncingPythonDist = true;
-  logger.syncInfo('Start syncing python dist...');
-  var distSyncer = new DistSyncer({
-    disturl: config.pythonDisturl
-  });
-  try {
-    yield* distSyncer.start();
-  } catch (err) {
-    err.message += ' (sync python dist error)';
-    logger.syncError(err);
-    if (config.noticeSyncDistError) {
-      sendMailToAdmin(err, null, new Date());
-    }
-  }
-  syncingPythonDist = false;
-});
-
-if (config.syncPythonDist) {
-  syncPythonDist();
-  setInterval(syncPythonDist, syncInterval);
-} else {
-  logger.syncInfo('sync python dist disable');
 }
 
 /**
