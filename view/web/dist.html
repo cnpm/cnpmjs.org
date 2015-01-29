@@ -1,9 +1,0 @@
-<h1>Mirror index of <a target="_blank" href="<%= disturl %><%= dirname %>"><%= disturl %><%= dirname %></a></h1>
-<hr>
-<pre><a href="../">../</a><% for (var i = 0; i < items.length; i++) {
-  var item = items[i];
-  var sizestr = '' + (item.size || '-');
-%>
-<a href="<%= item.name %>"><%= item.name %></a><%- padding(50, item.name.length, " ") %><%= item.date %><%- padding(20, sizestr.length, " ") %><%= sizestr %><% } %>
-</pre>
-<hr>

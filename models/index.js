@@ -36,8 +36,6 @@ module.exports = {
   User: load('user'),
   Total: load('total'),
   DownloadTotal: load('download_total'),
-  DistFile: load('dist_file'),
-  DistDir: load('dist_dir'),
 
   query: function* (sql, args) {
     return yield this.sequelize.query(sql, null, {raw: true}, args);

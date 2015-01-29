@@ -6,7 +6,7 @@
  *
  * Authors:
  *  dead_horse <dead_horse@qq.com>
- *  fengmk2 <fengmk2@gmail.com> (http://fengmk2.github.com)
+ *  fengmk2 <fengmk2@gmail.com> (http://fengmk2.com)
  */
 
 'use strict';
@@ -37,6 +37,7 @@ var config = {
   /*
    * server configure
    */
+
   registryPort: 7001,
   webPort: 7002,
   bindingHost: '127.0.0.1', // only binding on 127.0.0.1 for local access
@@ -45,6 +46,8 @@ var config = {
   // if in debug mode, some middleware like limit wont load
   // logger module will print to stdout
   debug: true,
+  // page mode, enable on development env
+  pagemock: process.env.NODE_ENV === 'development',
   // session secret
   sessionSecret: 'cnpmjs.org test session secret',
   // max request json body size
@@ -180,15 +183,6 @@ var config = {
   /**
    * sync configs
    */
-
-  // sync dist config
-  // sync node.js dist from nodejs.org
-  noticeSyncDistError: true,
-  disturl: 'http://nodejs.org/dist',
-  syncDist: false,
-
-  pythonDisturl: 'https://www.python.org/ftp',
-  syncPythonDist: false,
 
   // the official npm registry
   // cnpm wont directly sync from this one
