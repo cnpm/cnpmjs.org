@@ -203,7 +203,8 @@ SyncModuleWorker.prototype.syncUpstream = function* (name) {
     headers: {
       'content-length': 0
     },
-    dataType: 'json'
+    dataType: 'json',
+    gzip: true,
   });
 
   if (r.status !== 201 || !r.data.ok) {
@@ -221,7 +222,8 @@ SyncModuleWorker.prototype.syncUpstream = function* (name) {
     var synclogURL = logURL + '?offset=' + offset;
     var rs = yield urllib.request(synclogURL, {
       timeout: 20000,
-      dataType: 'json'
+      dataType: 'json',
+      gzip: true,
     });
 
     if (rs.status !== 200 || !rs.data.ok) {
@@ -875,7 +877,8 @@ SyncModuleWorker.prototype._syncOneVersion = function *(versionIndex, sourcePack
     timeout: 600000, // 10 minutes download
     headers: {
       'user-agent': USER_AGENT
-    }
+    },
+    gzip: true,
   };
 
   var dependencies = Object.keys(sourcePackage.dependencies || {});

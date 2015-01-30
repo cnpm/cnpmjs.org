@@ -27,6 +27,7 @@ function* request(url, options) {
   options.headers = {
     'user-agent': USER_AGENT
   };
+  options.gzip = true;
   var registry = options.registry || config.sourceNpmRegistry;
   url = registry + url;
   var r;
