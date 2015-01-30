@@ -24,6 +24,7 @@ var common = require('../../../lib/common');
 var downloadAsReadStream = require('../../utils').downloadAsReadStream;
 var packageService = require('../../../services/package');
 var downloadTotalService = require('../../../services/download_total');
+var config = require('../../../config');
 
 var _downloads = {};
 
@@ -45,6 +46,13 @@ module.exports = function* download(next) {
     if (!url) {
       return yield* next;
     }
+    this.status = 302;
+    this.set('Location', url);
+    _downloads[name] = (_downloads[name] || 0) + 1;
+    return;
+  }
+
+  if (config.downloadRedirectToNFS && url) {
     this.status = 302;
     this.set('Location', url);
     _downloads[name] = (_downloads[name] || 0) + 1;

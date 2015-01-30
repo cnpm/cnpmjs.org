@@ -154,6 +154,8 @@ var config = {
   nfs: require('fs-cnpm')({
     dir: path.join(root, '.tmp', 'nfs')
   }),
+  // if set true, will 302 redirect to `nfs.url(dist.key)`
+  downloadRedirectToNFS: false,
 
   // registry url name
   registryHost: 'r.cnpmjs.org',
