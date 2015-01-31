@@ -33,7 +33,7 @@
     "koa-limit": "~1.0.2",
     "koa-markdown": "~2.0.1",
     "koa-middlewares": "~2.0.0",
-    "marky-markdown": "~4.0.0",
+    "markdown-it": "~3.0.4",
     "mime": "~1.2.11",
     "mini-logger": "~1.0.0",
     "mkdirp": "~0.5.0",
@@ -45,7 +45,8 @@
     "sequelize": "~2.0.0-rc4",
     "thunkify-wrap": "~1.0.4",
     "urllib": "~2.2.1",
-    "utility": "~1.2.1"
+    "utility": "~1.2.1",
+    "xss": "~0.1.20"
   },
   "devDependencies": {
     "autod": "*",
