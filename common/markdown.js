@@ -14,14 +14,15 @@
  * Module dependencies.
  */
 
-var xss = require('xss');
-var MarkdownIt = require('markdown-it');
-
-var md = new MarkdownIt({
-  html: true,
-  linkify: true,
-});
+var marky = require('marky-markdown');
 
 exports.render = function (content, filterXss) {
-  return md.render(filterXss === false ? content : xss(content));
+  var sanitize = filterXss === false ? false : true;
+  return marky(content, {
+    sanitize: sanitize,
+    serveImagesWithCDN: false,
+    highlightSyntax: true,
+    debug: false,
+    package: null, // TODO
+  }).html();
 };
