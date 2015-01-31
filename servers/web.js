@@ -89,7 +89,7 @@ app.use(markdownMiddleware({
   indexName: '_readme',
   cache: true,
   render: function (content) {
-    return renderMarkdown(content, false);
+    return '<div class="markdown-body">' + renderMarkdown(content, false) + '</div>';
   },
 }));
 
@@ -118,6 +118,7 @@ routes(app);
 
 app.on('error', function (err, ctx) {
   err.url = err.url || ctx.request.url;
+  console.log(err);
   console.log(err.stack);
   logger.error(err);
 });

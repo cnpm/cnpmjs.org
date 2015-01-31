@@ -31,7 +31,7 @@
     "humanize-number": "~0.0.2",
     "koa": "~0.13.0",
     "koa-limit": "~1.0.2",
-    "koa-markdown": "~1.1.0",
+    "koa-markdown": "~2.0.1",
     "koa-middlewares": "~2.0.0",
     "marky-markdown": "~4.0.0",
     "mime": "~1.2.11",

@@ -184,10 +184,6 @@ header #search-input {
   text-align: right;
 }
 
-.markdown-body code {
-  font-family: monospace, sans-serif, Consolas, "Liberation Mono", Menlo, Monaco, Courier;
-  background-color: #f5f5f5;
-}
 .markdown-body pre {
   overflow-x: auto;
   margin: 0;
@@ -198,6 +194,12 @@ header #search-input {
   vertical-align: baseline;
   background-color: #fff;
 }
+
+.markdown-body code {
+  font-family: monospace, sans-serif, Consolas, "Liberation Mono", Menlo, Monaco, Courier;
+  background-color: #f5f5f5;
+}
+
 .markdown-body pre code {
   display: block;
   margin: 0;
