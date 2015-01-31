@@ -30,7 +30,7 @@ describe('common/markdown.test.js', function () {
   it('should filter xss', function () {
     var html = markdown.render('foo<script>alert(1)</script>/xss\n[foo](/foo) <a onclick="alert(1)">bar</a>\n"\'');
     // console.log(html);
-    html.should.equal('<p>foo/xss\n<a href="/foo">foo</a> <a>bar</a>\n&quot;&apos;</p>\n');
+    html.should.equal('<p>foo&lt;script&gt;alert(1)&lt;/script&gt;/xss\n<a href="/foo">foo</a> <a>bar</a>\n&quot;\'</p>\n');
     markdown.render('[xss link](javascript:alert(2))').should.equal('<p>[xss link](javascript:alert(2))</p>\n');
   });
 });
