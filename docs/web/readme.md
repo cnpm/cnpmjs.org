@@ -67,8 +67,8 @@ Badge URL: `http://cnpmjs.org/badge/v/cnpmjs.org.svg` ![cnpmjs.org-badge](http:/
 
 use our npm client [cnpm](https://github.com/cnpm/cnpm)(More suitable with cnpmjs.org and gzip support), you can get our client through npm:
 
-```
-npm install -g cnpm --registry=http://r.cnpmjs.org
+```bash
+$ npm install -g cnpm --registry=http://r.cnpmjs.org
 ```
 
 Or you can alias NPM to use it:
@@ -90,7 +90,7 @@ $ echo '\n#alias for cnpm\nalias cnpm="npm --registry=http://r.cnpmjs.org \
 
 Install package from [r.cnpmjs.org](http://r.cnpmjs.org). When installing a package or version does not exist, it will try to install from the official registry([registry.npmjs.org](http://registry.npmjs.org)), and sync this package to cnpm in the backend.
 
-```
+```bash
 $ cnpm install [name]
 ```
 
@@ -102,7 +102,7 @@ Only `cnpm` cli has this command. Meaning sync package from source npm.
 $ cnpm sync connect
 ```
 
-sync package on web: [cnpmjs.org/sync/connect](http://cnpmjs.org/sync/connect)
+sync package on web: [sync/connect](/sync/connect)
 
 ```bash
 $ open http://cnpmjs.org/sync/connect
