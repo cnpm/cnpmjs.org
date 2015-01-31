@@ -1,4 +1,10 @@
 
+2.0.0-rc.11 / 2015-02-01
+==================
+
+ * fix xss tests
+ * fix(markdown): revert marky-markdown
+
 2.0.0-rc.10 / 2015-01-31
 ==================
 
