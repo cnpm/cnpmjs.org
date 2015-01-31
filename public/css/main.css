@@ -183,35 +183,3 @@ header #search-input {
   margin-bottom: 20px;
   text-align: right;
 }
-
-.markdown-body pre {
-  overflow-x: auto;
-  margin: 0;
-  padding: 0;
-  border: 0;
-  font-size: 100%;
-  font: inherit;
-  vertical-align: baseline;
-  background-color: #fff;
-}
-
-.markdown-body code {
-  font-family: monospace, sans-serif, Consolas, "Liberation Mono", Menlo, Monaco, Courier;
-  background-color: #f5f5f5;
-}
-
-.markdown-body pre code {
-  display: block;
-  margin: 0;
-  padding: 8px;
-  border-radius: 2px;
-}
-
-.markdown-body pre code .editor {
-  background-color: #f5f5f5;
-}
-
-.markdown-body .deep-link a {
-  color: #000;
-  text-decoration: none;
-}

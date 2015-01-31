@@ -89,7 +89,7 @@ app.use(markdownMiddleware({
   indexName: '_readme',
   cache: true,
   render: function (content) {
-    return '<div class="markdown-body">' + renderMarkdown(content, false) + '</div>';
+    return renderMarkdown(content, false);
   },
 }));
 
