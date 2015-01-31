@@ -1,4 +1,16 @@
 
+2.0.0-rc.10 / 2015-01-31
+==================
+
+ * feat(middleware): CORS headers for GET and HEAD requests
+ * fix(readme): fix index page markdown
+ * feat(markdown): use npm same markdown parser
+ * feat(download): support download redirect to nfs
+ * feat(syncer): request npm registry with gzip
+ * change(sync): remove dist syncer
+ * feat(registry): add dist tag api
+ * refactor(common): remove redis store
+
 2.0.0-rc.9 / 2015-01-22 
 ==================
 
