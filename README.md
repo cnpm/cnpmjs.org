@@ -45,6 +45,7 @@ Our goal is to provide a low cost maintenance and easy to use solution for priva
 ### Features
 
 * **Support "scoped" packages**: [npm/npm#5239](https://github.com/npm/npm/issues/5239)
+* **Support [CORS](http://en.wikipedia.org/wiki/Cross-origin_resource_sharing)**
 * **Simple to deploy**: only need `mysql` and a [simple store system](https://github.com/cnpm/cnpmjs.org/wiki/NFS-Guide).
 You can get the source code through `npm` or `git`.
 * **Low cost and easy maintenance**: `package.json` info store in MySQL, MariaDB, SQLite or PostgreSQL databases,

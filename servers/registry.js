@@ -26,6 +26,7 @@ var block = require('../middleware/block');
 var auth = require('../middleware/auth');
 var staticCache = require('../middleware/static');
 var notFound = require('../middleware/registry_not_found');
+var cors = require('../middleware/cors');
 
 app.use(block());
 middlewares.jsonp(app);
@@ -36,6 +37,9 @@ app.use(staticCache);
 app.keys = ['todokey', config.sessionSecret];
 app.proxy = true;
 app.use(middlewares.bodyParser({jsonLimit: config.jsonLimit}));
+app.use(cors({
+  methods: 'GET,HEAD'
+}));
 app.use(auth());
 app.use(notFound);
 
