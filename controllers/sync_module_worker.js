@@ -37,8 +37,10 @@ var npmSerivce = require('../services/npm');
 var packageService = require('../services/package');
 var logService = require('../services/module_log');
 var User = require('../models').User;
+var os = require('os');
 
-var USER_AGENT = 'sync.cnpmjs.org/' + config.version + ' ' + urllib.USER_AGENT;
+var USER_AGENT = 'sync.cnpmjs.org/' + config.version +
+  ' hostname/' + os.hostname() + ' ' + urllib.USER_AGENT;
 
 function SyncModuleWorker(options) {
   EventEmitter.call(this);
