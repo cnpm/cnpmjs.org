@@ -791,7 +791,9 @@ SyncModuleWorker.prototype._sync = function* (name, pkg) {
     names.forEach(function (username) {
       var r = map[username];
       if (!r || !r.json) {
-        missingUsers.push(username);
+        if (username[0] !== '"' && username[0] !== "'") {
+          missingUsers.push(username);
+        }
       }
     });
 
