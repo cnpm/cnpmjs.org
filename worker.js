@@ -6,7 +6,7 @@
  *
  * Authors:
  *  dead_horse <dead_horse@qq.com>
- *  fengmk2 <fengmk2@gmail.com> (http://fengmk2.github.com)
+ *  fengmk2 <fengmk2@gmail.com> (http://fengmk2.com)
  */
 
 'use strict';
@@ -36,6 +36,7 @@ graceful({
     if (err.message) {
       err.message += ' (uncaughtException throw ' + throwErrorCount + ' times on pid:' + process.pid + ')';
     }
+    console.error(err);
     console.error(err.stack);
     logger.error(err);
   }
