@@ -1,4 +1,10 @@
 
+2.0.0-rc.12 / 2015-02-01
+==================
+
+ * feat(syncer): add hostname ua
+ * fix(web): remove pkg.contributors logic
+
 2.0.0-rc.11 / 2015-02-01
 ==================
 
