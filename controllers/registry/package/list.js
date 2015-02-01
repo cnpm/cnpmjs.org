@@ -72,7 +72,10 @@ module.exports = function* list() {
 
   var starUserMap = {};
   for (var i = 0; i < starUsers.length; i++) {
-    starUserMap[starUsers[i]] = true;
+    var starUser = starUsers[i];
+    if (starUser[0] !== '"' && starUser[0] !== "'") {
+      starUserMap[starUser] = true;
+    }
   }
   starUsers = starUserMap;
 

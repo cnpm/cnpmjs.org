@@ -52,6 +52,7 @@ exports.getUser = function* (name) {
   var r = yield* request(url);
   var data = r.data;
   if (data && !data.name) {
+    // 404
     data = null;
   }
   return data;
