@@ -120,22 +120,6 @@ module.exports = function* show(next) {
     }
   }
 
-  if (pkg.contributors) {
-    // registry.cnpmjs.org/compressible
-    if (!Array.isArray(pkg.contributors)) {
-      pkg.contributors = [pkg.contributors];
-    }
-    for (var i = 0; i < pkg.contributors.length; i++) {
-      var contributor = pkg.contributors[i];
-      if (contributor.email) {
-        contributor.gravatar = gravatar.url(contributor.email, {s: '50', d: 'retro'}, true);
-      }
-      if (config.packagePageContributorSearch || !contributor.url) {
-        contributor.url = '/~' + encodeURIComponent(contributor.name);
-      }
-    }
-  }
-
   if (pkg.repository === 'undefined') {
     pkg.repository = null;
   }
