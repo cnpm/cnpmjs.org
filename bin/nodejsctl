@@ -52,9 +52,9 @@ stop()
     kill -15 $PID
     sleep 2
 
-    node_num=`ps -ef |grep node|grep ${PROJECT_NAME}|grep -v grep|wc -l`
+    node_num=`ps -ef | grep ${PROJECT_NAME} | grep -v grep | wc -l`
     if [ $node_num != 0 ]; then
-      ps -ef |grep node | grep ${PROJECT_NAME} |grep -v grep|awk '{print $2}'|xargs kill -9
+      ps -ef | grep ${PROJECT_NAME} |grep -v grep|awk '{print $2}'|xargs kill -9
       ipcs -s | grep 0x | awk '{print $2}' | xargs -n1 ipcrm -s  > /dev/null 2>&1
       ipcs -m | grep 0x | awk '{print $2}' | xargs -n1 ipcrm -m  > /dev/null 2>&1
     fi
