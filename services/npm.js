@@ -18,7 +18,7 @@
 var urllib = require('../common/urllib');
 var config = require('../config');
 
-var USER_AGENT = 'cnpmjs.org/' + config.version + ' ' + urllib.USER_AGENT;
+var USER_AGENT = 'npm_service.cnpmjs.org/' + config.version + ' ' + urllib.USER_AGENT;
 
 function* request(url, options) {
   options = options || {};

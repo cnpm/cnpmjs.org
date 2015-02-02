@@ -51,6 +51,15 @@ describe('controllers/registry/package/list.test.js', function () {
     });
   });
 
+  before(function (done) {
+    var worker = new SyncModuleWorker({
+      name: 'baidu',
+      noDep: true,
+    });
+    worker.start();
+    worker.on('end', done);
+  });
+
   it('should return all versions', function (done) {
     request(app.listen())
     .get('/testmodule-list-1')
