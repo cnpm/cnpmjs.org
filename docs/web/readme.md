@@ -7,6 +7,7 @@ So `cnpm` is meaning: **Company npm**.
 - Our public registry: [r.cnpmjs.org](http://r.cnpmjs.org), syncing from [registry.npmjs.org](http://registry.npmjs.org)
 - [cnpmjs.org](/) version: <span id="app-version"></span>
 - [Node.js](https://nodejs.org) version: <span id="node-version"></span>
+- For developers behind the GFW, please visit [the Chinese mirror](https://npm.taobao.org). 中国用户请访问[国内镜像站点](https://npm.taobao.org/)。
 
 <table class="downloads">
   <tbody>
