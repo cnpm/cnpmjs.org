@@ -225,7 +225,7 @@ describe('controllers/registry/package/deprecate.test.js', function () {
       })
       .expect({
         error: 'no_perms',
-        reason: 'Private mode enable, only admin can publish this module'
+        reason: 'only allow publish with @cnpm, @cnpmtest scope(s)'
       })
       .expect(403, done);
     });

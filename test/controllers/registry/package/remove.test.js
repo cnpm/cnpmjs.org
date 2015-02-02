@@ -48,7 +48,7 @@ describe('controllers/registry/package/remove.test.js', function () {
     .del('/testmodule-remove-1/-rev/1')
     .expect({
       error: 'unauthorized',
-      reason: 'Login first.'
+      reason: 'Login first'
     })
     .expect(401, done);
   });

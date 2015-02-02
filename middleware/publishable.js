@@ -90,7 +90,7 @@ function checkNoneScope(ctx) {
   }
 
   // only admins can publish or unpublish non-scope modules
-  if (ctx.user.isAdmin) {
+  if (ctx.user.isAdmin && config.syncModel !== 'none') {
     return true;
   }
 

@@ -20,7 +20,6 @@ var pedding = require('pedding');
 var should = require('should');
 var app = require('../../../../servers/registry');
 var utils = require('../../../utils');
-var config = require('../../../../config');
 
 describe('controllers/registry/package/dist_tag.test.js', function () {
   afterEach(mm.restore);
