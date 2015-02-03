@@ -146,10 +146,6 @@ SyncModuleWorker.prototype.start = function () {
       return;
     }
 
-    if (config.syncModel === 'none') {
-      return;
-    }
-
     var arr = [];
     for (var i = 0; i < that.concurrency; i++) {
       arr.push(that.next(i));
@@ -283,6 +279,10 @@ SyncModuleWorker.prototype.syncUser = function* () {
 };
 
 SyncModuleWorker.prototype.next = function* (concurrencyId) {
+  if (config.syncModel === 'none') {
+    return this.finish();
+  }
+
   var name = this.names.shift();
   if (!name) {
     return setImmediate(this.finish.bind(this));

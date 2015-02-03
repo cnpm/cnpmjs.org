@@ -18,7 +18,6 @@
 var mkdirp = require('mkdirp');
 var copy = require('copy-to');
 var path = require('path');
-var fs = require('fs');
 var os = require('os');
 
 var version = require('../package.json').version;
@@ -159,10 +158,7 @@ var config = {
   enablePrivate: false,
 
   // registry scopes, if don't set, means do not support scopes
-  scopes: [
-    '@cnpm',
-    '@cnpmtest'
-  ],
+  scopes: [ '@cnpm', '@cnpmtest' ],
 
   // some registry already have some private packages in global scope
   // but we want to treat them as scoped private packages,
@@ -219,10 +215,20 @@ var config = {
   userService: null,
 };
 
-// load config/config.js, everything in config.js will cover the same key in index.js
-var customConfig = path.join(root, 'config/config.js');
-if (fs.existsSync(customConfig)) {
-  copy(require(customConfig)).override(config);
+if (process.env.NODE_ENV !== 'test') {
+  // 1. try to load `$dataDir/config.js` first, not exists then goto 2.
+  // 2. load config/config.js, everything in config.js will cover the same key in index.js
+  var customConfig = path.join(dataDir, 'config');
+  try {
+    copy(require(customConfig)).override(config);
+  } catch (err) {
+    customConfig = path.join(root, 'config', 'config');
+    try {
+      copy(require(customConfig)).override(config);
+    } catch (err) {
+      // ignore
+    }
+  }
 }
 
 mkdirp.sync(config.logdir);
