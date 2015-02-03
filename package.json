@@ -27,6 +27,7 @@
     "error-formater": "~1.0.3",
     "fs-cnpm": "~1.2.0",
     "giturl": "~0.0.3",
+    "gnode": "~0.1.1",
     "graceful": "~1.0.0",
     "gravatar": "~1.1.0",
     "humanize-ms": "~1.0.1",

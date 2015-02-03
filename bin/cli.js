@@ -1,4 +1,4 @@
-#!/usr/bin/env node --harmony
+#!/usr/bin/env node
 
 /**!
  * cnpmjs.org - bin/cli.js
@@ -16,6 +16,7 @@
  * Module dependencies.
  */
 
+require('gnode');
 var debug = require('debug')('cnpmjs.org:cli');
 var program = require('commander');
 var path = require('path');
@@ -50,6 +51,7 @@ program.parse(process.argv);
 
 
 function start(options) {
+  stop(options);
   var dataDir = options.dataDir || path.join(process.env.HOME, '.cnpmjs.org');
   mkdirp.sync(dataDir);
 
@@ -103,8 +105,6 @@ function stop(options) {
       console.log('cnpmjs.org server:%d stop', pid);
       fs.unlinkSync(pidfile);
     });
-  } else {
-    console.log('cnpmjs.org server not start');
   }
 }
 
