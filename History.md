@@ -1,4 +1,19 @@
 
+2.0.0-rc.13 / 2015-02-04
+==================
+
+ * docs: Deploy a private npm registry in 5 minutes
+ * refactor(config): move application data to ~/.cnpmjs.org/
+ * fix(sync): make get popular pakcage faster
+ * feat(sync): web page also redirect to npm www
+ * refactor(config): make syncModel to none by default
+ * test: fix admin can not publish non-scoped package test cases
+ * docs: add chinese mirror link
+ * fix: admin can not publish non scoped package on "none" sync model
+ * feat(sync): enable none syncModel proxy all public packages
+ * fix: ignore username start with " or '
+ * fix(bin): fix stop not work on iojs
+
 2.0.0-rc.12 / 2015-02-01
 ==================
 
