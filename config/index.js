@@ -6,7 +6,7 @@
  *
  * Authors:
  *  dead_horse <dead_horse@qq.com>
- *  fengmk2 <fengmk2@gmail.com> (http://fengmk2.com)
+ *  fengmk2 <m@fengmk2.com> (http://fengmk2.com)
  */
 
 'use strict';
@@ -18,12 +18,12 @@
 var mkdirp = require('mkdirp');
 var copy = require('copy-to');
 var path = require('path');
-var fs = require('fs');
 var os = require('os');
 
 var version = require('../package.json').version;
 
 var root = path.dirname(__dirname);
+var dataDir = path.join(process.env.HOME || root, '.cnpmjs.org');
 
 var config = {
   version: version,
@@ -45,7 +45,7 @@ var config = {
   // debug mode
   // if in debug mode, some middleware like limit wont load
   // logger module will print to stdout
-  debug: true,
+  debug: process.env.NODE_ENV === 'development',
   // page mode, enable on development env
   pagemock: process.env.NODE_ENV === 'development',
   // session secret
@@ -53,9 +53,9 @@ var config = {
   // max request json body size
   jsonLimit: '10mb',
   // log dir name
-  logdir: path.join(root, '.tmp', 'logs'),
+  logdir: path.join(dataDir, 'logs'),
   // update file template dir
-  uploadDir: path.join(root, '.tmp', 'downloads'),
+  uploadDir: path.join(dataDir, 'downloads'),
   // web page viewCache
   viewCache: false,
 
@@ -92,18 +92,6 @@ var config = {
       pass: 'your password'
     }
   },
-  // forward Compat with old style
-  // mail: {
-  //   appname: 'cnpmjs.org',
-  //   sender: 'cnpmjs.org mail sender <adderss@gmail.com>',
-  //   host: 'smtp.gmail.com',
-  //   port: 465,
-  //   user: 'address@gmail.com',
-  //   pass: 'your password',
-  //   ssl: true,
-  //   debug: false
-  // },
-
 
   logoURL: '//ww4.sinaimg.cn/large/69c1d4acgw1ebfly5kjlij208202oglr.jpg', // cnpm logo image url
   customReadmeFile: '', // you can use your custom readme file instead the cnpm one
@@ -144,15 +132,15 @@ var config = {
     },
 
     // the storage engine for 'sqlite'
-    // default store into ~/cnpmjs.org.sqlite
-    storage: path.join(process.env.HOME || root, 'cnpmjs.org.sqlite'),
+    // default store into ~/.cnpmjs.org/data.sqlite
+    storage: path.join(dataDir, 'data.sqlite'),
 
     logging: !!process.env.SQL_DEBUG,
   },
 
   // package tarball store in local filesystem by default
   nfs: require('fs-cnpm')({
-    dir: path.join(root, '.tmp', 'nfs')
+    dir: path.join(dataDir, 'nfs')
   }),
   // if set true, will 302 redirect to `nfs.url(dist.key)`
   downloadRedirectToNFS: false,
@@ -170,10 +158,7 @@ var config = {
   enablePrivate: false,
 
   // registry scopes, if don't set, means do not support scopes
-  scopes: [
-    '@cnpm',
-    '@cnpmtest'
-  ],
+  scopes: [ '@cnpm', '@cnpmtest' ],
 
   // some registry already have some private packages in global scope
   // but we want to treat them as scoped private packages,
@@ -230,10 +215,20 @@ var config = {
   userService: null,
 };
 
-// load config/config.js, everything in config.js will cover the same key in index.js
-var customConfig = path.join(root, 'config/config.js');
-if (fs.existsSync(customConfig)) {
-  copy(require(customConfig)).override(config);
+if (process.env.NODE_ENV !== 'test') {
+  // 1. try to load `$dataDir/config.js` first, not exists then goto 2.
+  // 2. load config/config.js, everything in config.js will cover the same key in index.js
+  var customConfig = path.join(dataDir, 'config');
+  try {
+    copy(require(customConfig)).override(config);
+  } catch (err) {
+    customConfig = path.join(root, 'config', 'config');
+    try {
+      copy(require(customConfig)).override(config);
+    } catch (err) {
+      // ignore
+    }
+  }
 }
 
 mkdirp.sync(config.logdir);

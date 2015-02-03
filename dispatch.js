@@ -23,6 +23,9 @@ var config = require('./config');
 var workerPath = path.join(__dirname, 'worker.js');
 var syncPath = path.join(__dirname, 'sync');
 
+console.log('Starting cnpmjs.org ...\ncluster: %s\nadmins: %j\nscopes: %j\nsourceNpmRegistry: %s',
+  config.enableCluster, config.admins, config.scopes, config.sourceNpmRegistry);
+
 if (config.enableCluster) {
   forkWorker();
   if (config.syncModel !== 'none') {

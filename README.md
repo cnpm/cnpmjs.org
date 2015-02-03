@@ -42,7 +42,7 @@ Our goal is to provide a low cost maintenance and easy to use solution for priva
 * Build a mirror NPM. (we use it to build a mirror in China: [cnpmjs.org](http://cnpmjs.org/))
 * Build a completely independent NPM registry to store whatever you like.
 
-### Features
+## Features
 
 * **Support "scoped" packages**: [npm/npm#5239](https://github.com/npm/npm/issues/5239)
 * **Support [CORS](http://en.wikipedia.org/wiki/Cross-origin_resource_sharing)**
@@ -66,6 +66,7 @@ as well as [New features in 2.x](https://github.com/cnpm/cnpmjs.org/wiki/New-fea
 
 ## Getting Start
 
+* [Deploy a private npm registry in 5 minutes](https://github.com/cnpm/cnpmjs.org/wiki/Deploy-a-private-npm-registry-in-5-minutes)
 * @[dead-horse](https://github.com/dead-horse): [What is cnpm?](http://deadhorse.me/slides/cnpmjs.html)
 * install and deploy cnpmjs.org through npm: [examples](https://github.com/cnpm/custom-cnpm-example)
 * Mirror NPM in China: [cnpmjs.org](http://cnpmjs.org)
