@@ -28,10 +28,13 @@ describe('controllers/sync_module_worker.test.js', function () {
   afterEach(mm.restore);
 
   beforeEach(function () {
+    mm(config, 'syncModel', 'all');
     mm(config, 'sourceNpmRegistryIsCNpm', false);
+    mm(config, 'privatePackages', ['google']);
   });
 
   before(function (done) {
+    mm(config, 'privatePackages', ['google']);
     var pkg = utils.getPackage('google', '0.0.1', utils.admin);
     request(app.listen())
     .put('/' + pkg.name)

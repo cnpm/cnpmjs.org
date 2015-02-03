@@ -164,18 +164,16 @@ var config = {
    * registry mode config
    */
 
-  // enable private mode, only admin can publish, other use just can sync package from source npm
-  enablePrivate: true,
+  // enable private mode or not
+  // private mode: only admins can publish, other users just can sync package from source npm
+  // public mode: all users can publish
+  enablePrivate: false,
 
   // registry scopes, if don't set, means do not support scopes
   scopes: [
     '@cnpm',
     '@cnpmtest'
   ],
-
-  // force user publish with scope
-  // but admins still can publish without scope
-  forcePublishWithScope: true,
 
   // some registry already have some private packages in global scope
   // but we want to treat them as scoped private packages,
@@ -205,10 +203,10 @@ var config = {
   syncByInstall: true,
 
   // sync mode select
-  // none: do not sync any module
+  // none: do not sync any module, proxy all public modules from sourceNpmRegistry
   // exist: only sync exist modules
   // all: sync all modules
-  syncModel: 'exist', // 'none', 'all', 'exist'
+  syncModel: 'none', // 'none', 'all', 'exist'
 
   syncConcurrency: 1,
   // sync interval, default is 10 minutes

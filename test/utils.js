@@ -16,7 +16,9 @@
 
 var path = require('path');
 var fs = require('fs');
+var mm = require('mm');
 var config = require('../config');
+var SyncModuleWorker = require('../controllers/sync_module_worker');
 
 var fixtures = path.join(__dirname, 'fixtures');
 
@@ -67,4 +69,17 @@ exports.getPackage = function (name, version, user, tag, readme) {
     pkg.versions[version].readme = pkg.readme = readme;
   }
   return pkg;
+};
+
+exports.sync = function (name, callback) {
+  mm(config, 'syncModel', 'all');
+  var worker = new SyncModuleWorker({
+    name: name,
+    noDep: true,
+  });
+  worker.start();
+  worker.on('end', function () {
+    mm.restore();
+    callback();
+  });
 };

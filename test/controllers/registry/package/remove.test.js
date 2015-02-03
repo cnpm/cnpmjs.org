@@ -27,35 +27,27 @@ describe('controllers/registry/package/remove.test.js', function () {
   afterEach(mm.restore);
 
   before(function (done) {
-    var pkg = utils.getPackage('testmodule-remove-1', '0.0.1', utils.admin);
+    var pkg = utils.getPackage('@cnpmtest/testmodule-remove-1', '1.0.0', utils.admin);
     request(app.listen())
     .put('/' + pkg.name)
     .set('authorization', utils.adminAuth)
     .send(pkg)
-    .expect(201, function (err) {
-      should.not.exist(err);
-      var pkg = utils.getPackage('@cnpmtest/testmodule-remove-1', '1.0.0', utils.admin);
-      request(app.listen())
-      .put('/' + pkg.name)
-      .set('authorization', utils.adminAuth)
-      .send(pkg)
-      .expect(201, done);
-    });
+    .expect(201, done);
   });
 
   it('should delete 401 when no auth', function (done) {
     request(app)
-    .del('/testmodule-remove-1/-rev/1')
+    .del('/@cnpmtest/testmodule-remove-1/-rev/1')
     .expect({
       error: 'unauthorized',
-      reason: 'Login first.'
+      reason: 'Login first'
     })
     .expect(401, done);
   });
 
   it('should 404 when package not exists', function (done) {
     request(app)
-    .del('/testmodule-remove-1-not-exists/-rev/1')
+    .del('/@cnpmtest/testmodule-remove-1-not-exists/-rev/1')
     .set('authorization', utils.adminAuth)
     .expect({
       error: 'not_found',
@@ -67,7 +59,7 @@ describe('controllers/registry/package/remove.test.js', function () {
   it('should delete 403 when user is not admin on config.enablePrivate = true', function (done) {
     mm(config, 'enablePrivate', true);
     request(app)
-    .del('/testmodule-remove-1/-rev/1')
+    .del('/@cnpmtest/testmodule-remove-1/-rev/1')
     .set('authorization', utils.otherUserAuth)
     .expect({
       error: 'no_perms',
@@ -77,7 +69,6 @@ describe('controllers/registry/package/remove.test.js', function () {
   });
 
   it('should 400 when scope not exists', function (done) {
-    mm(config, 'enablePrivate', false);
     request(app)
     .del('/@cnpm-not-exists/testmodule-remove-1/-rev/1')
     .set('authorization', utils.otherUserAuth)
@@ -89,7 +80,6 @@ describe('controllers/registry/package/remove.test.js', function () {
   });
 
   it('should 403 when delete non scoped package', function (done) {
-    mm(config, 'enablePrivate', false);
     request(app)
     .del('/testmodule-remove-1/-rev/1')
     .set('authorization', utils.otherUserAuth)
@@ -100,20 +90,7 @@ describe('controllers/registry/package/remove.test.js', function () {
     .expect(403, done);
   });
 
-  it('should remove all versions ok', function (done) {
-    request(app)
-    .del('/testmodule-remove-1/-rev/1')
-    .set('authorization', utils.adminAuth)
-    .expect(200, function (err) {
-      should.not.exist(err);
-      request(app)
-      .get('/testmodule-remove-1')
-      .expect(404, done);
-    });
-  });
-
   it('should 403 when user not maintainer', function (done) {
-    mm(config, 'enablePrivate', false);
     request(app)
     .del('/@cnpmtest/testmodule-remove-1/-rev/1')
     .set('authorization', utils.otherUserAuth)
@@ -124,7 +101,7 @@ describe('controllers/registry/package/remove.test.js', function () {
     .expect(403, done);
   });
 
-  it('should remove scoped package all versions ok', function (done) {
+  it('should remove all versions ok', function (done) {
     request(app)
     .del('/@cnpmtest/testmodule-remove-1/-rev/1')
     .set('authorization', utils.adminAuth)

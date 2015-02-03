@@ -16,10 +16,9 @@
 
 var debug = require('debug')('cnpmjs.org:controllers:registry:package:list');
 var packageService = require('../../../services/package');
-var npmService = require('../../../services/npm');
-var config = require('../../../config');
-var setDownloadURL = require('../../../lib/common').setDownloadURL;
+var common = require('../../../lib/common');
 var SyncModuleWorker = require('../../sync_module_worker');
+var config = require('../../../config');
 
 /**
  * list all version of a module
@@ -114,23 +113,7 @@ module.exports = function* list() {
     var logId = yield* SyncModuleWorker.sync(name, 'sync-by-install');
     debug('start sync %s, get log id %s', name, logId);
 
-    // try to get package from official registry
-    var r = yield* npmService.request('/' + name, {
-      registry: config.officialNpmRegistry
-    });
-
-    debug('requet from officialNpmRegistry response %s', r.status);
-    if (r.status !== 200) {
-      this.status = 404;
-      this.body = {
-        error: 'not_found',
-        reason: 'document not found'
-      };
-      return;
-    }
-
-    this.body = r.data;
-    return;
+    return this.redirect(config.officialNpmRegistry + this.url);
   }
 
   var latestMod = null;
@@ -150,7 +133,7 @@ module.exports = function* list() {
   for (var i = 0; i < rows.length; i++) {
     var row = rows[i];
     var pkg = row.package;
-    setDownloadURL(pkg, this);
+    common.setDownloadURL(pkg, this);
     pkg._cnpm_publish_time = row.publish_time;
     versions[pkg.version] = pkg;
 

@@ -16,17 +16,6 @@
 
 var packageService = require('../../../services/package');
 
-function* getTags(ctx) {
-  var name = ctx.params.name || ctx.params[0];
-  var rows = yield* packageService.listModuleTags(name);
-  var tags = {};
-  for (var i = 0; i < rows.length; i++) {
-    var row = rows[i];
-    tags[row.tag] = row.version;
-  }
-  return tags;
-}
-
 function ok() {
   return {
     ok: "dist-tags updated"
@@ -35,7 +24,13 @@ function ok() {
 
 // GET /-/package/:pkg/dist-tags -- returns the package's dist-tags
 exports.index = function* () {
-  var tags = yield* getTags(this);
+  var name = this.params.name || this.params[0];
+  var rows = yield* packageService.listModuleTags(name);
+  var tags = {};
+  for (var i = 0; i < rows.length; i++) {
+    var row = rows[i];
+    tags[row.tag] = row.version;
+  }
   this.body = tags;
 };
 

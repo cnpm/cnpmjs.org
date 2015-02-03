@@ -24,7 +24,7 @@ describe('controllers/registry/package/list_since.test.js', function () {
   afterEach(mm.restore);
 
   before(function (done) {
-    var pkg = utils.getPackage('testmodule-list_since', '0.0.1', utils.admin);
+    var pkg = utils.getPackage('@cnpmtest/testmodule-list_since', '0.0.1', utils.admin);
     request(app.listen())
     .put('/' + pkg.name)
     .set('authorization', utils.adminAuth)
@@ -41,7 +41,7 @@ describe('controllers/registry/package/list_since.test.js', function () {
         res.body.should.be.an.Object;
         res.body._updated.should.be.a.Number;
         Object.keys(res.body).length.should.above(1);
-        res.body['testmodule-list_since'].should.equal(true);
+        res.body['@cnpmtest/testmodule-list_since'].should.equal(true);
         done();
       });
     });
@@ -54,7 +54,7 @@ describe('controllers/registry/package/list_since.test.js', function () {
         res.body.should.be.an.Object;
         res.body._updated.should.be.a.Number;
         Object.keys(res.body).length.should.above(1);
-        res.body['testmodule-list_since'].should.equal(true);
+        res.body['@cnpmtest/testmodule-list_since'].should.equal(true);
         done();
       });
     });

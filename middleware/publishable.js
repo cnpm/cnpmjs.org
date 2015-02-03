@@ -29,9 +29,8 @@ module.exports = function *publishable(next) {
     return;
   }
 
-  // public mode, all user have permission to publish
-  // but if `config.scopes` exist, only can publish with scopes in `config.scope`
-  // if `config.forcePublishWithScope` set to true, only admins can publish without scope
+  // public mode, all user have permission to publish `scoped package`
+  // and only can publish with scopes in `ctx.user.scopes`, default is `config.scopes`
 
   var name = this.params.name || this.params[0];
 
@@ -49,7 +48,7 @@ module.exports = function *publishable(next) {
   }
 
   // none-scope
-  if (checkNoneScope(this)) {
+  if (checkNoneScope(name, this)) {
     return yield* next;
   }
 };
@@ -82,19 +81,21 @@ function checkScope(name, ctx) {
  * check if user have permission to publish without scope
  */
 
-function checkNoneScope(ctx) {
-  if (!config.scopes
-    || !config.scopes.length
-    || !config.forcePublishWithScope) {
-    return true;
-  }
-
-  // only admins can publish or unpublish non-scope modules
-  if (ctx.user.isAdmin) {
+function checkNoneScope(name, ctx) {
+  // admins unpublished everything
+  if (ctx.user.isAdmin && ctx.method === 'DELETE') {
     return true;
   }
 
   ctx.status = 403;
+  if (ctx.user.scopes.length === 0) {
+    ctx.body = {
+      error: 'no_perms',
+      reason: 'can\'t publish non-scoped package, please set `config.scopes`'
+    };
+    return;
+  }
+
   ctx.body = {
     error: 'no_perms',
     reason: 'only allow publish with ' + ctx.user.scopes.join(', ') + ' scope(s)'

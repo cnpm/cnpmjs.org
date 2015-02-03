@@ -146,6 +146,10 @@ SyncModuleWorker.prototype.start = function () {
       return;
     }
 
+    if (config.syncModel === 'none') {
+      return;
+    }
+
     var arr = [];
     for (var i = 0; i < that.concurrency; i++) {
       arr.push(that.next(i));
@@ -389,7 +393,7 @@ SyncModuleWorker.prototype._unpublished = function* (name, unpublishedInfo) {
   var mods = yield* packageService.listModulesByName(name);
   this.log('  [%s] start unpublished %d versions from local cnpm registry',
     name, mods.length);
-  if (this._isLocalModule(mods)) {
+  if (common.isLocalModule(mods)) {
     // publish on cnpm, dont sync this version package
     this.log('  [%s] publish on local cnpm registry, don\'t sync', name);
     return [];
@@ -427,16 +431,6 @@ SyncModuleWorker.prototype._unpublished = function* (name, unpublishedInfo) {
   this.log('    [%s] delete nfs files: %j success', name, keys);
 };
 
-SyncModuleWorker.prototype._isLocalModule = function (mods) {
-  for (var i = 0; i < mods.length; i++) {
-    var r = mods[i];
-    if (r.package && r.package._publish_on_cnpm) {
-      return true;
-    }
-  }
-  return false;
-};
-
 SyncModuleWorker.prototype._sync = function* (name, pkg) {
   var that = this;
   var hasModules = false;
@@ -451,7 +445,7 @@ SyncModuleWorker.prototype._sync = function* (name, pkg) {
   var existsStarUsers = result[2];
   var existsNpmMaintainers = result[3];
 
-  if (that._isLocalModule(moduleRows)) {
+  if (common.isLocalModule(moduleRows)) {
     // publish on cnpm, dont sync this version package
     that.log('  [%s] publish on local cnpm registry, don\'t sync', name);
     return [];

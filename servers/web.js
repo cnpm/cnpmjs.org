@@ -24,6 +24,7 @@ var block = require('../middleware/block');
 var logger = require('../common/logger');
 var renderMarkdown = require('../common/markdown').render;
 var auth = require('../middleware/auth');
+var proxyToNpm = require('../middleware/proxy_to_npm');
 var routes = require('../routes/web');
 var config = require('../config');
 var path = require('path');
@@ -49,6 +50,9 @@ if (config.pagemock) {
 app.use(opensearch);
 app.keys = ['todokey', config.sessionSecret];
 app.proxy = true;
+app.use(proxyToNpm({
+  isWeb: true
+}));
 app.use(middlewares.bodyParser());
 app.use(auth());
 app.use(notFound);

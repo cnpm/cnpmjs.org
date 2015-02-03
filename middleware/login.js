@@ -34,7 +34,7 @@ module.exports = function *login(next) {
     this.status = 401;
     this.body = {
       error: 'unauthorized',
-      reason: 'Login first.'
+      reason: 'Login first'
     };
     return;
   }

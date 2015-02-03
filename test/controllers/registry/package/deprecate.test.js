@@ -22,9 +22,8 @@ var app = require('../../../../servers/registry');
 var utils = require('../../../utils');
 
 describe('controllers/registry/package/deprecate.test.js', function () {
-  var pkgname = 'testmodule-deprecate';
+  var pkgname = '@cnpmtest/testmodule-deprecate';
   before(function (done) {
-    done = pedding(2, done);
     var pkg = utils.getPackage(pkgname, '0.0.1', utils.admin);
 
     request(app.listen())
@@ -49,36 +48,11 @@ describe('controllers/registry/package/deprecate.test.js', function () {
         .expect(201, done);
       });
     });
-
-    pkg = utils.getPackage('@cnpmtest/testmodule-deprecate', '1.0.0', utils.admin);
-    request(app.listen())
-    .put('/' + pkg.name)
-    .set('authorization', utils.adminAuth)
-    .send(pkg)
-    .expect(201, done);
   });
 
   afterEach(mm.restore);
 
   describe('PUT /:name', function () {
-    it('should deprecate scoped package version@1.0.0', function (done) {
-      request(app.listen())
-      .put('/@cnpmtest/testmodule-deprecate')
-      .set('authorization', utils.adminAuth)
-      .send({
-        name: pkgname,
-        versions: {
-          '1.0.0': {
-            deprecated: 'mock test deprecated message 1.0.0'
-          }
-        }
-      })
-      .expect({
-        ok: true
-      })
-      .expect(201, done);
-    });
-
     it('should deprecate version@1.0.0', function (done) {
       request(app.listen())
       .put('/' + pkgname)
@@ -205,7 +179,7 @@ describe('controllers/registry/package/deprecate.test.js', function () {
       .expect(400, done);
     });
 
-    it('should 403', function (done) {
+    it('should 403 can not modified when use is not maintainer', function (done) {
       request(app.listen())
       .put('/' + pkgname)
       .set('authorization', utils.otherUserAuth)
@@ -224,8 +198,8 @@ describe('controllers/registry/package/deprecate.test.js', function () {
         }
       })
       .expect({
-        error: 'no_perms',
-        reason: 'Private mode enable, only admin can publish this module'
+        error: 'forbidden user',
+        reason: 'cnpmjstest101 not authorized to modify @cnpmtest/testmodule-deprecate, please contact maintainers: cnpmjstest10'
       })
       .expect(403, done);
     });

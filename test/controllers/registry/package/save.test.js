@@ -19,13 +19,20 @@ var request = require('supertest');
 var mm = require('mm');
 var packageService = require('../../../../services/package');
 var app = require('../../../../servers/registry');
+var config = require('../../../../config');
 var utils = require('../../../utils');
 
 describe('controllers/registry/package/save.test.js', function () {
   afterEach(mm.restore);
 
   describe('no @scoped package', function () {
+    beforeEach(function () {
+      mm(config, 'syncModel', 'all');
+      mm(config, 'privatePackages', ['testmodule-new-1', 'testmodule-new-2', 'testmodule-no-latest']);
+    });
+
     before(function (done) {
+      mm(config, 'privatePackages', ['testmodule-new-1', 'testmodule-new-2']);
       var pkg = utils.getPackage('testmodule-new-1', '0.0.1', utils.admin);
       pkg.versions['0.0.1'].dependencies = {
         'bytetest-1': '~0.0.1',

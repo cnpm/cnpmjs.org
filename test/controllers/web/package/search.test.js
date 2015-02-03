@@ -14,7 +14,6 @@
  * Module dependencies.
  */
 
-var should = require('should');
 var request = require('supertest');
 var mm = require('mm');
 var app = require('../../../../servers/web');
@@ -23,41 +22,22 @@ var utils = require('../../../utils');
 
 describe('controllers/web/package/search.test.js', function () {
   before(function (done) {
-    var pkg = utils.getPackage('testmodule-web-search', '0.0.1', utils.admin);
+    var pkg = utils.getPackage('@cnpmtest/testmodule-web-search', '0.0.1', utils.admin);
     pkg.versions['0.0.1'].dependencies = {
       bytetest: '~0.0.1',
-      mocha: '~1.0.0'
+      mocha: '~1.0.0',
+      'testmodule-web-show': '0.0.1'
     };
     request(registry.listen())
     .put('/' + pkg.name)
     .set('authorization', utils.adminAuth)
     .send(pkg)
-    .expect(201, function (err) {
-      should.not.exist(err);
-      var pkg = utils.getPackage('@cnpmtest/testmodule-web-search', '0.0.1', utils.admin);
-      pkg.versions['0.0.1'].dependencies = {
-        bytetest: '~0.0.1',
-        mocha: '~1.0.0',
-        'testmodule-web-show': '0.0.1'
-      };
-      request(registry.listen())
-      .put('/' + pkg.name)
-      .set('authorization', utils.adminAuth)
-      .send(pkg)
-      .expect(201, done);
-    });
+    .expect(201, done);
   });
 
   afterEach(mm.restore);
 
   describe('GET /browse/keyword/:word', function () {
-    it('should list by keyword ok', function (done) {
-      request(app)
-      .get('/browse/keyword/testmodule-web-search')
-      .expect(200)
-      .expect(/Packages match/, done);
-    });
-
     it('should list by keyword ok', function (done) {
       request(app)
       .get('/browse/keyword/@cnpmtest/testmodule-web-search')
@@ -67,7 +47,7 @@ describe('controllers/web/package/search.test.js', function () {
 
     it('should list by keyword with json ok', function (done) {
       request(app)
-      .get('/browse/keyword/testmodule-web-search?type=json')
+      .get('/browse/keyword/@cnpmtest/testmodule-web-search?type=json')
       .expect(200)
       .expect('content-type', 'application/json; charset=utf-8', done);
     });

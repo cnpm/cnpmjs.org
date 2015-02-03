@@ -90,6 +90,7 @@ if (sync) {
  * sync popular modules
  */
 
+var startSyncPopular = require('./sync_popular');
 var syncingPopular = false;
 var syncPopular = co(function* syncPopular() {
   if (syncingPopular) {
@@ -100,7 +101,7 @@ var syncPopular = co(function* syncPopular() {
   var data;
   var error;
   try {
-    data = yield* require('./sync_popular');
+    data = yield* startSyncPopular();
   } catch (err) {
     error = err;
     error.message += ' (sync package error)';

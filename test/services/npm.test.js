@@ -74,16 +74,16 @@ describe('services/npm.test.js', function () {
           { key: ['foo8'], value: 1 },
           { key: ['foo9'], value: 1 },
           { key: ['foo10'], value: 1 },
-          { key: ['underscore'], value: 100 },
-          { key: ['foo12'], value: 1 },
+          { key: ['underscore'], value: 1001 },
+          { key: ['foo12'], value: 100 },
           { key: ['foo13'], value: 1 },
           { key: ['foo14'], value: 1 },
           { key: ['foo15'], value: 1 },
         ]
       }));
-      var names = yield* npm.getPopular(10);
-      names.should.length(10);
-      names[0].should.equal('underscore');
+      var rows = yield* npm.getPopular(10);
+      rows.should.length(2);
+      rows[0][0].should.equal('underscore');
     });
   });
 });
