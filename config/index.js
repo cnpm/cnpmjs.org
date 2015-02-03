@@ -6,7 +6,7 @@
  *
  * Authors:
  *  dead_horse <dead_horse@qq.com>
- *  fengmk2 <fengmk2@gmail.com> (http://fengmk2.com)
+ *  fengmk2 <m@fengmk2.com> (http://fengmk2.com)
  */
 
 'use strict';
@@ -24,6 +24,7 @@ var os = require('os');
 var version = require('../package.json').version;
 
 var root = path.dirname(__dirname);
+var dataDir = path.join(process.env.HOME || root, '.cnpmjs.org');
 
 var config = {
   version: version,
@@ -45,7 +46,7 @@ var config = {
   // debug mode
   // if in debug mode, some middleware like limit wont load
   // logger module will print to stdout
-  debug: true,
+  debug: process.env.NODE_ENV === 'development',
   // page mode, enable on development env
   pagemock: process.env.NODE_ENV === 'development',
   // session secret
@@ -53,9 +54,9 @@ var config = {
   // max request json body size
   jsonLimit: '10mb',
   // log dir name
-  logdir: path.join(root, '.tmp', 'logs'),
+  logdir: path.join(dataDir, 'logs'),
   // update file template dir
-  uploadDir: path.join(root, '.tmp', 'downloads'),
+  uploadDir: path.join(dataDir, 'downloads'),
   // web page viewCache
   viewCache: false,
 
@@ -92,18 +93,6 @@ var config = {
       pass: 'your password'
     }
   },
-  // forward Compat with old style
-  // mail: {
-  //   appname: 'cnpmjs.org',
-  //   sender: 'cnpmjs.org mail sender <adderss@gmail.com>',
-  //   host: 'smtp.gmail.com',
-  //   port: 465,
-  //   user: 'address@gmail.com',
-  //   pass: 'your password',
-  //   ssl: true,
-  //   debug: false
-  // },
-
 
   logoURL: '//ww4.sinaimg.cn/large/69c1d4acgw1ebfly5kjlij208202oglr.jpg', // cnpm logo image url
   customReadmeFile: '', // you can use your custom readme file instead the cnpm one
@@ -144,15 +133,15 @@ var config = {
     },
 
     // the storage engine for 'sqlite'
-    // default store into ~/cnpmjs.org.sqlite
-    storage: path.join(process.env.HOME || root, 'cnpmjs.org.sqlite'),
+    // default store into ~/.cnpmjs.org/data.sqlite
+    storage: path.join(dataDir, 'data.sqlite'),
 
     logging: !!process.env.SQL_DEBUG,
   },
 
   // package tarball store in local filesystem by default
   nfs: require('fs-cnpm')({
-    dir: path.join(root, '.tmp', 'nfs')
+    dir: path.join(dataDir, 'nfs')
   }),
   // if set true, will 302 redirect to `nfs.url(dist.key)`
   downloadRedirectToNFS: false,
