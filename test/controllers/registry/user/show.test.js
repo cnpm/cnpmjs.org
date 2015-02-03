@@ -20,18 +20,13 @@ var mm = require('mm');
 var app = require('../../../../servers/registry');
 var config = require('../../../../config');
 var userService = require('../../../../services/user');
-var SyncModuleWorker = require('../../../../controllers/sync_module_worker');
+var utils = require('../../../utils');
 
 describe('controllers/registry/user/show.test.js, GET /-/user/org.couchdb.user:name', function () {
   afterEach(mm.restore);
 
   before(function (done) {
-    var worker = new SyncModuleWorker({
-      name: 'pedding',
-      noDep: true,
-    });
-    worker.start();
-    worker.on('end', done);
+    utils.sync('pedding', done);
   });
 
   beforeEach(function () {

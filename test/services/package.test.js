@@ -17,7 +17,7 @@
 var should = require('should');
 var sleep = require('co-sleep');
 var Package = require('../../services/package');
-var SyncModuleWorker = require('../../controllers/sync_module_worker');
+var utils = require('../utils');
 
 describe('services/package.test.js', function () {
   function* createModule(name, version, user, tag) {
@@ -88,19 +88,7 @@ describe('services/package.test.js', function () {
 
   describe('listMaintainers()', function () {
     before(function (done) {
-      var worker = new SyncModuleWorker({
-        name: ['enable'],
-        username: 'fengmk2',
-        noDep: true
-      });
-
-      worker.start();
-      worker.on('end', function () {
-        var names = worker.successes.concat(worker.fails);
-        names.sort();
-        names.should.eql(['enable']);
-        done();
-      });
+      utils.sync('enable', done);
     });
 
     it('should show public package maintainers', function* () {

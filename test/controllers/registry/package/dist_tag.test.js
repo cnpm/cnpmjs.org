@@ -47,6 +47,7 @@ describe('controllers/registry/package/dist_tag.test.js', function () {
     });
 
     it('should get normal pakcage tags', function (done) {
+      mm(config, 'syncModel', 'all');
       request(app.listen())
       .get('/-/package/byte/dist-tags')
       .expect(200, function (err, res) {

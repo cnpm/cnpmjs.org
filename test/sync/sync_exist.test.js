@@ -15,23 +15,22 @@
  */
 
 var mm = require('mm');
+var config = require('../../config');
 var sync = require('../../sync/sync_exist');
 var npmService = require('../../services/npm');
 var totalService = require('../../services/total');
-var SyncModuleWorker = require('../../controllers/sync_module_worker');
+var utils = require('../utils');
 
 describe('sync/sync_exist.test.js', function () {
-  describe('sync()', function () {
-    afterEach(mm.restore);
+  beforeEach(function () {
+    mm(config, 'syncModel', 'all');
+  });
 
+  afterEach(mm.restore);
+
+  describe('sync()', function () {
     before(function (done) {
-      var worker = new SyncModuleWorker({
-        name: 'byte',
-        username: 'admin',
-        noDep: true
-      });
-      worker.start();
-      worker.on('end', done);
+      utils.sync('byte', done);
     });
 
     it('should sync first time ok', function *() {

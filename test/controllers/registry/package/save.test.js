@@ -27,6 +27,7 @@ describe('controllers/registry/package/save.test.js', function () {
 
   describe('no @scoped package', function () {
     beforeEach(function () {
+      mm(config, 'syncModel', 'all');
       mm(config, 'privatePackages', ['testmodule-new-1', 'testmodule-new-2', 'testmodule-no-latest']);
     });
 

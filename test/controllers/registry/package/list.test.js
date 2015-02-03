@@ -134,6 +134,7 @@ describe('controllers/registry/package/list.test.js', function () {
     });
 
     it('should show unpublished info', function (done) {
+      mm(config, 'syncModel', 'all');
       request(app.listen())
       .get('/tfs')
       .expect(404, function (err, res) {
@@ -152,6 +153,7 @@ describe('controllers/registry/package/list.test.js', function () {
     });
 
     it('should show npm package after sync', function (done) {
+      mm(config, 'syncModel', 'all');
       request(app.listen())
       .get('/tair')
       .expect(200, function (err, res) {

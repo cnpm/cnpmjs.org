@@ -28,6 +28,7 @@ describe('controllers/sync_module_worker.test.js', function () {
   afterEach(mm.restore);
 
   beforeEach(function () {
+    mm(config, 'syncModel', 'all');
     mm(config, 'sourceNpmRegistryIsCNpm', false);
     mm(config, 'privatePackages', ['google']);
   });

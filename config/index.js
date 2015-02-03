@@ -175,10 +175,6 @@ var config = {
     '@cnpmtest'
   ],
 
-  // force users publish with scope
-  // and admins still can publish without scope
-  forcePublishWithScope: true,
-
   // some registry already have some private packages in global scope
   // but we want to treat them as scoped private packages,
   // so you can use this white list.
@@ -210,7 +206,7 @@ var config = {
   // none: do not sync any module, proxy all public modules from sourceNpmRegistry
   // exist: only sync exist modules
   // all: sync all modules
-  syncModel: 'exist', // 'none', 'all', 'exist'
+  syncModel: 'none', // 'none', 'all', 'exist'
 
   syncConcurrency: 1,
   // sync interval, default is 10 minutes

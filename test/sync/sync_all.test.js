@@ -16,15 +16,20 @@
 
 var should = require('should');
 var mm = require('mm');
+var config = require('../../config');
 var sync = require('../../sync/sync_all');
 var npmSerivce = require('../../services/npm');
 var totalService = require('../../services/total');
 var packageService = require('../../services/package');
 
 describe('sync/sync_all.test.js', function () {
-  describe('sync()', function () {
-    afterEach(mm.restore);
+  beforeEach(function () {
+    mm(config, 'syncModel', 'all');
+  });
 
+  afterEach(mm.restore);
+
+  describe('sync()', function () {
     it('should sync first time ok', function* () {
       mm.data(npmSerivce, 'getShort', ['mk2testmodule', 'mk2testmodule-not-exists']);
       mm.data(totalService, 'getTotalInfo', {last_sync_time: 0});

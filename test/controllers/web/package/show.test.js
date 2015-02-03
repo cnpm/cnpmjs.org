@@ -119,6 +119,7 @@ describe('controllers/web/package/show.test.js', function () {
     });
 
     it('should display unpublished info', function (done) {
+      mm(config, 'syncModel', 'all');
       request(app)
       .get('/package/tnpm')
       .expect(200)
