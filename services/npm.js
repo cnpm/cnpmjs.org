@@ -86,20 +86,25 @@ exports.getShort = function* (timeout) {
 exports.getPopular = function* (top, timeout) {
   var r = yield* request('/-/_view/dependedUpon?group_level=1', {
     registry: config.officialNpmRegistry,
-    timeout: timeout || 60000
+    timeout: timeout || 120000
   });
   if (!r.data || !r.data.rows || !r.data.rows.length) {
     return [];
   }
 
-  return r.data.rows.sort(function (a, b) {
+  // deps number must >= 100
+  var rows = r.data.rows.filter(function (a) {
+    return a.value >= 100;
+  });
+
+  return rows.sort(function (a, b) {
     return b.value - a.value;
   })
   .slice(0, top)
   .map(function (r) {
-    return r.key && r.key[0];
+    return [r.key && r.key[0] && r.key[0].trim(), r.value];
   })
   .filter(function (r) {
-    return r;
+    return r[0];
   });
 };
