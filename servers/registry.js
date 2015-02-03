@@ -37,7 +37,7 @@ app.use(staticCache);
 
 app.keys = ['todokey', config.sessionSecret];
 app.proxy = true;
-app.use(proxyToNpm);
+app.use(proxyToNpm());
 app.use(middlewares.bodyParser({jsonLimit: config.jsonLimit}));
 app.use(cors({
   methods: 'GET,HEAD'

@@ -21,7 +21,6 @@ var utility = require('utility');
 var ms = require('humanize-ms');
 var moment = require('moment');
 var downloadTotalService = require('../services/download_total');
-var npmService = require('../services/npm');
 var nfs = require('../common/nfs');
 var config = require('../config');
 
@@ -159,20 +158,4 @@ exports.getOssLicenseUrlFromName = function (name) {
 
   return licenseMap[name.toLowerCase()] ?
     base + licenseMap[name.toLowerCase()] : base + name;
-};
-
-exports.proxyToNpmRegistry = function* (ctx) {
-  var r = yield* npmService.request(ctx.url);
-  if (!r.status && r.status < 200) {
-    r.status = 502;
-    r.body = {
-      error: 'remote_npm_registry_error',
-      reason: 'status: ' + r.status + ' body: ' + (r.data ? r.data.toString() : '[empty]'),
-    };
-    return;
-  }
-
-  ctx.status = r.status;
-  ctx.body = r.data;
-  return;
 };

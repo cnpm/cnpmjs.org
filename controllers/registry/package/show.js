@@ -17,7 +17,6 @@
 var debug = require('debug')('cnpmjs.org:controllers:registry:package:show');
 var semver = require('semver');
 var packageService = require('../../../services/package');
-var npmService = require('../../../services/npm');
 var setDownloadURL = require('../../../lib/common').setDownloadURL;
 var SyncModuleWorker = require('../../sync_module_worker');
 var config = require('../../../config');
@@ -65,20 +64,5 @@ module.exports = function* show() {
   var logId = yield* SyncModuleWorker.sync(name, 'sync-by-install');
   debug('start sync %s, get log id %s', name, logId);
 
-  // rty to get package from official registry
-  var r = yield npmService.request('/' + name + '/' + tag, {
-    registry: config.officialNpmRegistry
-  });
-
-  if (r.status !== 200) {
-    debug('requet from officialNpmRegistry response %s', r.status);
-    this.status = 404;
-    this.body = {
-      error: 'not exist',
-      reason: 'tag or version not found: ' + tag
-    };
-    return;
-  }
-
-  this.body = r.data;
+  this.redirect(config.officialNpmRegistry + this.url);
 };

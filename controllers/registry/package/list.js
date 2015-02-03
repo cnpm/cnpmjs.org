@@ -18,7 +18,7 @@ var debug = require('debug')('cnpmjs.org:controllers:registry:package:list');
 var packageService = require('../../../services/package');
 var common = require('../../../lib/common');
 var SyncModuleWorker = require('../../sync_module_worker');
-var utils = require('../../utils');
+var config = require('../../../config');
 
 /**
  * list all version of a module
@@ -113,7 +113,7 @@ module.exports = function* list() {
     var logId = yield* SyncModuleWorker.sync(name, 'sync-by-install');
     debug('start sync %s, get log id %s', name, logId);
 
-    return yield utils.proxyToNpmRegistry(this);
+    return this.redirect(config.officialNpmRegistry + this.url);
   }
 
   var latestMod = null;
