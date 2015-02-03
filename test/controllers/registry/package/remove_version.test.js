@@ -26,9 +26,8 @@ describe('controllers/registry/package/remove_version.test.js', function () {
   afterEach(mm.restore);
 
   var lastRev;
-  var lastRevScoped;
   before(function (done) {
-    var pkg = utils.getPackage('testmodule-remove_version-1', '0.0.1', utils.admin);
+    var pkg = utils.getPackage('@cnpmtest/testmodule-remove_version-1', '0.0.1', utils.admin);
     request(app.listen())
     .put('/' + pkg.name)
     .set('authorization', utils.adminAuth)
@@ -36,22 +35,13 @@ describe('controllers/registry/package/remove_version.test.js', function () {
     .expect(201, function (err, res) {
       should.not.exist(err);
       lastRev = res.body.rev;
-      var pkg = utils.getPackage('@cnpmtest/testmodule-remove_version-1', '0.0.1', utils.admin);
-      request(app.listen())
-      .put('/' + pkg.name)
-      .set('authorization', utils.adminAuth)
-      .send(pkg)
-      .expect(201, function (err, res) {
-        should.not.exist(err);
-        lastRevScoped = res.body.rev;
-        done();
-      });
+      done();
     });
   });
 
   it('should 404 when version format error', function (done) {
     request(app)
-    .del('/testmodule-remove_version-1/download/testmodule_remove_version123.tgz/-rev/112312312321')
+    .del('/@cnpmtest/testmodule-remove_version-1/download/@cnpmtest/testmodule_remove_version123.tgz/-rev/112312312321')
     .set('authorization', utils.adminAuth)
     .expect({
       error: 'not_found',
@@ -62,7 +52,7 @@ describe('controllers/registry/package/remove_version.test.js', function () {
 
   it('should 404 when rev format error', function (done) {
     request(app)
-    .del('/testmodule-remove_version-1/download/testmodule-remove_version-1-1.0.1.tgz/-rev/abc')
+    .del('/@cnpmtest/testmodule-remove_version-1/download/@cnpmtest/testmodule-remove_version-1-1.0.1.tgz/-rev/abc')
     .set('authorization', utils.adminAuth)
     .expect({
       error: 'not_found',
@@ -73,7 +63,7 @@ describe('controllers/registry/package/remove_version.test.js', function () {
 
   it('should 404 when version not exists', function (done) {
     request(app)
-    .del('/testmodule-remove_version-1/download/testmodule-remove_version-1-1.0.1.tgz/-rev/112312312321')
+    .del('/@cnpmtest/testmodule-remove_version-1/download/@cnpmtest/testmodule-remove_version-1-1.0.1.tgz/-rev/112312312321')
     .set('authorization', utils.adminAuth)
     .expect({
       error: 'not_found',
@@ -84,47 +74,32 @@ describe('controllers/registry/package/remove_version.test.js', function () {
 
   it('should 401 when no auth', function (done) {
     request(app)
-    .del('/testmodule-remove_version-1/download/testmodule-remove_version-1-0.0.1.tgz/-rev/' + lastRev)
+    .del('/@cnpmtest/testmodule-remove_version-1/download/@cnpmtest/testmodule-remove_version-1-0.0.1.tgz/-rev/' + lastRev)
     .expect(401, done);
   });
 
   it('should 403 when auth error', function (done) {
     request(app)
-    .del('/testmodule-remove_version-1/download/testmodule-remove_version-1-0.0.1.tgz/-rev/' + lastRev)
+    .del('/@cnpmtest/testmodule-remove_version-1/download/@cnpmtest/testmodule-remove_version-1-0.0.1.tgz/-rev/' + lastRev)
     .set('authorization', utils.otherUserAuth)
     .expect(403, done);
   });
 
   it('should 200 when delete success', function (done) {
     request(app)
-    .del('/testmodule-remove_version-1/download/testmodule-remove_version-1-0.0.1.tgz/-rev/' + lastRev)
-    .set('authorization', utils.adminAuth)
-    .expect(200, done);
-  });
-
-  it('should 200 when delete scoped package success', function (done) {
-    request(app)
-    .del('/@cnpmtest/testmodule-remove_version-1/download/@cnpmtest/testmodule-remove_version-1-0.0.1.tgz/-rev/123123123')
+    .del('/@cnpmtest/testmodule-remove_version-1/download/@cnpmtest/testmodule-remove_version-1-0.0.1.tgz/-rev/' + lastRev)
     .set('authorization', utils.adminAuth)
     .expect(200, done);
   });
 
   describe('mock error', function () {
     before(function (done) {
-      var pkg = utils.getPackage('testmodule-remove_version-1', '0.0.2', utils.admin);
+      var pkg = utils.getPackage('@cnpmtest/testmodule-remove_version-1', '0.0.2', utils.admin);
       request(app.listen())
       .put('/' + pkg.name)
       .set('authorization', utils.adminAuth)
       .send(pkg)
-      .expect(201, function (err) {
-        should.not.exist(err);
-        var pkg = utils.getPackage('@cnpmtest/testmodule-remove_version-1', '0.0.2', utils.admin);
-        request(app.listen())
-        .put('/' + pkg.name)
-        .set('authorization', utils.adminAuth)
-        .send(pkg)
-        .expect(201, done);
-      });
+      .expect(201, done);
     });
 
     it('should auto add cdn key', function (done) {
@@ -136,17 +111,7 @@ describe('controllers/registry/package/remove_version.test.js', function () {
       });
 
       request(app)
-      .del('/testmodule-remove_version-1/download/testmodule-remove_version-1-0.0.2.tgz/-rev/' + lastRev)
-      .set('authorization', utils.adminAuth)
-      .expect(200, done);
-    });
-
-    it('should mock nfs.remove error', function (done) {
-      mm(nfs, 'remove', function* (key) {
-        throw new Error('mock remove ' + key + ' error');
-      });
-      request(app)
-      .del('/@cnpmtest/testmodule-remove_version-1/download/@cnpmtest/testmodule-remove_version-1-0.0.2.tgz/-rev/1')
+      .del('/@cnpmtest/testmodule-remove_version-1/download/@cnpmtest/testmodule-remove_version-1-0.0.2.tgz/-rev/' + lastRev)
       .set('authorization', utils.adminAuth)
       .expect(200, done);
     });

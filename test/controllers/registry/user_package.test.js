@@ -1,5 +1,5 @@
 /**!
- * cnpmjs.org - test/contributors/registry/user_package.test.js
+ * cnpmjs.org - test/controllers/registry/user_package.test.js
  *
  * Copyright(c) fengmk2 and other contributors.
  * MIT Licensed
@@ -19,24 +19,18 @@ var request = require('supertest');
 var pedding = require('pedding');
 var app = require('../../../servers/registry');
 var utils = require('../../utils');
-var SyncModuleWorker = require('../../../controllers/sync_module_worker');
 
-describe('contributors/registry/user_package.test.js', function () {
+describe('controllers/registry/user_package.test.js', function () {
   before(function (done) {
+    done = pedding(2, done);
     // sync pedding
-    var worker = new SyncModuleWorker({
-      name: 'pedding',
-      noDep: true,
-    });
-    worker.start();
-    worker.on('end', function () {
-      var pkg = utils.getPackage('test-user-package-module', '0.0.1', utils.otherAdmin2);
-      request(app)
-      .put('/' + pkg.name)
-      .set('authorization', utils.otherAdmin2Auth)
-      .send(pkg)
-      .expect(201, done);
-    });
+    utils.sync('pedding', done);
+    var pkg = utils.getPackage('@cnpmtest/test-user-package-module', '0.0.1', utils.otherAdmin2);
+    request(app)
+    .put('/' + pkg.name)
+    .set('authorization', utils.otherAdmin2Auth)
+    .send(pkg)
+    .expect(201, done);
   });
 
   describe('listOne()', function () {
@@ -104,8 +98,6 @@ describe('contributors/registry/user_package.test.js', function () {
         should.not.exist(err);
         res.body.fengmk2.should.be.an.Array;
         res.body.fengmk2.should.containEql('pedding');
-        res.body.cnpmjstestAdmin2.should.be.an.Array;
-        res.body.cnpmjstestAdmin2.should.containEql('test-user-package-module');
         done();
       });
     });

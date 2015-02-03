@@ -14,7 +14,6 @@
  * Module dependencies.
  */
 
-var should = require('should');
 var request = require('supertest');
 var mm = require('mm');
 var DownloadTotal = require('../../../../services/download_total');

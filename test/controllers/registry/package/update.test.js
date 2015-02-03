@@ -25,43 +25,27 @@ var config = require('../../../../config');
 describe('controllers/registry/package/update.test.js', function () {
   afterEach(mm.restore);
 
-  beforeEach(function () {
-    mm(config, 'enablePrivate', false);
-    mm(config, 'forcePublishWithScope', false);
-  });
-
   before(function (done) {
-    mm(config, 'enablePrivate', false);
-    mm(config, 'forcePublishWithScope', false);
-
-    var pkg = utils.getPackage('testmodule-update-1', '0.0.1', utils.otherUser);
+    var pkg = utils.getPackage('@cnpmtest/testmodule-update-1', '1.0.0', utils.otherUser);
     request(app.listen())
     .put('/' + pkg.name)
     .set('authorization', utils.otherUserAuth)
     .send(pkg)
     .expect(201, function (err) {
       should.not.exist(err);
-      var pkg = utils.getPackage('@cnpmtest/testmodule-update-1', '1.0.0', utils.otherUser);
+      var pkg = utils.getPackage('@cnpmtest/testmodule-update-1', '2.0.0', utils.otherUser);
       request(app.listen())
       .put('/' + pkg.name)
       .set('authorization', utils.otherUserAuth)
       .send(pkg)
-      .expect(201, function (err) {
-        should.not.exist(err);
-        var pkg = utils.getPackage('@cnpmtest/testmodule-update-1', '2.0.0', utils.otherUser);
-        request(app.listen())
-        .put('/' + pkg.name)
-        .set('authorization', utils.otherUserAuth)
-        .send(pkg)
-        .expect(201, done);
-      });
+      .expect(201, done);
     });
   });
 
   it('should 404 when update body wrong', function (done) {
     request(app)
-    .put('/testmodule-update-1/-rev/1')
-    .set('authorization', utils.adminAuth)
+    .put('/@cnpmtest/testmodule-update-1/-rev/1')
+    .set('authorization', utils.otherUserAuth)
     .send({
       foo: 'bar'
     })
@@ -74,11 +58,8 @@ describe('controllers/registry/package/update.test.js', function () {
 
   describe('PUT /:name/-rev/:rev updatePrivateModuleMaintainers()', function () {
     before(function (done) {
-      mm(config, 'enablePrivate', false);
-      mm(config, 'forcePublishWithScope', false);
-
       request(app)
-      .put('/testmodule-update-1/-rev/1')
+      .put('/@cnpmtest/testmodule-update-1/-rev/1')
       .send({
         maintainers: [{
           name: 'cnpmjstest101',
@@ -88,7 +69,7 @@ describe('controllers/registry/package/update.test.js', function () {
       .set('authorization', utils.otherUserAuth)
       .expect({
         ok: true,
-        id:"testmodule-update-1",
+        id:"@cnpmtest/testmodule-update-1",
         rev: "1"
       }, done);
     });
@@ -153,7 +134,7 @@ describe('controllers/registry/package/update.test.js', function () {
 
     it('should add again new maintainers', function (done) {
       request(app)
-      .put('/testmodule-update-1/-rev/1')
+      .put('/@cnpmtest/testmodule-update-1/-rev/1')
       .send({
         maintainers: [{
           name: 'cnpmjstest101',
@@ -170,7 +151,7 @@ describe('controllers/registry/package/update.test.js', function () {
 
     it('should add new maintainers by admin', function (done) {
       request(app)
-      .put('/testmodule-update-1/-rev/1')
+      .put('/@cnpmtest/testmodule-update-1/-rev/1')
       .send({
         maintainers: [{
           name: 'cnpmjstest101',
@@ -187,7 +168,7 @@ describe('controllers/registry/package/update.test.js', function () {
 
     it('should rm maintainers', function (done) {
       request(app)
-      .put('/testmodule-update-1/-rev/1')
+      .put('/@cnpmtest/testmodule-update-1/-rev/1')
       .send({
         maintainers: [{
           name: 'cnpmjstest101',
@@ -201,7 +182,7 @@ describe('controllers/registry/package/update.test.js', function () {
 
     it('should rm again maintainers', function (done) {
       request(app)
-      .put('/testmodule-update-1/-rev/1')
+      .put('/@cnpmtest/testmodule-update-1/-rev/1')
       .send({
         maintainers: [{
           name: 'cnpmjstest101',
@@ -211,7 +192,7 @@ describe('controllers/registry/package/update.test.js', function () {
       .set('authorization', utils.otherUserAuth)
       .expect(201)
       .expect({
-        id: 'testmodule-update-1',
+        id: '@cnpmtest/testmodule-update-1',
         rev: '1',
         ok: true
       }, done);
@@ -219,7 +200,7 @@ describe('controllers/registry/package/update.test.js', function () {
 
     it('should rm all maintainers forbidden 403', function (done) {
       request(app)
-      .put('/testmodule-update-1/-rev/1')
+      .put('/@cnpmtest/testmodule-update-1/-rev/1')
       .send({
         maintainers: []
       })
@@ -231,7 +212,7 @@ describe('controllers/registry/package/update.test.js', function () {
 
     it('should 403 when not maintainer update', function (done) {
       request(app)
-      .put('/testmodule-update-1/-rev/1')
+      .put('/@cnpmtest/testmodule-update-1/-rev/1')
       .send({
         maintainers: [{
           name: 'cnpmjstest10',
@@ -242,18 +223,12 @@ describe('controllers/registry/package/update.test.js', function () {
       .expect(403)
       .expect({
         error: 'forbidden user',
-        reason: 'cnpmjstest102 not authorized to modify testmodule-update-1'
+        reason: 'cnpmjstest102 not authorized to modify @cnpmtest/testmodule-update-1'
       }, done);
     });
 
     describe('forcePublishWithScope = true', function () {
-      beforeEach(function () {
-        mm(config, 'forcePublishWithScope', true);
-      });
-
       before(function (done) {
-        mm(config, 'forcePublishWithScope', true);
-        mm(config, 'enablePrivate', false);
         var pkg = utils.getPackage('@cnpm/testmodule-update-1', '0.0.1', utils.otherUser);
         request(app)
         .put('/' + pkg.name)
@@ -375,21 +350,21 @@ describe('controllers/registry/package/update.test.js', function () {
   describe('PUT /:name/-rev/:rev updateVersions()', function () {
     it('should update 401 when no auth', function (done) {
       request(app)
-      .put('/testmodule-update-1/-rev/123')
+      .put('/@cnpmtest/testmodule-update-1/-rev/123')
       .expect(401, done);
     });
 
     it('should update 403 when auth error', function (done) {
       request(app)
-      .put('/testmodule-update-1/-rev/123')
+      .put('/@cnpmtest/testmodule-update-1/-rev/123')
       .set('authorization', utils.thirdUserAuth)
       .expect(403, done);
     });
 
     it('should remove nothing removed ok', function (done) {
       request(app)
-      .put('/testmodule-update-1/-rev/1')
-      .set('authorization', utils.adminAuth)
+      .put('/@cnpmtest/testmodule-update-1/-rev/1')
+      .set('authorization', utils.otherUserAuth)
       .send({
         versions: {
           '0.0.1': {},
@@ -402,7 +377,7 @@ describe('controllers/registry/package/update.test.js', function () {
     it('should remove lastest tag with scoped', function (done) {
       request(app)
       .put('/@cnpmtest/testmodule-update-1/-rev/1')
-      .set('authorization', utils.adminAuth)
+      .set('authorization', utils.otherUserAuth)
       .send({
         versions: {
           '1.0.0': {},
@@ -413,7 +388,7 @@ describe('controllers/registry/package/update.test.js', function () {
         // again should work
         request(app)
         .put('/@cnpmtest/testmodule-update-1/-rev/1')
-        .set('authorization', utils.adminAuth)
+        .set('authorization', utils.otherUserAuth)
         .send({
           versions: {
             '1.0.0': {},
@@ -426,7 +401,7 @@ describe('controllers/registry/package/update.test.js', function () {
     it('should 404 when package not exists', function (done) {
       request(app)
       .put('/@cnpmtest/testmodule-update-1-not-exists/-rev/1')
-      .set('authorization', utils.adminAuth)
+      .set('authorization', utils.otherUserAuth)
       .send({
         versions: {
           '0.0.1': {},
@@ -438,8 +413,8 @@ describe('controllers/registry/package/update.test.js', function () {
 
     it('should remove all version ok', function (done) {
       request(app)
-      .put('/testmodule-update-1/-rev/1')
-      .set('authorization', utils.adminAuth)
+      .put('/@cnpmtest/testmodule-update-1/-rev/1')
+      .set('authorization', utils.otherUserAuth)
       .send({
         versions: {}
       })

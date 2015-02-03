@@ -23,29 +23,17 @@ var utils = require('../../../utils');
 
 describe('controllers/web/package/search_range.test.js', function () {
   before(function (done) {
-    var pkg = utils.getPackage('testmodule-web-search_range', '0.0.1', utils.admin);
+    var pkg = utils.getPackage('@cnpmtest/testmodule-web-search_range', '0.0.1', utils.admin);
     pkg.versions['0.0.1'].dependencies = {
       bytetest: '~0.0.1',
-      mocha: '~1.0.0'
+      mocha: '~1.0.0',
+      'testmodule-web-show': '0.0.1'
     };
     request(registry.listen())
     .put('/' + pkg.name)
     .set('authorization', utils.adminAuth)
     .send(pkg)
-    .expect(201, function (err) {
-      should.not.exist(err);
-      var pkg = utils.getPackage('@cnpmtest/testmodule-web-search_range', '0.0.1', utils.admin);
-      pkg.versions['0.0.1'].dependencies = {
-        bytetest: '~0.0.1',
-        mocha: '~1.0.0',
-        'testmodule-web-show': '0.0.1'
-      };
-      request(registry.listen())
-      .put('/' + pkg.name)
-      .set('authorization', utils.adminAuth)
-      .send(pkg)
-      .expect(201, done);
-    });
+    .expect(201, done);
   });
 
   afterEach(mm.restore);

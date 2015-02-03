@@ -25,6 +25,7 @@ describe('controllers/web/package/list_privates.test.js', function () {
   afterEach(mm.restore);
 
   before(function (done) {
+    mm(config, 'privatePackages', ['testmodule-web-list_privates-no-scoped', 'hsf-haha']);
     var pkg = utils.getPackage('@cnpm/testmodule-web-list_privates', '0.0.1', utils.admin);
     request(registry.listen())
     .put('/' + pkg.name)
