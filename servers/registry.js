@@ -26,7 +26,7 @@ var block = require('../middleware/block');
 var auth = require('../middleware/auth');
 var staticCache = require('../middleware/static');
 var notFound = require('../middleware/registry_not_found');
-var cors = require('../middleware/cors');
+var cors = require('kcors');
 var proxyToNpm = require('../middleware/proxy_to_npm');
 
 app.use(block());
@@ -40,7 +40,7 @@ app.proxy = true;
 app.use(proxyToNpm());
 app.use(middlewares.bodyParser({jsonLimit: config.jsonLimit}));
 app.use(cors({
-  methods: 'GET,HEAD'
+  allowMethods: 'GET,HEAD'
 }));
 app.use(auth());
 app.use(notFound);

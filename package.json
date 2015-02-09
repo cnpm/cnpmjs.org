@@ -32,6 +32,7 @@
     "gravatar": "~1.1.0",
     "humanize-ms": "~1.0.1",
     "humanize-number": "~0.0.2",
+    "kcors": "~1.0.0",
     "koa": "~0.13.0",
     "koa-limit": "~1.0.2",
     "koa-markdown": "~2.0.1",
