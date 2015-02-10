@@ -37,7 +37,7 @@ Status.prototype.log = function (syncDone) {
   };
   co(function* () {
     yield* Total.updateSyncNum(params);
-  })();
+  }).catch(function () {});
 };
 
 Status.prototype.start = function () {

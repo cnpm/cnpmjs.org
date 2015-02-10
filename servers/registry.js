@@ -15,6 +15,7 @@
  * Module dependencies.
  */
 
+global.Promise = require('bluebird');
 var koa = require('koa');
 var app = module.exports = koa();
 var http = require('http');

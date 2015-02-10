@@ -14,6 +14,7 @@
  * Module dependencies.
  */
 
+global.Promise = require('bluebird');
 var debug = require('debug')('cnpmjs.org:sync:index');
 var co = require('co');
 var ms = require('humanize-ms');
@@ -42,14 +43,14 @@ if (!sync && config.enableCluster) {
 console.log('[%s] [sync_worker:%s] syncing with %s mode',
   Date(), process.pid, config.syncModel);
 
+function onerror(err) {
+  logger.error(err);
+}
+
 //set sync_status = 0 at first
 co(function* () {
   yield* totalService.updateSyncStatus(0);
-})(function (err) {
-  if (err) {
-    logger.error(err);
-  }
-});
+}).catch(onerror);
 
 var syncInterval = ms(config.syncInterval);
 var minSyncInterval = ms('5m');
@@ -59,7 +60,7 @@ if (!syncInterval || syncInterval < minSyncInterval) {
 
 // the same time only sync once
 var syncing = false;
-var handleSync = co(function* () {
+var syncFn = co.wrap(function* () {
   debug('mode: %s, syncing: %s', config.syncModel, syncing);
   if (!syncing) {
     syncing = true;
@@ -82,8 +83,10 @@ var handleSync = co(function* () {
 });
 
 if (sync) {
-  handleSync();
-  setInterval(handleSync, syncInterval);
+  syncFn().catch(onerror);
+  setInterval(function () {
+    syncFn().catch(onerror);
+  }, syncInterval);
 }
 
 /**
@@ -92,7 +95,7 @@ if (sync) {
 
 var startSyncPopular = require('./sync_popular');
 var syncingPopular = false;
-var syncPopular = co(function* syncPopular() {
+var syncPopularFn = co.wrap(function* syncPopular() {
   if (syncingPopular) {
     return;
   }
@@ -119,8 +122,10 @@ var syncPopular = co(function* syncPopular() {
 });
 
 if (config.syncPopular) {
-  syncPopular();
-  setInterval(syncPopular, ms(config.syncPopularInterval));
+  syncPopularFn().catch(onerror);
+  setInterval(function () {
+    syncPopularFn().catch(onerror);
+  }, ms(config.syncPopularInterval));
 } else {
   logger.syncInfo('sync popular module disable');
 }

@@ -105,11 +105,10 @@ co(function* () {
       yield tasks;
     }
   }
-})(function (err) {
-  if (err) {
-    console.error(err);
-    throw err;
-  }
+}).then(function () {
   console.log('sync done, you can upgrade to 2.x now.');
   process.exit(0);
+}).catch(function (err) {
+  console.error(err);
+  throw err;
 });
