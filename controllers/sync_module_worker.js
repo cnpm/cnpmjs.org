@@ -116,10 +116,13 @@ SyncModuleWorker.prototype._saveLog = function () {
   that._log = '';
   co(function* () {
     yield* logService.append(that._logId, logstr);
-  })(function (err) {
-    if (err) {
-      logger.error(err);
+  }).then(function () {
+    that._loging = false;
+    if (that._log) {
+      that._saveLog();
     }
+  }).catch(function (err) {
+    logger.error(err);
     that._loging = false;
     if (that._log) {
       that._saveLog();
@@ -131,7 +134,7 @@ SyncModuleWorker.prototype.start = function () {
   this.log('user: %s, sync %s worker start, %d concurrency, nodeps: %s, publish: %s',
     this.username, this.names[0], this.concurrency, this.noDep, this._publish);
   var that = this;
-  co(function *() {
+  co(function* () {
     // sync upstream
     if (that.syncUpstreamFirst) {
       try {
@@ -151,7 +154,9 @@ SyncModuleWorker.prototype.start = function () {
       arr.push(that.next(i));
     }
     yield arr;
-  })();
+  }).catch(function (err) {
+    logger.error(err);
+  });
 };
 
 SyncModuleWorker.prototype.pushSuccess = function (name) {

@@ -28,6 +28,7 @@ function* request(url, options) {
     'user-agent': USER_AGENT
   };
   options.gzip = true;
+  options.followRedirect = true;
   var registry = options.registry || config.sourceNpmRegistry;
   url = registry + url;
   var r;

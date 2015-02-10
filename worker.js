@@ -16,10 +16,10 @@
  */
 
 var graceful = require('graceful');
-var logger = require('./common/logger');
-var config = require('./config');
 var registry = require('./servers/registry');
 var web = require('./servers/web');
+var logger = require('./common/logger');
+var config = require('./config');
 
 registry.listen(config.registryPort, config.bindingHost);
 web.listen(config.webPort, config.bindingHost);

@@ -15,6 +15,7 @@
  * Module dependencies.
  */
 
+global.Promise = require('bluebird');
 var opensearch = require('../middleware/opensearch');
 var notFound = require('../middleware/web_not_found');
 var staticCache = require('../middleware/static');

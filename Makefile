@@ -2,12 +2,18 @@ TESTS = $(shell ls -S `find test -type f -name "*.test.js" -print`)
 REPORTER = spec
 TIMEOUT = 30000
 MOCHA_OPTS =
-REGISTRY = --registry=https://registry.npm.taobao.org
 DB = sqlite
+DISTURL = http://npm.taobao.org/mirrors/iojs
+BIN = iojs
+
+ifeq ($(findstring io.js, $(shell which node)),)
+	BIN = node
+	DISTURL = http://npm.taobao.org/mirrors/node
+endif
 
 install:
-	@npm install --build-from-source $(REGISTRY) \
-		--disturl=https://npm.taobao.org/dist
+	@npm install --build-from-source --registry=http://registry.npm.taobao.org \
+		--disturl=$(DISTURL)
 
 install-production production:
 	@NODE_ENV=production $(MAKE) install
@@ -16,7 +22,7 @@ jshint: install
 	@-node_modules/.bin/jshint ./
 
 init-database:
-	@node --harmony test/init_db.js
+	@$(BIN) --harmony test/init_db.js
 
 init-mysql:
 	@mysql -uroot -e 'DROP DATABASE IF EXISTS cnpmjs_test;'
@@ -43,7 +49,7 @@ test-mysql: init-mysql
 test-all: test-sqlite test-mysql
 
 test-cov cov: install init-database
-	@NODE_ENV=test DB=${DB} node --harmony \
+	@NODE_ENV=test DB=${DB} $(BIN) --harmony \
 		node_modules/.bin/istanbul cover --preserve-comments \
 		node_modules/.bin/_mocha \
 		-- -u exports \
@@ -64,7 +70,7 @@ test-cov-mysql: init-mysql
 
 test-travis: install init-database
 	@NODE_ENV=test DB=${DB} CNPM_SOURCE_NPM=https://registry.npmjs.org CNPM_SOURCE_NPM_ISCNPM=false \
-		node --harmony \
+		$(BIN) --harmony \
 		node_modules/.bin/istanbul cover --preserve-comments \
 		node_modules/.bin/_mocha \
 		--report lcovonly \
@@ -87,7 +93,7 @@ test-travis-mysql: init-mysql
 test-travis-all: test-travis-sqlite test-travis-mysql
 
 dev:
-	@NODE_ENV=development node_modules/.bin/node-dev --harmony dispatch.js
+	@NODE_ENV=development $(BIN) node_modules/.bin/node-dev --harmony dispatch.js
 
 contributors: install
 	@node_modules/.bin/contributors -f plain -o AUTHORS
