@@ -117,6 +117,9 @@ module.exports = function (sequelize, DataTypes) {
         return yield this.find({ where: { name: name } });
       },
       listByNames: function* (names) {
+        if (!names || names.length === 0) {
+          return [];
+        }
         return yield this.findAll({
           where: {
             name: {
