@@ -213,6 +213,10 @@ var config = {
 
   // custom user service, @see https://github.com/cnpm/cnpmjs.org/wiki/Use-Your-Own-User-Authorization
   userService: null,
+
+  // always-auth https://docs.npmjs.com/misc/config#always-auth
+  // Force npm to always require authentication when accessing the registry, even for GET requests.
+  alwaysAuth: false,
 };
 
 if (process.env.NODE_ENV !== 'test') {
