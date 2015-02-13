@@ -33,4 +33,16 @@ describe('common/markdown.test.js', function () {
     html.should.equal('<p>foo&lt;script&gt;alert(1)&lt;/script&gt;/xss\n<a href="/foo">foo</a> <a>bar</a>\n&quot;\'</p>\n');
     markdown.render('[xss link](javascript:alert(2))').should.equal('<p>[xss link](javascript:alert(2))</p>\n');
   });
+
+  it('should handle eat cpu markdown', function () {
+    // http://cnpmjs.org/package/chewer
+    var MarkdownIt = require('markdown-it');
+
+    var md = new MarkdownIt({
+      html: true,
+      linkify: true,
+    });
+    var readme = fs.readFileSync(path.join(fixtures, 'eat-cpu.md'), 'utf8');
+    md.render(readme);
+  });
 });

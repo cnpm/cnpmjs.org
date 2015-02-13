@@ -216,17 +216,26 @@ var config = {
 };
 
 if (process.env.NODE_ENV !== 'test') {
-  // 1. try to load `$dataDir/config.js` first, not exists then goto 2.
-  // 2. load config/config.js, everything in config.js will cover the same key in index.js
-  var customConfig = path.join(dataDir, 'config');
-  try {
-    copy(require(customConfig)).override(config);
-  } catch (err) {
-    customConfig = path.join(root, 'config', 'config');
+  if (process.env.NODE_ENV === 'development') {
+    var customConfig = path.join(root, 'config', 'config');
     try {
       copy(require(customConfig)).override(config);
     } catch (err) {
       // ignore
+    }
+  } else {
+    // 1. try to load `$dataDir/config.js` first, not exists then goto 2.
+    // 2. load config/config.js, everything in config.js will cover the same key in index.js
+    var customConfig = path.join(dataDir, 'config');
+    try {
+      copy(require(customConfig)).override(config);
+    } catch (err) {
+      customConfig = path.join(root, 'config', 'config');
+      try {
+        copy(require(customConfig)).override(config);
+      } catch (err) {
+        // ignore
+      }
     }
   }
 }
