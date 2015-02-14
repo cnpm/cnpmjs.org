@@ -285,6 +285,8 @@ SyncModuleWorker.prototype.syncUser = function* () {
 
 SyncModuleWorker.prototype.next = function* (concurrencyId) {
   if (config.syncModel === 'none') {
+    this.log('[c#%d] [%s] syncModel is none, ignore',
+      concurrencyId, name);
     return this.finish();
   }
 

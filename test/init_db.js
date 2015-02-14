@@ -22,7 +22,8 @@ var config = require('../config');
 
 // init db first
 var initscript = path.join(__dirname, '..', 'models', 'init_script.js');
-var cmd = ['node', '--harmony', initscript, 'true', config.database.dialect].join(' ');
+var cmd = ['node', '--harmony', initscript, 'true',
+  config.database.dialect, config.database.port, config.database.username].join(' ');
 console.log('$ %s', cmd);
 var stdout = childProcess.execSync(cmd);
 process.stdout.write(stdout);
@@ -56,6 +57,7 @@ usernames.forEach(function (name) {
       process.exit(0);
     }
   }).catch(function (err) {
-    throw err;
+    console.log(err);
+    process.exit(1);
   });
 });

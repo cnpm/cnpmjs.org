@@ -14,8 +14,6 @@
  * Module dependencies.
  */
 
-var utils = require('./utils');
-
 /*
 CREATE TABLE IF NOT EXISTS `module` (
   `id` INTEGER NOT NULL auto_increment ,
@@ -73,12 +71,12 @@ module.exports = function (sequelize, DataTypes) {
       allowNull: true,
     },
     dist_size: {
-      type: DataTypes.INTEGER.UNSIGNED,
+      type: DataTypes.INTEGER,
       allowNull: false,
       defaultValue: 0,
     },
     publish_time: {
-      type: DataTypes.BIGINT(20).UNSIGNED,
+      type: DataTypes.BIGINT(20),
       allowNull: true,
     }
   }, {

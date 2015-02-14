@@ -23,6 +23,8 @@ describe('services/total.test.js', function () {
 
       yield* Total.plusDeleteModule();
       var info2 = yield* Total.getTotalInfo();
+      // TODO: pg bigint will be string
+      // https://github.com/sequelize/sequelize/pull/726
       info2.module_delete.should.equal(info.module_delete + 1);
 
       yield* Total.plusDeleteModule();

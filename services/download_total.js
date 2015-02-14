@@ -14,6 +14,7 @@
  * Module dependencies.
  */
 
+var utility = require('utility');
 var DownloadTotal = require('../models').DownloadTotal;
 
 exports.getModuleTotal = function* (name, start, end) {
@@ -47,6 +48,10 @@ exports.plusModuleTotal = function* (data) {
     });
   }
   var field = 'd' + data.date.substring(8, 10);
+  if (typeof row[field] === 'string') {
+    // pg bigint is string...
+    row[field] = utility.toSafeNumber(row[field]);
+  }
   row[field] += data.count;
   if (row.isDirty) {
     yield row.save();
@@ -65,6 +70,10 @@ exports.plusModuleTotal = function* (data) {
     });
   }
   var field = 'd' + data.date.substring(8, 10);
+  if (typeof row[field] === 'string') {
+    // pg bigint is string...
+    row[field] = utility.toSafeNumber(row[field]);
+  }
   row[field] += data.count;
   if (row.isDirty) {
     return yield row.save();
@@ -92,6 +101,9 @@ function formatRows(rows, startDate, endDate) {
       var field = 'd' + day;
       var d = yearMonth + '-' + day;
       var count = row[field];
+      if (typeof count === 'string') {
+        count = utility.toSafeNumber(count);
+      }
       if (count > 0 && d >= startDate && d <= endDate) {
         dates.push({
           name: row.name,

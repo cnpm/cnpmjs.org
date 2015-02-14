@@ -19,7 +19,7 @@ debug.enable('cnpmjs.org*');
 var SyncModuleWorker = require('../controllers/sync_module_worker');
 var config = require('../config');
 
-config.sourceNpmRegistry = 'https://registry.npmjs.org';
+// config.sourceNpmRegistry = 'https://registry.npmjs.org';
 
 var names = process.argv[2] || 'enable';
 names = names.split(',');
