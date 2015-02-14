@@ -14,10 +14,10 @@
  * Module dependencies.
  */
 
-var mailConfig = require('../config').mail;
 var nodemailer = require('nodemailer');
 var utility = require('utility');
 var os = require('os');
+var mailConfig = require('../config').mail;
 
 var smtpConfig;
 if (mailConfig.auth) {
@@ -25,6 +25,7 @@ if (mailConfig.auth) {
   smtpConfig = mailConfig;
 } else {
   smtpConfig = {
+    enable: mailConfig.enable,
     // backward compat
     host: mailConfig.host,
     port: mailConfig.port,
@@ -37,7 +38,7 @@ if (mailConfig.auth) {
   };
 }
 
-var transport = nodemailer.createTransport(smtpConfig);
+var transport;
 
 /**
  * Send notice email with mail level and appname.
@@ -70,6 +71,15 @@ LEVELS.forEach(function (level) {
  */
 exports.send = function (to, subject, html, callback) {
   callback = callback || utility.noop;
+
+  if (mailConfig.enable === false) {
+    console.log('[send mail debug] [%s] to: %s, subject: %s\n%s', Date(), to, subject, html);
+    return callback();
+  }
+
+  if (!transport) {
+    transport = nodemailer.createTransport(smtpConfig);
+  }
 
   var message = {
     from: mailConfig.from || mailConfig.sender,

@@ -18,6 +18,7 @@
 var mkdirp = require('mkdirp');
 var copy = require('copy-to');
 var path = require('path');
+var fs = require('fs');
 var os = require('os');
 
 var version = require('../package.json').version;
@@ -84,6 +85,7 @@ var config = {
   // email notification for errors
   // check https://github.com/andris9/Nodemailer for more informations
   mail: {
+    enable: false,
     appname: 'cnpmjs.org',
     from: 'cnpmjs.org mail sender <adderss@gmail.com>',
     service: 'gmail',
@@ -220,27 +222,19 @@ var config = {
 };
 
 if (process.env.NODE_ENV !== 'test') {
+  var customConfig;
   if (process.env.NODE_ENV === 'development') {
-    var customConfig = path.join(root, 'config', 'config');
-    try {
-      copy(require(customConfig)).override(config);
-    } catch (err) {
-      // ignore
-    }
+    customConfig = path.join(root, 'config', 'config.js');
   } else {
-    // 1. try to load `$dataDir/config.js` first, not exists then goto 2.
+    // 1. try to load `$dataDir/config.json` first, not exists then goto 2.
     // 2. load config/config.js, everything in config.js will cover the same key in index.js
-    var customConfig = path.join(dataDir, 'config');
-    try {
-      copy(require(customConfig)).override(config);
-    } catch (err) {
-      customConfig = path.join(root, 'config', 'config');
-      try {
-        copy(require(customConfig)).override(config);
-      } catch (err) {
-        // ignore
-      }
+    customConfig = path.join(dataDir, 'config.json');
+    if (!fs.existsSync(customConfig)) {
+      customConfig = path.join(root, 'config', 'config.js');
     }
+  }
+  if (fs.existsSync(customConfig)) {
+    copy(require(customConfig)).override(config);
   }
 }
 
