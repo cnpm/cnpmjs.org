@@ -1,4 +1,14 @@
 
+2.0.0-rc.14 / 2015-02-14
+==================
+
+ * feat: support always-auth
+ * fix mysql select args = [] bug
+ * fix #597 sequelize raw query.
+ * fix(markdown): hotfix markdown-it cpu problem
+ * feat: upgrade to co4
+ * use kcors fixes #594
+
 2.0.0-rc.13 / 2015-02-04
 ==================
 
