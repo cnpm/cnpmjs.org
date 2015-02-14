@@ -83,3 +83,8 @@ exports.sync = function (name, callback) {
     callback();
   });
 };
+
+exports.getFileContent = function (name) {
+  var fixtures = path.join(__dirname, 'fixtures');
+  return fs.readFileSync(path.join(fixtures, name), 'utf8');
+};
