@@ -72,6 +72,14 @@ app.use(function *(){
 app.listen(3000);
 ```
 
+```html
+<body>foo</body>
+
+a > b
+```
+
+foo<script>alert(1)</script>/xss\n[foo](/foo) <a onclick="alert(1)">bar</a>\n"\'
+
 ## Running tests
 
 ```

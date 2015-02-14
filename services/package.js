@@ -37,6 +37,10 @@ function parseRow(row) {
         row.package = decodeURIComponent(row.package);
       }
       row.package = JSON.parse(row.package);
+      if (typeof row.publish_time === 'string') {
+        // pg bigint is string
+        row.publish_time = Number(row.publish_time);
+      }
     } catch (e) {
       console.warn('parse package error: %s, id: %s version: %s, error: %s', row.name, row.id, row.version, e);
     }
@@ -609,7 +613,7 @@ exports.search = function* (word, options) {
   // 3. keyword equal search
   var ids = {};
 
-  var sql = 'SELECT module_id FROM tag WHERE LOWER(name) LIKE LOWER(?) AND tag="latest" \
+  var sql = 'SELECT module_id FROM tag WHERE LOWER(name) LIKE LOWER(?) AND tag=\'latest\' \
     ORDER BY name LIMIT ?;';
   var rows = yield* models.query(sql, [word + '%', limit ]);
   for (var i = 0; i < rows.length; i++) {

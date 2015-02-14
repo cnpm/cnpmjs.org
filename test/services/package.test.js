@@ -113,7 +113,7 @@ describe('services/package.test.js', function () {
     it('should got all public module names', function* () {
       var names = yield* Package.listPublicModuleNamesByUser('listPublicModuleNamesByUser-user');
       names.should.length(3);
-      names.should.eql([
+      names.sort().should.eql([
         'listPublicModuleNamesByUser-module0',
         'listPublicModuleNamesByUser-module1',
         'listPublicModuleNamesByUser-module2'
