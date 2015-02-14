@@ -38,12 +38,12 @@ app.use(staticCache);
 
 app.keys = ['todokey', config.sessionSecret];
 app.proxy = true;
-app.use(proxyToNpm());
 app.use(middlewares.bodyParser({jsonLimit: config.jsonLimit}));
 app.use(cors({
   allowMethods: 'GET,HEAD'
 }));
 app.use(auth());
+app.use(proxyToNpm());
 app.use(notFound);
 
 if (config.enableCompress) {

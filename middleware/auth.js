@@ -16,6 +16,7 @@
 
 var debug = require('debug')('cnpmjs.org:middleware:auth');
 var UserService = require('../services/user');
+var config = require('../config');
 
 /**
  * Parse the request authorization
@@ -30,12 +31,12 @@ module.exports = function () {
     authorization = authorization.trim();
     debug('%s %s with %j', this.method, this.url, authorization);
     if (!authorization) {
-      return yield* next;
+      return yield* unauthorized.call(this, next);
     }
 
     authorization = new Buffer(authorization, 'base64').toString().split(':');
     if (authorization.length !== 2) {
-      return yield* next;
+      return yield* unauthorized.call(this, next);
     }
 
     var username = authorization[0];
@@ -52,7 +53,7 @@ module.exports = function () {
 
     if (!row) {
       debug('auth fail user: %j, headers: %j', row, this.header);
-      return yield* next;
+      return yield* unauthorized.call(this, next);
     }
 
     this.user.name = row.login;
@@ -62,3 +63,19 @@ module.exports = function () {
     yield* next;
   };
 };
+
+function* unauthorized(next) {
+  if (!config.alwaysAuth || this.method !== 'GET') {
+    return yield* next;
+  }
+  this.status = 401;
+  this.set('WWW-Authenticate', 'Basic realm="sample"');
+  if (this.accepts(['html', 'json']) === 'json') {
+    this.body = {
+      error: 'unauthorized',
+      reason: 'login first'
+    };
+  } else {
+    this.body = 'login first';
+  }
+}

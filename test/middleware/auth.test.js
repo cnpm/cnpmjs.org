@@ -6,7 +6,7 @@
  *
  * Authors:
  *  dead_horse <dead_horse@qq.com> (http://deadhorse.me)
- *  fengmk2 <fengmk2@gmail.com> (http://fengmk2.github.com)
+ *  fengmk2 <fengmk2@gmail.com> (http://fengmk2.com)
  */
 
 'use strict';
@@ -75,6 +75,31 @@ describe('middleware/auth.test.js', function () {
         })
         .expect(401, done);
       });
+    });
+  });
+
+  describe('config.alwaysAuth = true', function () {
+    beforeEach(function () {
+      mm(config, 'alwaysAuth', true);
+    });
+
+    it('should required auth for GET registry request', function (done) {
+      request(app)
+      .get('/')
+      .set('Accept', 'application/json')
+      .expect({
+        error: 'unauthorized',
+        reason: 'login first'
+      })
+      .expect(401, done);
+    });
+
+    it('should required auth for GET web request', function (done) {
+      request(app)
+      .get('/')
+      .set('Accept', 'text/html')
+      .expect('login first')
+      .expect(401, done);
     });
   });
 });
