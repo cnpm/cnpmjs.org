@@ -1,4 +1,10 @@
 
+2.0.0-rc.15 / 2015-02-15
+==================
+
+ * fix(markdown): filter xss after markdown render
+ * feat(database): support PostgreSQL
+
 2.0.0-rc.14 / 2015-02-14
 ==================
 
