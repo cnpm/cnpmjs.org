@@ -4,7 +4,7 @@ So `cnpm` is meaning: **Company npm**.
 
 ## Registry
 
-- Our public registry: [r.cnpmjs.org](http://r.cnpmjs.org), syncing from [registry.npmjs.org](http://registry.npmjs.org)
+- Our public registry: [r.cnpmjs.org](//r.cnpmjs.org), syncing from [registry.npmjs.org](//registry.npmjs.org)
 - [cnpmjs.org](/) version: <span id="app-version"></span>
 - [Node.js](https://nodejs.org) version: <span id="node-version"></span>
 - For developers behind the GFW, please visit [the Chinese mirror](https://npm.taobao.org). 中国用户请访问[国内镜像站点](https://npm.taobao.org/)。
@@ -50,7 +50,7 @@ So `cnpm` is meaning: **Company npm**.
   </table>
 </div>
 
-Running on [Node.js](http://nodejs.org), version <span id="node-version"></span>.
+Running on [Node.js](https://nodejs.org), version <span id="node-version"></span>.
 
 <script src="/js/readme.js"></script>
 
@@ -58,7 +58,7 @@ Running on [Node.js](http://nodejs.org), version <span id="node-version"></span>
 
 Default style is `flat-square`.
 
-Badge URL: `http://cnpmjs.org/badge/v/cnpmjs.org.svg` ![cnpmjs.org-badge](http://cnpmjs.org/badge/v/cnpmjs.org.svg)
+Badge URL: `https://cnpmjs.org/badge/v/cnpmjs.org.svg` ![cnpmjs.org-badge](//cnpmjs.org/badge/v/cnpmjs.org.svg)
 
 * `<0.1.0 & >=0.0.0`: ![red-badge](https://img.shields.io/badge/cnpm-0.0.1-red.svg?style=flat-square)
 * `<1.0.0 & >=0.1.0`: ![red-badge](https://img.shields.io/badge/cnpm-0.1.0-green.svg?style=flat-square)
@@ -69,27 +69,27 @@ Badge URL: `http://cnpmjs.org/badge/v/cnpmjs.org.svg` ![cnpmjs.org-badge](http:/
 use our npm client [cnpm](https://github.com/cnpm/cnpm)(More suitable with cnpmjs.org and gzip support), you can get our client through npm:
 
 ```bash
-$ npm install -g cnpm --registry=http://r.cnpmjs.org
+$ npm install -g cnpm --registry=https://r.cnpmjs.org
 ```
 
 Or you can alias NPM to use it:
 
 ```bash
-alias cnpm="npm --registry=http://r.cnpmjs.org \
+alias cnpm="npm --registry=https://r.cnpmjs.org \
 --cache=$HOME/.npm/.cache/cnpm \
---disturl=http://cnpmjs.org/dist \
+--disturl=https://cnpmjs.org/mirrors/node \
 --userconfig=$HOME/.cnpmrc"
 
 #Or alias it in .bashrc or .zshrc
-$ echo '\n#alias for cnpm\nalias cnpm="npm --registry=http://r.cnpmjs.org \
+$ echo '\n#alias for cnpm\nalias cnpm="npm --registry=https://r.cnpmjs.org \
   --cache=$HOME/.npm/.cache/cnpm \
-  --disturl=http://cnpmjs.org/dist \
+  --disturl=https://cnpmjs.org/mirrors/node \
   --userconfig=$HOME/.cnpmrc"' >> ~/.zshrc && source ~/.zshrc
 ```
 
 ### install
 
-Install package from [r.cnpmjs.org](http://r.cnpmjs.org). When installing a package or version does not exist, it will try to install from the official registry([registry.npmjs.org](http://registry.npmjs.org)), and sync this package to cnpm in the backend.
+Install package from [r.cnpmjs.org](//r.cnpmjs.org). When installing a package or version does not exist, it will try to install from the official registry([registry.npmjs.org](//registry.npmjs.org)), and sync this package to cnpm in the backend.
 
 ```bash
 $ cnpm install [name]
@@ -106,7 +106,7 @@ $ cnpm sync connect
 sync package on web: [sync/connect](/sync/connect)
 
 ```bash
-$ open http://cnpmjs.org/sync/connect
+$ open https://cnpmjs.org/sync/connect
 ```
 
 ### publish / unpublish

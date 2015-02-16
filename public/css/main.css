@@ -26,7 +26,7 @@ header #search-input {
 }
 .pack-overview-background {
   height: 300px;
-  background: #428bca url(http://rockdai.u.qiniudn.com/bs-docs-masthead-pattern.png) repeat center center;
+  background: #428bca url(https://dn-cnpm.qbox.me/bs-docs-masthead-pattern.png) repeat center center;
   position: absolute;
   width: 100%;
   z-index: -1;
