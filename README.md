@@ -100,7 +100,7 @@ $ make test
 # coverage
 $ make test-cov
 
-# udpate dependencies
+# update dependencies
 $ make autod
 
 # start server with development mode
