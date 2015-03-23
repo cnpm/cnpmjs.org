@@ -116,6 +116,10 @@ $ make dev
 
 Tips: make sure your code is following the [node-style-guide](https://github.com/felixge/node-style-guide).
 
+## Sponsors
+
+- [![UCloud云计算](https://www.ucloud.cn/www/img/www/logo.png)](http://www.ucloud.cn/sdk?sem=sdk-CNPMJS)
+
 ## License
 
 MIT

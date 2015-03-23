@@ -50,8 +50,6 @@ So `cnpm` is meaning: **Company npm**.
   </table>
 </div>
 
-Running on [Node.js](https://nodejs.org), version <span id="node-version"></span>.
-
 <script src="/js/readme.js"></script>
 
 ## Version Badge
@@ -137,3 +135,7 @@ Release [History](/history).
 ## npm and cnpm relation
 
 ![npm&cnpm](https://dn-cnpm.qbox.me/cnpm-npm-relation.png)
+
+## Sponsors
+
+- [![UCloud云计算](https://www.ucloud.cn/www/img/www/logo.png)](http://www.ucloud.cn/sdk?sem=sdk-CNPMJS)
