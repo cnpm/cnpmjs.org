@@ -72,7 +72,8 @@ var layoutFile = path.join(viewDir, '_layout.html');
 var footer = config.customFooter || fs.readFileSync(path.join(viewDir, 'footer.html'), 'utf8');
 var layout = fs.readFileSync(path.join(viewDir, 'layout.html'), 'utf8')
   .replace('{{footer}}', footer)
-  .replace('{{logoURL}}', config.logoURL);
+  .replace('{{logoURL}}', config.logoURL)
+  .replace('{{adBanner}}', config.adBanner || '');
 fs.writeFileSync(layoutFile, layout);
 
 // custom web readme home page support
