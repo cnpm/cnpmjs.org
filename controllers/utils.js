@@ -27,6 +27,11 @@ var config = require('../config');
 var DOWNLOAD_TIMEOUT = ms('10m');
 
 exports.downloadAsReadStream = function* (key) {
+  var options = { timeout: DOWNLOAD_TIMEOUT };
+  if (nfs.createDownloadStream) {
+    return yield nfs.createDownloadStream(key, options);
+  }
+
   var tmpPath = path.join(config.uploadDir,
     utility.randomString() + key.replace(/\//g, '-'));
   function cleanup() {
@@ -35,7 +40,7 @@ exports.downloadAsReadStream = function* (key) {
   }
   debug('downloadAsReadStream() %s to %s', key, tmpPath);
   try {
-    yield nfs.download(key, tmpPath, {timeout: DOWNLOAD_TIMEOUT});
+    yield nfs.download(key, tmpPath, options);
   } catch (err) {
     debug('downloadAsReadStream() %s to %s error: %s', key, tmpPath, err.stack);
     cleanup();
