@@ -52,10 +52,11 @@ module.exports = function* download(next) {
     return;
   }
 
+  _downloads[name] = (_downloads[name] || 0) + 1;
+
   if (config.downloadRedirectToNFS && url) {
     this.status = 302;
     this.set('Location', url);
-    _downloads[name] = (_downloads[name] || 0) + 1;
     return;
   }
 
@@ -66,17 +67,10 @@ module.exports = function* download(next) {
     debug('get tarball by 302, url: %s', url);
     this.status = 302;
     this.set('Location', url);
-    _downloads[name] = (_downloads[name] || 0) + 1;
     return;
   }
 
   // else use `dist.key` to get tarball from nfs
-  if (!nfs.download) {
-    return yield* next;
-  }
-
-  _downloads[name] = (_downloads[name] || 0) + 1;
-
   if (typeof dist.size === 'number' && dist.size > 0) {
     this.length = dist.size;
   }
