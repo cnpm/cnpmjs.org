@@ -1,4 +1,14 @@
 
+2.0.0 / 2015-05-11
+==================
+
+ * fix: real download as stream
+ * add custom ad banner config
+ * add sponsors: ucloud.cn
+ * fix small typo
+ * feat(urllib): support http_proxy
+ * force using https links
+
 2.0.0-rc.15 / 2015-02-15
 ==================
 
