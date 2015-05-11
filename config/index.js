@@ -220,6 +220,10 @@ var config = {
   // always-auth https://docs.npmjs.com/misc/config#always-auth
   // Force npm to always require authentication when accessing the registry, even for GET requests.
   alwaysAuth: false,
+
+  // if you're behind firewall, need to request through http proxy, please set this
+  // e.g.: `httpProxy: 'http://proxy.mycompany.com:8080'`
+  httpProxy: null,
 };
 
 if (process.env.NODE_ENV !== 'test') {
