@@ -1,12 +1,12 @@
 /**!
  * cnpmjs.org - routes/web.js
  *
- * Copyright(c) cnpmjs.org and other contributors.
+ * Copyright(c) cnpm and other contributors.
  * MIT Licensed
  *
  * Authors:
  *  dead_horse <dead_horse@qq.com>
- *  fengmk2 <fengmk2@gmail.com> (http://fengmk2.github.com)
+ *  fengmk2 <m@fengmk2.com> (http://fengmk2.com)
  */
 
 "use strict";
@@ -24,8 +24,10 @@ var showUser = require('../controllers/web/user/show');
 var sync = require('../controllers/sync');
 var showTotal = require('../controllers/total');
 var badge = require('../controllers/web/badge');
+var home = require('../controllers/web/home');
 
 function routes(app) {
+  app.get('/', home);
   app.get('/total', showTotal);
 
   // scope package without version

@@ -1,12 +1,12 @@
 /**!
  * cnpmjs.org - servers/web.js
  *
- * Copyright(c) cnpmjs.org and other contributors.
+ * Copyright(c) cnpm and other contributors.
  * MIT Licensed
  *
  * Authors:
  *  dead_horse <dead_horse@qq.com>
- *  fengmk2 <fengmk2@gmail.com> (http://fengmk2.github.com)
+ *  fengmk2 <m@fengmk2.com> (http://fengmk2.com)
  */
 
 "use strict";
@@ -26,6 +26,7 @@ var logger = require('../common/logger');
 var renderMarkdown = require('../common/markdown').render;
 var auth = require('../middleware/auth');
 var proxyToNpm = require('../middleware/proxy_to_npm');
+var i18n = require('../middleware/i18n');
 var routes = require('../routes/web');
 var config = require('../config');
 var path = require('path');
@@ -77,14 +78,11 @@ var layout = fs.readFileSync(path.join(viewDir, 'layout.html'), 'utf8')
 fs.writeFileSync(layoutFile, layout);
 
 // custom web readme home page support
-var readmeFile = path.join(docDir, '_readme.md');
-var readmeContent;
 if (config.customReadmeFile) {
-  readmeContent = fs.readFileSync(config.customReadmeFile, 'utf8');
-} else {
-  readmeContent = fs.readFileSync(path.join(docDir, 'readme.md'), 'utf8');
+  var readmeFile = path.join(docDir, '_readme.md');
+  var readmeContent = fs.readFileSync(config.customReadmeFile, 'utf8');
+  fs.writeFileSync(readmeFile, readmeContent);
 }
-fs.writeFileSync(readmeFile, readmeContent);
 
 app.use(markdownMiddleware({
   baseUrl: '/',
@@ -99,7 +97,12 @@ app.use(markdownMiddleware({
   },
 }));
 
-var locals = {
+app.use(i18n({
+  dir: path.join(__dirname, '..', 'locales'),
+  defaultLocale: 'en_US'
+}, app));
+
+var globalLocals = {
   config: config
 };
 
@@ -109,7 +112,7 @@ middlewares.ejs(app, {
   layout: '_layout',
   cache: config.viewCache,
   debug: config.debug,
-  locals: locals
+  locals: globalLocals
 });
 
 /**

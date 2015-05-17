@@ -1,0 +1,117 @@
+<h1><%= __('cnpmjs.org: Private npm registry and web for Company') %></h1>
+<p>So <code>cnpm</code> is meaning: <strong>Company npm</strong>.</p>
+
+<h2>Registry</h2>
+<ul>
+  <li>Our public registry: <a href="//r.cnpmjs.org">r.cnpmjs.org</a>, syncing from <a href="//registry.npmjs.org">registry.npmjs.org</a></li>
+  <li><a href="/">cnpmjs.org</a> version: <span id="app-version"></span></li>
+  <li><a href="https://nodejs.org">Node.js</a> version: <span id="node-version"></span></li>
+  <li>For developers behind the GFW, please visit <a href="https://npm.taobao.org">the Chinese mirror</a>. 中国用户请访问<a href="https://npm.taobao.org/">国内镜像站点</a>。</li>
+</ul>
+
+<table class="downloads">
+  <tbody>
+    <tr>
+      <td class="count" id="total-packages"></td><td>total packages</td>
+      <td class="count" id="total-versions"></td><td>total package versions</td>
+      <td class="count" id="total-deletes"></td><td>total delete packages</td>
+    </tr>
+    <tr>
+      <td class="count"></td><td> downloads today</td>
+      <td class="count"></td><td> downloads in this week</td>
+      <td class="count"></td><td> downloads in this month</td>
+    </tr>
+    <tr>
+      <td class="count"></td><td> downloads in the last day</td>
+      <td class="count"></td><td> downloads in the last week</td>
+      <td class="count"></td><td> downloads in the last month</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="sync" style="display:none;">
+  <h3>Sync Status</h3>
+  <p id="sync-model"></p>
+  <p>Last sync time is <span id="last-sync-time"></span>. </p>
+  <p class="syncing alert alert-info">The sync worker is working in the backend now. </p>
+  <table class="sync-status">
+    <tbody>
+      <tr>
+        <td><span id="need-sync"></span> packages need to be sync</td>
+        <td class="syncing"><span id="left-sync"></span> packages and dependencies waiting for sync</td>
+        <td><span id="percent-sync"></span>% progress</td>
+      </tr>
+      <tr>
+        <td><span id="success-sync"></span> packages and dependencies sync successed</td>
+        <td><span id="fail-sync"></span> packages and dependencies sync failed</td>
+        <td>last success: <span id="last-success-name"></span></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<script src="/js/readme.js"></script>
+
+<h2>Version Badge</h2>
+<p>Default style is <code>flat-square</code>.</p>
+<p>Badge URL: <code>https://cnpmjs.org/badge/v/cnpmjs.org.svg</code> <img src="//cnpmjs.org/badge/v/cnpmjs.org.svg" alt="cnpmjs.org-badge"></p>
+<ul>
+  <li><code>&lt;0.1.0 &amp; &gt;=0.0.0</code>: <img src="https://img.shields.io/badge/cnpm-0.0.1-red.svg?style=flat-square" alt="red-badge"></li>
+  <li><code>&lt;1.0.0 &amp; &gt;=0.1.0</code>: <img src="https://img.shields.io/badge/cnpm-0.1.0-green.svg?style=flat-square" alt="red-badge"></li>
+  <li><code>&gt;=1.0.0</code>: <img src="https://img.shields.io/badge/cnpm-1.0.0-blue.svg?style=flat-square" alt="red-badge"></li>
+</ul>
+
+<h2>Usage</h2>
+<p>use our npm client <a href="https://github.com/cnpm/cnpm">cnpm</a>(More suitable with cnpmjs.org and gzip support), you can get our client through npm:</p>
+<pre><code class="language-bash">$ npm install -g cnpm --registry=https://r.cnpmjs.org
+</code></pre>
+<p>Or you can alias NPM to use it:</p>
+<pre><code class="language-bash">alias cnpm=&quot;npm --registry=https://r.cnpmjs.org \
+--cache=$HOME/.npm/.cache/cnpm \
+--disturl=https://cnpmjs.org/mirrors/node \
+--userconfig=$HOME/.cnpmrc&quot;
+
+#Or alias it in .bashrc or .zshrc
+$ echo '\n#alias for cnpm\nalias cnpm=&quot;npm --registry=https://r.cnpmjs.org \
+  --cache=$HOME/.npm/.cache/cnpm \
+  --disturl=https://cnpmjs.org/mirrors/node \
+  --userconfig=$HOME/.cnpmrc&quot;' &gt;&gt; ~/.zshrc &amp;&amp; source ~/.zshrc
+</code></pre>
+
+<h3>install</h3>
+<p>Install package from <a href="//r.cnpmjs.org">r.cnpmjs.org</a>. When installing a package or version does not exist, it will try to install from the official registry(<a href="//registry.npmjs.org">registry.npmjs.org</a>), and sync this package to cnpm in the backend.</p>
+<pre><code class="language-bash">$ cnpm install [name]
+</code></pre>
+
+<h3>sync</h3>
+<p>Only <code>cnpm</code> cli has this command. Meaning sync package from source npm.</p>
+<pre><code class="language-bash">$ cnpm sync connect
+</code></pre>
+<p>sync package on web: <a href="/sync/connect">sync/connect</a></p>
+<pre><code class="language-bash">$ open https://cnpmjs.org/sync/connect
+</code></pre>
+
+<h3>publish / unpublish</h3>
+<p>Only <code>admin</code> user can publish / unpublish package to private registry.</p>
+<pre><code class="language-bash">$ cnpm publish [name]
+$ cnpm unpublish [name]
+</code></pre>
+
+<h3>Other commands</h3>
+<p>Support all the other npm commands. e.g.:</p>
+<pre><code class="language-bash">$ cnpm info cnpm
+</code></pre>
+
+<h2>TODO list</h2>
+<p>@see Github <a href="https://github.com/cnpm/cnpmjs.org/issues">Issues</a></p>
+
+<h2>Histories</h2>
+<p>Release <a href="/history">History</a>.</p>
+
+<h2>npm and cnpm relation</h2>
+<p><img src="https://dn-cnpm.qbox.me/cnpm-npm-relation.png" alt="npm&amp;cnpm"></p>
+
+<h2>Sponsors</h2>
+<ul>
+  <li><a href="http://www.ucloud.cn/sdk?sem=sdk-CNPMJS"><img src="https://www.ucloud.cn/www/img/www/logo.png" alt="UCloud云计算"></a></li>
+</ul>
