@@ -6,7 +6,7 @@
  *
  * Authors:
  *  dead_horse <dead_horse@qq.com> (http://deadhorse.me)
- *  fengmk2 <fengmk2@gmail.com> (http://fengmk2.github.com)
+ *  fengmk2 <m@fengmk2.com> (http://fengmk2.com)
  */
 
 'use strict';
@@ -35,13 +35,12 @@ module.exports = function* search() {
 
   // return a json result
   if (this.query && this.query.type === 'json') {
-    this.body = {
+    this.jsonp = {
       keyword: word,
       match: match,
       packages: result.searchMatchs,
       keywords: result.keywordMatchs,
     };
-    this.type = 'application/json; charset=utf-8';
     return;
   }
   yield this.render('search', {
