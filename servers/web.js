@@ -6,7 +6,7 @@
  *
  * Authors:
  *  dead_horse <dead_horse@qq.com>
- *  fengmk2 <fengmk2@gmail.com> (http://fengmk2.github.com)
+ *  fengmk2 <m@fengmk2.com> (http://fengmk2.com)
  */
 
 "use strict";
@@ -28,12 +28,15 @@ var auth = require('../middleware/auth');
 var proxyToNpm = require('../middleware/proxy_to_npm');
 var routes = require('../routes/web');
 var config = require('../config');
+var jsonp = require('koa-safe-jsonp');
 var path = require('path');
 var http = require('http');
 var koa = require('koa');
 var fs = require('fs');
 
 var app = koa();
+
+jsonp(app);
 
 var rootdir = path.dirname(__dirname);
 

@@ -6,6 +6,7 @@
  *
  * Authors:
  *  dead_horse <dead_horse@qq.com> (http://deadhorse.me)
+ *  fengmk2 <m@fengmk2.com> (http://fengmk2.com)
  */
 
 'use strict';
@@ -49,7 +50,21 @@ describe('controllers/web/package/search.test.js', function () {
       request(app)
       .get('/browse/keyword/@cnpmtest/testmodule-web-search?type=json')
       .expect(200)
+      .expect({
+        keyword: '@cnpmtest/testmodule-web-search',
+        match: { name: '@cnpmtest/testmodule-web-search', description: '' },
+        packages: [ { name: '@cnpmtest/testmodule-web-search', description: '' } ],
+        keywords: []
+      })
       .expect('content-type', 'application/json; charset=utf-8', done);
+    });
+
+    it('should search with jsonp work', function (done) {
+      request(app)
+      .get('/browse/keyword/@cnpmtest/testmodule-web-search?type=json&callback=foo')
+      .expect(200)
+      .expect('/**/ typeof foo === \'function\' && foo({"keyword":"@cnpmtest/testmodule-web-search","match":{"name":"@cnpmtest/testmodule-web-search","description":""},"packages":[{"name":"@cnpmtest/testmodule-web-search","description":""}],"keywords":[]});')
+      .expect('content-type', 'application/javascript; charset=utf-8', done);
     });
 
     it('should list no match ok', function (done) {
