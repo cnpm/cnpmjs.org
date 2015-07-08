@@ -1,4 +1,10 @@
 
+2.1.0 / 2015-07-08
+==================
+
+ * feat(web): search support jsonp
+ * fix function name
+
 2.0.0 / 2015-05-11
 ==================
 
