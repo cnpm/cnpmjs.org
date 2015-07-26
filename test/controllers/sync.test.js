@@ -129,7 +129,7 @@ describe('controllers/sync.test.js', function () {
     it('should sync scope package not found', function (done) {
       request(webApp.listen())
       .put('/sync/@cnpm/not-exists-package')
-      .expect(404, done);
+      .expect(201, done);
     });
   });
 });

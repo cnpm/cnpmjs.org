@@ -5,7 +5,7 @@
  * MIT Licensed
  *
  * Authors:
- *  fengmk2 <fengmk2@gmail.com> (http://fengmk2.github.com)
+ *  fengmk2 <fengmk2@gmail.com> (http://fengmk2.com)
  */
 
 'use strict';
@@ -53,9 +53,29 @@ describe('controllers/sync_module_worker.test.js', function () {
     yield end();
   });
 
-  it('should not sync scoped package', function* () {
+  it('should not sync private scoped package', function* () {
     var worker = new SyncModuleWorker({
-      name: '@scoped/google',
+      name: '@cnpmtest/google',
+      username: 'fengmk2',
+    });
+    worker.start();
+    var end = thunkify.event(worker, 'end');
+    yield end();
+  });
+
+  it('should sync public scoped package', function* () {
+    mm(config, 'sourceNpmRegistry', 'https://registry.npmjs.org');
+    var worker = new SyncModuleWorker({
+      name: '@sindresorhus/df',
+      username: 'fengmk2',
+    });
+    worker.start();
+    var end = thunkify.event(worker, 'end');
+    yield end();
+
+    // sync again
+    var worker = new SyncModuleWorker({
+      name: '@sindresorhus/df',
       username: 'fengmk2',
     });
     worker.start();

@@ -42,10 +42,13 @@ function routes(app) {
 
   app.get('/~:name', showUser);
 
+  app.get(/\/sync\/(@[\w\-\.]+\/[\w\-\.]+)$/, showSync);
   app.get('/sync/:name', showSync);
   app.get('/sync', showSync);
+  app.put(/\/sync\/(@[\w\-\.]+\/[\w\-\.]+)$/, sync.sync);
   app.put('/sync/:name', sync.sync);
 
+  app.get(/\/sync\/(@[\w\-\.]+\/[\w\-\.]+)\/log\/(\d+)$/, sync.getSyncLog);
   app.get('/sync/:name/log/:id', sync.getSyncLog);
 
   app.get('/_list/search/search', searchRange);

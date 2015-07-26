@@ -10,7 +10,11 @@
   var $log = $('#sync-log');
   var $notify = $('#sync-notify');
   var timer;
-  var name = '<%= type %>:<%= name %>';
+  var type = '<%= type %>';
+  var name = '<%= name %>';
+  if (type !== 'package') {
+    name = type + ':' + name;
+  }
   var resourceURL = '/sync/' + name;
   $(function() {
     var checkLogId = location.hash.match(/logid=(\d+)/);

@@ -55,7 +55,7 @@ describe('services/npm.test.js', function () {
       throw new Error('should not run this');
     } catch (err) {
       err.name.should.equal('NPMServerError');
-      err.message.should.equal('Url: http://registry.npm.taobao.org/octopie, Status 500, ' +
+      err.message.should.containEql('Status 500, ' +
         fs.readFileSync(path.join(fixtures, '500.txt'), 'utf8'));
     }
   });
