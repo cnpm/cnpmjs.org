@@ -39,7 +39,8 @@ function* request(url, options) {
     var data = err.data || '[empty]';
     if (err.name === 'JSONResponseFormatError' && statusCode >= 500) {
       err.name = 'NPMServerError';
-      err.message = 'Status ' + statusCode + ', ' + data.toString();
+      err.status = statusCode;
+      err.message = 'Url: ' + url + ', Status ' + statusCode + ', ' + data.toString();
     }
     throw err;
   }

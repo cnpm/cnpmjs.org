@@ -75,7 +75,8 @@ var syncFn = co.wrap(function* () {
       logger.syncError(error);
     }
     data && logger.syncInfo(data);
-    if (!config.debug) {
+    // ignore 503 error
+    if (!config.debug && error.status !== 503) {
       sendMailToAdmin(error, data, new Date());
     }
     syncing = false;
