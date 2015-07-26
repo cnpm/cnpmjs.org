@@ -196,6 +196,11 @@ SyncModuleWorker.prototype._doneOne = function* (concurrencyId, name, success) {
 };
 
 SyncModuleWorker.prototype.syncUpstream = function* (name) {
+  if (config.sourceNpmRegistry.indexOf('registry.npmjs.org') >= 0 ||
+      config.sourceNpmRegistry.indexOf('registry.npmjs.com') >= 0) {
+    this.log('----------------- upstream is npm registry: %s, ignore it -------------------', config.sourceNpmRegistry);
+    return;
+  }
   var syncname = name;
   if (this.type === 'user') {
     syncname = this.type + ':' + syncname;
