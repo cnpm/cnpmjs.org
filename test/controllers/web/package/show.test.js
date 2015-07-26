@@ -115,13 +115,13 @@ describe('controllers/web/package/show.test.js', function () {
 
   describe('unpublished package', function () {
     before(function (done) {
-      utils.sync('tnpm', done);
+      utils.sync('tfs', done);
     });
 
     it('should display unpublished info', function (done) {
       mm(config, 'syncModel', 'all');
       request(app)
-      .get('/package/tnpm')
+      .get('/package/tfs')
       .expect(200)
       .expect(/This package has been unpublished\./, done);
     });

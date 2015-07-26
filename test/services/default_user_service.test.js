@@ -98,9 +98,9 @@ describe('services/default_user_service.test.js', function () {
         login: 'fengmk2',
         email: 'fengmk2@gmail.com',
         name: 'Yuan Feng',
-        html_url: 'http://fengmk2.github.com',
+        html_url: 'http://cnpmjs.org/~fengmk2',
         avatar_url: 'https://secure.gravatar.com/avatar/95b9d41231617a05ced5604d242c9670?s=50&d=retro',
-        im_url: 'https://twitter.com/fengmk2',
+        im_url: '',
         site_admin: true,
         scopes: ['@cnpm', '@cnpmtest'],
       });
