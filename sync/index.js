@@ -75,8 +75,7 @@ var syncFn = co.wrap(function* () {
       logger.syncError(error);
     }
     data && logger.syncInfo(data);
-    // ignore 503 error
-    if (!config.debug && error.status !== 503) {
+    if (!config.debug) {
       sendMailToAdmin(error, data, new Date());
     }
     syncing = false;
@@ -143,6 +142,10 @@ function sendMailToAdmin(err, result, syncTime) {
   var type;
   var html;
   if (err) {
+    // ignore 503 error
+    if (err.status === 503) {
+      return;
+    }
     subject = 'Sync Error';
     type = 'error';
     html = util.format('Sync packages from official registry failed.\n' +
