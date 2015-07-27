@@ -77,7 +77,9 @@ function routes(app) {
   app.put('/:name', login, publishable, savePackage);
 
   // sync from source npm
+  app.put(/^\/(@[\w\-\.]+\/[\w\-\.]+)\/sync$/, sync.sync);
   app.put('/:name/sync', sync.sync);
+  app.get(/^\/(@[\w\-\.]+\/[\w\-\.]+)\/sync\/log\/(\d+)$/, sync.getSyncLog);
   app.get('/:name/sync/log/:id', sync.getSyncLog);
 
   // add tag

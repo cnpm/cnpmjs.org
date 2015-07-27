@@ -5,7 +5,7 @@
  * MIT Licensed
  *
  * Authors:
- *  fengmk2 <fengmk2@gmail.com> (http://fengmk2.github.com)
+ *  fengmk2 <fengmk2@gmail.com> (http://fengmk2.com)
  *  dead_horse <dead_horse@qq.com> (http://deadhorse.me)
  */
 
@@ -196,6 +196,11 @@ SyncModuleWorker.prototype._doneOne = function* (concurrencyId, name, success) {
 };
 
 SyncModuleWorker.prototype.syncUpstream = function* (name) {
+  if (config.sourceNpmRegistry.indexOf('registry.npmjs.org') >= 0 ||
+      config.sourceNpmRegistry.indexOf('registry.npmjs.com') >= 0) {
+    this.log('----------------- upstream is npm registry: %s, ignore it -------------------', config.sourceNpmRegistry);
+    return;
+  }
   var syncname = name;
   if (this.type === 'user') {
     syncname = this.type + ':' + syncname;
@@ -302,17 +307,17 @@ SyncModuleWorker.prototype.next = function* (concurrencyId) {
 
   this.log('----------------- Syncing %s -------------------', name);
 
-  // ignore scoped package
-  if (name[0] === '@') {
-    this.log('[c#%d] [%s] ignore sync scoped package',
-      concurrencyId, name);
+  // ignore private scoped package
+  if (name[0] === '@' && config.scopes.indexOf(name.split('/')[0]) >= 0) {
+    this.log('[c#%d] [%s] ignore sync private scoped %j package',
+      concurrencyId, name, config.scopes);
     yield* this._doneOne(concurrencyId, name, true);
     return;
   }
 
   // get from npm
   try {
-    var result = yield* npmSerivce.request('/' + name);
+    var result = yield* npmSerivce.request('/' + name.replace('/', '%2f'));
     pkg = result.data;
     status = result.status;
   } catch (err) {
