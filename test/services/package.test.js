@@ -5,7 +5,7 @@
  * MIT Licensed
  *
  * Authors:
- *   fengmk2 <fengmk2@gmail.com> (http://fengmk2.github.com)
+ *   fengmk2 <fengmk2@gmail.com> (http://fengmk2.com)
  */
 
 'use strict';
@@ -19,7 +19,7 @@ var sleep = require('co-sleep');
 var Package = require('../../services/package');
 var utils = require('../utils');
 
-describe('services/package.test.js', function () {
+describe('test/services/package.test.js', function () {
   function* createModule(name, version, user, tag) {
     var sourcePackage = {
       version: version,
@@ -160,12 +160,11 @@ describe('services/package.test.js', function () {
     });
 
     it('should work', function* () {
-      yield* createModule('@cnpm-test-scope1/test-listPrivateModules-module-1', '1.0.0');
-      yield* createModule('@cnpm-test-scope1/test-listPrivateModules-module-2', '1.0.0');
-      var modules = yield* Package.listPrivateModulesByScope('@cnpm-test-scope1');
-      // console.log(modules[0].toJSON())
+      yield* createModule('@cnpm-test/test-listPrivateModules-module-1', '1.0.0');
+      yield* createModule('@cnpm-test/test-listPrivateModules-module-2', '1.0.0');
+      var modules = yield* Package.listPrivateModulesByScope('@cnpm-test');
       modules.should.length(2);
-      modules[0].name.should.containEql('@cnpm-test-scope1/test-listPrivateModules-module-');
+      modules[0].name.should.containEql('@cnpm-test/test-listPrivateModules-module-');
     });
   });
 

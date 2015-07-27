@@ -5,7 +5,7 @@
  * MIT Licensed
  *
  * Authors:
- *  fengmk2 <fengmk2@gmail.com> (http://fengmk2.github.com)
+ *  fengmk2 <fengmk2@gmail.com> (http://fengmk2.com)
  */
 
 'use strict';
@@ -23,7 +23,7 @@ var config = require('../../../../config');
 var packageService = require('../../../../services/package');
 var nfs = require('../../../../common/nfs');
 
-describe('controllers/registry/package/remove.test.js', function () {
+describe('test/controllers/registry/package/remove.test.js', function () {
   afterEach(mm.restore);
 
   before(function (done) {
@@ -74,7 +74,7 @@ describe('controllers/registry/package/remove.test.js', function () {
     .set('authorization', utils.otherUserAuth)
     .expect({
       error: 'invalid scope',
-      reason: 'scope @cnpm-not-exists not match legal scopes: @cnpm, @cnpmtest'
+      reason: 'scope @cnpm-not-exists not match legal scopes: @cnpm, @cnpmtest, @cnpm-test'
     })
     .expect(400, done);
   });
@@ -85,7 +85,7 @@ describe('controllers/registry/package/remove.test.js', function () {
     .set('authorization', utils.otherUserAuth)
     .expect({
       error: 'no_perms',
-      reason: 'only allow publish with @cnpm, @cnpmtest scope(s)'
+      reason: 'only allow publish with @cnpm, @cnpmtest, @cnpm-test scope(s)'
     })
     .expect(403, done);
   });

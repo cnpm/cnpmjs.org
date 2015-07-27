@@ -24,13 +24,14 @@ describe('services/common.test.js', function () {
   describe('isPrivatePackage()', function () {
     it('should detect prviate package', function* () {
       mm(config, 'privatePackages', ['some-private-package', 'foobar2']);
-      (yield* common.isPrivatePackage('@cnpm/ooxx')).should.equal(true);
-      (yield* common.isPrivatePackage('@cnpm/some-private-package')).should.equal(true);
-      (yield* common.isPrivatePackage('some-private-package')).should.equal(true);
-      (yield* common.isPrivatePackage('foobar2')).should.equal(true);
+      common.isPrivatePackage('@cnpm/ooxx').should.equal(true);
+      common.isPrivatePackage('@cnpm/some-private-package').should.equal(true);
+      common.isPrivatePackage('some-private-package').should.equal(true);
+      common.isPrivatePackage('foobar2').should.equal(true);
 
-      (yield* common.isPrivatePackage('foobar')).should.equal(false);
-      (yield* common.isPrivatePackage('pedding-2')).should.equal(false);
+      common.isPrivatePackage('foobar').should.equal(false);
+      common.isPrivatePackage('pedding-2').should.equal(false);
+      common.isPrivatePackage('@public/some-package').should.equal(false);
     });
   });
 });
