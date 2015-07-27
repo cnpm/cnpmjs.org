@@ -1,4 +1,14 @@
 
+2.1.1 / 2015-07-27
+==================
+
+ * fix: fix private scope package detect
+ * fix: dont sync if upstream is npm registry
+ * fix(sync): support sync public scope package
+ * test: fix fails tests
+ * fix: ignore 503 server error
+ * fix: ignore sync 503 server error
+
 2.1.0 / 2015-07-08
 ==================
 
