@@ -308,7 +308,7 @@ SyncModuleWorker.prototype.next = function* (concurrencyId) {
   this.log('----------------- Syncing %s -------------------', name);
 
   // ignore private scoped package
-  if (name[0] === '@' && config.scopes.indexOf(name.split('/')[0]) >= 0) {
+  if (common.isPrivateScopedPackage(name)) {
     this.log('[c#%d] [%s] ignore sync private scoped %j package',
       concurrencyId, name, config.scopes);
     yield* this._doneOne(concurrencyId, name, true);
