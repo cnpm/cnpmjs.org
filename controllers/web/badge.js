@@ -5,7 +5,7 @@
  * MIT Licensed
  *
  * Authors:
- *   fengmk2 <fengmk2@gmail.com> (http://fengmk2.github.com)
+ *   fengmk2 <fengmk2@gmail.com> (http://fengmk2.com)
  */
 
 'use strict';
@@ -18,6 +18,7 @@ var utility = require('utility');
 var util = require('util');
 var config = require('../../config');
 var packageService = require('../../services/package');
+var DownloadTotal = require('../../services/download_total');
 
 exports.version = function* () {
   var color = 'lightgrey';
@@ -44,5 +45,15 @@ exports.version = function* () {
   var style = this.query.style || 'flat-square';
   var url = util.format('https://img.shields.io/badge/%s-%s-%s.svg?style=%s',
     subject, version, color, utility.encodeURIComponent(style));
+  this.redirect(url);
+};
+
+exports.downloads = function* () {
+  // https://img.shields.io/badge/downloads-100k/month-brightgreen.svg?style=flat-square
+  var name = this.params[0];
+  var count = yield DownloadTotal.getTotalByName(name);
+  var style = this.query.style || 'flat-square';
+  var url = util.format('https://img.shields.io/badge/downloads-%s-brightgreen.svg?style=%s',
+    count, utility.encodeURIComponent(style));
   this.redirect(url);
 };

@@ -54,6 +54,7 @@ function routes(app) {
   app.get('/_list/search/search', searchRange);
 
   app.get(/^\/badge\/v\/([@\w\-\.\/]+)\.svg$/, badge.version);
+  app.get(/^\/badge\/d\/([@\w\-\.\/]+)\.svg$/, badge.downloads);
 }
 
 module.exports = routes;
