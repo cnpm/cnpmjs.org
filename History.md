@@ -1,4 +1,10 @@
 
+2.1.2 / 2015-08-09
+==================
+
+ * fix(syncer): sync worker pkg null bug
+ * feat(web): add downloads badge
+
 2.1.1 / 2015-07-27
 ==================
 
