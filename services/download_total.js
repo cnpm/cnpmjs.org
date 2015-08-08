@@ -32,6 +32,27 @@ exports.getModuleTotal = function* (name, start, end) {
   return formatRows(rows, start, end);
 };
 
+exports.getTotalByName = function* (name) {
+  var rows = yield DownloadTotal.findAll({
+    where: {
+      name: name
+    }
+  });
+  var count = 0;
+  rows.forEach(function (row) {
+    for (var i = 1; i <= 31; i++) {
+      var day = i < 10 ? '0' + i : String(i);
+      var field = 'd' + day;
+      var val = row[field];
+      if (typeof val === 'string') {
+        val = utility.toSafeNumber(val);
+      }
+      count += val;
+    }
+  });
+  return count;
+};
+
 exports.plusModuleTotal = function* (data) {
   var yearMonth = parseYearMonth(data.date);
   // all module download total

@@ -107,4 +107,21 @@ describe('controllers/web/badge.test.js', function () {
       .expect(302, done);
     });
   });
+
+  describe('GET /badge/d/:name.svg', function () {
+    it('should show downloads count', function (done) {
+      var pkg = utils.getPackage('@cnpmtest/badge-download-module', '1.0.1', utils.admin);
+      request(registry)
+      .put('/' + pkg.name)
+      .set('authorization', utils.adminAuth)
+      .send(pkg)
+      .end(function (err) {
+        should.not.exists(err);
+        request(app)
+        .get('/badge/d/@cnpmtest/badge-download-module.svg?style=flat-square')
+        .expect('Location', 'https://img.shields.io/badge/downloads-0-brightgreen.svg?style=flat-square')
+        .expect(302, done);
+      });
+    });
+  });
 });

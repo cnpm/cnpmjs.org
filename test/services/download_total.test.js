@@ -16,7 +16,7 @@
 
 var DownloadTotal = require('../../services/download_total');
 
-describe('services/download_total.test.js', function () {
+describe('test/services/download_total.test.js', function () {
   describe('plusModuleTotal()', function () {
     it('should plus one module download count', function* () {
       var data = {
@@ -87,6 +87,27 @@ describe('services/download_total.test.js', function () {
       rows[1].count.should.equal(5);
       rows[2].date.should.equal('2014-12-21');
       rows[2].count.should.equal(3);
+    });
+  });
+
+  describe('getTotalByName()', function () {
+    it('should get total downloads', function* () {
+      var data = {
+        date: '2014-10-21',
+        name: 'getTotalByName-module',
+        count: 1000
+      };
+      yield* DownloadTotal.plusModuleTotal(data);
+
+      data = {
+        date: '2015-10-22',
+        name: 'getTotalByName-module',
+        count: 2
+      };
+      yield* DownloadTotal.plusModuleTotal(data);
+
+      var count = yield DownloadTotal.getTotalByName('getTotalByName-module');
+      count.should.equal(1002);
     });
   });
 });
