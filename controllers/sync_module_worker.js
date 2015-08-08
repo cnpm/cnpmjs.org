@@ -334,7 +334,7 @@ SyncModuleWorker.prototype.next = function* (concurrencyId) {
   var unpublishedInfo = null;
   if (status === 404) {
     // check if it's unpublished
-    if (pkg.time && pkg.time.unpublished && pkg.time.unpublished.time) {
+    if (pkg && pkg.time && pkg.time.unpublished && pkg.time.unpublished.time) {
       unpublishedInfo = pkg.time.unpublished;
     } else {
       pkg = null;
