@@ -58,7 +58,7 @@ Default style is `flat-square`.
 
 ### Version
 
-Badge URL: `https://cnpmjs.org/badge/v/cnpmjs.org.svg` ![cnpmjs.org-version-badge](//cnpmjs.org/badge/v/cnpmjs.org.svg)
+Badge URL: `http://cnpmjs.org/badge/v/cnpmjs.org.svg` ![cnpmjs.org-version-badge](//cnpmjs.org/badge/v/cnpmjs.org.svg)
 
 * `<0.1.0 & >=0.0.0`: ![red-badge](https://img.shields.io/badge/cnpm-0.0.1-red.svg?style=flat-square)
 * `<1.0.0 & >=0.1.0`: ![red-badge](https://img.shields.io/badge/cnpm-0.1.0-green.svg?style=flat-square)
@@ -66,28 +66,28 @@ Badge URL: `https://cnpmjs.org/badge/v/cnpmjs.org.svg` ![cnpmjs.org-version-badg
 
 ### Downloads
 
-Badge URL: `https://cnpmjs.org/badge/d/cnpmjs.org.svg` ![cnpmjs.org-download-badge](//cnpmjs.org/badge/d/cnpmjs.org.svg)
+Badge URL: `http://cnpmjs.org/badge/d/cnpmjs.org.svg` ![cnpmjs.org-download-badge](//cnpmjs.org/badge/d/cnpmjs.org.svg)
 
 ## Usage
 
 use our npm client [cnpm](https://github.com/cnpm/cnpm)(More suitable with cnpmjs.org and gzip support), you can get our client through npm:
 
 ```bash
-$ npm install -g cnpm --registry=https://r.cnpmjs.org
+$ npm install -g cnpm --registry=http://registry.npm.taobao.org
 ```
 
 Or you can alias NPM to use it:
 
 ```bash
-alias cnpm="npm --registry=https://r.cnpmjs.org \
+alias cnpm="npm --registry=http://registry.npm.taobao.org \
 --cache=$HOME/.npm/.cache/cnpm \
---disturl=https://cnpmjs.org/mirrors/node \
+--disturl=http://registry.npm.taobao.org/mirrors/node \
 --userconfig=$HOME/.cnpmrc"
 
 #Or alias it in .bashrc or .zshrc
-$ echo '\n#alias for cnpm\nalias cnpm="npm --registry=https://r.cnpmjs.org \
+$ echo '\n#alias for cnpm\nalias cnpm="npm --registry=http://registry.npm.taobao.org \
   --cache=$HOME/.npm/.cache/cnpm \
-  --disturl=https://cnpmjs.org/mirrors/node \
+  --disturl=http://registry.npm.taobao.org/mirrors/node \
   --userconfig=$HOME/.cnpmrc"' >> ~/.zshrc && source ~/.zshrc
 ```
 
@@ -110,7 +110,7 @@ $ cnpm sync connect
 sync package on web: [sync/connect](/sync/connect)
 
 ```bash
-$ open https://cnpmjs.org/sync/connect
+$ open http://registry.npm.taobao.org/sync/connect
 ```
 
 ### publish / unpublish
