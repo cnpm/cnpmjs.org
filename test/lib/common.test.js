@@ -6,7 +6,7 @@
  *
  * Authors:
  *  dead_horse <dead_horse@qq.com>
- *  fengmk2 <fengmk2@gmail.com> (http://fengmk2.github.com)
+ *  fengmk2 <fengmk2@gmail.com> (http://fengmk2.com)
  */
 
 'use strict';
@@ -17,13 +17,22 @@
 
 var common = require('../../lib/common');
 
-describe('lib/common.test.js', function () {
+describe('test/lib/common.test.js', function () {
   describe('isAdmin()', function () {
     it('should admin is admin', function () {
       common.isAdmin('admin').should.equal(true);
       common.isAdmin('fengmk2').should.equal(true);
       common.isAdmin('constructor').should.equal(false);
       common.isAdmin('toString').should.equal(false);
+    });
+  });
+
+  describe('getCDNKey()', function () {
+    it('should auto fix scope filename', function () {
+      common.getCDNKey('foo', 'foo-1.0.0.tgz').should.equal('/foo/-/foo-1.0.0.tgz');
+      common.getCDNKey('@bar/foo', 'foo-1.0.0.tgz').should.equal('/@bar/foo/-/@bar/foo-1.0.0.tgz');
+      common.getCDNKey('@bar/foo', '@bar/foo-1.0.0.tgz').should.equal('/@bar/foo/-/@bar/foo-1.0.0.tgz');
+      common.getCDNKey('@bar/foo', '@bar1/foo-1.0.0.tgz').should.equal('/@bar/foo/-/@bar1/foo-1.0.0.tgz');
     });
   });
 });
