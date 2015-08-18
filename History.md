@@ -1,4 +1,10 @@
 
+2.1.3 / 2015-08-18
+==================
+
+ * fix: sync public scope package download url is wrong
+ * fix: default registry change to taobao registry
+
 2.1.2 / 2015-08-09
 ==================
 
