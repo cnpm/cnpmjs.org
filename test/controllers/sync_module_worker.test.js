@@ -17,6 +17,7 @@
 var mm = require('mm');
 var thunkify = require('thunkify-wrap');
 var request = require('supertest');
+var urllib = require('urllib');
 var config = require('../../config');
 var SyncModuleWorker = require('../../controllers/sync_module_worker');
 var logService = require('../../services/module_log');
@@ -24,7 +25,7 @@ var packageService = require('../../services/package');
 var utils = require('../utils');
 var app = require('../../servers/registry');
 
-describe('controllers/sync_module_worker.test.js', function () {
+describe('test/controllers/sync_module_worker.test.js', function () {
   afterEach(mm.restore);
 
   beforeEach(function () {
@@ -81,6 +82,24 @@ describe('controllers/sync_module_worker.test.js', function () {
     worker.start();
     var end = thunkify.event(worker, 'end');
     yield end();
+
+    var tgzUrl;
+    function checkResult() {
+      return function (done) {
+        request(app.listen())
+        .get('/@sindresorhus/df')
+        .expect(function (res) {
+          var latest = res.body.versions[res.body['dist-tags']['latest']];
+          tgzUrl = latest.dist.tarball;
+        })
+        .expect(200, done);
+      };
+    }
+
+    yield checkResult();
+
+    var r = yield urllib.request(tgzUrl);
+    r.status.should.equal(200);
   });
 
   it('should start a sync worker and dont sync deps', function* () {
