@@ -45,9 +45,6 @@ module.exports = function* list() {
       }
     }
 
-    // use modifiedTime as etag
-    this.set('ETag', '"' + modifiedTime.getTime() + '"');
-
     // must set status first
     this.status = 200;
     if (this.fresh) {
