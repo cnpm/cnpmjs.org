@@ -65,14 +65,13 @@ module.exports = function* sync() {
   } else {
     debug('sync new module from last exist sync time: %s', info.last_sync_time);
     var data = yield* npmService.getAllSince(info.last_exist_sync_time - ms('10m'));
-    if (!data) {
+    if (!data || !Array.isArray(data)) {
       allPackages = [];
+    } else {
+      allPackages = data.map(function (item) {
+        return item.name;
+      });
     }
-    if (data._updated) {
-      syncTime = data._updated;
-      delete data._updated;
-    }
-    allPackages = Object.keys(data);
   }
 
   var packages = intersection(existPackages, allPackages);
