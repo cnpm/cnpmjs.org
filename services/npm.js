@@ -15,6 +15,7 @@
  * Module dependencies.
  */
 
+var ms = require('humanize-ms');
 var urllib = require('../common/urllib');
 var config = require('../config');
 
@@ -67,6 +68,46 @@ exports.get = function* (name) {
     data = null;
   }
   return data;
+};
+
+exports.fetchUpdatesSince = function* (lastSyncTime, timeout) {
+  var lastModified = lastSyncTime - ms('10m');
+  var data = yield exports.getAllSince(lastModified, timeout);
+  var result = {
+    lastModified: lastSyncTime,
+    names: [],
+  };
+  if (!data) {
+    return result;
+  }
+  if (Array.isArray(data)) {
+    // support https://registry.npmjs.org/-/all/static/today.json
+    var maxModified;
+    data.forEach(function (pkg) {
+      if (pkg.time && pkg.time.modified) {
+        var modified = Date.parse(pkg.time.modified);
+        if (modified >= lastModified) {
+          result.names.push(pkg.name);
+        }
+        if (!maxModified || modified > maxModified) {
+          maxModified = modified;
+        }
+      } else {
+        result.names.push(pkg.name);
+      }
+    });
+    if (maxModified) {
+      result.lastModified = maxModified;
+    }
+  } else {
+    // /-/all/since
+    if (data._updated) {
+      result.lastModified = data._updated;
+      delete data._updated;
+    }
+    result.names = Object.keys(data);
+  }
+  return result;
 };
 
 exports.getAllSince = function* (startkey, timeout) {

@@ -56,7 +56,16 @@ describe('test/sync/sync_all.test.js', function () {
           versions: {
             '0.0.2': 'latest'
           }
-        }
+        },
+        {
+          name: 'mk2testmodule1',
+          time: {
+            modified: '2015-09-05T07:31:35.734Z',
+          },
+          versions: {
+            '0.0.2': 'latest'
+          }
+        },
       ]);
       mm.data(npmSerivce, 'getShort', ['mk2testmodule']);
       mm.data(totalService, 'getTotalInfo', {last_sync_time: Date.now()});

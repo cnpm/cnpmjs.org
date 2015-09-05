@@ -6,6 +6,7 @@
  *
  * Authors:
  *  dead_horse <dead_horse@qq.com> (http://deadhorse.me)
+ *  fengmk2 <m@fengmk2.com> (http://fengmk2.com)
  */
 
 'use strict';
@@ -14,7 +15,6 @@
  * Module dependencies.
  */
 
-var ms = require('humanize-ms');
 var thunkify = require('thunkify-wrap');
 var config = require('../config');
 var Status = require('./status');
@@ -40,25 +40,6 @@ function* getFirstSyncPackages(lastSyncModule) {
   }
 }
 
-/**
- * get all the packages that update time > lastSyncTime
- * @param {Number} lastSyncTime
- */
-function* getCommonSyncPackages(lastSyncTime) {
-  var data = yield* npmService.getAllSince(lastSyncTime);
-  if (!data) {
-    return [];
-  } else if (Array.isArray(data)) {
-    // support https://registry.npmjs.org/-/all/static/today.json
-    return data.map(function (item) {
-      return item.name;
-    });
-  } else {
-    delete data._updated;
-    return Object.keys(data);
-  }
-}
-
 module.exports = function* sync() {
   var syncTime = Date.now();
   var info = yield* totalService.getTotalInfo();
@@ -72,7 +53,9 @@ module.exports = function* sync() {
     logger.syncInfo('First time sync all packages from official registry');
     packages = yield* getFirstSyncPackages(info.last_sync_module);
   } else {
-    packages = yield* getCommonSyncPackages(info.last_sync_time - ms('10m'));
+    var result = yield npmService.fetchUpdatesSince(info.last_sync_time);
+    syncTime = result.lastModified;
+    packages = result.names;
   }
 
   packages = packages || [];
