@@ -1,4 +1,11 @@
 
+2.1.4 / 2015-09-05
+==================
+
+ * fix: support new array and old map format both
+ * fix: /-/all/since had been redirect to /-/all/static/today.json
+ * fix(list): let koa-etag to caculate the etag
+
 2.1.3 / 2015-08-18
 ==================
 
