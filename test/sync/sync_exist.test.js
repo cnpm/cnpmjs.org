@@ -21,7 +21,7 @@ var npmService = require('../../services/npm');
 var totalService = require('../../services/total');
 var utils = require('../utils');
 
-describe('sync/sync_exist.test.js', function () {
+describe('test/sync/sync_exist.test.js', function () {
   beforeEach(function () {
     mm(config, 'syncModel', 'all');
   });
@@ -41,17 +41,16 @@ describe('sync/sync_exist.test.js', function () {
     });
 
     it('should sync common ok', function *() {
-      mm.data(npmService, 'getAllSince', {
-        _updated: Date.now(),
-        'byte': {},
-      });
+      mm.data(npmService, 'getAllSince', [
+        {
+          name: 'byte',
+        }
+      ]);
       mm.data(totalService, 'getTotalInfo', {last_exist_sync_time: Date.now()});
       var data = yield* sync();
       data.successes.should.eql(['byte']);
 
-      mm.data(npmService, 'getAllSince', {
-        _updated: Date.now(),
-      });
+      mm.data(npmService, 'getAllSince', []);
       var data = yield* sync();
       data.successes.should.eql([]);
     });

@@ -46,11 +46,12 @@ function* getFirstSyncPackages(lastSyncModule) {
  */
 function* getCommonSyncPackages(lastSyncTime) {
   var data = yield* npmService.getAllSince(lastSyncTime);
-  if (!data) {
+  if (!data || !Array.isArray(data)) {
     return [];
   }
-  delete data._updated;
-  return Object.keys(data);
+  return data.map(function (item) {
+    return item.name;
+  });
 }
 
 module.exports = function* sync() {

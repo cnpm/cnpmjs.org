@@ -70,9 +70,19 @@ exports.get = function* (name) {
 };
 
 exports.getAllSince = function* (startkey, timeout) {
+  return yield exports.getAllToday(timeout);
+
   var r = yield* request('/-/all/since?stale=update_after&startkey=' + startkey, {
     timeout: timeout || 300000
   });
+  return r.data;
+};
+
+exports.getAllToday = function* (timeout) {
+  var r = yield* request('/-/all/static/today.json', {
+    timeout: timeout || 300000
+  });
+  // data is array: see https://registry.npmjs.org/-/all/static/today.json
   return r.data;
 };
 
