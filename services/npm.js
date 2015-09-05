@@ -70,8 +70,6 @@ exports.get = function* (name) {
 };
 
 exports.getAllSince = function* (startkey, timeout) {
-  return yield exports.getAllToday(timeout);
-
   var r = yield* request('/-/all/since?stale=update_after&startkey=' + startkey, {
     timeout: timeout || 300000
   });
