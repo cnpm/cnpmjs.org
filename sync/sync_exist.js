@@ -65,12 +65,19 @@ module.exports = function* sync() {
   } else {
     debug('sync new module from last exist sync time: %s', info.last_sync_time);
     var data = yield* npmService.getAllSince(info.last_exist_sync_time - ms('10m'));
-    if (!data || !Array.isArray(data)) {
+    if (!data) {
       allPackages = [];
-    } else {
+    } else if (Array.isArray(data)) {
+      // support https://registry.npmjs.org/-/all/static/today.json
       allPackages = data.map(function (item) {
         return item.name;
       });
+    } else {
+      if (data._updated) {
+        syncTime = data._updated;
+        delete data._updated;
+      }
+      allPackages = Object.keys(data);
     }
   }
 

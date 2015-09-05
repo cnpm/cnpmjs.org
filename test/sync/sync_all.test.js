@@ -36,11 +36,20 @@ describe('test/sync/sync_all.test.js', function () {
     });
 
     it('should sync common ok', function* () {
-      // mm.data(npmSerivce, 'getAllSince', {
-      //   _updated: Date.now(),
-      //   'mk2testmodule': {},
-      //   // cutter: {}
-      // });
+      mm.data(npmSerivce, 'getAllSince', {
+        _updated: Date.now(),
+        'mk2testmodule': {},
+        // cutter: {}
+      });
+      mm.data(npmSerivce, 'getShort', ['mk2testmodule']);
+      mm.data(totalService, 'getTotalInfo', {last_sync_time: Date.now()});
+      mm.data(packageService, 'listAllPublicModuleNames', [ 'mk2testmodule' ]);
+      var data = yield sync;
+      data.successes.should.eql(['mk2testmodule']);
+      mm.restore();
+    });
+
+    it('should sync with array data format ok', function* () {
       mm.data(npmSerivce, 'getAllSince', [
         {
           name: 'mk2testmodule',

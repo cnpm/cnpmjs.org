@@ -41,6 +41,20 @@ describe('test/sync/sync_exist.test.js', function () {
     });
 
     it('should sync common ok', function *() {
+      mm.data(npmService, 'getAllSince', {
+        _updated: Date.now(),
+        byte: {},
+      });
+      mm.data(totalService, 'getTotalInfo', {last_exist_sync_time: Date.now()});
+      var data = yield* sync();
+      data.successes.should.eql(['byte']);
+
+      mm.data(npmService, 'getAllSince', []);
+      var data = yield* sync();
+      data.successes.should.eql([]);
+    });
+
+    it('should sync with array format data', function *() {
       mm.data(npmService, 'getAllSince', [
         {
           name: 'byte',
