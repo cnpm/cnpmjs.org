@@ -110,6 +110,43 @@ exports.fetchUpdatesSince = function* (lastSyncTime, timeout) {
   return result;
 };
 
+exports.fetchAllPackagesSince = function* (timestamp) {
+  var r = yield request('/-/all/static/all.json', {
+    registry: 'http://registry.npmjs.org',
+    timeout: 600000
+  });
+  // {"_updated":1441520402174,"0":{"name":"0","dist-tags
+  // "time":{"modified":"2014-06-17T06:38:43.495Z"}
+  var data = r.data;
+  var result = {
+    lastModified: timestamp,
+    lastModifiedName: null,
+    names: [],
+  };
+  var maxModified;
+  for (var key in data) {
+    if (key === '_updated') {
+      continue;
+    }
+    var pkg = data[key];
+    if (!pkg.time || !pkg.time.modified) {
+      continue;
+    }
+    var modified = Date.parse(pkg.time.modified);
+    if (modified >= timestamp) {
+      result.names.push(pkg.name);
+    }
+    if (!maxModified || modified > maxModified) {
+      maxModified = modified;
+      result.lastModifiedName = pkg.name;
+    }
+  }
+  if (maxModified) {
+    result.lastModified = maxModified;
+  }
+  return result;
+};
+
 exports.getAllSince = function* (startkey, timeout) {
   var r = yield* request('/-/all/since?stale=update_after&startkey=' + startkey, {
     timeout: timeout || 300000
