@@ -41,10 +41,13 @@ exports.version = function* () {
   }
 
   var subject = config.badgeSubject.replace(/\-/g, '--');
+  if (this.query.subject) {
+    subject = this.query.subject.replace(/\-/g, '--');
+  }
   version = version.replace(/\-/g, '--');
   var style = this.query.style || 'flat-square';
   var url = util.format('https://img.shields.io/badge/%s-%s-%s.svg?style=%s',
-    subject, version, color, utility.encodeURIComponent(style));
+    utility.encodeURIComponent(subject), version, color, utility.encodeURIComponent(style));
   this.redirect(url);
 };
 
