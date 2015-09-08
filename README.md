@@ -3,7 +3,7 @@ cnpmjs.org
 
 [![NPM version][npm-image]][npm-url]
 [![build status][travis-image]][travis-url]
-[![Test coverage][coveralls-image]][coveralls-url]
+[![Test coverage][cov-image]][cov-url]
 [![Gittip][gittip-image]][gittip-url]
 [![David deps][david-image]][david-url]
 [![node version][node-image]][node-url]
@@ -14,8 +14,8 @@ cnpmjs.org
 [npm-url]: http://cnpmjs.org/package/cnpmjs.org
 [travis-image]: https://img.shields.io/travis/cnpm/cnpmjs.org.svg?style=flat-square
 [travis-url]: https://travis-ci.org/cnpm/cnpmjs.org
-[coveralls-image]: https://img.shields.io/coveralls/cnpm/cnpmjs.org.svg?style=flat-square
-[coveralls-url]: https://coveralls.io/r/cnpm/cnpmjs.org?branch=master
+[cov-image]: http://codecov.io/github/cnpm/cnpmjs.org/coverage.svg?branch=master
+[cov-url]: http://codecov.io/github/cnpm/cnpmjs.org?branch=master
 [gittip-image]: https://img.shields.io/gittip/fengmk2.svg?style=flat-square
 [gittip-url]: https://www.gittip.com/fengmk2/
 [david-image]: https://img.shields.io/david/cnpm/cnpmjs.org.svg?style=flat-square

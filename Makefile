@@ -80,7 +80,6 @@ test-travis: install init-database
 		$(BIN) --harmony \
 		node_modules/.bin/istanbul cover --preserve-comments \
 		node_modules/.bin/_mocha \
-		--report lcovonly \
 		-- -u exports \
 		--reporter dot \
 		--timeout $(TIMEOUT) \
