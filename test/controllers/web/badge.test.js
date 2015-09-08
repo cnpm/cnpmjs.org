@@ -5,7 +5,7 @@
  * MIT Licensed
  *
  * Authors:
- *  fengmk2 <fengmk2@gmail.com> (http://fengmk2.github.com)
+ *  fengmk2 <fengmk2@gmail.com> (http://fengmk2.com)
  */
 
 'use strict';
@@ -51,6 +51,21 @@ describe('controllers/web/badge.test.js', function () {
         request(app)
         .get('/badge/v/@cnpmtest/badge-test-module.svg?style=flat-square&tag=v2')
         .expect('Location', 'https://img.shields.io/badge/cnpm-2.0.1-blue.svg?style=flat-square')
+        .expect(302, done);
+      });
+    });
+
+    it('should support custom subject', function (done) {
+      var pkg = utils.getPackage('@cnpmtest/badge-test-module', '3.0.1', utils.admin, 'v3');
+      request(registry)
+      .put('/' + pkg.name)
+      .set('authorization', utils.adminAuth)
+      .send(pkg)
+      .end(function (err) {
+        should.not.exists(err);
+        request(app)
+        .get('/badge/v/@cnpmtest/badge-test-module.svg?style=flat-square&tag=v3&subject=ant-design')
+        .expect('Location', 'https://img.shields.io/badge/ant--design-3.0.1-blue.svg?style=flat-square')
         .expect(302, done);
       });
     });
