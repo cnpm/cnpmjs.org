@@ -30,6 +30,14 @@ function* sync(sinceTimestamp) {
     console.log('no packages need be sync');
     process.exit(0);
   }
+  // var news = [];
+  // for (var i = 0; i < packages.length; i++) {
+  //   if (packages[i] === 'elwms') {
+  //     news = packages.slice(i);
+  //     break;
+  //   }
+  // }
+  // packages = news;
   console.log('lastModified: %s, lastModified package: %s, total %d packages to sync: %j',
     new Date(result.lastModified), result.lastModifiedName, packages.length, packages);
 
