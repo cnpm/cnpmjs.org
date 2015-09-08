@@ -1,4 +1,4 @@
-/*!
+/**!
  * cnpmjs.org - sync/sync_all.js
  *
  * Copyright(c) cnpmjs.org and other contributors.
