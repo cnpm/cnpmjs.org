@@ -4,11 +4,8 @@ cnpmjs.org
 [![NPM version][npm-image]][npm-url]
 [![build status][travis-image]][travis-url]
 [![Test coverage][cov-image]][cov-url]
-[![Gittip][gittip-image]][gittip-url]
 [![David deps][david-image]][david-url]
-[![node version][node-image]][node-url]
 [![npm download][download-image]][download-url]
-[![gitter][gitter-image]][gitter-url]
 
 [npm-image]: http://cnpmjs.org/badge/v/cnpmjs.org.svg?style=flat-square
 [npm-url]: http://cnpmjs.org/package/cnpmjs.org
@@ -16,16 +13,10 @@ cnpmjs.org
 [travis-url]: https://travis-ci.org/cnpm/cnpmjs.org
 [cov-image]: http://codecov.io/github/cnpm/cnpmjs.org/coverage.svg?branch=master
 [cov-url]: http://codecov.io/github/cnpm/cnpmjs.org?branch=master
-[gittip-image]: https://img.shields.io/gittip/fengmk2.svg?style=flat-square
-[gittip-url]: https://www.gittip.com/fengmk2/
 [david-image]: https://img.shields.io/david/cnpm/cnpmjs.org.svg?style=flat-square
 [david-url]: https://david-dm.org/cnpm/cnpmjs.org
-[node-image]: https://img.shields.io/badge/node.js-%3E=_0.11-red.svg?style=flat-square
-[node-url]: http://nodejs.org/download/
 [download-image]: https://img.shields.io/npm/dm/cnpmjs.org.svg?style=flat-square
 [download-url]: https://npmjs.org/package/cnpmjs.org
-[gitter-image]: https://badges.gitter.im/Join%20Chat.svg
-[gitter-url]: https://gitter.im/cnpm/cnpmjs.org?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge
 
 ![logo](https://raw.github.com/cnpm/cnpmjs.org/master/logo.png)
 
@@ -120,8 +111,8 @@ Tips: make sure your code is following the [node-style-guide](https://github.com
 
 ## Sponsors
 
-- [![UCloud云计算](https://www.ucloud.cn/www/img/www/logo.png)](http://www.ucloud.cn/sdk?sem=sdk-CNPMJS)
+- [![UCloud云计算](https://www.ucloud.cn/static/style/images/about/logo.png)](http://www.ucloud.cn?sem=sdk-CNPMJS)
 
 ## License
 
-MIT
+[MIT](LICENSE.txt)

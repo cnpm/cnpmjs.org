@@ -128,7 +128,7 @@ exports.listModules = function* (names) {
       id: ids
     },
     attributes: [
-      'name', 'description'
+      'name', 'description', 'version',
     ]
   });
   return rows;

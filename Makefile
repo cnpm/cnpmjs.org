@@ -3,12 +3,12 @@ REPORTER = spec
 TIMEOUT = 30000
 MOCHA_OPTS =
 DB = sqlite
-DISTURL = http://npm.taobao.org/mirrors/iojs
+DISTURL = https://npm.taobao.org/mirrors/iojs
 BIN = iojs
 
 ifeq ($(findstring io.js, $(shell which node)),)
 	BIN = node
-	DISTURL = http://npm.taobao.org/mirrors/node
+	DISTURL = https://npm.taobao.org/mirrors/node
 endif
 
 install:
