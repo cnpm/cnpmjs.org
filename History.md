@@ -1,4 +1,13 @@
 
+2.2.0 / 2015-09-29
+==================
+
+ * feat: list packages by username
+ * test: use codecov
+ * feat(badge): support custom subject
+ * fix(sync): add recover logic
+ * feat(sync): add sync scripts
+
 2.1.5 / 2015-09-05
 ==================
 
