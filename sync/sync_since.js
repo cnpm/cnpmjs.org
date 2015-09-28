@@ -1,7 +1,7 @@
 /**!
  * sync packages since by some days ago
  *
- * Copyright(c) fengmk2 and other contributors.
+ * Copyright(c) cnpmjs.org and other contributors.
  * MIT Licensed
  *
  * Authors:
@@ -55,7 +55,7 @@ function* sync(sinceTimestamp) {
   console.log('All packages sync done, successes %d, fails %d',
       worker.successes.length, worker.fails.length);
   process.exit(0);
-};
+}
 
 co(function* () {
   var timestamp = Date.now() - ms(process.argv[2] || '30d');

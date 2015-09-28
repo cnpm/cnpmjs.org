@@ -38,6 +38,7 @@ var usernames = [
   'cnpmjstest10', // admin
   'cnpmjstestAdmin2', // other admin
   'cnpmjstestAdmin3', // other admin
+  'cnpmjstest_list_by_user',
 ];
 
 var count = usernames.length;

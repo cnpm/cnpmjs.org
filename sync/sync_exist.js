@@ -1,6 +1,4 @@
 /*!
- * cnpmjs.org - sync/sync_exist.js
- *
  * Copyright(c) cnpmjs.org and other contributors.
  * MIT Licensed
  *
@@ -16,7 +14,6 @@
 
 var debug = require('debug')('cnpmjs.org:sync:sync_exist');
 var Status = require('./status');
-var ms = require('humanize-ms');
 var thunkify = require('thunkify-wrap');
 var config = require('../config');
 var npmService = require('../services/npm');

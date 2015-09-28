@@ -59,10 +59,12 @@
   <% if (!packages.length) { %>
     <div class="alert alert-warning">Can not found any package by <%= user.name %>.</div>
   <% } %>
-  <% for (var i = 0; i < packages.length; i++) { %>
+  <% for (var i = 0; i < packages.length; i++) {
+    var package = packages[i];
+  %>
     <div class="package">
-      <a href="/package/<%= packages[i].name %>" class="package-name"><%= packages[i].name %></a>
-      <span class="package-description"><%= packages[i].description %></span>
+      <a href="/package/<%= packages[i].name %>" class="package-name"><%= package.name %></a>
+      <span class="package-description">(latest: <%= package.version %>) <%= package.description %></span>
     </div>
   <% } %>
 </div>

@@ -124,7 +124,7 @@ describe('test/services/package.test.js', function () {
       var mods = yield* Package.listPublicModulesByUser('listPublicModuleNamesByUser-user');
       mods.should.length(3);
       mods.forEach(function (mod) {
-        mod.toJSON().should.have.keys('name', 'description');
+        mod.toJSON().should.have.keys('name', 'description', 'version');
         mod.name.should.containEql('listPublicModuleNamesByUser-module');
       });
     });

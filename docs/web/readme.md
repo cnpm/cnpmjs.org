@@ -144,4 +144,4 @@ Release [History](/history).
 
 ## Sponsors
 
-- [![UCloud云计算](https://www.ucloud.cn/www/img/www/logo.png)](http://www.ucloud.cn/sdk?sem=sdk-CNPMJS)
+- [![UCloud云计算](https://www.ucloud.cn/static/style/images/about/logo.png)](http://www.ucloud.cn?sem=sdk-CNPMJS)

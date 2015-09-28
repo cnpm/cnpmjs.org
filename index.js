@@ -1,6 +1,4 @@
 /**!
- * cnpmjs.org - index.js
- *
  * Copyright(c) cnpmjs.org and other contributors.
  * MIT Licensed
  *
