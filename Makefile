@@ -56,7 +56,7 @@ test-pg: init-pg
 test-all: test-sqlite test-mysql
 
 test-cov cov: install init-database
-	@NODE_ENV=test DB=${DB} $(BIN) --harmony \
+	@NODE_ENV=test DB=${DB} $(BIN) \
 		node_modules/.bin/istanbul cover --preserve-comments \
 		node_modules/.bin/_mocha \
 		-- -u exports \
@@ -77,7 +77,7 @@ test-cov-mysql: init-mysql
 
 test-travis: install init-database
 	@NODE_ENV=test DB=${DB} CNPM_SOURCE_NPM=http://registry.npmjs.com CNPM_SOURCE_NPM_ISCNPM=false \
-		$(BIN) --harmony \
+		$(BIN) \
 		node_modules/.bin/istanbul cover --preserve-comments \
 		node_modules/.bin/_mocha \
 		-- -u exports \

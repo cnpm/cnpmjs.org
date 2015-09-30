@@ -3,7 +3,6 @@ language: node_js
 node_js:
   - '1'
   - '2'
-  - '3'
   - '4'
 addons:
   - postgresql: '9.3'
