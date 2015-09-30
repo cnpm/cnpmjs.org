@@ -61,7 +61,7 @@
     "chunkstream": "*",
     "co-mocha": "*",
     "contributors": "*",
-    "istanbul-harmony": "*",
+    "istanbul": "*",
     "jshint": "*",
     "mm": "*",
     "mocha": "*",
