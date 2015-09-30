@@ -1,4 +1,11 @@
 
+2.2.1 / 2015-09-30
+==================
+
+ * test: use istanbul
+ * pref: move out try/catch block
+ * fix: support nfs.url is generator
+
 2.2.0 / 2015-09-29
 ==================
 
