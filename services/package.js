@@ -28,19 +28,23 @@ var NpmModuleMaintainer = models.NpmModuleMaintainer;
 
 // module
 
+var _parseRow = function (row) {
+  if (row.package.indexOf('%7B%22') === 0) {
+    // now store package will encodeURIComponent() after JSON.stringify
+    row.package = decodeURIComponent(row.package);
+  }
+  row.package = JSON.parse(row.package);
+  if (typeof row.publish_time === 'string') {
+    // pg bigint is string
+    row.publish_time = Number(row.publish_time);
+  }
+};
+
 // module:read
 function parseRow(row) {
   if (row && row.package) {
     try {
-      if (row.package.indexOf('%7B%22') === 0) {
-        // now store package will encodeURIComponent() after JSON.stringify
-        row.package = decodeURIComponent(row.package);
-      }
-      row.package = JSON.parse(row.package);
-      if (typeof row.publish_time === 'string') {
-        // pg bigint is string
-        row.publish_time = Number(row.publish_time);
-      }
+      _parseRow(row);
     } catch (e) {
       console.warn('parse package error: %s, id: %s version: %s, error: %s', row.name, row.id, row.version, e);
     }
