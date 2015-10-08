@@ -9,7 +9,7 @@ module.exports = {
       node: {
         version: '>= 0.11.13',
         title: 'node: >=0.11.13',
-        badgeURL: 'https://img.shields.io/badge/node-%3E%3D%200.11.13-red.svg?style=flat-square',
+        badgeURL: 'https://dn-img-shields-io.qbox.me/badge/node-%3E%3D%200.11.13-red.svg?style=flat-square',
       }
     },
     _publish_on_cnpm: false,

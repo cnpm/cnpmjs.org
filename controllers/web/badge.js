@@ -46,17 +46,17 @@ exports.version = function* () {
   }
   version = version.replace(/\-/g, '--');
   var style = this.query.style || 'flat-square';
-  var url = util.format('https://img.shields.io/badge/%s-%s-%s.svg?style=%s',
+  var url = util.format('https://dn-img-shields-io.qbox.me/badge/%s-%s-%s.svg?style=%s',
     utility.encodeURIComponent(subject), version, color, utility.encodeURIComponent(style));
   this.redirect(url);
 };
 
 exports.downloads = function* () {
-  // https://img.shields.io/badge/downloads-100k/month-brightgreen.svg?style=flat-square
+  // https://dn-img-shields-io.qbox.me/badge/downloads-100k/month-brightgreen.svg?style=flat-square
   var name = this.params[0];
   var count = yield DownloadTotal.getTotalByName(name);
   var style = this.query.style || 'flat-square';
-  var url = util.format('https://img.shields.io/badge/downloads-%s-brightgreen.svg?style=%s',
+  var url = util.format('https://dn-img-shields-io.qbox.me/badge/downloads-%s-brightgreen.svg?style=%s',
     count, utility.encodeURIComponent(style));
   this.redirect(url);
 };

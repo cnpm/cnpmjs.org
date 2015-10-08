@@ -60,9 +60,9 @@ Default style is `flat-square`.
 
 Badge URL: `http://cnpmjs.org/badge/v/cnpmjs.org.svg` ![cnpmjs.org-version-badge](//cnpmjs.org/badge/v/cnpmjs.org.svg)
 
-* `<0.1.0 & >=0.0.0`: ![red-badge](https://img.shields.io/badge/cnpm-0.0.1-red.svg?style=flat-square)
-* `<1.0.0 & >=0.1.0`: ![red-badge](https://img.shields.io/badge/cnpm-0.1.0-green.svg?style=flat-square)
-* `>=1.0.0`: ![red-badge](https://img.shields.io/badge/cnpm-1.0.0-blue.svg?style=flat-square)
+* `<0.1.0 & >=0.0.0`: ![red-badge](https://dn-img-shields-io.qbox.me/badge/cnpm-0.0.1-red.svg?style=flat-square)
+* `<1.0.0 & >=0.1.0`: ![red-badge](https://dn-img-shields-io.qbox.me/badge/cnpm-0.1.0-green.svg?style=flat-square)
+* `>=1.0.0`: ![red-badge](https://dn-img-shields-io.qbox.me/badge/cnpm-1.0.0-blue.svg?style=flat-square)
 
 ### Downloads
 
