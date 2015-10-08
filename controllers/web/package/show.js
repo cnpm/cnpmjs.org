@@ -178,7 +178,7 @@ module.exports = function* show(next) {
       pkg.engines[k] = {
         version: engine,
         title: k + ': ' + engine,
-        badgeURL: 'https://img.shields.io/badge/' + encodeURIComponent(k) +
+        badgeURL: 'https://dn-img-shields-io.qbox.me/badge/' + encodeURIComponent(k) +
           '-' + encodeURIComponent(engine) + '-' + color + '.svg?style=flat-square',
       };
     }
