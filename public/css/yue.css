@@ -1,0 +1,147 @@
+/**
+ * yue.css
+ *
+ * yue.css is designed for readable content.
+ *
+ * Copyright (c) 2013 - 2014 by Hsiaoming Yang.
+ */
+
+
+.yue h1,
+.yue h2,
+.yue h3,
+.yue h4,
+.yue h5,
+.yue h6 {
+  font-family: "Georgia", "Xin Gothic", "Hiragino Sans GB", "Droid Sans Fallback", "Microsoft YaHei", "SimSun", sans-serif;
+  color: #222223;
+}
+
+.yue h1 {
+  font-size: 1.8em;
+  margin: 0.67em 0;
+}
+
+.yue > h1 {
+  margin-top: 0;
+  font-size: 2em;
+}
+
+.yue h2 {
+  font-size: 1.5em;
+  margin: 0.83em 0;
+}
+
+.yue h3 {
+  font-size: 1.17em;
+  margin: 1em 0;
+}
+
+.yue h4,
+.yue h5,
+.yue h6 {
+  font-size: 1em;
+  margin: 1.6em 0 1em 0;
+}
+
+.yue h6 {
+  font-weight: 500;
+}
+
+.yue p {
+  margin-top: 0;
+  margin-bottom: 1.46em;
+}
+
+
+.yue strong,
+.yue b {
+  font-weight: 700;
+  color: #222223;
+}
+
+.yue em,
+.yue i {
+  font-style: italic;
+  color: #222223;
+}
+
+
+
+
+
+.yue hr {
+  display: block;
+  width: 14%;
+  margin: 40px auto 34px;
+  border: 0 none;
+  border-top: 3px solid #dededc;
+}
+
+.yue blockquote {
+  margin: 0 0 1.64em 0;
+  border-left: 3px solid #dadada;
+  padding-left: 12px;
+  color: #666664;
+}
+
+.yue blockquote a {
+  color: #666664;
+}
+
+.yue ul,
+.yue ol {
+  margin: 0 0 24px 6px;
+  padding-left: 16px;
+}
+
+.yue ul {
+  list-style-type: square;
+}
+
+.yue ol {
+  list-style-type: decimal;
+}
+
+.yue li {
+  margin-bottom: 0.2em;
+}
+
+.yue li ul,
+.yue li ol {
+  margin-top: 0;
+  margin-bottom: 0;
+  margin-left: 14px;
+}
+
+.yue li ul {
+  list-style-type: disc;
+}
+
+.yue li ul ul {
+  list-style-type: circle;
+}
+
+.yue li p {
+  margin: 0.4em 0 0.6em;
+}
+
+.yue .unstyled {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
+
+
+@media (min-width: 1100px) {
+  .yue blockquote {
+    margin-left: -24px;
+    padding-left: 20px;
+    border-width: 4px;
+  }
+
+  .yue blockquote blockquote {
+    margin-left: 0;
+  }
+}

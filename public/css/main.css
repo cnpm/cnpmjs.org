@@ -1,16 +1,53 @@
 body {
   font-size: 16px;
-  color: #333333;
 }
-header {
-  max-width: 1140px;
-  min-width: 960px;
-  margin: 30px auto 30px auto;
+.container {
+    padding-right: 15px;
+    padding-left: 15px;
+    margin-right: auto;
+    margin-left: auto
 }
-header .logo {
+
+@media (min-width: 768px) {
+    .container {
+        width:750px
+    }
+}
+
+@media (min-width: 992px) {
+    .container {
+        width:970px
+    }
+}
+
+@media (min-width: 1200px) {
+    .container {
+        width:1170px
+    }
+}
+
+hr {
+  margin-top: 20px;
+  margin-bottom: 20px;
+  border: 0;
+  border-top: 1px solid #eee;
+  height: 0;
+}
+
+#header {
+  padding: 30px 0;
+}
+
+#header .logo {
   display: inline-block;
 }
-header #search-input {
+
+#header .logo a {
+  display: inline-block;
+  vertical-align: top;
+}
+
+#search-input {
   display: inline-block;
   width: 400px;
   height: 50px;
@@ -18,168 +55,37 @@ header #search-input {
   float: right;
   margin-top: 22px;
 }
-.pack-overview {
-  min-width: 960px;
-  color: #f1f1f1;
-  height: 300px;
-  width: 100%;
-}
-.pack-overview-background {
-  height: 300px;
-  background: #428bca url(https://dn-cnpm.qbox.me/bs-docs-masthead-pattern.png) repeat center center;
-  position: absolute;
-  width: 100%;
-  z-index: -1;
-  left: 0;
-}
-.pack-overview a {
-  color: #f1f1f1;
-  text-decoration: underline;
-}
-.pack-overview a:hover {
-  color: #ffffff;
-}
-.pack-info {
-  position: relative;
-  max-width: 1140px;
-  margin: 0 auto;
-  padding: 30px 0;
-  font-size: 20px;
-  line-height: 25px;
+
+.bottom {
+  text-align: center;
+  font-size: 14px;
+  padding-bottom: 15px;
 }
 
-.pack-name {
-  font-size: 48px;
-  line-height: 48px;
-  color: #fff;
+code {
+  padding: 2px 4px;
+  font-size: 95%;
+  color: #c7254e;
+  background-color: #f9f2f4;
+  border-radius: 4px;
 }
-.pack-description {
-  line-height: 28px;
-  text-overflow: ellipsis;
-  color: #fff;
-  width: 600px;
-  white-space:nowrap;
-  text-overflow: ellipsis;
-  overflow:hidden;
+
+img {
+  vertical-align: middle;
 }
-.deprecated {
-  text-decoration: line-through;
-  color: #BDBDBD;
-}
-.deprecated-content {
-  color: #FF8A65;
-  width: 600px;
-  white-space:nowrap;
-  text-overflow: ellipsis;
-  overflow:hidden;
-}
-.pack-ver {
-  font-size: 28px;
-  line-height: 48px;
-}
-.pack-repo {
-  margin-top: 50px;
-}
-.pack-install {
-  position: absolute;
-  top: 85px;
-  right: 0px;
-}
-.pack-install pre {
-  border: none;
-  background-color: #666666;
-  color: #f1f1f1;
-  font-size: 16px;
-  width: 480px;
-}
-.pack-details {
-  max-width: 1140px;
-  min-width: 960px;
-  margin: 40px auto;
-}
-.pack-details a {
-  color: #333333;
-}
-.cols-box {
-  display: flex;
-  -webkit-box-pack: center;
-}
-.cols-box ul {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-.cols-box-item {
-  flex: 1;
-  height: 250px;
-  margin-right: 30px;
-}
-.cols-box-item:last-child {
-  margin-right: 0;
-}
-.cols-box-title {
-  font-size: 20px;
-  color: #428bca;
-  margin-bottom: 10px;
-  font-weight: bold;
-  overflow: hidden;
-}
-.cols-box-item .more-item {
-  font-size: 16px;
-  line-height: 28px;
-  color: #428bca;
-  text-decoration: underline;
-  float: right;
-}
-.pack-dep-ver, .pack-download-num {
-  float: right;
-}
-.pack-lastup, .pack-sync {
-  margin-top: 10px;
-}
-.pack-sync a {
-  font-size: 23px;
-}
-.maintainers .row {
-  display: -moz-box;
-  display: -webkit-box;
-  display: box;
-  -webkit-box-pack: center;
-  margin-right: 0;
-  margin-left: 0;
-}
-.maintainer {
-  -moz-box-flex: 1;
-  -webkit-box-flex: 1;
-  box-flex: 1;
-  margin-bottom: 10px;
-  width: 50%;
-  -webkit-box-orient: vertical;
-  -webkit-box-pack: center;
-  line-height: 50px;
-  overflow: hidden;
-}
-.maintainer .avatar {
-  -webkit-border-radius: 50px;
-  -moz-border-radius: 50px;
-  border-radius: 50px;
-  margin-right: 10px;
-}
-.downloads .row {
-  margin-left: 0;
-  margin-right: 50px;
-  line-height: 28px;
-  border-bottom: 1px solid #f2f2f2;
-}
-.pack-readme {
-  max-width: 1140px;
-  min-width: 960px;
-  margin: 10px auto;
-  border-top: 1px solid #dddddd;
-}
-.pack-readme .title {
-  color: #dddddd;
-  font-weight: bolder;
+
+pre {
   margin-bottom: 20px;
-  text-align: right;
+}
+
+pre code {
+  padding: 0;
+  font-size: inherit;
+  color: inherit;
+  white-space: pre-wrap;
+  background-color: transparent;
+  border-radius: 0;
+}
+.ant-table {
+  font-size: 14px;
 }

@@ -8,34 +8,15 @@
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black" />
     <link rel="shortcut icon" href="/favicon.png">
-    <!-- Bootstrap -->
-    <link href="//dn-staticfile.qbox.me/twitter-bootstrap/3.2.0/css/bootstrap.min.css" rel="stylesheet" media="screen">
+    <!-- Ant design -->
+    <link href="/css/antd-0.9.1.min.css" rel="stylesheet" media="screen">
     <link href="/css/main.css" rel="stylesheet" media="screen">
+    <link href="/css/yue.css" rel="stylesheet" media="screen">
     <link href="/css/github.css" rel="stylesheet" media="screen">
     <link href="/css/github-markdown.css" rel="stylesheet" media="screen">
     <!-- JavaScript plugins (requires jQuery) -->
     <script src="//dn-staticfile.qbox.me/jquery/2.0.3/jquery.min.js"></script>
     <link rel="search" type="application/opensearchdescription+xml" href="/opensearch.xml" title="CNPM" />
-    <style>
-      #tagline{display:inline;}
-      /*#wrapper{padding:5% 8%;min-width:480px;}*/
-      #tagline{font:0.8em serif;color:#888;display:inline-block;margin:0.1em 0 1.2em;}
-      #fork{position:fixed;top:0;right:0;_position:absolute;}
-      .bottom{text-align: center;}
-      #content-header {margin: 20px 0 50px 0;}
-      .user .avatar {
-        width: 32px;
-        height: 32px;
-        margin-bottom: 3px;
-      }
-      table.downloads td.count {
-        text-align: right;
-      }
-
-      .nav-tabs{margin:20px 0;}
-      .nav-cont{display:none;}
-      .nav-cont.active{display:block;}
-    </style>
     <script>
       $(function () {
         $('#search-input').keypress(function (e) {
@@ -62,15 +43,17 @@
   </head>
   <body>
     <div class="container">
-      <header>
+      <header id="header">
         <div class="logo">
           <a href="/"><img src="{{logoURL}}"></a>
           {{adBanner}}
         </div>
-        <input type="text" id="search-input" class="form-control" placeholder="Search Packages">
+        <input type="text" id="search-input" class="ant-input ant-input-lg" placeholder="Search Packages">
       </header>
 
-      <%- locals.body %>
+      <div class="yue">
+        <%- locals.body %>
+      </div>
       <div class="bottom">
         <hr/>
         <p>
@@ -78,8 +61,6 @@
         </p>
       </div>
     </div>
-    <!-- Include all compiled plugins (below), or include individual files as needed -->
-    <script src="//dn-staticfile.qbox.me/twitter-bootstrap/3.2.0/js/bootstrap.min.js"></script>
 
     <!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
     <script src="//dn-staticfile.qbox.me/respond.js/1.2.0/respond.min.js"></script>
@@ -91,7 +72,7 @@
     $(function () {
       $('pre code').parent().addClass('prettyprint');
       prettyPrint();
-      $('table').addClass('table table-bordered table-striped');
+      $('table').addClass('');
     });
     </script>
   </body>
