@@ -1,7 +1,7 @@
 <div id="sync">
   <h1>Sync <%= type %> <span style="color:#09f;"><%= name %></span></h1>
   <div id="sync-notify">
-    <div class="alert alert-success">Sync started, please wait patiently.</div>
+    <div class="ant-alert ant-alert-success">Sync started, please wait patiently.</div>
   </div>
   <h2>Log</h2>
   <pre style="min-height: 400px;" id="sync-log"></pre>
@@ -28,7 +28,7 @@
       dataType: 'json',
       success: handleSyncSucess,
       error: function (err) {
-        var alert = $('<div class="alert alert-error"></div>');
+        var alert = $('<div class="ant-alert ant-alert-error"></div>');
         var message = 'Sync request error. ';
         if (err.status === 404) {
           message += name + ' not exist in official registry.';
@@ -48,7 +48,7 @@
       location.hash = '#logid=' + data.logId;
       return;
     }
-    $notify.html('<div class="alert alert-error">Sync request error.</div>');
+    $notify.html('<div class="ant-alert ant-alert-error">Sync request error.</div>');
   }
 
   var offset = 0;

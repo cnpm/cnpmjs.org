@@ -81,6 +81,12 @@ img {
 
 pre {
   margin-bottom: 20px;
+  background: #333;
+  color: #fff;
+  border-radius: 6px;
+  margin-top: 30px;
+  padding: 10px 20px;
+  word-wrap: break-word;
 }
 
 pre code {
@@ -91,6 +97,12 @@ pre code {
   background-color: transparent;
   border-radius: 0;
 }
+
 .ant-table {
   font-size: 14px;
+}
+
+.ant-alert {
+  font-size: 14px !important;
+  padding: 15px;
 }
