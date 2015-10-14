@@ -56,9 +56,15 @@ hr {
   display: inline-block;
   width: 400px;
   height: 50px;
-  font-size: 30px;
+  font-size: 20px;
   float: right;
   margin-top: 22px;
+  border-radius: 8px;
+  padding: 20px;
+}
+
+#search .package.match {
+  font-weight: bold;
 }
 
 .bottom {
