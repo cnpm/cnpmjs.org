@@ -1,6 +1,11 @@
 body {
   font-size: 16px;
 }
+
+.mb15 {
+  margin-bottom: 15px !important;
+}
+
 .container {
     padding-right: 15px;
     padding-left: 15px;
