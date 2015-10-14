@@ -1,42 +1,30 @@
-<style>
-#search .package {
-  padding: 10px;
-  font-size: 18px;
-  border-bottom: 1px solid #ddd;
-}
-
-#search .alert a {
-  font-size: 20px;
-}
-#search .package.match {
-  font-size: 25px;
-  font-weight: bolder;
-}
-</style>
-<div id="search">
+<div id="search" class="row">
   <% if (!packages.length) { %>
-    <div class="alert alert-warning">
+    <div class="ant-alert ant-alert-warn">
       Can not found package match <%= keyword %>. You can
       <a href="/sync/<%= keyword %>" target="_blank">SYNC</a> from official npm registry or
       <a href="https://npmjs.org/search?q=<%= keyword %>" target="_blank">SEARCH</a> in official npm website.
     </div>
   <% } else if (!match) { %>
-    <div class="alert alert-info">
+    <div class="ant-alert ant-alert-info">
       Can not found package <%= keyword %>. You can
       <a href="/sync/<%= keyword %>" target="_blank">SYNC</a> from official npm registry or
       <a href="https://npmjs.org/search?q=<%= keyword %>" target="_blank">SEARCH</a> in official npm website.
     </div>
   <% } %>
+  <div class="col-12">
+
   <% if (packages.length) { %>
-    <h1>
+    <h2>
       Packages match "<span style="color: #09f;"><%= keyword %></span>"
-    </h1>
-    <hr />
+    </h2>
     <% if (match) { %>
-      <div class="package match">
-        <a href="/package/<%= match.name %>" class="package-name"><%= match.name %></a>
-        <span class="package-description"><%= match.description %></span>
-      </div>
+      <ul>
+        <li class="package match">
+          <a href="/package/<%= match.name %>" class="package-name"><%= match.name %></a>
+          <span class="package-description"><%= match.description %></span>
+        </li>
+      </ul>
     <% } %>
     <% for (var i = 0; i < packages.length; i++) {
       var item = packages[i];
@@ -44,25 +32,30 @@
         continue;
       }
     %>
-      <div class="package">
+    <ul>
+      <li class="package">
         <a href="/package/<%= item.name %>" class="package-name"><%= item.name %></a>
         <span class="package-description"><%= item.description %></span>
-      </div>
+      </li>
+    </ul>
     <% } %>
   <% } %>
-
+  </div>
+  <div class="col-12">
   <% if (keywords.length) { %>
-    <h1>
+    <h2>
       Keywords match "<span style="color: #09f;"><%= keyword %></span>"
-    </h1>
-    <hr />
+    </h2>
     <% for (var i = 0; i < keywords.length; i++) {
       var item = keywords[i];
     %>
-      <div class="package <%= item.name === keyword ? 'match' : '' %>">
+    <ul>
+      <li class="package <%= item.name === keyword ? 'match' : '' %>">
         <a href="/package/<%= item.name %>" class="package-name"><%= item.name %></a>
         <span class="package-description"><%= item.description %></span>
-      </div>
+      </li>
+    </ul>
     <% } %>
   <% } %>
+  </div>
 </div>
