@@ -16,7 +16,7 @@
     "agentkeepalive": "~1.2.0",
     "bluebird": "~2.9.7",
     "bytes": "~1.0.0",
-    "cfork": "~1.2.2",
+    "cfork": "~1.3.1",
     "co": "~4.3.1",
     "co-defer": "~1.0.0",
     "co-gather": "~0.0.1",
