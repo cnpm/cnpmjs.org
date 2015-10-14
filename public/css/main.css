@@ -112,3 +112,148 @@ pre code {
   font-size: 14px !important;
   padding: 15px;
 }
+
+
+.pack-overview {
+  min-width: 960px;
+  color: #f1f1f1;
+  height: 300px;
+  width: 100%;
+  margin-bottom: 50px;
+}
+.pack-overview-background {
+  height: 300px;
+  background: #428bca url(https://dn-cnpm.qbox.me/bs-docs-masthead-pattern.png) repeat center center;
+  position: absolute;
+  width: 100%;
+  z-index: -1;
+  left: 0;
+}
+.pack-overview a {
+  color: #f1f1f1;
+  text-decoration: none;
+  font-size: 16px;
+  transition: all .2s ease-in-out;
+  padding-bottom: 2px;
+  border-bottom: 1px solid;
+}
+.pack-overview a:hover {
+  color: #ffffff;
+  opacity: .7;
+}
+
+.pack-info {
+  position: relative;
+  max-width: 1140px;
+  margin: 0 auto;
+  padding: 30px 0;
+  font-size: 20px;
+  line-height: 25px;
+}
+
+.pack-name {
+  font-size: 48px;
+  line-height: 48px;
+  color: #fff;
+}
+.pack-description {
+  line-height: 28px;
+  color: #fff;
+  width: 600px;
+  white-space:nowrap;
+  text-overflow: ellipsis;
+  overflow:hidden;
+  margin-top: 20px;
+  font-family: sans-serif;
+}
+.deprecated {
+  text-decoration: line-through;
+  color: #BDBDBD;
+}
+.deprecated-content {
+  color: #FF8A65;
+  width: 600px;
+  white-space:nowrap;
+  text-overflow: ellipsis;
+  overflow:hidden;
+}
+.pack-ver {
+  font-size: 28px;
+  line-height: 48px;
+}
+.pack-lastup {
+  font-size: 14px;
+  display: inline-block;
+}
+
+.pack-repo {
+  margin-top: 60px;
+}
+.pack-repo a {
+  border: none;
+}
+.pack-repo a:hover {
+  border-bottom: 1px solid;
+}
+
+.pack-install {
+  position: absolute;
+  top: 85px;
+  right: 0px;
+}
+
+
+.pack-details a {
+  color: #333333;
+}
+
+.cols-box ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.cols-box-item {
+  flex: 1;
+  height: 250px;
+  margin-right: 30px;
+}
+.cols-box-item:last-child {
+  margin-right: 0;
+}
+.cols-box-title {
+  font-size: 20px;
+  color: #428bca;
+  margin-bottom: 10px;
+  font-weight: bold;
+  overflow: hidden;
+  border-bottom: 1px solid #ccc;
+  padding-bottom: 3px;
+}
+.cols-box-item .more-item {
+  font-size: 16px;
+  line-height: 28px;
+  color: #428bca;
+  margin-top: 15px;
+}
+.pack-dep-ver, .pack-download-num {
+  float: right;
+}
+.pack-lastup, .pack-sync {
+  margin-top: 10px;
+}
+
+
+.maintainer {
+  margin-bottom: 10px;
+  line-height: 50px;
+  overflow: hidden;
+}
+.maintainer a:hover {
+  font-style: italic;
+}
+.maintainer .avatar {
+  -webkit-border-radius: 50px;
+  -moz-border-radius: 50px;
+  border-radius: 50px;
+  margin-right: 10px;
+}
