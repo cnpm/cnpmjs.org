@@ -94,7 +94,7 @@ var config = {
   },
 
   logoURL: '//ww4.sinaimg.cn/large/69c1d4acgw1ebfly5kjlij208202oglr.jpg', // cnpm logo image url
-  adBanner: '<a class="ad-banner" style="margin-left: 20px" target="_blank" href="http://www.ucloud.cn/sdk?sem=sdk-CNPMJS"><img src="https://dn-cnpm.qbox.me/360x120.jpg"></a>',
+  adBanner: '',
   customReadmeFile: '', // you can use your custom readme file instead the cnpm one
   customFooter: '', // you can add copyright and site total script html here
   npmClientName: 'cnpm', // use `${name} install package`
