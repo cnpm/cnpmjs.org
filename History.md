@@ -1,4 +1,11 @@
 
+2.3.1 / 2015-10-15
+==================
+
+ * refactor: remove gnode
+ * deps: upgrade giturl
+ * Some fixes
+
 2.3.0 / 2015-10-15
 ==================
 
