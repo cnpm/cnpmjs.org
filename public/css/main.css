@@ -212,14 +212,15 @@ pre code {
   margin: 0;
   padding: 0;
 }
+
 .cols-box-item {
-  flex: 1;
-  height: 250px;
-  margin-right: 30px;
+  margin-bottom: 15px;
 }
+
 .cols-box-item:last-child {
   margin-right: 0;
 }
+
 .cols-box-title {
   font-size: 20px;
   color: #428bca;
