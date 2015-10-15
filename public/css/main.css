@@ -7,6 +7,7 @@ body {
 }
 
 .container {
+  min-width: 960px;;
   padding-right: 15px;
   padding-left: 15px;
   margin-right: auto;
@@ -41,6 +42,7 @@ hr {
 
 #header {
   padding: 30px 0;
+  height: 156px;
 }
 
 #header .logo {
@@ -60,7 +62,7 @@ hr {
   float: right;
   margin-top: 22px;
   border-radius: 8px;
-  padding: 20px;
+  padding: 10px 20px;
 }
 
 #search .package.match {
@@ -115,11 +117,11 @@ pre code {
 
 
 .pack-overview {
-  min-width: 960px;
   color: #f1f1f1;
   height: 300px;
   width: 100%;
   margin-bottom: 50px;
+  position: relative;
 }
 .pack-overview-background {
   height: 300px;
@@ -143,7 +145,6 @@ pre code {
 }
 
 .pack-info {
-  position: relative;
   max-width: 1140px;
   margin: 0 auto;
   padding: 30px 0;
@@ -156,26 +157,32 @@ pre code {
   line-height: 48px;
   color: #fff;
 }
+
 .pack-description {
-  line-height: 28px;
-  color: #fff;
-  width: 600px;
-  white-space:nowrap;
-  text-overflow: ellipsis;
-  overflow:hidden;
+  font-family: "-apple-system", sans-serif;
   margin-top: 20px;
-  font-family: sans-serif;
+  display: block; /* Fallback for non-webkit */
+  display: -webkit-box;
+  width: 600px;
+  font-size: 20px;
+  line-height: 26px;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-height: 100px;
 }
 .deprecated {
   text-decoration: line-through;
   color: #BDBDBD;
 }
 .deprecated-content {
-  color: #FF8A65;
+  color: #555;
   width: 600px;
   white-space:nowrap;
   text-overflow: ellipsis;
   overflow:hidden;
+  font-style: italic;
 }
 .pack-ver {
   font-size: 28px;
@@ -187,19 +194,25 @@ pre code {
 }
 
 .pack-repo {
-  margin-top: 60px;
+  position: absolute;
+  bottom: 10px;
+  text-align: right;
+  width: 100%;
 }
+
 .pack-repo a {
   border: none;
 }
+
 .pack-repo a:hover {
   border-bottom: 1px solid;
 }
 
 .pack-install {
   position: absolute;
-  top: 85px;
+  top: 75px;
   right: 0px;
+  max-width: 450px;
 }
 
 
@@ -207,19 +220,25 @@ pre code {
   color: #333333;
 }
 
+.pack-details a:hover {
+  border-bottom: 1px solid;
+  opacity: .8;
+}
+
 .cols-box ul {
   list-style: none;
   margin: 0;
   padding: 0;
 }
+
 .cols-box-item {
-  flex: 1;
-  height: 250px;
-  margin-right: 30px;
+  margin-bottom: 15px;
 }
+
 .cols-box-item:last-child {
   margin-right: 0;
 }
+
 .cols-box-title {
   font-size: 20px;
   color: #428bca;
@@ -239,21 +258,24 @@ pre code {
   float: right;
 }
 .pack-lastup, .pack-sync {
-  margin-top: 10px;
+  float: left;
 }
 
 
 .maintainer {
   margin-bottom: 10px;
-  line-height: 50px;
+  line-height: 30px;
   overflow: hidden;
 }
 .maintainer a:hover {
   font-style: italic;
+  border: none;
 }
 .maintainer .avatar {
   -webkit-border-radius: 50px;
   -moz-border-radius: 50px;
-  border-radius: 50px;
+  border-radius: 30px;
+  width: 30px;
+  height: 30px;
   margin-right: 10px;
 }
