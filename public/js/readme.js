@@ -41,7 +41,7 @@ $(function () {
       data.last_sync_module + '</a>');
 
     if (!data.sync_status) {
-      $('.syncing').html('');
+      $('.syncing').remove();
     }
 
     $('.sync').show();

@@ -63,7 +63,20 @@ hr {
   margin-top: 22px;
   border-radius: 8px;
   padding: 10px 20px;
+  transition: width .3s ease-in-out;
 }
+
+@media (max-width: 1024px) {
+  #search-input {
+    width: 200px;
+  }
+
+  .pack-overview-background {
+    min-width: 960px;
+  }
+
+}
+
 
 #search .package.match {
   font-weight: bold;

@@ -35,9 +35,9 @@ So `cnpm` is meaning: **Company npm**.
   <h3>Sync Status</h3>
   <p id="sync-model"></p>
   <p>Last sync time is <span id="last-sync-time"></span>. </p>
-  <div class="ant-alert ant-alert-info">
+  <div class="ant-alert ant-alert-info syncing">
     <span class="anticon ant-alert-icon anticon-info-circle"></span>
-    <span class="syncing ant-alert-description">The sync worker is working in the backend now. </span>
+    <span class="ant-alert-description">The sync worker is working in the backend now. </span>
   </div>
   <div class="ant-table">
   <table class="sync-status">
