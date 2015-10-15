@@ -62,7 +62,7 @@ hr {
   float: right;
   margin-top: 22px;
   border-radius: 8px;
-  padding: 20px;
+  padding: 10px 20px;
 }
 
 #search .package.match {
@@ -170,17 +170,19 @@ pre code {
   -webkit-box-orient: vertical;
   overflow: hidden;
   text-overflow: ellipsis;
+  max-height: 100px;
 }
 .deprecated {
   text-decoration: line-through;
   color: #BDBDBD;
 }
 .deprecated-content {
-  color: #FF8A65;
+  color: #555;
   width: 600px;
   white-space:nowrap;
   text-overflow: ellipsis;
   overflow:hidden;
+  font-style: italic;
 }
 .pack-ver {
   font-size: 28px;
@@ -201,6 +203,7 @@ pre code {
 .pack-repo a {
   border: none;
 }
+
 .pack-repo a:hover {
   border-bottom: 1px solid;
 }
@@ -215,6 +218,11 @@ pre code {
 
 .pack-details a {
   color: #333333;
+}
+
+.pack-details a:hover {
+  border-bottom: 1px solid;
+  opacity: .8;
 }
 
 .cols-box ul {
@@ -261,6 +269,7 @@ pre code {
 }
 .maintainer a:hover {
   font-style: italic;
+  border: none;
 }
 .maintainer .avatar {
   -webkit-border-radius: 50px;

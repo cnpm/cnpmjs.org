@@ -76,7 +76,7 @@
 
   <div class="pack-readme col-17">
     <section id="readme" class="markdown-body">
-      <%- package.readme || 'No README was found' %>
+      <%- package.readme || 'No README was found.' %>
     </section>
   </div>
 
@@ -138,7 +138,6 @@
         <%
           var deps = Object.keys(package.dependencies || {})
           var l = deps.length
-          var m = 8
         %>
         Dependencies<%= ' (' + l + ')' %>
 
@@ -151,6 +150,30 @@
         <li>
           <a class="pack-dep-name" target="_blank" href="/package/<%= pkg %>"><%= pkg %></a>
            <span class="pack-dep-ver"><%= package.dependencies[pkg]%></span>
+        </li>
+        <% }) %>
+      </ul>
+      <% } else { %>
+        None
+      <% } %>
+    </div>
+    <div class="pack-dep cols-box-item">
+      <div class="cols-box-title">
+        <%
+          var deps = Object.keys(package.devDependencies || {})
+          var l = deps.length
+        %>
+        Dev Dependencies<%= ' (' + l + ')' %>
+
+      </div>
+      <% if (l) { %>
+        <ul>
+        <%
+          deps.forEach(function(pkg, i) {
+        %>
+        <li>
+          <a class="pack-dep-name" target="_blank" href="/package/<%= pkg %>"><%= pkg %></a>
+           <span class="pack-dep-ver"><%= package.devDependencies[pkg]%></span>
         </li>
         <% }) %>
       </ul>
