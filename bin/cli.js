@@ -1,9 +1,7 @@
 #!/usr/bin/env node
 
 /**!
- * cnpmjs.org - bin/cli.js
- *
- * Copyright(c) fengmk2 and other contributors.
+ * Copyright(c) cnpm and other contributors.
  * MIT Licensed
  *
  * Authors:
@@ -16,7 +14,6 @@
  * Module dependencies.
  */
 
-require('gnode');
 var debug = require('debug')('cnpmjs.org:cli');
 var program = require('commander');
 var path = require('path');

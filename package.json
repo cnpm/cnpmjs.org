@@ -27,7 +27,6 @@
     "error-formater": "~1.0.3",
     "fs-cnpm": "~1.2.0",
     "giturl": "^1.0.0",
-    "gnode": "~0.1.1",
     "graceful": "~1.0.0",
     "gravatar": "~1.1.0",
     "humanize-ms": "~1.0.1",
@@ -95,7 +94,7 @@
     "node": ">= 1.0.0"
   },
   "author": [
-    "fengmk2 <fengmk2@gmail.com> (http://fengmk2.github.com)",
+    "fengmk2 <fengmk2@gmail.com> (http://fengmk2.com)",
     "dead_horse <dead_horse@qq.com> (http://deadhorse.me)"
   ],
   "license": "MIT"
