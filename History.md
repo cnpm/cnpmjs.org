@@ -1,4 +1,33 @@
 
+2.3.0 / 2015-10-15
+==================
+
+ * Add dev dependencies.
+ * Package page fix.
+ * refactor: add more sync log
+ * Add mock data.
+ * refactor: add more sync log
+ * Fix sidebar overflow.
+ * Merge pull request #680 from ibigbug/ant-design
+ * Clean code.
+ * Indent.
+ * chore(package): update debug to version 2.2.0
+ * chore(package): update should to version 7.1.0
+ * chore(package): update koa to version 1.1.0
+ * Remove default adBanner.
+ * Package pages.
+ * Common styles.
+ * search page.
+ * Sync page.
+ * Profile page antd style.
+ * Unpublished pkg page style.
+ * Add page title for unpubed pkg.
+ * Index page style use antd.
+ * chore(package): update pg to version 4.4.2
+ * chore(package): update cfork to version 1.3.1
+ * chore(package): update moment to version 2.10.6
+ * feat(badge): Use qiniu cdn
+
 2.2.1 / 2015-09-30
 ==================
 
