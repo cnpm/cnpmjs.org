@@ -22,7 +22,7 @@ jshint: install
 	@-node_modules/.bin/jshint ./
 
 init-database:
-	@$(BIN) --harmony test/init_db.js
+	@$(BIN) test/init_db.js
 
 init-mysql:
 	@mysql -uroot -e 'DROP DATABASE IF EXISTS cnpmjs_test;'
@@ -34,7 +34,6 @@ init-pg:
 
 test: install init-database
 	@NODE_ENV=test DB=${DB} node_modules/.bin/mocha \
-		--harmony \
 		--reporter $(REPORTER) \
 		--timeout $(TIMEOUT) \
 		--require should \

@@ -7,7 +7,7 @@ export NODE_ENV='production'
 ulimit -c unlimited
 
 cd `dirname $0`/..
-NODEJS='node --harmony'
+NODEJS='node'
 BASE_HOME=`pwd`
 PROJECT_NAME=`basename ${BASE_HOME}`
 STDOUT_LOG=`$NODEJS -e "console.log(require('path').join(require('$BASE_HOME/config').logdir, 'nodejs_stdout.log'));\
