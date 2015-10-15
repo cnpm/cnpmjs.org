@@ -874,6 +874,7 @@ SyncModuleWorker.prototype._sync = function* (name, pkg) {
 };
 
 SyncModuleWorker.prototype._syncOneVersion = function *(versionIndex, sourcePackage) {
+  logger.syncInfo('[sync_module_worker] start sync %s@%s', sourcePackage.name, sourcePackage.version);
   var that = this;
   var username = this.username;
   var downurl = sourcePackage.dist.tarball;
@@ -930,6 +931,7 @@ SyncModuleWorker.prototype._syncOneVersion = function *(versionIndex, sourcePack
 
   try {
     // get tarball
+    logger.syncInfo('[sync_module_worker] downling %j to %j', downurl, filepath);
     var r = yield urllib.request(downurl, options);
     var statusCode = r.status || -1;
     // https://github.com/cnpm/cnpmjs.org/issues/325
@@ -981,7 +983,10 @@ SyncModuleWorker.prototype._syncOneVersion = function *(versionIndex, sourcePack
     // upload to NFS
     logger.syncInfo('[sync_module_worker] uploading %j to nfs', options);
     var result = yield nfs.upload(filepath, options);
-    return yield *afterUpload(result);
+    logger.syncInfo('[sync_module_worker] uploaded, saving %j to database', result);
+    var r = yield *afterUpload(result);
+    logger.syncInfo('[sync_module_worker] sync %s@%s done!', sourcePackage.name, sourcePackage.version);
+    return r;
   } finally {
     // remove tmp file whatever
     fs.unlink(filepath, utility.noop);
