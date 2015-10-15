@@ -41,16 +41,16 @@
         <% } %>
 
         <% if (package.repository) { %>
-          <% if (package.license) {%> | <% } %>
+          <% if (package.license) {%> &middot; <% } %>
           <a href="<%= package.repository.weburl %>" target="_blank">Repository</a>
         <% } %>
 
         <% if (package.bugs.url) { %>
-          <% if (package.license || package.repository) {%> | <% } %>
+          <% if (package.license || package.repository) {%> &middot; <% } %>
           <a href="<%= package.bugs.url %>" target="_blank">Bugs</a>
         <% } %>
 
-        <% if (package.license || package.repository || package.bugs.url) {%> | <% } %>
+        <% if (package.license || package.repository || package.bugs.url) {%> &middot; <% } %>
 
         <% if (!package._publish_on_cnpm) { %>
         <a href="https://www.npmjs.org/package/<%= package.name %>" target="_blank">Original npm</a>
@@ -71,106 +71,113 @@
   </div>
 </div>
 
-<div class="pack-details cols-box">
-  <div class="pack-dep cols-box-item">
-    <div class="cols-box-title">
-      <%
-        var deps = Object.keys(package.dependencies || {})
-        var l = deps.length
-        var m = 8
-      %>
-      Dependencies<%= ' (' + l + ')' %>
-      <% if (l > m) { %>
-        <a class="more-item" href="<%= package.registryUrl %>" target="_blank">+<%= l-m %> more</a>
-      <% } %>
-    </div>
-    <% if (l) { %>
-      <ul>
-      <% if (l > m) deps = deps.slice(0, m)
-      deps.forEach(function(pkg, i) {
-        %>
-      <li>
-        <a class="pack-dep-name" target="_blank" href="/package/<%= pkg %>"><%= pkg %></a>
-         <span class="pack-dep-ver"><%= package.dependencies[pkg]%></span>
-      </li>
-      <% }) %>
-    </ul>
-    <% } else { %>
-      None
-    <% } %>
+<div class="row">
+
+
+  <div class="pack-readme col-17">
+    <section id="readme" class="markdown-body">
+      <%- package.readme %>
+    </section>
   </div>
 
-  <div class="pack-maintainers cols-box-item">
-    <div class="cols-box-title">
-      <%
-        var maintainers = package.maintainers || [];
-        var l = maintainers.length
-        var m = 6
-      %>
-      Maintainers <%= l > 0 ? ' (' + l + ')' : '' %>
-      <% if (l > m) { %>
-        <a class="more-item" href="<%= package.registryUrl %>" target="_blank">+<%= l-m %> more</a>
-      <% } %>
-    </div>
-    <div class="maintainers">
-      <% if (l > m) maintainers = maintainers.slice(0, m) %>
-      <% for (var i = 0; i < maintainers.length; i += 2) { %>
-        <div class="row">
-          <div class="maintainer">
-            <a class="username" href="/~<%= maintainers[i].name %>">
-              <img src="<%= maintainers[i].gravatar %>" class="avatar">
-              <%= maintainers[i].name %>
-            </a>
-          </div>
-          <% if (maintainers[i + 1]) { %>
+  <div class="pack-details cols-box col-7 col-push-1">
+
+    <div class="pack-maintainers cols-box-item">
+      <div class="cols-box-title">
+        <%
+          var maintainers = package.maintainers || [];
+          var l = maintainers.length
+          var m = 6
+        %>
+        Maintainers <%= l > 0 ? ' (' + l + ')' : '' %>
+        <% if (l > m) { %>
+          <a class="more-item" href="<%= package.registryUrl %>" target="_blank">+<%= l-m %> more</a>
+        <% } %>
+      </div>
+      <div class="maintainers">
+        <% if (l > m) maintainers = maintainers.slice(0, m) %>
+        <% for (var i = 0; i < maintainers.length; i += 2) { %>
+          <div class="row">
             <div class="maintainer">
-              <a class="username" href="/~<%= maintainers[i + 1].name %>">
-                <img src="<%= maintainers[i + 1].gravatar %>" class="avatar">
-                <%= maintainers[i + 1].name %>
+              <a class="username" href="/~<%= maintainers[i].name %>">
+                <img src="<%= maintainers[i].gravatar %>" class="avatar">
+                <%= maintainers[i].name %>
               </a>
             </div>
-          <% } %>
+            <% if (maintainers[i + 1]) { %>
+              <div class="maintainer">
+                <a class="username" href="/~<%= maintainers[i + 1].name %>">
+                  <img src="<%= maintainers[i + 1].gravatar %>" class="avatar">
+                  <%= maintainers[i + 1].name %>
+                </a>
+              </div>
+            <% } %>
+          </div>
+        <% } %>
+      </div>
+    </div>
+
+    <div class="pack-downloads cols-box-item">
+      <div class="cols-box-title">
+        Downloads
+      </div>
+      <div class="downloads">
+        <div class="row">
+          Today
+          <span class="pack-download-num"><%= download.today %></span>
+          </div>
+      <div class="row">
+          This Week
+          <span class="pack-download-num"><%= download.thisweek %></span>
+          </div>
+      <div class="row">
+          This Month
+          <span class="pack-download-num"><%= download.thismonth %></span>
+          </div>
+      <div class="row">
+          Last Day
+          <span class="pack-download-num"><%= download.lastday %></span>
+          </div>
+      <div class="row">
+          Last Week
+          <span class="pack-download-num"><%= download.lastweek %></span>
+          </div>
+      <div class="row">
+          Last Month
+          <span class="pack-download-num"><%= download.lastmonth %></span>
         </div>
+      </div>
+    </div>
+    <div class="pack-dep cols-box-item">
+      <div class="cols-box-title">
+        <%
+          var deps = Object.keys(package.dependencies || {})
+          var l = deps.length
+          var m = 8
+        %>
+        Dependencies<%= ' (' + l + ')' %>
+
+      </div>
+      <% if (l) { %>
+        <ul>
+        <% if (l > m) deps = deps.slice(0, m)
+          deps.forEach(function(pkg, i) {
+        %>
+        <li>
+          <a class="pack-dep-name" target="_blank" href="/package/<%= pkg %>"><%= pkg %></a>
+           <span class="pack-dep-ver"><%= package.dependencies[pkg]%></span>
+        </li>
+        <% }) %>
+      </ul>
+      <% } else { %>
+        None
+      <% } %>
+
+      <% if (l > m) { %>
+        <a class="more-item" href="<%= package.registryUrl %>" target="_blank">+<%= l-m %> more</a>
       <% } %>
     </div>
-  </div>
 
-  <div class="pack-downloads cols-box-item">
-    <div class="cols-box-title">
-      Downloads
-    </div>
-    <div class="downloads">
-      <div class="row">
-        Today
-        <span class="pack-download-num"><%= download.today %></span>
-      </div>
-      <div class="row">
-        This Week
-        <span class="pack-download-num"><%= download.thisweek %></span>
-      </div>
-      <div class="row">
-        This Month
-        <span class="pack-download-num"><%= download.thismonth %></span>
-      </div>
-      <div class="row">
-        Last Day
-        <span class="pack-download-num"><%= download.lastday %></span>
-      </div>
-      <div class="row">
-        Last Week
-        <span class="pack-download-num"><%= download.lastweek %></span>
-      </div>
-      <div class="row">
-        Last Month
-        <span class="pack-download-num"><%= download.lastmonth %></span>
-      </div>
-    </div>
-  </div>
-</div>
 
-<div class="pack-readme">
-  <div class="title">README</div>
-  <section id="readme" class="markdown-body">
-    <%- package.readme %>
-  </section>
+  </div>
 </div>

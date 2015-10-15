@@ -9,6 +9,7 @@ So `cnpm` is meaning: **Company npm**.
 - [Node.js](https://nodejs.org) version: <span id="node-version"></span>
 - For developers behind the GFW, please visit [the Chinese mirror](https://npm.taobao.org). 中国用户请访问[国内镜像站点](https://npm.taobao.org/)。
 
+<div class="ant-table">
 <table class="downloads">
   <tbody>
     <tr>
@@ -28,12 +29,17 @@ So `cnpm` is meaning: **Company npm**.
     </tr>
   </tbody>
 </table>
+</div>
 
 <div class="sync" style="display:none;">
   <h3>Sync Status</h3>
   <p id="sync-model"></p>
   <p>Last sync time is <span id="last-sync-time"></span>. </p>
-  <p class="syncing alert alert-info">The sync worker is working in the backend now. </p>
+  <div class="ant-alert ant-alert-info">
+    <span class="anticon ant-alert-icon anticon-info-circle"></span>
+    <span class="syncing ant-alert-description">The sync worker is working in the backend now. </span>
+  </div>
+  <div class="ant-table">
   <table class="sync-status">
     <tbody>
       <tr>
@@ -48,6 +54,7 @@ So `cnpm` is meaning: **Company npm**.
       </tr>
     </tbody>
   </table>
+  </div>
 </div>
 
 <script src="/js/readme.js"></script>

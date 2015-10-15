@@ -68,7 +68,8 @@ module.exports = function* show(next) {
         }
       }
       yield this.render('package_unpublished', {
-        package: data
+        package: data,
+        title: 'Package - ' + name
       });
       return;
     }
