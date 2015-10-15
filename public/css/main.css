@@ -7,6 +7,7 @@ body {
 }
 
 .container {
+  min-width: 960px;;
   padding-right: 15px;
   padding-left: 15px;
   margin-right: auto;
@@ -41,6 +42,7 @@ hr {
 
 #header {
   padding: 30px 0;
+  height: 156px;
 }
 
 #header .logo {
@@ -115,11 +117,11 @@ pre code {
 
 
 .pack-overview {
-  min-width: 960px;
   color: #f1f1f1;
   height: 300px;
   width: 100%;
   margin-bottom: 50px;
+  position: relative;
 }
 .pack-overview-background {
   height: 300px;
@@ -143,7 +145,6 @@ pre code {
 }
 
 .pack-info {
-  position: relative;
   max-width: 1140px;
   margin: 0 auto;
   padding: 30px 0;
@@ -156,15 +157,19 @@ pre code {
   line-height: 48px;
   color: #fff;
 }
+
 .pack-description {
-  line-height: 28px;
-  color: #fff;
-  width: 600px;
-  white-space:nowrap;
-  text-overflow: ellipsis;
-  overflow:hidden;
+  font-family: "-apple-system", sans-serif;
   margin-top: 20px;
-  font-family: sans-serif;
+  display: block; /* Fallback for non-webkit */
+  display: -webkit-box;
+  width: 600px;
+  font-size: 20px;
+  line-height: 26px;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .deprecated {
   text-decoration: line-through;
@@ -187,8 +192,12 @@ pre code {
 }
 
 .pack-repo {
-  margin-top: 60px;
+  position: absolute;
+  bottom: 10px;
+  text-align: right;
+  width: 100%;
 }
+
 .pack-repo a {
   border: none;
 }
@@ -198,8 +207,9 @@ pre code {
 
 .pack-install {
   position: absolute;
-  top: 85px;
+  top: 75px;
   right: 0px;
+  max-width: 450px;
 }
 
 
@@ -240,13 +250,13 @@ pre code {
   float: right;
 }
 .pack-lastup, .pack-sync {
-  margin-top: 10px;
+  float: left;
 }
 
 
 .maintainer {
   margin-bottom: 10px;
-  line-height: 50px;
+  line-height: 30px;
   overflow: hidden;
 }
 .maintainer a:hover {
@@ -255,6 +265,8 @@ pre code {
 .maintainer .avatar {
   -webkit-border-radius: 50px;
   -moz-border-radius: 50px;
-  border-radius: 50px;
+  border-radius: 30px;
+  width: 30px;
+  height: 30px;
   margin-right: 10px;
 }

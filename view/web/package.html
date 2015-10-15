@@ -4,7 +4,7 @@
       <% if (package.deprecated) { %>
         <div class="pack-name deprecated"><%= package.name %></div>
         <% if (package.description) {%>
-          <div class="pack-description deprecated"><%= package.description %></div>
+          <p class="pack-description deprecated"><%= package.description %></p>
         <% } %>
         <div class="deprecated-content" title="<%= package.deprecated %>"><%= package.deprecated %></div>
       <% } else { %>
@@ -23,19 +23,19 @@
         <% }
         }%>
       </div>
-      <% if (package.fromNow) { %>
-        <div class="pack-lastup">
-          Last updated <%= package.fromNow %>
-          <% if (package.lastPublishedUser) {
-            var name = package.lastPublishedUser.name;
-          %>
-            by <a href="/~<%= name %>"><%= name %></a>
-          <% } %>
-          .
-          </div>
-      <% } %>
-
       <div class="pack-repo">
+        <% if (package.fromNow) { %>
+          <div class="pack-lastup">
+            Last updated <%= package.fromNow %>
+            <% if (package.lastPublishedUser) {
+              var name = package.lastPublishedUser.name;
+            %>
+              by <a href="/~<%= name %>"><%= name %></a>
+            <% } %>
+            .
+            </div>
+        <% } %>
+
         <% if (package.license) { %>
           <a href="<%= package.license.url %>" target="_blank"><%= package.license.name %></a>
         <% } %>
@@ -76,42 +76,27 @@
 
   <div class="pack-readme col-17">
     <section id="readme" class="markdown-body">
-      <%- package.readme %>
+      <%- package.readme || 'No README was found' %>
     </section>
   </div>
 
-  <div class="pack-details cols-box col-7 col-push-1">
+  <div class="pack-details cols-box col-6 col-push-1">
 
     <div class="pack-maintainers cols-box-item">
       <div class="cols-box-title">
         <%
           var maintainers = package.maintainers || [];
           var l = maintainers.length
-          var m = 6
         %>
         Maintainers <%= l > 0 ? ' (' + l + ')' : '' %>
-        <% if (l > m) { %>
-          <a class="more-item" href="<%= package.registryUrl %>" target="_blank">+<%= l-m %> more</a>
-        <% } %>
       </div>
       <div class="maintainers">
-        <% if (l > m) maintainers = maintainers.slice(0, m) %>
-        <% for (var i = 0; i < maintainers.length; i += 2) { %>
-          <div class="row">
-            <div class="maintainer">
-              <a class="username" href="/~<%= maintainers[i].name %>">
-                <img src="<%= maintainers[i].gravatar %>" class="avatar">
-                <%= maintainers[i].name %>
-              </a>
-            </div>
-            <% if (maintainers[i + 1]) { %>
-              <div class="maintainer">
-                <a class="username" href="/~<%= maintainers[i + 1].name %>">
-                  <img src="<%= maintainers[i + 1].gravatar %>" class="avatar">
-                  <%= maintainers[i + 1].name %>
-                </a>
-              </div>
-            <% } %>
+        <% for (var i = 0; i < maintainers.length; i ++) { %>
+          <div class="maintainer">
+            <a class="username" href="/~<%= maintainers[i].name %>">
+              <img src="<%= maintainers[i].gravatar %>" class="avatar">
+              <%= maintainers[i].name %>
+            </a>
           </div>
         <% } %>
       </div>
@@ -160,7 +145,7 @@
       </div>
       <% if (l) { %>
         <ul>
-        <% if (l > m) deps = deps.slice(0, m)
+        <%
           deps.forEach(function(pkg, i) {
         %>
         <li>
@@ -171,10 +156,6 @@
       </ul>
       <% } else { %>
         None
-      <% } %>
-
-      <% if (l > m) { %>
-        <a class="more-item" href="<%= package.registryUrl %>" target="_blank">+<%= l-m %> more</a>
       <% } %>
     </div>
 
