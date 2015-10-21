@@ -1,11 +1,9 @@
 /**!
- * cnpmjs.org - test/controllers/registry/package/save.test.js
- *
  * Copyright(c) cnpmjs.org and other contributors.
  * MIT Licensed
  *
  * Authors:
- *  fengmk2 <fengmk2@gmail.com> (http://fengmk2.github.com)
+ *  fengmk2 <fengmk2@gmail.com> (http://fengmk2.com)
  */
 
 'use strict';
@@ -22,7 +20,7 @@ var app = require('../../../../servers/registry');
 var config = require('../../../../config');
 var utils = require('../../../utils');
 
-describe('controllers/registry/package/save.test.js', function () {
+describe('test/controllers/registry/package/save.test.js', function () {
   afterEach(mm.restore);
 
   describe('no @scoped package', function () {
@@ -288,11 +286,11 @@ describe('controllers/registry/package/save.test.js', function () {
     });
 
     it('should save dependents', function* () {
-      var names = yield* packageService.listDependents('bytetest2');
+      var names = yield packageService.listDependents('bytetest2');
       names.should.length(2);
       names.should.eql(['@cnpmtest/testmodule-new-1', '@cnpmtest/testmodule-new-2']);
 
-      names = yield* packageService.listDependents('@cnpmtest/testmodule-new-1');
+      names = yield packageService.listDependents('@cnpmtest/testmodule-new-1');
       names.should.length(0);
     });
   });

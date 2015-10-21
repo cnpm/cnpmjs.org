@@ -136,8 +136,8 @@
     <div class="pack-dep cols-box-item">
       <div class="cols-box-title">
         <%
-          var deps = Object.keys(package.dependencies || {})
-          var l = deps.length
+          var deps = Object.keys(package.dependencies || {});
+          var l = deps.length;
         %>
         Dependencies<%= ' (' + l + ')' %>
 
@@ -151,7 +151,7 @@
           <a class="pack-dep-name" target="_blank" href="/package/<%= pkg %>"><%= pkg %></a>
            <span class="pack-dep-ver"><%= package.dependencies[pkg]%></span>
         </li>
-        <% }) %>
+        <% }); %>
       </ul>
       <% } else { %>
         None
@@ -160,8 +160,8 @@
     <div class="pack-dep cols-box-item">
       <div class="cols-box-title">
         <%
-          var deps = Object.keys(package.devDependencies || {})
-          var l = deps.length
+          var deps = Object.keys(package.devDependencies || {});
+          var l = deps.length;
         %>
         Dev Dependencies<%= ' (' + l + ')' %>
 
@@ -175,13 +175,36 @@
           <a class="pack-dep-name" target="_blank" href="/package/<%= pkg %>"><%= pkg %></a>
            <span class="pack-dep-ver"><%= package.devDependencies[pkg]%></span>
         </li>
-        <% }) %>
+        <% }); %>
       </ul>
       <% } else { %>
         None
       <% } %>
     </div>
 
+    <div class="pack-dep cols-box-item">
+      <div class="cols-box-title">
+        <%
+          var deps = package.dependents;
+          var l = deps.length;
+        %>
+        Dependents<%= ' (' + l + ')' %>
+
+      </div>
+      <% if (l) { %>
+        <ul>
+        <%
+          deps.forEach(function(pkg) {
+        %>
+        <li>
+          <a class="pack-dep-name" target="_blank" href="/package/<%= pkg %>"><%= pkg %></a>
+        </li>
+        <% }); %>
+      </ul>
+      <% } else { %>
+        None
+      <% } %>
+    </div>
 
   </div>
 </div>

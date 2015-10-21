@@ -26,6 +26,7 @@ var listAll = require('../controllers/registry/package/list_all');
 var listShorts = require('../controllers/registry/package/list_shorts');
 var listSince = require('../controllers/registry/package/list_since');
 var listAllVersions = require('../controllers/registry/package/list');
+var listDependents = require('../controllers/registry/package/list_dependents');
 var getOneVersion = require('../controllers/registry/package/show');
 var savePackage = require('../controllers/registry/package/save');
 var tag = require('../controllers/registry/package/tag');
@@ -117,6 +118,10 @@ function routes(app) {
   // download times
   app.get('/downloads/range/:range/:name', downloadTotal);
   app.get('/downloads/range/:range', downloadTotal);
+
+  // GET /-/package/:pkg/dependents
+  app.get('/-/package/:name/dependents', existsPackage, listDependents);
+  app.get(/^\/\-\/package\/(@[\w\-\.]+\/[\w\-\.]+)\/dependents$/, existsPackage, listDependents);
 
   // GET /-/package/:pkg/dist-tags -- returns the package's dist-tags
   app.get('/-/package/:name/dist-tags', existsPackage, tags.index);
