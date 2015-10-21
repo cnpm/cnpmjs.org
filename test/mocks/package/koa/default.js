@@ -60,6 +60,10 @@ module.exports = {
       supertest: '~0.13.0',
       'test-console': '^0.7.1'
     },
+    dependents: [
+      'cnpmjs.org',
+      'koa-project',
+    ],
     maintainers: [
       {
         name: 'fengmk2',

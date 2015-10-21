@@ -1,11 +1,9 @@
 /**!
- * cnpmjs.org - services/download_total.js
- *
- * Copyright(c) fengmk2 and other contributors.
+ * Copyright(c) cnpm and other contributors.
  * MIT Licensed
  *
  * Authors:
- *   fengmk2 <fengmk2@gmail.com> (http://fengmk2.github.com)
+ *   fengmk2 <fengmk2@gmail.com> (http://fengmk2.com)
  */
 
 'use strict';
@@ -103,7 +101,7 @@ exports.plusModuleTotal = function* (data) {
 };
 
 exports.getTotal = function* (start, end) {
-  return yield* exports.getModuleTotal('__all__', start, end);
+  return yield exports.getModuleTotal('__all__', start, end);
 };
 
 function parseYearMonth(date) {
