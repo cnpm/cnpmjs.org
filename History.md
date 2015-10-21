@@ -1,4 +1,12 @@
 
+2.4.0 / 2015-10-21
+==================
+
+ * feat(registry): add package's dependents api
+ * fix: show package's dependents
+ * chore(package): update utility to version 1.5.0
+ * chore(package): update bluebird to version 2.10.2
+
 2.3.1 / 2015-10-15
 ==================
 
