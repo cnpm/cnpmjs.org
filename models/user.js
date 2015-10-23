@@ -83,6 +83,13 @@ module.exports = function (sequelize, DataTypes) {
       allowNull: false,
       defaultValue: false,
       comment: 'user sync from npm or not, 1: true, other: false',
+    },
+    role: {
+      field: 'role',
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: 0,
+      comment: 'user role level'
     }
   }, {
     tableName: 'user',

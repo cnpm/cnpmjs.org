@@ -1,0 +1,32 @@
+{
+  "name": "admin",
+  "version": "1.0.0",
+  "entry": {
+    "index": "./src/entry/index.jsx"
+  },
+  "dependencies": {
+    "antd": "*",
+    "antd-build": "0.2.x",
+    "flux": "~2.1.1",
+    "keymirror": "~0.1.1",
+    "object-assign": "~4.0.1",
+    "react": "*",
+    "reqwest": "~2.0.5"
+  },
+  "devDependencies": {
+    "antd-bin": "0.7.x",
+    "babel-eslint": "~4.0.5",
+    "eslint": "~1.1.0",
+    "eslint-config-airbnb": "0.0.7",
+    "eslint-plugin-react": "~3.2.1",
+    "precommit-hook": "1.x"
+  },
+  "precommit": [
+    "lint"
+  ],
+  "scripts": {
+    "dev": "antd server",
+    "lint": "eslint --ext .js,.jsx src",
+    "build": "antd-build && rsync --delete -avz ./dist/ ../../../public/dist/"
+  }
+}

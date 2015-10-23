@@ -92,3 +92,15 @@ exports.add = function* (user) {
 exports.update = function* (user) {
   return yield* User.update(user);
 };
+
+exports.userList = function* (page, perPage) {
+  var limit = perPage;
+  var offset = (page - 1) * perPage;
+  var users = yield User.findAndCountAll({
+    offset: offset,
+    limit: limit,
+    attributes: ['id', 'name', 'role']
+  });
+
+  return users;
+};

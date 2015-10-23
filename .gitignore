@@ -8,6 +8,7 @@ coverage.html
 *.gz
 dump.rdb
 .DS_Store
+.idea
 
 pids
 logs

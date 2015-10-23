@@ -24,6 +24,7 @@ var showUser = require('../controllers/web/user/show');
 var sync = require('../controllers/sync');
 var showTotal = require('../controllers/total');
 var badge = require('../controllers/web/badge');
+var admin = require('../controllers/web/admin');
 
 function routes(app) {
   app.get('/total', showTotal);
@@ -55,6 +56,10 @@ function routes(app) {
 
   app.get(/^\/badge\/v\/([@\w\-\.\/]+)\.svg$/, badge.version);
   app.get(/^\/badge\/d\/([@\w\-\.\/]+)\.svg$/, badge.downloads);
+
+  app.get('/admin', admin.admin);
+  app.get('/admin/user', admin.user.userList);
+  app.put('/admin/user/:uid', admin.user.updateUser);
 }
 
 module.exports = routes;
