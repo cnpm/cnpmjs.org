@@ -20,6 +20,7 @@ var mm = require('mm');
 var app = require('../../../servers/web');
 var registry = require('../../../servers/registry');
 var utils = require('../../utils');
+var config = require('../../../config')
 
 describe('controllers/web/badge.test.js', function () {
   afterEach(mm.restore);
@@ -35,7 +36,7 @@ describe('controllers/web/badge.test.js', function () {
         should.not.exists(err);
         request(app)
         .get('/badge/v/@cnpmtest/badge-test-module.svg?style=flat-square')
-        .expect('Location', 'https://dn-img-shields-io.qbox.me/badge/cnpm-1.0.1-blue.svg?style=flat-square')
+        .expect('Location', config.badgePrefixURL + '/cnpm-1.0.1-blue.svg?style=flat-square')
         .expect(302, done);
       });
     });
@@ -50,7 +51,7 @@ describe('controllers/web/badge.test.js', function () {
         should.not.exists(err);
         request(app)
         .get('/badge/v/@cnpmtest/badge-test-module.svg?style=flat-square&tag=v2')
-        .expect('Location', 'https://dn-img-shields-io.qbox.me/badge/cnpm-2.0.1-blue.svg?style=flat-square')
+        .expect('Location', config.badgePrefixURL + '/cnpm-2.0.1-blue.svg?style=flat-square')
         .expect(302, done);
       });
     });
@@ -65,7 +66,7 @@ describe('controllers/web/badge.test.js', function () {
         should.not.exists(err);
         request(app)
         .get('/badge/v/@cnpmtest/badge-test-module.svg?style=flat-square&tag=v3&subject=ant-design')
-        .expect('Location', 'https://dn-img-shields-io.qbox.me/badge/ant--design-3.0.1-blue.svg?style=flat-square')
+        .expect('Location', config.badgePrefixURL + '/ant--design-3.0.1-blue.svg?style=flat-square')
         .expect(302, done);
       });
     });
@@ -80,7 +81,7 @@ describe('controllers/web/badge.test.js', function () {
         should.not.exists(err);
         request(app)
         .get('/badge/v/@cnpmtest/badge-test-module.svg?style=flat-square')
-        .expect('Location', 'https://dn-img-shields-io.qbox.me/badge/cnpm-1.0.0--beta1-blue.svg?style=flat-square')
+        .expect('Location', config.badgePrefixURL + '/cnpm-1.0.0--beta1-blue.svg?style=flat-square')
         .expect(302, done);
       });
     });
@@ -95,7 +96,7 @@ describe('controllers/web/badge.test.js', function () {
         should.not.exists(err);
         request(app)
         .get('/badge/v/@cnpmtest/badge-test-module.svg?style=flat-square')
-        .expect('Location', 'https://dn-img-shields-io.qbox.me/badge/cnpm-0.1.0-green.svg?style=flat-square')
+        .expect('Location', config.badgePrefixURL + '/cnpm-0.1.0-green.svg?style=flat-square')
         .expect(302, done);
       });
     });
@@ -110,7 +111,7 @@ describe('controllers/web/badge.test.js', function () {
         should.not.exists(err);
         request(app)
         .get('/badge/v/@cnpmtest/badge-test-module.svg?style=flat-square')
-        .expect('Location', 'https://dn-img-shields-io.qbox.me/badge/cnpm-0.0.0-red.svg?style=flat-square')
+        .expect('Location', config.badgePrefixURL + '/cnpm-0.0.0-red.svg?style=flat-square')
         .expect(302, done);
       });
     });
@@ -118,7 +119,7 @@ describe('controllers/web/badge.test.js', function () {
     it('should show invalid when package not exists', function (done) {
       request(app)
       .get('/badge/v/@cnpmtest/badge-test-module-not-exists.svg?style=flat')
-      .expect('Location', 'https://dn-img-shields-io.qbox.me/badge/cnpm-invalid-lightgrey.svg?style=flat')
+      .expect('Location', config.badgePrefixURL + '/cnpm-invalid-lightgrey.svg?style=flat')
       .expect(302, done);
     });
   });
@@ -134,7 +135,7 @@ describe('controllers/web/badge.test.js', function () {
         should.not.exists(err);
         request(app)
         .get('/badge/d/@cnpmtest/badge-download-module.svg?style=flat-square')
-        .expect('Location', 'https://dn-img-shields-io.qbox.me/badge/downloads-0-brightgreen.svg?style=flat-square')
+        .expect('Location', config.badgePrefixURL + '/downloads-0-brightgreen.svg?style=flat-square')
         .expect(302, done);
       });
     });
