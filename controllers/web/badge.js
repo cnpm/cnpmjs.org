@@ -46,7 +46,7 @@ exports.version = function* () {
   }
   version = version.replace(/\-/g, '--');
   var style = this.query.style || 'flat-square';
-  var url = util.format('https://dn-img-shields-io.qbox.me/badge/%s-%s-%s.svg?style=%s',
+  var url = util.format(config.badgePrefixURL + '/%s-%s-%s.svg?style=%s',
     utility.encodeURIComponent(subject), version, color, utility.encodeURIComponent(style));
   this.redirect(url);
 };
@@ -56,7 +56,7 @@ exports.downloads = function* () {
   var name = this.params[0];
   var count = yield DownloadTotal.getTotalByName(name);
   var style = this.query.style || 'flat-square';
-  var url = util.format('https://dn-img-shields-io.qbox.me/badge/downloads-%s-brightgreen.svg?style=%s',
+  var url = util.format(config.badgePrefixURL + '/downloads-%s-brightgreen.svg?style=%s',
     count, utility.encodeURIComponent(style));
   this.redirect(url);
 };
