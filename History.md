@@ -1,4 +1,14 @@
 
+2.4.1 / 2015-10-27
+==================
+
+ * fix: improve registry index page performance with cache
+ * Configable badge URL prefix.
+ * chore(package): update koa-mock to version 1.5.0
+ * chore(package): update urllib to version 2.5.0
+ * chore(package): update co to version 4.6.0
+ * chore(package): update semver to version 5.0.3
+
 2.4.0 / 2015-10-21
 ==================
 
