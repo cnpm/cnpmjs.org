@@ -210,7 +210,7 @@ var config = {
   syncDevDependencies: false,
 
   // badge subject on http://shields.io/
-  badgePrefixURL: 'https://dn-img-shields-io.qbox.me/badge',
+  badgePrefixURL: 'https://img.shields.io/badge',
   badgeSubject: 'cnpm',
 
   // custom user service, @see https://github.com/cnpm/cnpmjs.org/wiki/Use-Your-Own-User-Authorization
