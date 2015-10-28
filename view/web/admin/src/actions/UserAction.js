@@ -25,7 +25,7 @@ module.exports = {
       type: 'json',
       method: 'PUT',
       data: {
-        level: Number(!row.role)
+        role: Number(!row.role)
       }
     }).then(function(res) {
       UserDispatcher.dispatch({

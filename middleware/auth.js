@@ -56,6 +56,7 @@ module.exports = function () {
       return yield* unauthorized.call(this, next);
     }
 
+    this.user.role = row.role;
     this.user.name = row.login;
     this.user.isAdmin = row.site_admin;
     this.user.scopes = row.scopes;

@@ -34,6 +34,7 @@
     "is-type-of": "~0.3.1",
     "kcors": "~1.0.1",
     "koa": "~1.1.0",
+    "koa-compose": "~3.0.0",
     "koa-limit": "~1.0.2",
     "koa-markdown": "~2.0.1",
     "koa-middlewares": "~2.1.0",

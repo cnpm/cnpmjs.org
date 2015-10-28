@@ -99,7 +99,7 @@ exports.userList = function* (page, perPage) {
   var users = yield User.findAndCountAll({
     offset: offset,
     limit: limit,
-    attributes: ['id', 'name', 'role']
+    attributes: ['id', 'name', 'role', 'email', 'gmt_create', 'npm_user']
   });
 
   return users;

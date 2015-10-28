@@ -49,6 +49,9 @@ usernames.forEach(function (name) {
     ip: '127.0.0.1',
     rev: '1',
   });
+  if (name === 'cnpmjstest10') {
+    user.role = 1;  // admin flag
+  }
   user.salt = crypto.randomBytes(30).toString('hex');
   user.password_sha = User.createPasswordSha(name, user.salt);
   user.save().then(function () {
