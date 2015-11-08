@@ -14,7 +14,7 @@
   },
   "dependencies": {
     "agentkeepalive": "~1.2.0",
-    "bluebird": "~2.10.2",
+    "bluebird": "~3.0.3",
     "bytes": "~1.0.0",
     "cfork": "~1.4.0",
     "co": "~4.6.0",
