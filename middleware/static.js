@@ -23,7 +23,7 @@ var staticDir = path.join(path.dirname(__dirname), 'public');
 module.exports = middlewares.staticCache(staticDir, {
   buffer: config.debug ? false : true,
   maxAge: config.debug ? 0 : 60 * 60 * 24 * 7,
-  alas: {
+  alias: {
     '/favicon.ico': '/favicon.png'
   }
 });
