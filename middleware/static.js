@@ -25,5 +25,6 @@ module.exports = middlewares.staticCache(staticDir, {
   maxAge: config.debug ? 0 : 60 * 60 * 24 * 7,
   alias: {
     '/favicon.ico': '/favicon.png'
-  }
+  },
+  gzip: config.enableCompress,
 });
