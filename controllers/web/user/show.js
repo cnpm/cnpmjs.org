@@ -37,7 +37,8 @@ module.exports = function* showUser(next) {
   var data = {
     name: name,
     email: user.email,
-    json: user.json || {}
+    json: user.json || {}，
+    isNpmUser: user.isNpmUser,
   };
 
   if (data.json.login) {
