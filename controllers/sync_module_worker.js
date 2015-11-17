@@ -13,7 +13,7 @@
  * Module dependencies.
  */
 
-var debug = require('debug')('cnpmjs.org:proxy:sync_module_worker');
+var debug = require('debug')('cnpmjs.org:sync_module_worker');
 var co = require('co');
 var gather = require('co-gather');
 var defer = require('co-defer');
@@ -383,11 +383,21 @@ function* _listStarUsers(modName) {
 }
 
 function* _saveNpmUser(username) {
-  var user = yield* npmSerivce.getUser(username);
+  var user = yield npmSerivce.getUser(username);
   if (!user) {
-    return;
+    var existsUser = yield User.findByName(username);
+    if (existsUser && existsUser.isNpmUser) {
+      // delete it
+      yield User.destroy({
+        where: {
+          name: username,
+        }
+      });
+      return { exists: true, deleted: true, isNpmUser: true };
+    }
+    return { exists: false };
   }
-  yield* User.saveNpmUser(user);
+  yield User.saveNpmUser(user);
   return user;
 }
 
@@ -677,7 +687,7 @@ SyncModuleWorker.prototype._sync = function* (name, pkg) {
     that.log('  [%s] %d versions: %j need to deleted',
       name, deletedVersionNames.length, deletedVersionNames);
     try {
-      yield* packageService.removeModulesByNameAndVersions(name, deletedVersionNames);
+      yield packageService.removeModulesByNameAndVersions(name, deletedVersionNames);
     } catch (err) {
       that.log('    [%s] delete error, %s: %s', name, err.name, err.message);
     }
@@ -1049,7 +1059,7 @@ SyncModuleWorker.prototype._syncOneVersion = function *(versionIndex, sourcePack
 
 SyncModuleWorker.sync = function* (name, username, options) {
   options = options || {};
-  var result = yield* logService.create({name: name, username: username});
+  var result = yield logService.create({name: name, username: username});
   var worker = new SyncModuleWorker({
     logId: result.id,
     type: options.type,
