@@ -1,4 +1,19 @@
 
+2.5.0 / 2015-11-17
+==================
+
+ * test: add node v5
+ * feat(sync): sync deleted user
+ * Update show.js
+ * chore(package): update bytes to version 2.2.0
+ * do not sync inner username
+ * gzip static file
+ * chore(package): update bytes to version 2.1.0
+ * chore(package): update is-type-of to version 1.0.0
+ * Update static.js
+ * chore(package): update cfork to version 1.4.0
+ * chore(package): update bluebird to version 3.0.5
+
 2.4.1 / 2015-10-27
 ==================
 
