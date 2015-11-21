@@ -93,14 +93,31 @@ exports.update = function* (user) {
   return yield* User.update(user);
 };
 
-exports.userList = function* (page, perPage) {
+exports.userList = function* (page, perPage, cond) {
+  cond = String(cond || '');
   var limit = perPage;
   var offset = (page - 1) * perPage;
-  var users = yield User.findAndCountAll({
+  var query = {
     offset: offset,
     limit: limit,
     attributes: ['id', 'name', 'role', 'email', 'gmt_create', 'npm_user']
-  });
+  }
+  if (cond) {
+    query.where = {
+      $or: [
+        {
+          name: {
+            $like: '%' + cond + '%'
+          }
+        },{
+          email: {
+            $like: '%' + cond + '%'
+          }
+        }
+      ]
+    }
+  }
+  let users = yield User.findAndCountAll(query);
 
   return users;
 };

@@ -11,9 +11,10 @@ function addHeader(request) {
 }
 
 module.exports = {
-  fetchList: function () {
+  fetchList: function (cond) {
     urllib.get('/admin/user')
       .use(addHeader)
+      .query({cond: cond})
       .end(function (err, res) {
         if (err) {
           if (res.body.error === 'unauthorized') {

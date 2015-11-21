@@ -23,6 +23,7 @@ export default React.createClass({
     let Ω = this;
 
     return {
+      searchCondition: '',
       columns: [
         {
           title: 'id', dataIndex: 'id'
@@ -70,7 +71,14 @@ export default React.createClass({
   },
 
   render () {
-    return <Table dataSource={this.state.data.rows} columns={this.state.columns} pagination={this.state.pagination} rowKey={ (e) => e.id }/>
+    let s = {
+      marginBottom: '10px'
+    }
+    return (
+      <div>
+        <input type="text" style={s} value={this.state.searchCondition} onChange={this._setSearchCondition} className="ant-input ant-input-lg" onKeyUp={this._handleKeyUp} placeholder="Search email or username"/>
+        <Table dataSource={this.state.data.rows} columns={this.state.columns} pagination={this.state.pagination} rowKey={ (e) => e.id }/>
+      </div>);
   },
 
   _onChange () {
@@ -84,8 +92,18 @@ export default React.createClass({
     })
   },
 
+  _setSearchCondition(evt) {
+    this.setState({searchCondition: evt.target.value});
+  },
+
+  _handleKeyUp (evt) {
+    if (evt.keyCode === 13) {
+      UserAction.fetchList(this.state.searchCondition);
+    }
+  },
+
   _setAdmin(row) {
-    UserAction.setAdmin(row)
+    UserAction.setAdmin(row);
   }
 })
 

@@ -8,7 +8,8 @@ const User = require('../../../models').User;
 exports.userList = function* userList() {
   let page = this.query.page || 1;
   let perPage = this.query.perPage || 10;
-  this.body = yield userService.userList(page, perPage)
+  let cond = String(this.query.cond || '');
+  this.body = yield userService.userList(page, perPage, cond);
 };
 
 exports.updateUser = function* updateUser() {
