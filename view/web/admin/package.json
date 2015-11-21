@@ -11,7 +11,7 @@
     "keymirror": "~0.1.1",
     "object-assign": "~4.0.1",
     "react": "*",
-    "reqwest": "~2.0.5"
+    "superagent": "~1.4.0"
   },
   "devDependencies": {
     "antd-bin": "0.7.x",

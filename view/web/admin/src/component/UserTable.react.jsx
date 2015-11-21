@@ -9,18 +9,8 @@ const UserStore = require('../stores/UserStore');
 const UserAction = require('../actions/UserAction');
 
 
-function getUserDataSource() {
-  return {
-    data: UserStore.getAll(),
-    pagination: {
-      total: UserStore.getAll().count
-    }
-  }
-}
-
-
 export default React.createClass({
-    componentDidMount() {
+  componentDidMount() {
     UserAction.fetchList();
     UserStore.addChangeListener(this._onChange)
   },
@@ -73,7 +63,9 @@ export default React.createClass({
         current: 1
       },
 
-      data: getUserDataSource().data
+      data: {
+        rows: UserStore.getAll().rows
+      }
     }
   },
 
@@ -82,7 +74,14 @@ export default React.createClass({
   },
 
   _onChange () {
-    this.setState(getUserDataSource())
+    this.setState({
+      pagination: {
+        total: UserStore.getAll().count
+      },
+      data: {
+        rows: UserStore.getAll().rows
+      }
+    })
   },
 
   _setAdmin(row) {
