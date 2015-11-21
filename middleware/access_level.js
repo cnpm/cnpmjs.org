@@ -1,18 +1,16 @@
 'use strict';
 
-const auth = require('./auth')();
-const compose = require('koa-compose');
 
-
-module.exports = function (level) {
-  function* access_level(next) {
-    if (this.user.role >= level || this.user.id === 0) {
+function require_level(level) {
+  return function* access_level(next) {
+    if (this.user.role >= level || this.user.id === 0 || this.user.isAdmin) {
       yield *next;
     } else {
-      this.throw(403);
+      this.status = 401;
+      this.set('WWW-Authenticate', 'Basic realm="sample"');
     }
   }
-  return compose([auth, access_level]);
 };
 
+exports.require_admin = require_level(1);
 
