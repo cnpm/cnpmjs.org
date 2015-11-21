@@ -42,8 +42,9 @@ function convertToUser(row) {
     html_url: 'http://cnpmjs.org/~' + row.name,
     avatar_url: '',
     im_url: '',
-    site_admin: row.role >= 1,
+    site_admin: row.role >= 1 || isAdmin(row.name),
     scopes: config.scopes,
+    role: row.role
   };
   if (row.json) {
     var data = row.json;
