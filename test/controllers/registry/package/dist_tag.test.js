@@ -170,6 +170,18 @@ describe('controllers/registry/package/dist_tag.test.js', function () {
       });
     });
 
+    it('should not destroy latest tag', function(done) {
+      request(app.listen())
+      .delete('/-/package/@cnpmtest/dist_tag_test_module_destroy/dist-tags/latest')
+      .set('authorization', utils.otherUserAuth)
+      .set('content-type', 'application/json')
+      .expect({
+        error: 'dist_tag_error',
+        reason: 'Can\'t not delete latest tag',
+      })
+      .expect(400, done);
+    });
+
     it('should 404 destroy not exists tag', function (done) {
       request(app.listen())
       .delete('/-/package/@cnpmtest/dist_tag_test_module_destroy/dist-tags/not-exists')
