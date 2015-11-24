@@ -1,11 +1,9 @@
 /**!
- * cnpmjs.org - controllers/registry/package/dist_tag.js
- *
- * Copyright(c) fengmk2 and other contributors.
+ * Copyright(c) cnpm and other contributors.
  * MIT Licensed
  *
  * Authors:
- *   fengmk2 <fengmk2@gmail.com> (http://fengmk2.github.com)
+ *   fengmk2 <fengmk2@gmail.com> (http://fengmk2.com)
  */
 
 'use strict';
@@ -25,7 +23,7 @@ function ok() {
 // GET /-/package/:pkg/dist-tags -- returns the package's dist-tags
 exports.index = function* () {
   var name = this.params.name || this.params[0];
-  var rows = yield* packageService.listModuleTags(name);
+  var rows = yield packageService.listModuleTags(name);
   var tags = {};
   for (var i = 0; i < rows.length; i++) {
     var row = rows[i];
@@ -79,6 +77,14 @@ exports.set = function* () {
 exports.destroy = function* () {
   var name = this.params.name || this.params[0];
   var tag = this.params.tag || this.params[1];
+  if (tag === 'latest') {
+    this.status = 400;
+    this.body = {
+      error: 'dist_tag_error',
+      reason: 'Can\'t not delete latest tag',
+    };
+    return;
+  }
   yield packageService.removeModuleTagsByNames(name, tag);
   this.body = ok();
 };
