@@ -60,8 +60,13 @@ exports.sync = function* () {
 };
 
 exports.getSyncLog = function* (next) {
-  var logId = this.params.id || this.params[1];
+  var logId = Number(this.params.id || this.params[1]);
   var offset = Number(this.query.offset) || 0;
+
+  if (!logId) { // NaN
+    this.status = 404;
+    return;
+  }
   var row = yield* Log.get(logId);
   if (!row) {
     return yield* next;

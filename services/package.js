@@ -25,7 +25,6 @@ var ModuleUnpublished = models.ModuleUnpublished;
 var NpmModuleMaintainer = models.NpmModuleMaintainer;
 
 // module
-
 var _parseRow = function (row) {
   if (row.package.indexOf('%7B%22') === 0) {
     // now store package will encodeURIComponent() after JSON.stringify
