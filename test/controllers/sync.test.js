@@ -123,6 +123,12 @@ describe('controllers/sync.test.js', function () {
       .get('/sync/pedding/log/123123123')
       .expect(404, done);
     });
+
+    it('should 404 when log id not number', function (done) {
+      request(webApp.listen())
+      .get('/sync/pedding/log/info.php')
+      .expect(404, done);
+    });
   });
 
   describe('scope package', function () {
