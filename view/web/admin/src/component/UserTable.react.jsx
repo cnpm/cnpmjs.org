@@ -12,11 +12,11 @@ const UserAction = require('../actions/UserAction');
 export default React.createClass({
   componentDidMount() {
     UserAction.fetchList();
-    UserStore.addChangeListener(this._onChange)
+    UserStore.addChangeListener(this._rerender)
   },
 
   componentWillUnmount() {
-    UserStore.removeChangeListener(this._onChange)
+    UserStore.removeChangeListener(this._rerender)
   },
 
   getInitialState() {
@@ -59,10 +59,7 @@ export default React.createClass({
           }
         }
       ],
-      pagination: {
-        total: 0,
-        current: 1
-      },
+      pagination: UserStore.getAll().pagination,
 
       data: {
         rows: UserStore.getAll().rows
@@ -77,19 +74,21 @@ export default React.createClass({
     return (
       <div>
         <input type="text" style={s} value={this.state.searchCondition} onChange={this._setSearchCondition} className="ant-input ant-input-lg" onKeyUp={this._handleKeyUp} placeholder="Search email or username"/>
-        <Table dataSource={this.state.data.rows} columns={this.state.columns} pagination={this.state.pagination} rowKey={ (e) => e.id }/>
+        <Table dataSource={this.state.data.rows} onChange={this._pageChange} columns={this.state.columns} pagination={this.state.pagination} rowKey={ (e) => e.id }/>
       </div>);
   },
 
-  _onChange () {
+  _rerender () {
     this.setState({
-      pagination: {
-        total: UserStore.getAll().count
-      },
+      pagination: UserStore.getAll().pagination,
       data: {
         rows: UserStore.getAll().rows
       }
     })
+  },
+
+  _pageChange (page) {
+    UserAction.fetchList(page.current, this.state.searchCondition);
   },
 
   _setSearchCondition(evt) {
@@ -98,7 +97,7 @@ export default React.createClass({
 
   _handleKeyUp (evt) {
     if (evt.keyCode === 13) {
-      UserAction.fetchList(this.state.searchCondition);
+      UserAction.fetchList(1, this.state.searchCondition);
     }
   },
 

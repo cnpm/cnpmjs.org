@@ -40,7 +40,6 @@ module.exports = function () {
 
     var username = authorization[0];
     var password = authorization[1];
-    console.log(username)
     var row;
     try {
       row = yield* UserService.auth(username, password);

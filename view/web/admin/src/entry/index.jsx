@@ -1,5 +1,6 @@
 import '../common/lib';
 import App from '../component/App';
 import React from 'react';
+import ReactDOM from 'react-dom';
 
-React.render(<App />, document.getElementById('react-content'));
+ReactDOM.render(<App />, document.getElementById('react-content'));

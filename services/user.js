@@ -94,10 +94,11 @@ exports.update = function* (user) {
 };
 
 exports.userList = function* (page, perPage, cond) {
+  page = Number(page || 1);
   cond = String(cond || '');
-  var limit = perPage;
-  var offset = (page - 1) * perPage;
-  var query = {
+  let limit = perPage;
+  let offset = (page - 1) * perPage;
+  let query = {
     offset: offset,
     limit: limit,
     attributes: ['id', 'name', 'role', 'email', 'gmt_create', 'npm_user']
@@ -119,5 +120,13 @@ exports.userList = function* (page, perPage, cond) {
   }
   let users = yield User.findAndCountAll(query);
 
-  return users;
+  let body = {
+    rows: users.rows,
+    pagination: {
+      current: page,
+      total: users.count
+    }
+  }
+
+  return body;
 };

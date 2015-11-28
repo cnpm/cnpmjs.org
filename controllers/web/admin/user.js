@@ -32,7 +32,6 @@ exports.updateUser = function* updateUser() {
       if (!checkConstrain(key, form[key])) {
         this.throw(400, `bad ${key}: ${form[key]}`)
       }
-      console.log(key, form[key])
       user[key] = Number(form[key]);
     }
   }

@@ -58,6 +58,7 @@ app.use(proxyToNpm({
   isWeb: true
 }));
 app.use(middlewares.bodyParser());
+app.use(auth());
 app.use(notFound);
 
 if (config.enableCompress) {

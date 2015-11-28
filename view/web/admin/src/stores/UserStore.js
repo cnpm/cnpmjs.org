@@ -18,8 +18,11 @@ function updateUser(modified) {
 }
 
 let _users = {
-  count: 0,
-  rows: []
+  rows: [],
+  pagination: {
+    current: 1,
+    total: 0
+  }
 };
 
 const UserStore = assign({}, EventEmitter.prototype, {
