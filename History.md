@@ -1,4 +1,15 @@
 
+2.5.1 / 2015-12-02
+==================
+
+ * chore(package): update bluebird to version 3.0.6
+ * fix: SequelizeDatabaseError
+ * fix(dist_tag): disable delete latest tag
+ * feat: count total private pkgs
+ * fix: use isoweek. a week start from monday
+ * chore(package): update xss to version 0.2.8
+ * chore(package): update semver to version 5.1.0
+
 2.5.0 / 2015-11-17
 ==================
 
