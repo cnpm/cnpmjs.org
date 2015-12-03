@@ -15,17 +15,13 @@
 var debug = require('debug')('cnpmjs.org:controllers:registry:download');
 var mime = require('mime');
 var utility = require('utility');
-var defer = require('co-defer');
 var is = require('is-type-of');
 var nfs = require('../../../common/nfs');
 var logger = require('../../../common/logger');
 var common = require('../../../lib/common');
 var downloadAsReadStream = require('../../utils').downloadAsReadStream;
 var packageService = require('../../../services/package');
-var downloadTotalService = require('../../../services/download_total');
 var config = require('../../../config');
-
-var _downloads = {};
 
 module.exports = function* download(next) {
   var name = this.params.name || this.params[0];
@@ -51,11 +47,8 @@ module.exports = function* download(next) {
     }
     this.status = 302;
     this.set('Location', url);
-    _downloads[name] = (_downloads[name] || 0) + 1;
     return;
   }
-
-  _downloads[name] = (_downloads[name] || 0) + 1;
 
   if (config.downloadRedirectToNFS && url) {
     this.status = 302;
@@ -84,33 +77,4 @@ module.exports = function* download(next) {
   this.body = yield downloadAsReadStream(dist.key);
 };
 
-defer.setInterval(function* () {
-  // save download count
-  var totals = [];
-  for (var name in _downloads) {
-    var count = _downloads[name];
-    totals.push([name, count]);
-  }
-  _downloads = {};
 
-  if (totals.length === 0) {
-    return;
-  }
-
-  debug('save download total: %j', totals);
-
-  var date = utility.YYYYMMDD();
-  for (var i = 0; i < totals.length; i++) {
-    var item = totals[i];
-    var name = item[0];
-    var count = item[1];
-    try {
-      yield* downloadTotalService.plusModuleTotal({ name: name, date: date, count: count });
-    } catch (err) {
-      err.message += '; name: ' + name + ', count: ' + count + ', date: ' + date;
-      logger.error(err);
-      // save back to _downloads, try again next time
-      _downloads[name] = (_downloads[name] || 0) + count;
-    }
-  }
-}, 5000);
