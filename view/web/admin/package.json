@@ -27,6 +27,6 @@
   "scripts": {
     "dev": "antd server",
     "lint": "eslint --ext .js,.jsx src",
-    "build": "antd-build && rsync --delete -avz ./dist/ ../../../public/dist/"
+    "build": "antd-build && rsync --delete -avz ./dist/ ../../../public/admin/"
   }
 }

@@ -23,5 +23,5 @@ antd build --debug --watch
 ## 构建
 
 ```
-antd build
+npm run build
 ```
