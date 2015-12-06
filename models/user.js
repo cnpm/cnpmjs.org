@@ -31,7 +31,7 @@ CREATE TABLE IF NOT EXISTS `user` (
  `email` varchar(400) NOT NULL,
  `json` longtext CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'json details',
  `npm_user` tinyint(1) DEFAULT '0' COMMENT 'user sync from npm or not, 1: true, other: false',
- `role Bool`
+ `role` int NOT NULL DEFAULT 0 COMMENT 'user role level,0 normal, 1 admin, 2 GOD user',
  PRIMARY KEY (`id`),
  UNIQUE KEY `user_name` (`name`),
  KEY `user_gmt_modified` (`gmt_modified`)
