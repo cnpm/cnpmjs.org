@@ -13,9 +13,8 @@ https://github.com/airbnb/javascript
 ## 开发
 
 ```
-npm install -g tnpm --registry=http://registry.npm.alibaba-inc.com
-tnpm install
-antd build --debug --watch
+cnpm install
+./node_modules/.bin/antd build --debug --watch
 ```
 
 访问 http://127.0.0.1:7002/admin/ 

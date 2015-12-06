@@ -3,7 +3,7 @@ const UserConstants = require('../constants/UserConstants');
 
 const ActionTypes = UserConstants.ActionTypes;
 
-const urllib = require('superagent');
+const superagent = require('superagent');
 
 function addHeader(request) {
   request.set('X-Web-Client', 'true');
@@ -12,7 +12,7 @@ function addHeader(request) {
 
 module.exports = {
   fetchList: function (page, cond) {
-    urllib.get('/admin/user')
+    superagent.get('/admin/user')
       .use(addHeader)
       .query({page, cond})
       .end(function (err, res) {
@@ -30,7 +30,7 @@ module.exports = {
   },
 
   setAdmin: function (row) {
-    urllib.put('/admin/user/' + row.id)
+    superagent.put('/admin/user/' + row.id)
     .send({role: Number(!row.role)})
     .end(function (err, res) {
       if (err) {

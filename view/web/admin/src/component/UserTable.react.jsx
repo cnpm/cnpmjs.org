@@ -20,7 +20,7 @@ export default React.createClass({
   },
 
   getInitialState() {
-    let Ω = this;
+    let that = this;
 
     return {
       searchCondition: '',
@@ -52,7 +52,7 @@ export default React.createClass({
           render(_, row) {
             let btn = row.role === 1 ? 'Remove Admin' : 'Assign Admin';
             return (
-              <a onClick={Ω._setAdmin.bind(Ω, row)} href="javascript:;">
+              <a onClick={that._setAdmin.bind(that, row)} href="javascript:;">
                 {btn}
               </a>
             )
