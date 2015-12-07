@@ -112,7 +112,7 @@ autod: install
 	@node_modules/.bin/autod -w \
 		--prefix "~" \
 		--exclude public,view,docs,backup,coverage \
-		--dep bluebird,mysql \
+		--dep mysql \
 		--keep should,supertest,should-http,chunkstream,mm,pedding
 	@$(MAKE) install
 
