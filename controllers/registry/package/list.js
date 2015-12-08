@@ -1,11 +1,9 @@
-/**!
- * cnpmjs.org - controllers/registry/package/list.js
- *
- * Copyright(c) fengmk2 and other contributors.
+/**
+ * Copyright(c) cnpm and other contributors.
  * MIT Licensed
  *
  * Authors:
- *   fengmk2 <fengmk2@gmail.com> (http://fengmk2.github.com)
+ *   fengmk2 <fengmk2@gmail.com> (http://fengmk2.com)
  */
 
 'use strict';
@@ -130,6 +128,10 @@ module.exports = function* list() {
   for (var i = 0; i < rows.length; i++) {
     var row = rows[i];
     var pkg = row.package;
+    // pkg is string ... ignore it
+    if (typeof pkg === 'string') {
+      continue;
+    }
     common.setDownloadURL(pkg, this);
     pkg._cnpm_publish_time = row.publish_time;
     versions[pkg.version] = pkg;
