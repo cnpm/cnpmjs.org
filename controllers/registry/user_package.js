@@ -42,10 +42,15 @@ exports.list = function* () {
   }
 
   var data = yield tasks;
-  for (var k in data) {
-    if (data[k].length === 0) {
-      data[k] = undefined;
+
+  var keys = Object.keys(data);
+  for (var k = 0; k < keys.length; k++) {
+    var key = keys[k];
+    // make empty object as undefined
+    if (data[key].length === 0) {
+      data[key] = undefined;
     }
   }
+
   this.body = data;
 };

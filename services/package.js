@@ -12,6 +12,8 @@
  * Module dependencies.
  */
 
+var _ = require('lodash');
+
 var models = require('../models');
 var common = require('./common');
 var Tag = models.Tag;
@@ -219,11 +221,11 @@ exports.listPublicModuleNamesSince = function* (start) {
 exports.listAllPublicModuleNames = function* () {
   var sql = 'SELECT DISTINCT(name) AS name FROM tag ORDER BY name';
   var rows = yield models.query(sql);
-  return rows.filter(function (row) {
+  return _.chain(rows).filter(function (row) {
     return !common.isPrivatePackage(row.name);
   }).map(function (row) {
     return row.name;
-  });
+  }).value();
 };
 
 exports.listModulesByName = function* (moduleName) {
@@ -233,10 +235,10 @@ exports.listModulesByName = function* (moduleName) {
     },
     order: [ ['id', 'DESC'] ]
   });
-  return mods.map(function (mod) {
+  return _.chain(mods).map(function (mod) {
     parseRow(mod);
     return mod;
-  });
+  }).value();
 };
 
 exports.getModuleLastModified = function* (name) {
