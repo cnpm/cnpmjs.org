@@ -1,4 +1,4 @@
-/**!
+/**
  * Copyright(c) cnpm and other contributors.
  * MIT Licensed
  *
@@ -233,10 +233,11 @@ exports.listModulesByName = function* (moduleName) {
     },
     order: [ ['id', 'DESC'] ]
   });
-  return mods.map(function (mod) {
+
+  for (var mod of mods) {
     parseRow(mod);
-    return mod;
-  });
+  }
+  return mods;
 };
 
 exports.getModuleLastModified = function* (name) {
