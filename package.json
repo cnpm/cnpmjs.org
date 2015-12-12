@@ -55,7 +55,7 @@
     "xss": "~0.2.8"
   },
   "devDependencies": {
-    "autod": "*",
+    "autod": "2.3.0",
     "chunkstream": "*",
     "co-mocha": "*",
     "contributors": "*",
