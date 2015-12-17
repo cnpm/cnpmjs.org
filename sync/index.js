@@ -14,7 +14,6 @@
  * Module dependencies.
  */
 
-global.Promise = require('bluebird');
 var debug = require('debug')('cnpmjs.org:sync:index');
 var co = require('co');
 var ms = require('humanize-ms');
