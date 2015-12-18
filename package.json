@@ -67,7 +67,7 @@
     "pedding": "*",
     "pg": "~4.4.2",
     "pg-hstore": "~2.3.2",
-    "should": "~7.1.0",
+    "should": "~8.0.2",
     "should-http": "*",
     "sqlite3": "*",
     "supertest": "*"
