@@ -5,15 +5,9 @@ const ActionTypes = UserConstants.ActionTypes;
 
 const superagent = require('superagent');
 
-function addHeader(request) {
-  request.set('X-Web-Client', 'true');
-  return request;
-}
-
 module.exports = {
   fetchList: function (page, cond) {
     superagent.get('/admin/user')
-      .use(addHeader)
       .query({page, cond})
       .end(function (err, res) {
         if (err) {

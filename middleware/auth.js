@@ -55,21 +55,19 @@ module.exports = function () {
     this.user.name = row.login;
     this.user.isAdmin = row.site_admin;
     this.user.scopes = row.scopes;
-    this.user.role = row.role;
     debug('auth pass user: %j, headers: %j', this.user, this.header);
     yield* next;
   };
 };
 
 function* unauthorized(next) {
-  var visitingAdminPage = this.get('X-Web-Client') || (this.url.indexOf('/admin') == 0)
-  if ((!config.alwaysAuth || this.method !== 'GET') && !visitingAdminPage) {
+  if (!config.alwaysAuth || this.method !== 'GET') {
     return yield* next;
   }
   this.status = 401;
   this.set('WWW-Authenticate', 'Basic realm="sample"');
 
-  if (this.accepts(['html', 'json']) === 'json' || visitingAdminPage) {
+  if (this.accepts(['html', 'json']) === 'json') {
     this.body = {
       error: 'unauthorized',
       reason: 'login first'
