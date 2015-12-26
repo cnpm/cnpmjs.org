@@ -6,7 +6,7 @@ module.exports = {
       'User',
       'role',
       {
-        type: Sequelize.INTEGER,
+        type: Sequelize.TINY_INT,
         allowNull: false,
         defaultValue: 0
       }
