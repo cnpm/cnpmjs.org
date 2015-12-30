@@ -35,7 +35,7 @@
     "koa": "~1.1.0",
     "koa-limit": "~1.0.2",
     "koa-markdown": "~2.0.1",
-    "koa-middlewares": "~2.1.0",
+    "koa-middlewares": "~4.1.0",
     "koa-mock": "~1.5.0",
     "koa-safe-jsonp": "~0.3.0",
     "markdown-it": "~3.0.6",
