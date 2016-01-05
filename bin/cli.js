@@ -83,9 +83,10 @@ function start(options) {
   debug('save config %s to %s', configJSON, configfile);
 
   // if sqlite db file not exists, init first
-  initDatabase();
+  initDatabase(function() {
+    require('../dispatch');
+  });
 
-  require('../dispatch');
   fs.writeFileSync(path.join(dataDir, 'pid'), process.pid + '');
 }
 
@@ -105,7 +106,7 @@ function stop(options) {
   }
 }
 
-function initDatabase() {
+function initDatabase(callback) {
   var models = require('../models');
 
   models.sequelize.sync({ force: false })
@@ -117,6 +118,7 @@ function initDatabase() {
           throw err;
         } else {
           console.log('[models/init_script.js] `sqlite` sequelize sync and init success');
+          callback();
         }
       });
     })
