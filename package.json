@@ -13,7 +13,7 @@
     "cnpmjs.org": "bin/cli.js"
   },
   "dependencies": {
-    "agentkeepalive": "~1.2.0",
+    "agentkeepalive": "~2.0.3",
     "bytes": "~2.2.0",
     "cfork": "~1.4.0",
     "co": "~4.6.0",
