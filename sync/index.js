@@ -178,6 +178,10 @@ function sendMailToAdmin(err, result, syncTime) {
 }
 
 function* checkSyncStatus() {
+  // if source registry not cnpm, ignore it. e.g.: cnpmjs.org source registry is npmjs.org
+  if (!config.sourceNpmRegistryIsCNpm) {
+    return;
+  }
   var total = yield totalService.getTotalInfo();
   var lastSyncTime;
   if (config.syncModel === 'all') {
