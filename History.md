@@ -1,4 +1,9 @@
 
+2.6.1 / 2016-01-12
+==================
+
+  * fix: source registry is not cnpm, ignore check status
+
 2.6.0 / 2016-01-12
 ==================
 
