@@ -1,4 +1,19 @@
 
+2.6.0 / 2016-01-12
+==================
+
+  * feat(sync): monitor sync status
+  * chore(package): update agentkeepalive to version 2.0.3
+  * fix SequelizeDatabaseError: ER_NO_SUCH_TABLE: Table 'qnpm.total' doesn't exist\nreproduce this bug:\nthe first startup of cnpmjs.org
+  * chore(package): update moment to version 2.11.0
+  * chore(package): update xss to version 0.2.10
+  * chore(package): update pg-hstore to version 2.3.2
+  * chore(package): update mini-logger to version 1.1.0
+  * chore(package): update urllib to version 2.6.0
+  * fix: row.package will json parse error
+  * remove bluebird
+  * chore(package): update utility to version 1.6.0
+
 2.5.1 / 2015-12-02
 ==================
 
