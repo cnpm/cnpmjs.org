@@ -1,11 +1,10 @@
-/**!
- * cnpmjs.org - sync/index.js
- *
- * Copyright(c) cnpmjs.org and other contributors.
+/**
+ * Copyright(c) cnpm and other contributors.
  * MIT Licensed
  *
  * Authors:
  *  dead_horse <dead_horse@qq.com> (http://deadhorse.me)
+ *  fengmk2 <fengmk2@gmail.com> (http://fengmk2.com)
  */
 
 'use strict';
@@ -48,7 +47,8 @@ function onerror(err) {
 
 //set sync_status = 0 at first
 co(function* () {
-  yield* totalService.updateSyncStatus(0);
+  yield totalService.updateSyncStatus(0);
+  yield checkSyncStatus();
 }).catch(onerror);
 
 var syncInterval = ms(config.syncInterval);
@@ -67,7 +67,7 @@ var syncFn = co.wrap(function* () {
     var data;
     var error;
     try {
-      data = yield* sync();
+      data = yield sync();
     } catch (err) {
       error = err;
       error.message += ' (sync package error)';
@@ -79,6 +79,9 @@ var syncFn = co.wrap(function* () {
     }
     syncing = false;
   }
+
+  // check last_sync_time and last_exist_sync_time
+  yield checkSyncStatus();
 });
 
 if (sync) {
@@ -103,7 +106,7 @@ var syncPopularFn = co.wrap(function* syncPopular() {
   var data;
   var error;
   try {
-    data = yield* startSyncPopular();
+    data = yield startSyncPopular();
   } catch (err) {
     error = err;
     error.message += ' (sync package error)';
@@ -171,5 +174,25 @@ function sendMailToAdmin(err, result, syncTime) {
         logger.error(err);
       }
     });
+  }
+}
+
+function* checkSyncStatus() {
+  var total = yield totalService.getTotalInfo();
+  var lastSyncTime;
+  if (config.syncModel === 'all') {
+    lastSyncTime = total.last_sync_time;
+  } else if (config.syncModel === 'exist') {
+    lastSyncTime = total.last_exist_sync_time;
+  }
+  debug('checkSyncStatus start, lastSyncTime: %s, syncInterval: %s', lastSyncTime, syncInterval);
+  if (!lastSyncTime) {
+    return;
+  }
+  var diff = Date.now() - lastSyncTime;
+  if (diff > syncInterval * 2) {
+    var err = new Error('Last sync time is expired in ' + diff + ' ms, lastSyncTime: ' + new Date(lastSyncTime));
+    err.name = 'SyncExpriedError';
+    sendMailToAdmin(err, null, new Date());
   }
 }
