@@ -44,14 +44,14 @@ module.exports = function* show() {
     if (maintainers.length > 0) {
       mod.package.maintainers = maintainers;
     }
-    this.body = mod.package;
+    this.jsonp = mod.package;
     return;
   }
 
   // if not fond, sync from source registry
   if (!this.allowSync) {
     this.status = 404;
-    this.body = {
+    this.jsonp = {
       error: 'not exist',
       reason: 'version not found: ' + version
     };

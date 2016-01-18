@@ -198,5 +198,5 @@ module.exports = function* list() {
   info.license = pkg.license;
 
   debug('show module %s: %s, latest: %s', orginalName, rev, latestMod.version);
-  this.body = info;
+  this.jsonp = info;
 };

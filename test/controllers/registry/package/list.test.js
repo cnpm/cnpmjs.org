@@ -89,6 +89,13 @@ describe('controllers/registry/package/list.test.js', function () {
     });
   });
 
+  it('should support jsonp', function (done) {
+    request(app.listen())
+    .get('/@cnpmtest/testmodule-list-1?callback=jsonp')
+    .expect(/jsonp\(\{/)
+    .expect(200, done);
+  });
+
   it('should 404 when package not exists', function (done) {
     request(app.listen())
     .get('/@cnpmtest/not-exists-package')
