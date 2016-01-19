@@ -45,6 +45,13 @@ describe('controllers/registry/package/show.test.js', function () {
     });
   });
 
+  it('should support jsonp', function (done) {
+    request(app.listen())
+    .get('/@cnpmtest/testmodule-show/0.0.1?callback=jsonp')
+    .expect(/jsonp\(\{/)
+    .expect(200, done);
+  });
+
   it('should return latest tag', function (done) {
     request(app.listen())
     .get('/@cnpmtest/testmodule-show/latest')
