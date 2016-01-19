@@ -1,4 +1,11 @@
 
+2.6.2 / 2016-01-19
+==================
+
+  * feat: list & show support jsonp
+  * chore(package): update urllib to version 2.7.0
+  * Delete install.md
+
 2.6.1 / 2016-01-12
 ==================
 
@@ -79,7 +86,7 @@
  * Add mock data.
  * refactor: add more sync log
  * Fix sidebar overflow.
- * Merge pull request #680 from ibigbug/ant-design
+ * Merge pull request [#680](https://github.com/cnpm/cnpmjs.org/issues/680) from ibigbug/ant-design
  * Clean code.
  * Indent.
  * chore(package): update debug to version 2.2.0
@@ -176,10 +183,10 @@
 
  * feat: support always-auth
  * fix mysql select args = [] bug
- * fix #597 sequelize raw query.
+ * fix [#597](https://github.com/cnpm/cnpmjs.org/issues/597) sequelize raw query.
  * fix(markdown): hotfix markdown-it cpu problem
  * feat: upgrade to co4
- * use kcors fixes #594
+ * use kcors fixes [#594](https://github.com/cnpm/cnpmjs.org/issues/594)
 
 2.0.0-rc.13 / 2015-02-04
 ==================
