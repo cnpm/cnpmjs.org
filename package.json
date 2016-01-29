@@ -63,7 +63,7 @@
     "jshint": "*",
     "mm": "*",
     "mocha": "*",
-    "node-dev": "*",
+    "node-dev": "3.0.0",
     "pedding": "*",
     "pg": "~4.4.2",
     "pg-hstore": "~2.3.2",
