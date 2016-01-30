@@ -80,6 +80,19 @@ describe('controllers/registry/package/show.test.js', function () {
     });
   });
 
+  it('should return max satisfied package with *', function (done) {
+    request(app.listen())
+    .get('/@cnpmtest/testmodule-show/*')
+    .expect(200, function (err, res) {
+      should.not.exist(err);
+      var data = res.body;
+      data.name.should.equal('@cnpmtest/testmodule-show');
+      data.version.should.equal('1.1.0');
+      data.dist.tarball.should.containEql('/@cnpmtest/testmodule-show/download/@cnpmtest/testmodule-show-1.1.0.tgz');
+      done();
+    });
+  });
+
   it('should support jsonp', function (done) {
     request(app.listen())
     .get('/@cnpmtest/testmodule-show/0.0.1?callback=jsonp')
