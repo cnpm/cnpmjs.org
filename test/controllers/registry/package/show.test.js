@@ -67,6 +67,19 @@ describe('controllers/registry/package/show.test.js', function () {
     });
   });
 
+  it('should return max satisfied package with complex semver range', function (done) {
+    request(app.listen())
+    .get('/@cnpmtest/testmodule-show/>1.2.0 <=2 || 0.0.1')
+    .expect(200, function (err, res) {
+      should.not.exist(err);
+      var data = res.body;
+      data.name.should.equal('@cnpmtest/testmodule-show');
+      data.version.should.equal('0.0.1');
+      data.dist.tarball.should.containEql('/@cnpmtest/testmodule-show/download/@cnpmtest/testmodule-show-0.0.1.tgz');
+      done();
+    });
+  });
+
   it('should support jsonp', function (done) {
     request(app.listen())
     .get('/@cnpmtest/testmodule-show/0.0.1?callback=jsonp')
