@@ -16,6 +16,7 @@
 
 var should = require('should');
 var request = require('supertest');
+var pedding = require('pedding');
 var mm = require('mm');
 var app = require('../../../../servers/registry');
 var utils = require('../../../utils');
@@ -24,7 +25,15 @@ describe('controllers/registry/package/show.test.js', function () {
   afterEach(mm.restore);
 
   before(function (done) {
+    done = pedding(done, 2);
     var pkg = utils.getPackage('@cnpmtest/testmodule-show', '0.0.1', utils.admin);
+    request(app.listen())
+    .put('/' + pkg.name)
+    .set('authorization', utils.adminAuth)
+    .send(pkg)
+    .expect(201, done);
+
+    pkg = utils.getPackage('@cnpmtest/testmodule-show', '1.1.0', utils.admin);
     request(app.listen())
     .put('/' + pkg.name)
     .set('authorization', utils.adminAuth)
@@ -41,6 +50,19 @@ describe('controllers/registry/package/show.test.js', function () {
       data.name.should.equal('@cnpmtest/testmodule-show');
       data.version.should.equal('0.0.1');
       data.dist.tarball.should.containEql('/@cnpmtest/testmodule-show/download/@cnpmtest/testmodule-show-0.0.1.tgz');
+      done();
+    });
+  });
+
+  it('should return max satisfied package with semver range', function (done) {
+    request(app.listen())
+    .get('/@cnpmtest/testmodule-show/^1.0.0')
+    .expect(200, function (err, res) {
+      should.not.exist(err);
+      var data = res.body;
+      data.name.should.equal('@cnpmtest/testmodule-show');
+      data.version.should.equal('1.1.0');
+      data.dist.tarball.should.containEql('/@cnpmtest/testmodule-show/download/@cnpmtest/testmodule-show-1.1.0.tgz');
       done();
     });
   });

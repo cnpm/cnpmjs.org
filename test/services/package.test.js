@@ -331,6 +331,26 @@ describe('test/services/package.test.js', function () {
     });
   });
 
+  describe('getModuleByRange()', function() {
+    it('should get undefined when not match semver range', function* () {
+      yield* createModule('test-getModuleByRange-module-0', '1.0.0');
+      yield* createModule('test-getModuleByRange-module-0', '1.1.0');
+      yield* createModule('test-getModuleByRange-module-0', '2.0.0');
+      var mod = yield* Package.getModuleByRange('test-getModuleByRange-module-0', '~2.1.0');
+      should.not.exist(mod);
+    });
+
+    it('should get package with semver range', function* () {
+      yield* createModule('test-getModuleByRange-module-1', '1.0.0');
+      yield* createModule('test-getModuleByRange-module-1', '1.1.0');
+      yield* createModule('test-getModuleByRange-module-1', '2.0.0');
+      var mod = yield* Package.getModuleByRange('test-getModuleByRange-module-1', '1');
+      mod.package.name.should.equal(mod.name);
+      mod.name.should.equal('test-getModuleByRange-module-1');
+      mod.version.should.equal('1.1.0');
+    });
+  });
+
   describe('updateModulePackage()', function () {
     it('should update not exists package return null', function* () {
       var r = yield* Package.updateModulePackage(101010101, {});
