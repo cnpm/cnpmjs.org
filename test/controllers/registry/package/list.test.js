@@ -148,7 +148,6 @@ describe('controllers/registry/package/list.test.js', function () {
         should.not.exist(err);
         var data = res.body;
         data.time.unpublished.name.should.equal('dead_horse');
-        data.time.unpublished.description.should.equal('moduletest1');
         done();
       });
     });

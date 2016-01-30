@@ -16,7 +16,6 @@
 
 var should = require('should');
 var request = require('supertest');
-var pedding = require('pedding');
 var mm = require('mm');
 var app = require('../../../../servers/registry');
 var utils = require('../../../utils');
@@ -25,20 +24,20 @@ describe('controllers/registry/package/show.test.js', function () {
   afterEach(mm.restore);
 
   before(function (done) {
-    done = pedding(done, 2);
     var pkg = utils.getPackage('@cnpmtest/testmodule-show', '0.0.1', utils.admin);
     request(app.listen())
     .put('/' + pkg.name)
     .set('authorization', utils.adminAuth)
     .send(pkg)
-    .expect(201, done);
-
-    pkg = utils.getPackage('@cnpmtest/testmodule-show', '1.1.0', utils.admin);
-    request(app.listen())
-    .put('/' + pkg.name)
-    .set('authorization', utils.adminAuth)
-    .send(pkg)
-    .expect(201, done);
+    .expect(201, function(err) {
+      should.not.exist(err);
+      pkg = utils.getPackage('@cnpmtest/testmodule-show', '1.1.0', utils.admin);
+      request(app.listen())
+      .put('/' + pkg.name)
+      .set('authorization', utils.adminAuth)
+      .send(pkg)
+      .expect(201, done);
+    });
   });
 
   it('should return one version', function (done) {
@@ -107,7 +106,7 @@ describe('controllers/registry/package/show.test.js', function () {
       should.not.exist(err);
       var data = res.body;
       data.name.should.equal('@cnpmtest/testmodule-show');
-      data.version.should.equal('0.0.1');
+      data.version.should.equal('1.1.0');
       done();
     });
   });
