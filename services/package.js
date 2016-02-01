@@ -12,6 +12,7 @@
  * Module dependencies.
  */
 
+var semver = require('semver');
 var models = require('../models');
 var common = require('./common');
 var Tag = models.Tag;
@@ -71,6 +72,18 @@ exports.getModuleByTag = function* (name, tag) {
     return null;
   }
   return yield* exports.getModule(tag.name, tag.version);
+};
+
+exports.getModuleByRange = function* (name, range) {
+  var rows = yield* exports.listModulesByName(name);
+  var versionMap = {};
+  var versions = rows.map(function(row) {
+    versionMap[row.version] = row;
+    return row.version;
+  });
+
+  var version = semver.maxSatisfying(versions, range);
+  return versionMap[version];
 };
 
 exports.getLatestModule = function* (name) {

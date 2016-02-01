@@ -121,7 +121,7 @@ describe('controllers/web/package/show.test.js', function () {
     it('should display unpublished info', function (done) {
       mm(config, 'syncModel', 'all');
       request(app)
-      .get('/package/tfs')
+      .get('/package/moduletest1')
       .expect(200)
       .expect(/This package has been unpublished\./, done);
     });

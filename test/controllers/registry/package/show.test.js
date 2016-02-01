@@ -29,7 +29,15 @@ describe('controllers/registry/package/show.test.js', function () {
     .put('/' + pkg.name)
     .set('authorization', utils.adminAuth)
     .send(pkg)
-    .expect(201, done);
+    .expect(201, function(err) {
+      should.not.exist(err);
+      pkg = utils.getPackage('@cnpmtest/testmodule-show', '1.1.0', utils.admin);
+      request(app.listen())
+      .put('/' + pkg.name)
+      .set('authorization', utils.adminAuth)
+      .send(pkg)
+      .expect(201, done);
+    });
   });
 
   it('should return one version', function (done) {
@@ -41,6 +49,45 @@ describe('controllers/registry/package/show.test.js', function () {
       data.name.should.equal('@cnpmtest/testmodule-show');
       data.version.should.equal('0.0.1');
       data.dist.tarball.should.containEql('/@cnpmtest/testmodule-show/download/@cnpmtest/testmodule-show-0.0.1.tgz');
+      done();
+    });
+  });
+
+  it('should return max satisfied package with semver range', function (done) {
+    request(app.listen())
+    .get('/@cnpmtest/testmodule-show/^1.0.0')
+    .expect(200, function (err, res) {
+      should.not.exist(err);
+      var data = res.body;
+      data.name.should.equal('@cnpmtest/testmodule-show');
+      data.version.should.equal('1.1.0');
+      data.dist.tarball.should.containEql('/@cnpmtest/testmodule-show/download/@cnpmtest/testmodule-show-1.1.0.tgz');
+      done();
+    });
+  });
+
+  it('should return max satisfied package with complex semver range', function (done) {
+    request(app.listen())
+    .get('/@cnpmtest/testmodule-show/>1.2.0 <=2 || 0.0.1')
+    .expect(200, function (err, res) {
+      should.not.exist(err);
+      var data = res.body;
+      data.name.should.equal('@cnpmtest/testmodule-show');
+      data.version.should.equal('0.0.1');
+      data.dist.tarball.should.containEql('/@cnpmtest/testmodule-show/download/@cnpmtest/testmodule-show-0.0.1.tgz');
+      done();
+    });
+  });
+
+  it('should return max satisfied package with *', function (done) {
+    request(app.listen())
+    .get('/@cnpmtest/testmodule-show/*')
+    .expect(200, function (err, res) {
+      should.not.exist(err);
+      var data = res.body;
+      data.name.should.equal('@cnpmtest/testmodule-show');
+      data.version.should.equal('1.1.0');
+      data.dist.tarball.should.containEql('/@cnpmtest/testmodule-show/download/@cnpmtest/testmodule-show-1.1.0.tgz');
       done();
     });
   });
@@ -59,7 +106,7 @@ describe('controllers/registry/package/show.test.js', function () {
       should.not.exist(err);
       var data = res.body;
       data.name.should.equal('@cnpmtest/testmodule-show');
-      data.version.should.equal('0.0.1');
+      data.version.should.equal('1.1.0');
       done();
     });
   });

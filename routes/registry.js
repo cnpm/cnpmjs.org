@@ -65,9 +65,9 @@ function routes(app) {
 
   // module
   // scope package: params: [$name]
-  app.get(/^\/(@[\w\-\.]+\/[\w\-\.]+)$/, syncByInstall, listAllVersions);
+  app.get(/^\/(@[\w\-\.]+\/[^\/]+)$/, syncByInstall, listAllVersions);
   // scope package: params: [$name, $version]
-  app.get(/^\/(@[\w\-\.]+\/[\w\-\.]+)\/([\w\.\-]+)$/, syncByInstall, getOneVersion);
+  app.get(/^\/(@[\w\-\.]+\/[\w\-\.]+)\/([^\/]+)$/, syncByInstall, getOneVersion);
 
   app.get('/:name', syncByInstall, listAllVersions);
   app.get('/:name/:version', syncByInstall, getOneVersion);

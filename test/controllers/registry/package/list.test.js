@@ -137,18 +137,17 @@ describe('controllers/registry/package/list.test.js', function () {
 
   describe('unpublished', function () {
     before(function (done) {
-      utils.sync('tfs', done);
+      utils.sync('moduletest1', done);
     });
 
     it('should show unpublished info', function (done) {
       mm(config, 'syncModel', 'all');
       request(app.listen())
-      .get('/tfs')
+      .get('/moduletest1')
       .expect(404, function (err, res) {
         should.not.exist(err);
         var data = res.body;
-        data.time.unpublished.name.should.equal('fengmk2');
-        data.time.unpublished.description.should.equal('tfs');
+        data.time.unpublished.name.should.equal('dead_horse');
         done();
       });
     });

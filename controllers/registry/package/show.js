@@ -31,12 +31,16 @@ module.exports = function* show() {
   var name = this.params.name || this.params[0];
   var tag = this.params.version || this.params[1];
   var version = semver.valid(tag);
+  var range = semver.validRange(tag);
   var mod;
   if (version) {
     mod = yield* packageService.getModule(name, version);
+  } else if (range) {
+    mod = yield* packageService.getModuleByRange(name, range);
   } else {
     mod = yield* packageService.getModuleByTag(name, tag);
   }
+
   if (mod) {
     setDownloadURL(mod.package, this);
     mod.package._cnpm_publish_time = mod.publish_time;
