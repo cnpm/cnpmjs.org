@@ -1,4 +1,12 @@
 
+2.7.0 / 2016-02-01
+==================
+
+  * test: fix all test cases
+  * test: fix unpublish
+  * test: add complex range test case
+  * feat: support semver
+
 2.6.2 / 2016-01-19
 ==================
 
