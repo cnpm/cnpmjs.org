@@ -349,6 +349,16 @@ describe('test/services/package.test.js', function () {
       mod.name.should.equal('test-getModuleByRange-module-1');
       mod.version.should.equal('1.1.0');
     });
+
+    it('should get package with semver range when have invalid version', function* () {
+      yield* createModule('test-getModuleByRange-module-2', '1.0.0');
+      yield* createModule('test-getModuleByRange-module-2', '1.1.0');
+      yield* createModule('test-getModuleByRange-module-2', 'next');
+      var mod = yield* Package.getModuleByRange('test-getModuleByRange-module-2', '1');
+      mod.package.name.should.equal(mod.name);
+      mod.name.should.equal('test-getModuleByRange-module-2');
+      mod.version.should.equal('1.1.0');
+    });
   });
 
   describe('updateModulePackage()', function () {

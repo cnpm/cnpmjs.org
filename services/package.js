@@ -80,6 +80,8 @@ exports.getModuleByRange = function* (name, range) {
   var versions = rows.map(function(row) {
     versionMap[row.version] = row;
     return row.version;
+  }).filter(function(version) {
+    return semver.valid(version);
   });
 
   var version = semver.maxSatisfying(versions, range);
