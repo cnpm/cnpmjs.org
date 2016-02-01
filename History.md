@@ -1,11 +1,16 @@
 
+2.7.1 / 2016-02-01
+==================
+
+  * fix(semver): when have invalid version([#817](https://github.com/cnpm/cnpmjs.org/issues/817))
+
 2.7.0 / 2016-02-01
 ==================
 
   * test: fix all test cases
   * test: fix unpublish
   * test: add complex range test case
-  * feat: support semver
+  * feat: support semver([#816](https://github.com/cnpm/cnpmjs.org/issues/816))
 
 2.6.2 / 2016-01-19
 ==================
