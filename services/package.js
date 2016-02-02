@@ -55,7 +55,7 @@ function stringifyPackage(pkg) {
 }
 
 exports.getModuleById = function* (id) {
-  var row = yield Module.find(Number(id));
+  var row = yield Module.findById(Number(id));
   parseRow(row);
   return row;
 };
@@ -297,7 +297,7 @@ exports.saveModule = function* (mod) {
   item.dist_size = dist.size;
   item.description = description;
 
-  if (item.isDirty) {
+  if (item.changed()) {
     item = yield item.save();
   }
   var result = {
@@ -329,7 +329,7 @@ exports.saveModule = function* (mod) {
 };
 
 exports.updateModulePackage = function* (id, pkg) {
-  var mod = yield Module.find(Number(id));
+  var mod = yield Module.findById(Number(id));
   if (!mod) {
     // not exists
     return null;
@@ -382,8 +382,9 @@ exports.updateModuleLastModified = function* (name) {
   if (!row) {
     return null;
   }
-  row.gmt_modified = new Date();
-  return yield row.save(['gmt_modified']);
+  // gmt_modified is readonly, we must use setDataValue
+  row.setDataValue('gmt_modified', new Date());
+  return yield row.save();
 };
 
 exports.removeModulesByName = function* (name) {
@@ -420,7 +421,7 @@ exports.addModuleTag = function* (name, tag, version) {
   }
   row.module_id = mod.id;
   row.version = version;
-  if (row.isDirty) {
+  if (row.changed()) {
     return yield row.save();
   }
   return row;
@@ -596,7 +597,7 @@ exports.addKeyword = function* (data) {
     item = ModuleKeyword.build(data);
   }
   item.description = data.description;
-  if (item.isDirty) {
+  if (item.changed()) {
     // make sure object will change, otherwise will cause empty sql error
     // @see https://github.com/cnpm/cnpmjs.org/issues/533
     return yield item.save();

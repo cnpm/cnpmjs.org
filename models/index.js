@@ -37,7 +37,7 @@ module.exports = {
 
   query: function* (sql, args) {
     var options = { replacements: args };
-    var data = yield this.sequelize.query(sql, options).spread();
+    var data = yield this.sequelize.query(sql, options);
     if (/select /i.test(sql)) {
       return data[0];
     }

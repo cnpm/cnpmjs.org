@@ -35,7 +35,10 @@ if (username) {
 
 var models = require('./');
 
-models.sequelize.sync({ force: force })
+models.sequelize.sync({
+  force: force,
+  logging: console.log,
+ })
   .then(function () {
     models.Total.init(function (err) {
       if (err) {

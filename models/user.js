@@ -155,7 +155,7 @@ module.exports = function (sequelize, DataTypes) {
         user.json = data;
         user.email = data.email || '';
         user.rev = data._rev || '';
-        if (user.isDirty) {
+        if (user.changed()) {
           user = yield user.save();
         }
         return user;
@@ -182,7 +182,7 @@ module.exports = function (sequelize, DataTypes) {
         user.rev = rev;
         user.salt = salt;
         user.password_sha = passwordSha;
-        if (user.isDirty) {
+        if (user.changed()) {
           user = yield user.save();
         }
         return user;
