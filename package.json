@@ -14,25 +14,25 @@
   },
   "dependencies": {
     "agentkeepalive": "~2.0.3",
-    "bytes": "~2.2.0",
+    "bytes": "~2.3.0",
     "cfork": "~1.4.0",
     "co": "~4.6.0",
     "co-defer": "~1.0.0",
     "co-gather": "~0.0.1",
     "co-sleep": "~0.0.1",
-    "commander": "~2.6.0",
+    "commander": "~2.9.0",
     "copy-to": "~2.0.1",
     "debug": "~2.2.0",
     "error-formater": "~1.0.3",
     "fs-cnpm": "~1.2.0",
     "giturl": "^1.0.0",
     "graceful": "~1.0.0",
-    "gravatar": "~1.1.0",
+    "gravatar": "~1.4.0",
     "humanize-ms": "~1.0.1",
     "humanize-number": "~0.0.2",
     "is-type-of": "~1.0.0",
     "kcors": "~1.0.1",
-    "koa": "~1.1.0",
+    "koa": "~1.1.2",
     "koa-limit": "~1.0.2",
     "koa-markdown": "~2.0.1",
     "koa-middlewares": "~2.1.0",
@@ -42,8 +42,8 @@
     "mime": "~1.3.4",
     "mini-logger": "~1.1.0",
     "mkdirp": "~0.5.0",
-    "moment": "~2.11.0",
-    "mysql": "~2.5.4",
+    "moment": "~2.11.2",
+    "mysql": "~2.10.2",
     "nodemailer": "~1.3.0",
     "semver": "~5.1.0",
     "sequelize": "~3.19.0",
@@ -57,7 +57,6 @@
   "devDependencies": {
     "autod": "*",
     "chunkstream": "*",
-    "co-mocha": "*",
     "contributors": "*",
     "istanbul": "*",
     "jshint": "*",
@@ -70,7 +69,8 @@
     "should": "~7.1.0",
     "should-http": "*",
     "sqlite3": "*",
-    "supertest": "*"
+    "supertest": "*",
+    "thunk-mocha": "1"
   },
   "homepage": "https://github.com/cnpm/cnpmjs.org",
   "repository": {
@@ -90,7 +90,7 @@
     "registry"
   ],
   "engines": {
-    "node": ">= 2.0.0"
+    "node": ">= 4.3.1"
   },
   "author": [
     "fengmk2 <fengmk2@gmail.com> (http://fengmk2.com)",

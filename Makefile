@@ -3,17 +3,10 @@ REPORTER = spec
 TIMEOUT = 30000
 MOCHA_OPTS =
 DB = sqlite
-DISTURL = https://npm.taobao.org/mirrors/iojs
-BIN = iojs
-
-ifeq ($(findstring io.js, $(shell which node)),)
-	BIN = node
-	DISTURL = https://npm.taobao.org/mirrors/node
-endif
 
 install:
-	@npm install --build-from-source --registry=http://registry.npm.taobao.org \
-		--disturl=$(DISTURL)
+	@npm install --build-from-source --registry=https://registry.npm.taobao.org \
+		--disturl=https://npm.taobao.org/mirrors/node
 
 install-production production:
 	@NODE_ENV=production $(MAKE) install
@@ -22,7 +15,7 @@ jshint: install
 	@-node_modules/.bin/jshint ./
 
 init-database:
-	@$(BIN) test/init_db.js
+	@node test/init_db.js
 
 init-mysql:
 	@mysql -uroot -e 'DROP DATABASE IF EXISTS cnpmjs_test;'
@@ -38,7 +31,7 @@ test: install init-database
 		--timeout $(TIMEOUT) \
 		--require should \
 		--require should-http \
-		--require co-mocha \
+		--require thunk-mocha \
 		--require ./test/init.js \
 		$(MOCHA_OPTS) \
 		$(TESTS)
@@ -55,15 +48,15 @@ test-pg: init-pg
 test-all: test-sqlite test-mysql
 
 test-cov cov: install init-database
-	@NODE_ENV=test DB=${DB} $(BIN) \
-		node_modules/.bin/istanbul cover --preserve-comments \
+	@NODE_ENV=test DB=${DB} node \
+		node_modules/.bin/istanbul cover \
 		node_modules/.bin/_mocha \
 		-- -u exports \
 		--reporter $(REPORTER) \
 		--timeout $(TIMEOUT) \
 		--require should \
 		--require should-http \
-		--require co-mocha \
+		--require thunk-mocha \
 		--require ./test/init.js \
 		$(MOCHA_OPTS) \
 		$(TESTS)
@@ -75,16 +68,16 @@ test-cov-mysql: init-mysql
 	@$(MAKE) test-cov DB=mysql
 
 test-travis: install init-database
-	@NODE_ENV=test DB=${DB} CNPM_SOURCE_NPM=http://registry.npmjs.com CNPM_SOURCE_NPM_ISCNPM=false \
-		$(BIN) \
-		node_modules/.bin/istanbul cover --preserve-comments \
+	@NODE_ENV=test DB=${DB} CNPM_SOURCE_NPM=https://registry.npmjs.com CNPM_SOURCE_NPM_ISCNPM=false \
+		node \
+		node_modules/.bin/istanbul cover \
 		node_modules/.bin/_mocha \
 		-- -u exports \
 		--reporter dot \
 		--timeout $(TIMEOUT) \
 		--require should \
 		--require should-http \
-		--require co-mocha \
+		--require thunk-mocha \
 		--require ./test/init.js \
 		$(MOCHA_OPTS) \
 		$(TESTS)
@@ -103,7 +96,7 @@ test-travis-pg:
 test-travis-all: test-travis-sqlite test-travis-mysql test-travis-pg
 
 dev:
-	@NODE_ENV=development $(BIN) node_modules/.bin/node-dev --harmony dispatch.js
+	@NODE_ENV=development node node_modules/.bin/node-dev dispatch.js
 
 contributors: install
 	@node_modules/.bin/contributors -f plain -o AUTHORS

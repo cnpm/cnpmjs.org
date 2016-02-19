@@ -1,11 +1,9 @@
-/**!
- * cnpmjs.org - test/services/default_user_service.test.js
- *
- * Copyright(c) fengmk2 and other contributors.
+/**
+ * Copyright(c) cnpm and other contributors.
  * MIT Licensed
  *
  * Authors:
- *   fengmk2 <fengmk2@gmail.com> (http://fengmk2.github.com)
+ *   fengmk2 <fengmk2@gmail.com> (http://fengmk2.com)
  */
 
 'use strict';
@@ -47,7 +45,7 @@ describe('services/default_user_service.test.js', function () {
         email: 'fengmk2@gmail.com',
         name: 'cnpmjstest10',
         html_url: 'http://cnpmjs.org/~cnpmjstest10',
-        avatar_url: 'https://secure.gravatar.com/avatar/95b9d41231617a05ced5604d242c9670?s=50&d=retro',
+        avatar_url: 'https://s.gravatar.com/avatar/95b9d41231617a05ced5604d242c9670?s=50&d=retro',
         im_url: '',
         site_admin: true,
         scopes: ['@cnpm', '@cnpmtest'],
@@ -69,7 +67,7 @@ describe('services/default_user_service.test.js', function () {
         email: 'fengmk2@gmail.com',
         name: 'cnpmjstest10',
         html_url: 'http://cnpmjs.org/~cnpmjstest10',
-        avatar_url: 'https://secure.gravatar.com/avatar/95b9d41231617a05ced5604d242c9670?s=50&d=retro',
+        avatar_url: 'https://s.gravatar.com/avatar/95b9d41231617a05ced5604d242c9670?s=50&d=retro',
         im_url: '',
         site_admin: true,
         scopes: ['@cnpm', '@cnpmtest'],
@@ -84,7 +82,7 @@ describe('services/default_user_service.test.js', function () {
         email: 'fengmk2@gmail.com',
         name: 'cnpmjstest101',
         html_url: 'http://cnpmjs.org/~cnpmjstest101',
-        avatar_url: 'https://secure.gravatar.com/avatar/95b9d41231617a05ced5604d242c9670?s=50&d=retro',
+        avatar_url: 'https://s.gravatar.com/avatar/95b9d41231617a05ced5604d242c9670?s=50&d=retro',
         im_url: '',
         site_admin: false,
         scopes: ['@cnpm', '@cnpmtest'],
@@ -99,7 +97,7 @@ describe('services/default_user_service.test.js', function () {
         email: 'fengmk2@gmail.com',
         name: 'Yuan Feng',
         html_url: 'http://cnpmjs.org/~fengmk2',
-        avatar_url: 'https://secure.gravatar.com/avatar/95b9d41231617a05ced5604d242c9670?s=50&d=retro',
+        avatar_url: 'https://s.gravatar.com/avatar/95b9d41231617a05ced5604d242c9670?s=50&d=retro',
         im_url: '',
         site_admin: true,
         scopes: ['@cnpm', '@cnpmtest'],

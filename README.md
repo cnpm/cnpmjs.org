@@ -71,7 +71,7 @@ as well as [New features in 2.x](https://github.com/cnpm/cnpmjs.org/wiki/New-fea
 
 ### Dependencies
 
-* [node](http://nodejs.org) >=0.11.12, use `--harmony`
+* [node](http://nodejs.org) >= 4.3.1
 * Databases: only required one type
   * [sqlite3](https://npm.taobao.org/package/sqlite3) >= 3.0.2, we use `sqlite3` by default
   * [MySQL](http://dev.mysql.com/downloads/) >= 0.5.0, include `mysqld` and `mysql cli`. I test on `mysql@5.6.16`.
