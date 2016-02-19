@@ -4,10 +4,10 @@ So `cnpm` is meaning: **Company npm**.
 
 ## Registry
 
-- Our public registry: [r.cnpmjs.org](//r.cnpmjs.org), syncing from [registry.npmjs.org](//registry.npmjs.org)
+- Our public registry: [r.cnpmjs.org](//r.cnpmjs.org), syncing from [registry.npmjs.org](https://registry.npmjs.org)
 - [cnpmjs.org](/) version: <span id="app-version"></span>
 - [Node.js](https://nodejs.org) version: <span id="node-version"></span>
-- For developers behind the GFW, please visit [the Chinese mirror](https://npm.taobao.org). 中国用户请访问[国内镜像站点](https://npm.taobao.org/)。
+- For developers in China, please visit [the China mirror](https://npm.taobao.org). 中国用户请访问[国内镜像站点](https://npm.taobao.org/)。
 
 <div class="ant-table">
 <table class="downloads">
@@ -65,7 +65,7 @@ Default style is `flat-square`.
 
 ### Version
 
-Badge URL: `http://cnpmjs.org/badge/v/cnpmjs.org.svg` ![cnpmjs.org-version-badge](//cnpmjs.org/badge/v/cnpmjs.org.svg)
+Badge URL: `https://cnpmjs.org/badge/v/cnpmjs.org.svg` ![cnpmjs.org-version-badge](//cnpmjs.org/badge/v/cnpmjs.org.svg)
 
 * `<0.1.0 & >=0.0.0`: ![red-badge](https://dn-img-shields-io.qbox.me/badge/cnpm-0.0.1-red.svg?style=flat-square)
 * `<1.0.0 & >=0.1.0`: ![red-badge](https://dn-img-shields-io.qbox.me/badge/cnpm-0.1.0-green.svg?style=flat-square)
@@ -73,34 +73,34 @@ Badge URL: `http://cnpmjs.org/badge/v/cnpmjs.org.svg` ![cnpmjs.org-version-badge
 
 ### Downloads
 
-Badge URL: `http://cnpmjs.org/badge/d/cnpmjs.org.svg` ![cnpmjs.org-download-badge](//cnpmjs.org/badge/d/cnpmjs.org.svg)
+Badge URL: `https://cnpmjs.org/badge/d/cnpmjs.org.svg` ![cnpmjs.org-download-badge](//cnpmjs.org/badge/d/cnpmjs.org.svg)
 
 ## Usage
 
 use our npm client [cnpm](https://github.com/cnpm/cnpm)(More suitable with cnpmjs.org and gzip support), you can get our client through npm:
 
 ```bash
-$ npm install -g cnpm --registry=http://registry.npm.taobao.org
+$ npm install -g cnpm --registry=https://registry.npm.taobao.org
 ```
 
 Or you can alias NPM to use it:
 
 ```bash
-alias cnpm="npm --registry=http://registry.npm.taobao.org \
+alias cnpm="npm --registry=https://registry.npm.taobao.org \
 --cache=$HOME/.npm/.cache/cnpm \
---disturl=http://registry.npm.taobao.org/mirrors/node \
+--disturl=https://npm.taobao.org/mirrors/node \
 --userconfig=$HOME/.cnpmrc"
 
 #Or alias it in .bashrc or .zshrc
-$ echo '\n#alias for cnpm\nalias cnpm="npm --registry=http://registry.npm.taobao.org \
+$ echo '\n#alias for cnpm\nalias cnpm="npm --registry=https://registry.npm.taobao.org \
   --cache=$HOME/.npm/.cache/cnpm \
-  --disturl=http://registry.npm.taobao.org/mirrors/node \
+  --disturl=https://npm.taobao.org/mirrors/node \
   --userconfig=$HOME/.cnpmrc"' >> ~/.zshrc && source ~/.zshrc
 ```
 
 ### install
 
-Install package from [r.cnpmjs.org](//r.cnpmjs.org). When installing a package or version does not exist, it will try to install from the official registry([registry.npmjs.org](//registry.npmjs.org)), and sync this package to cnpm in the backend.
+Install package from [r.cnpmjs.org](//r.cnpmjs.org). When installing a package or version does not exist, it will try to install from the official registry([registry.npmjs.org](https://registry.npmjs.org)), and sync this package to cnpm in the backend.
 
 ```bash
 $ cnpm install [name]
@@ -151,4 +151,5 @@ Release [History](/history).
 
 ## Sponsors
 
-- [![UCloud云计算](https://www.ucloud.cn/static/style/images/about/logo.png)](http://www.ucloud.cn?sem=sdk-CNPMJS)
+- [![阿里云](https://static.aliyun.com/images/www-summerwind/logo.gif)](https://www.aliyun.com?from=cnpmjs.org) (2016.2 - now)
+- [![UCloud云计算](https://www.ucloud.cn/static/style/images/about/logo.png)](http://www.ucloud.cn?sem=sdk-CNPMJS) (2015.3 - 2016.3)

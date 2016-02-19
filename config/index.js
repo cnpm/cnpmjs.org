@@ -1,4 +1,4 @@
-/**!
+/**
  * Copyright(c) cnpmjs.org and other contributors.
  * MIT Licensed
  *
