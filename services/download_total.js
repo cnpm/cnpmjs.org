@@ -72,7 +72,7 @@ exports.plusModuleTotal = function* (data) {
     row[field] = utility.toSafeNumber(row[field]);
   }
   row[field] += data.count;
-  if (row.isDirty) {
+  if (row.changed()) {
     yield row.save();
   }
 
@@ -94,7 +94,7 @@ exports.plusModuleTotal = function* (data) {
     row[field] = utility.toSafeNumber(row[field]);
   }
   row[field] += data.count;
-  if (row.isDirty) {
+  if (row.changed()) {
     return yield row.save();
   }
   return row;

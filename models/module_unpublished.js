@@ -70,7 +70,7 @@ module.exports = function (sequelize, DataTypes) {
         });
         if (row) {
           row.package = pkg;
-          if (row.isDirty) {
+          if (row.changed()) {
             row = yield row.save(['package']);
           }
           return row;

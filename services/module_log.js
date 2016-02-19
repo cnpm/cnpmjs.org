@@ -50,5 +50,5 @@ exports.append = function* (id, log) {
 };
 
 exports.get = function* (id) {
-  return yield ModuleLog.find(id);
+  return yield ModuleLog.findById(id);
 };
