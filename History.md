@@ -1,4 +1,14 @@
 
+2.8.0 / 2016-02-23
+==================
+
+  * fix: convert `*` to latest tag
+  * deps: upgrade deps and remove node 2.0.0 support
+  * doc: update sponsors on readme
+  * fix: update copyright year
+  * doc: fix disturl typo
+  * deps: sequelize@3.19.0
+
 2.7.1 / 2016-02-01
 ==================
 
