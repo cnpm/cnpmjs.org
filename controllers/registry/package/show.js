@@ -30,15 +30,18 @@ var config = require('../../../config');
 module.exports = function* show() {
   var name = this.params.name || this.params[0];
   var tag = this.params.version || this.params[1];
+  if (tag === '*') {
+    tag = 'latest';
+  }
   var version = semver.valid(tag);
   var range = semver.validRange(tag);
   var mod;
   if (version) {
-    mod = yield* packageService.getModule(name, version);
+    mod = yield packageService.getModule(name, version);
   } else if (range) {
-    mod = yield* packageService.getModuleByRange(name, range);
+    mod = yield packageService.getModuleByRange(name, range);
   } else {
-    mod = yield* packageService.getModuleByTag(name, tag);
+    mod = yield packageService.getModuleByTag(name, tag);
   }
 
   if (mod) {
@@ -63,7 +66,7 @@ module.exports = function* show() {
   }
 
   // start sync
-  var logId = yield* SyncModuleWorker.sync(name, 'sync-by-install');
+  var logId = yield SyncModuleWorker.sync(name, 'sync-by-install');
   debug('start sync %s, get log id %s', name, logId);
 
   this.redirect(config.officialNpmRegistry + this.url);

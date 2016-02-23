@@ -1,11 +1,9 @@
-/**!
- * cnpmjs.org - test/controllers/registry/package/show.test.js
- *
- * Copyright(c) cnpmjs.org and other contributors.
+/**
+ * Copyright(c) cnpm and other contributors.
  * MIT Licensed
  *
  * Authors:
- *  fengmk2 <fengmk2@gmail.com> (http://fengmk2.github.com)
+ *  fengmk2 <fengmk2@gmail.com> (http://fengmk2.com)
  */
 
 'use strict';
@@ -20,10 +18,10 @@ var mm = require('mm');
 var app = require('../../../../servers/registry');
 var utils = require('../../../utils');
 
-describe('controllers/registry/package/show.test.js', function () {
+describe('test/controllers/registry/package/show.test.js', function () {
   afterEach(mm.restore);
 
-  before(function (done) {
+  before(function(done) {
     var pkg = utils.getPackage('@cnpmtest/testmodule-show', '0.0.1', utils.admin);
     request(app.listen())
     .put('/' + pkg.name)
@@ -38,6 +36,15 @@ describe('controllers/registry/package/show.test.js', function () {
       .send(pkg)
       .expect(201, done);
     });
+  });
+
+  before(function(done) {
+    var pkg = utils.getPackage('@cnpmtest/testmodule-only-beta', '1.0.0-beta.1', utils.admin);
+    request(app.listen())
+    .put('/' + pkg.name)
+    .set('authorization', utils.adminAuth)
+    .send(pkg)
+    .expect(201, done);
   });
 
   it('should return one version', function (done) {
@@ -88,6 +95,19 @@ describe('controllers/registry/package/show.test.js', function () {
       data.name.should.equal('@cnpmtest/testmodule-show');
       data.version.should.equal('1.1.0');
       data.dist.tarball.should.containEql('/@cnpmtest/testmodule-show/download/@cnpmtest/testmodule-show-1.1.0.tgz');
+      done();
+    });
+  });
+
+  it('should return the only beta version', function (done) {
+    request(app.listen())
+    .get('/@cnpmtest/testmodule-only-beta/*')
+    .expect(200, function (err, res) {
+      should.not.exist(err);
+      var data = res.body;
+      data.name.should.equal('@cnpmtest/testmodule-only-beta');
+      data.version.should.equal('1.0.0-beta.1');
+      data.dist.tarball.should.containEql('/@cnpmtest/testmodule-only-beta/download/@cnpmtest/testmodule-only-beta-1.0.0-beta.1.tgz');
       done();
     });
   });
