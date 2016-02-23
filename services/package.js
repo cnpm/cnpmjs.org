@@ -75,7 +75,7 @@ exports.getModuleByTag = function* (name, tag) {
 };
 
 exports.getModuleByRange = function* (name, range) {
-  var rows = yield* exports.listModulesByName(name);
+  var rows = yield exports.listModulesByName(name);
   var versionMap = {};
   var versions = rows.map(function(row) {
     versionMap[row.version] = row;
