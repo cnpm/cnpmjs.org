@@ -1,4 +1,12 @@
 
+2.8.1 / 2016-03-07
+==================
+
+  * fix: only send warning email if no any sync data after 24h
+  * chore(package): update kcors to version 1.1.0
+  * chore(package): update koa to version 1.2.0
+  * chore(package): update urllib to version 2.8.0
+
 2.8.0 / 2016-02-23
 ==================
 
