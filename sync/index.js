@@ -194,7 +194,8 @@ function* checkSyncStatus() {
     return;
   }
   var diff = Date.now() - lastSyncTime;
-  if (diff > syncInterval * 2) {
+  var oneDay = 3600000 * 24;
+  if (diff > oneDay) {
     var err = new Error('Last sync time is expired in ' + diff + ' ms, lastSyncTime: ' + new Date(lastSyncTime));
     err.name = 'SyncExpriedError';
     sendMailToAdmin(err, null, new Date());
