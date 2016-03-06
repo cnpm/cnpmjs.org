@@ -78,6 +78,7 @@ function start(options) {
   }
 
   var configJSON = JSON.stringify(config, null, 2);
+  configfile = path.join(options.dataDir || process.env.HOME, '.cnpmjs.org', 'config.json');
   fs.writeFileSync(configfile, configJSON);
 
   debug('save config %s to %s', configJSON, configfile);
