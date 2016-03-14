@@ -107,10 +107,12 @@ defer.setInterval(function* () {
     try {
       yield* downloadTotalService.plusModuleTotal({ name: name, date: date, count: count });
     } catch (err) {
-      err.message += '; name: ' + name + ', count: ' + count + ', date: ' + date;
-      logger.error(err);
+      if (err.name !== 'SequelizeUniqueConstraintError') {
+        err.message += '; name: ' + name + ', count: ' + count + ', date: ' + date;
+        logger.error(err);
+      }
       // save back to _downloads, try again next time
       _downloads[name] = (_downloads[name] || 0) + count;
     }
   }
-}, 5000);
+}, 5000 + Math.ceil(Math.random() * 1000));
