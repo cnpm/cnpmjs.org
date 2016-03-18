@@ -109,6 +109,8 @@ $ make dev
 
 Tips: make sure your code is following the [node-style-guide](https://github.com/felixge/node-style-guide).
 
+Love cnpmjs.org
+
 ## Sponsors
 
 - [![阿里云](https://static.aliyun.com/images/www-summerwind/logo.gif)](https://www.aliyun.com?from=cnpmjs.org) (2016.2 - now)
