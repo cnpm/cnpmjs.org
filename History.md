@@ -1,4 +1,13 @@
 
+2.9.0 / 2016-03-26
+==================
+
+  * feat: only admin can unpublish
+  * chore(package): update gravatar to version 1.5.0
+  * chore(package): update sequelize to version 3.20.0
+  * fix: fix save download count unqiue constraint error
+  * chore(package): update moment to version 2.12.0
+
 2.8.1 / 2016-03-07
 ==================
 
