@@ -27,10 +27,10 @@ describe('test/controllers/registry/package/remove.test.js', function () {
   afterEach(mm.restore);
 
   before(function (done) {
-    var pkg = utils.getPackage('@cnpmtest/testmodule-remove-1', '1.0.0', utils.admin);
+    var pkg = utils.getPackage('@cnpmtest/testmodule-remove-1', '1.0.0', utils.otherUser);
     request(app.listen())
     .put('/' + pkg.name)
-    .set('authorization', utils.adminAuth)
+    .set('authorization', utils.otherUserAuth)
     .send(pkg)
     .expect(201, done);
   });
@@ -56,47 +56,13 @@ describe('test/controllers/registry/package/remove.test.js', function () {
     .expect(404, done);
   });
 
-  it('should delete 403 when user is not admin on config.enablePrivate = true', function (done) {
-    mm(config, 'enablePrivate', true);
+  it('should delete 403 when user is not admin', function (done) {
     request(app)
     .del('/@cnpmtest/testmodule-remove-1/-rev/1')
     .set('authorization', utils.otherUserAuth)
     .expect({
       error: 'no_perms',
-      reason: 'Private mode enable, only admin can publish this module'
-    })
-    .expect(403, done);
-  });
-
-  it('should 400 when scope not exists', function (done) {
-    request(app)
-    .del('/@cnpm-not-exists/testmodule-remove-1/-rev/1')
-    .set('authorization', utils.otherUserAuth)
-    .expect({
-      error: 'invalid scope',
-      reason: 'scope @cnpm-not-exists not match legal scopes: @cnpm, @cnpmtest, @cnpm-test'
-    })
-    .expect(400, done);
-  });
-
-  it('should 403 when delete non scoped package', function (done) {
-    request(app)
-    .del('/testmodule-remove-1/-rev/1')
-    .set('authorization', utils.otherUserAuth)
-    .expect({
-      error: 'no_perms',
-      reason: 'only allow publish with @cnpm, @cnpmtest, @cnpm-test scope(s)'
-    })
-    .expect(403, done);
-  });
-
-  it('should 403 when user not maintainer', function (done) {
-    request(app)
-    .del('/@cnpmtest/testmodule-remove-1/-rev/1')
-    .set('authorization', utils.otherUserAuth)
-    .expect({
-      error: 'forbidden user',
-      reason: 'cnpmjstest101 not authorized to modify @cnpmtest/testmodule-remove-1'
+      reason: 'Only administrators can unpublish module'
     })
     .expect(403, done);
   });

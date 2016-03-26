@@ -27,10 +27,10 @@ describe('controllers/registry/package/remove_version.test.js', function () {
 
   var lastRev;
   before(function (done) {
-    var pkg = utils.getPackage('@cnpmtest/testmodule-remove_version-1', '0.0.1', utils.admin);
+    var pkg = utils.getPackage('@cnpmtest/testmodule-remove_version-1', '0.0.1', utils.otherUser);
     request(app.listen())
     .put('/' + pkg.name)
-    .set('authorization', utils.adminAuth)
+    .set('authorization', utils.otherUserAuth)
     .send(pkg)
     .expect(201, function (err, res) {
       should.not.exist(err);
@@ -78,7 +78,7 @@ describe('controllers/registry/package/remove_version.test.js', function () {
     .expect(401, done);
   });
 
-  it('should 403 when auth error', function (done) {
+  it('should 403 when not admin', function (done) {
     request(app)
     .del('/@cnpmtest/testmodule-remove_version-1/download/@cnpmtest/testmodule-remove_version-1-0.0.1.tgz/-rev/' + lastRev)
     .set('authorization', utils.otherUserAuth)
@@ -94,10 +94,10 @@ describe('controllers/registry/package/remove_version.test.js', function () {
 
   describe('mock error', function () {
     before(function (done) {
-      var pkg = utils.getPackage('@cnpmtest/testmodule-remove_version-1', '0.0.2', utils.admin);
+      var pkg = utils.getPackage('@cnpmtest/testmodule-remove_version-1', '0.0.2', utils.otherUser);
       request(app.listen())
       .put('/' + pkg.name)
-      .set('authorization', utils.adminAuth)
+      .set('authorization', utils.otherUserAuth)
       .send(pkg)
       .expect(201, done);
     });

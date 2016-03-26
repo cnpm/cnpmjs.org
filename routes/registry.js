@@ -19,6 +19,7 @@ var publishable = require('../middleware/publishable');
 var syncByInstall = require('../middleware/sync_by_install');
 var editable = require('../middleware/editable');
 var existsPackage = require('../middleware/exists_package');
+var unpublishable = require('../middleware/unpublishable');
 
 var showTotal = require('../controllers/total');
 
@@ -94,16 +95,16 @@ function routes(app) {
 
   // delete tarball and remove one version
   app.delete(/^\/(@[\w\-\.]+\/[\w\-\.]+)\/download\/(@[\w\-\.]+\/[\w\-\.]+)\/\-rev\/([\w\-\.]+)$/,
-    login, publishable, editable, removeOneVersion);
-  app.delete('/:name/download/:filename/-rev/:rev', login, publishable, editable, removeOneVersion);
+    login, unpublishable, removeOneVersion);
+  app.delete('/:name/download/:filename/-rev/:rev', login, unpublishable, removeOneVersion);
 
   // update module, unpublish will PUT this
   app.put(/^\/(@[\w\-\.]+\/[\w\-\.]+)\/\-rev\/([\w\-\.]+)$/, login, publishable, editable, updatePackage);
   app.put('/:name/-rev/:rev', login, publishable, editable, updatePackage);
 
   // remove all versions
-  app.delete(/^\/(@[\w\-\.]+\/[\w\-\.]+)\/\-rev\/([\w\-\.]+)$/, login, publishable, editable, removePackage);
-  app.delete('/:name/-rev/:rev', login, publishable, editable, removePackage);
+  app.delete(/^\/(@[\w\-\.]+\/[\w\-\.]+)\/\-rev\/([\w\-\.]+)$/, login, unpublishable, removePackage);
+  app.delete('/:name/-rev/:rev', login, unpublishable, removePackage);
 
   // try to create a new user
   // https://registry.npmjs.org/-/user/org.couchdb.user:fengmk2
