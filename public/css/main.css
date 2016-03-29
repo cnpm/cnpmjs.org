@@ -292,3 +292,6 @@ pre code {
   height: 30px;
   margin-right: 10px;
 }
+ul, ol{
+  list-style: initial;
+}
