@@ -38,7 +38,11 @@ var User = require('../models').User;
 var os = require('os');
 
 var USER_AGENT = 'sync.cnpmjs.org/' + config.version +
-  ' hostname/' + os.hostname() + ' ' + urllib.USER_AGENT;
+  ' hostname/' + os.hostname() +
+  ' syncModel/' + config.syncModel +
+  ' syncInterval/' + config.syncInterval +
+  ' syncConcurrency/' + config.syncConcurrency +
+  ' ' + urllib.USER_AGENT;
 
 function SyncModuleWorker(options) {
   EventEmitter.call(this);
