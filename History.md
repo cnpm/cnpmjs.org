@@ -1,4 +1,12 @@
 
+2.9.3 / 2016-04-05
+==================
+
+  * fix: use better diff time to check sync status
+  * Update sequelize to version 3.21.0 🚀
+  * chore(package): update agentkeepalive to version 2.1.0
+  * chore(package): update pg to version 4.5.2
+
 2.9.2 / 2016-03-29
 ==================
 
