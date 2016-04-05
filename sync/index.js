@@ -195,9 +195,11 @@ function* checkSyncStatus() {
   }
   var diff = Date.now() - lastSyncTime;
   var oneDay = 3600000 * 24;
-  if (diff > oneDay) {
-    var err = new Error('Last sync time is expired in ' + diff + ' ms, lastSyncTime: ' + new Date(lastSyncTime));
-    err.name = 'SyncExpriedError';
+  var maxTime = Math.max(oneDay, syncInterval * 2);
+  if (diff > maxTime) {
+    var err = new Error('Last sync time is expired in ' + diff + ' ms, lastSyncTime: ' +
+      new Date(lastSyncTime) + ', maxTime: ' + maxTime + ' ms');
+    err.name = 'SyncExpiredError';
     sendMailToAdmin(err, null, new Date());
   }
 }
