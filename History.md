@@ -1,4 +1,11 @@
 
+2.9.4 / 2016-04-09
+==================
+
+  * fix: don't sync constructor package on exists mode (#883)
+  * Update utility to version 1.7.0 🚀
+  * chore: update sponsor link
+
 2.9.3 / 2016-04-05
 ==================
 
