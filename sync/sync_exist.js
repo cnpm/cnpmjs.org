@@ -31,7 +31,7 @@ function intersection(arrOne, arrTwo) {
     map[name] = true;
   });
   arrTwo.forEach(function (name) {
-    map[name] && results.push(name);
+    map[name] === true && results.push(name);
   });
   return results;
 }
@@ -48,7 +48,7 @@ module.exports = function* sync() {
 
   var allPackages;
   if (!info.last_exist_sync_time) {
-    var pkgs = yield* npmService.getShort();
+    var pkgs = yield npmService.getShort();
     debug('First time sync all packages from official registry, got %d packages', pkgs.length);
     if (info.last_sync_module) {
       // start from last success
@@ -74,7 +74,7 @@ module.exports = function* sync() {
       fails: []
     };
   }
-  debug('Total %d packages to sync', packages.length);
+  debug('Total %d packages to sync, top 10: %j', packages.length, packages.slice(0, 10));
 
   var worker = new SyncModuleWorker({
     username: 'admin',
