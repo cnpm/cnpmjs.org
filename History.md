@@ -1,4 +1,10 @@
 
+2.9.5 / 2016-04-12
+==================
+
+  * fix: change logo url to a better https source
+  * fix: http://cnpmjs.org/package/fms pre style (#739)
+
 2.9.4 / 2016-04-09
 ==================
 
