@@ -55,6 +55,11 @@
         <% if (!package._publish_on_cnpm) { %>
         <a href="https://www.npmjs.org/package/<%= package.name %>" target="_blank">Original npm</a>
         <% } %>
+
+        <% if (package.dist.tarball) { %>
+          &middot;
+          <a href="<%= package.dist.tarball %>" target="_blank">Tarball</a>
+        <% } %>
       </div>
       <div class="pack-install">
         <pre class="sh">$ <%- config.npmClientName %> install <%= package.name %> <% if (package.preferGlobal) { %>-g<% } %></pre>
