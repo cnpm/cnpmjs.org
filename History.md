@@ -1,4 +1,10 @@
 
+2.10.0 / 2016-04-15
+==================
+
+  * feat: show tarball url on package page (#894)
+  * chore(package): update koa-mock to version 1.6.1 (#891)
+
 2.9.5 / 2016-04-12
 ==================
 
