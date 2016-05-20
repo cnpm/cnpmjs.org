@@ -214,6 +214,8 @@ var config = {
   badgeSubject: 'cnpm',
 
   // custom user service, @see https://github.com/cnpm/cnpmjs.org/wiki/Use-Your-Own-User-Authorization
+  // when you not intend to ingegrate with your company's user system, then use null, it would
+  // use the default cnpm user system
   userService: null,
 
   // always-auth https://docs.npmjs.com/misc/config#always-auth
