@@ -44,7 +44,7 @@
     "mkdirp": "~0.5.0",
     "moment": "~2.12.0",
     "mysql": "~2.10.2",
-    "nodemailer": "~1.3.0",
+    "nodemailer": "~2.3.2",
     "semver": "~5.1.0",
     "sequelize": "~3.21.0",
     "thunkify-wrap": "~1.0.4",
