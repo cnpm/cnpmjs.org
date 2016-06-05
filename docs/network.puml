@@ -1,0 +1,98 @@
+@startuml
+
+title cnpmjs.org, npm.taobao.org Network
+
+node "China User" {
+  [cnpm cli]
+}
+
+node "OSS: aliyuncs.com" {
+  [tnpm-hz.oss-cn-hangzhou]
+}
+
+node "SLB: 114.55.80.225 Hangzhou" {
+  [npm.taobao.org]
+  [registry.npm.taobao.org]
+}
+
+node "npmtaobao3: 121.41.*" {
+  [nginx 5]
+  [registry 5]
+  [web 5]
+  [syncer 5]
+}
+
+node "npmtaobao4: 120.26.*" {
+  [nginx 6]
+  [registry 6]
+  [web 6]
+}
+
+node "cnpm6: 47.88.189.193 Singapore" {
+  [cnpmjs.org]
+  [r.cnpmjs.org]
+  [nginx 7]
+  [registry 7]
+  [web 7]
+  [syncer 7]
+}
+
+node "Aliyun CDN" {
+  [cdn.npm.taobao.org]
+}
+
+node "qiniu CDN" {
+  [cnpmjs.up.qiniu.com]
+  [dn-cnpm.qbox.me]
+}
+
+database "taobaonpm DB" {
+  [rds2860*.mysql.rds.aliyuncs.com]
+}
+
+database "cnpm DB" {
+  [rdsqiz*.mysql.rds.aliyuncs.com]
+}
+
+node "npmjs.com" {
+  [registry.npmjs.com]
+  [www.npmjs.com]
+}
+
+[cnpm cli] -down-> [registry.npm.taobao.org]: Read, Write
+[cnpm cli] -down-> [cdn.npm.taobao.org]: Read tgz
+[cnpm cli] -down-> [npm.taobao.org]: "Read /mirrors"
+
+[registry.npm.taobao.org] -down-> [nginx 5]
+[nginx 5] -down-> [registry 5]
+[npm.taobao.org] -down-> [nginx 5]
+[nginx 5] -down-> [web 5]
+[registry.npm.taobao.org] -down-> [nginx 6]
+[nginx 6] -down-> [registry 6]
+[npm.taobao.org] -down-> [nginx 6]
+[nginx 6] -down-> [web 6]
+
+[registry 5] -down-> [rds2860*.mysql.rds.aliyuncs.com]: Read, Write
+[web 5] -down-> [rds2860*.mysql.rds.aliyuncs.com]: Read
+[syncer 5] -down-> [rds2860*.mysql.rds.aliyuncs.com]: Read, Write
+[syncer 5] -down-> [tnpm-hz.oss-cn-hangzhou]: Write
+[syncer 5] -> [r.cnpmjs.org]: Read
+[syncer 5] -> [dn-cnpm.qbox.me]: Read tgz
+[registry 6] -down-> [rds2860*.mysql.rds.aliyuncs.com]: Read, Write
+[web 6] -down-> [rds2860*.mysql.rds.aliyuncs.com]: Read
+
+[cnpmjs.org] -down-> [nginx 7]
+[nginx 7] -down-> [registry 7]
+[r.cnpmjs.org] -down-> [nginx 7]
+[nginx 7] -down-> [web 7]
+
+[registry 7] -down-> [rdsqiz*.mysql.rds.aliyuncs.com]: Read, Write
+[web 7] -down-> [rdsqiz*.mysql.rds.aliyuncs.com]: Read
+[syncer 7] -down-> [rdsqiz*.mysql.rds.aliyuncs.com]: Read, Write
+[syncer 7] -down-> [cnpmjs.up.qiniu.com]: Write
+[syncer 7] -down-> [registry.npmjs.com]: Read
+
+[cdn.npm.taobao.org] -down-> [tnpm-hz.oss-cn-hangzhou]: Read
+[dn-cnpm.qbox.me] -down-> [cnpmjs.up.qiniu.com]: Read
+
+@enduml
