@@ -1,11 +1,3 @@
-/**
- * Copyright(c) cnpm and other contributors.
- * MIT Licensed
- *
- * Authors:
- *   fengmk2 <fengmk2@gmail.com> (http://fengmk2.com)
- */
-
 'use strict';
 
 /**
@@ -50,11 +42,12 @@ describe('test/controllers/registry/module/scope_package.test.js', function () {
 
   afterEach(mm.restore);
 
-  it('should get 404 when do not support scope', function (done) {
+  it('should get 302 when do not support scope', function (done) {
     mm(config, 'scopes', []);
     request(app)
     .get('/@invalid/test')
-    .expect(404, done);
+    .expect('Location', 'https://registry.npmjs.com/@invalid/test')
+    .expect(302, done);
   });
 
   it('should get 404 when scope is private', function (done) {

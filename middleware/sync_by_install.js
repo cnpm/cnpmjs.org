@@ -40,8 +40,7 @@ module.exports = function* syncByInstall(next) {
   // private scoped package don't sync
   if (name && name[0] === '@') {
     var scope = name.split('/')[0];
-    // if not support scopes, don't sync
-    if (config.scopes.length === 0 || config.scopes.indexOf(scope) >= 0) {
+    if (config.scopes.indexOf(scope) >= 0) {
       return yield next;
     }
   }
