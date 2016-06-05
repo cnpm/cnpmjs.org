@@ -4,10 +4,10 @@ So `cnpm` is meaning: **Company npm**.
 
 ## Registry
 
-- Our public registry: [r.cnpmjs.org](//r.cnpmjs.org), syncing from [registry.npmjs.org](https://registry.npmjs.org)
+- Our public registry: [r.cnpmjs.org](https://r.cnpmjs.org), syncing from [registry.npmjs.com](https://registry.npmjs.com)
 - [cnpmjs.org](/) version: <span id="app-version"></span>
 - [Node.js](https://nodejs.org) version: <span id="node-version"></span>
-- For developers in China, please visit [the China mirror](https://npm.taobao.org). 中国用户请访问[国内镜像站点](https://npm.taobao.org/)。
+- For developers in China, please visit [the China mirror](https://npm.taobao.org). 中国用户请访问[国内镜像站点](https://npm.taobao.org)。
 
 <div class="ant-table">
 <table class="downloads">
@@ -145,9 +145,9 @@ $ cnpm info cnpm
 
 Release [History](/history).
 
-## npm and cnpm relation
+## npmjs.org, cnpmjs.org and npm.taobao.org relation
 
-![npm&cnpm](https://dn-cnpm.qbox.me/cnpm-npm-relation.png)
+[![npm&cnpm](https://dn-cnpm.qbox.me/network.png)](https://dn-cnpm.qbox.me/network.png)
 
 ## Sponsors
 
