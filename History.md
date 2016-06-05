@@ -1,20 +1,31 @@
 
+2.10.1 / 2016-06-05
+==================
+
+  * fix: should sync missing public scoped package on install ([#946](https://github.com/cnpm/cnpmjs.org/issues/946))
+  * chore(package): update bytes to version 2.4.0 ([#943](https://github.com/cnpm/cnpmjs.org/issues/943))
+  * userService ([#926](https://github.com/cnpm/cnpmjs.org/issues/926))
+  * chore(package): update should to version 8.4.0 ([#928](https://github.com/cnpm/cnpmjs.org/issues/928))
+  * chore(package): update humanize-ms to version 1.2.0 ([#927](https://github.com/cnpm/cnpmjs.org/issues/927))
+  * chore(package): update kcors to version 1.2.1 ([#918](https://github.com/cnpm/cnpmjs.org/issues/918))
+  * chore(package): update urllib to version 2.9.0 ([#898](https://github.com/cnpm/cnpmjs.org/issues/898))
+
 2.10.0 / 2016-04-15
 ==================
 
-  * feat: show tarball url on package page (#894)
-  * chore(package): update koa-mock to version 1.6.1 (#891)
+  * feat: show tarball url on package page ([#894](https://github.com/cnpm/cnpmjs.org/issues/894))
+  * chore(package): update koa-mock to version 1.6.1 ([#891](https://github.com/cnpm/cnpmjs.org/issues/891))
 
 2.9.5 / 2016-04-12
 ==================
 
   * fix: change logo url to a better https source
-  * fix: http://cnpmjs.org/package/fms pre style (#739)
+  * fix: http://cnpmjs.org/package/fms pre style ([#739](https://github.com/cnpm/cnpmjs.org/issues/739))
 
 2.9.4 / 2016-04-09
 ==================
 
-  * fix: don't sync constructor package on exists mode (#883)
+  * fix: don't sync constructor package on exists mode ([#883](https://github.com/cnpm/cnpmjs.org/issues/883))
   * Update utility to version 1.7.0 🚀
   * chore: update sponsor link
 
