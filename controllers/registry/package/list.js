@@ -1,11 +1,3 @@
-/**
- * Copyright(c) cnpm and other contributors.
- * MIT Licensed
- *
- * Authors:
- *   fengmk2 <fengmk2@gmail.com> (http://fengmk2.com)
- */
-
 'use strict';
 
 /**
@@ -99,7 +91,7 @@ module.exports = function* list() {
       this.status = 404;
       this.body = {
         error: 'not_found',
-        reason: 'document not found'
+        reason: 'document not found',
       };
       return;
     }

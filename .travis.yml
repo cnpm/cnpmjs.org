@@ -2,7 +2,7 @@ sudo: false
 language: node_js
 node_js:
   - '4'
-  - '5'
+  - '6'
 addons:
   - postgresql: '9.3'
 script: 'make test-travis-all'

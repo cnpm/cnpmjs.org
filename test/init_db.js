@@ -1,13 +1,3 @@
-/**!
- * cnpmjs.org - test/init_db.js
- *
- * Copyright(c) fengmk2 and other contributors.
- * MIT Licensed
- *
- * Authors:
- *   fengmk2 <fengmk2@gmail.com> (http://fengmk2.github.com)
- */
-
 'use strict';
 
 /**
@@ -22,7 +12,7 @@ var config = require('../config');
 
 // init db first
 var initscript = path.join(__dirname, '..', 'models', 'init_script.js');
-var cmd = ['node', '--harmony', initscript, 'true',
+var cmd = ['node', initscript, 'true',
   config.database.dialect, config.database.port, config.database.username].join(' ');
 console.log('$ %s', cmd);
 var stdout = childProcess.execSync(cmd);

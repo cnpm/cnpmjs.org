@@ -1,12 +1,3 @@
-/**!
- * cnpmjs.org - middleware/proxy_to_npm.js
- *
- * Copyright(c) Alibaba Group Holding Limited.
- *
- * Authors:
- *   苏千 <suqian.yf@alipay.com> (http://fengmk2.com)
- */
-
 'use strict';
 
 /**
@@ -33,11 +24,11 @@ module.exports = function (options) {
   }
   return function* proxyToNpm(next) {
     if (config.syncModel !== 'none') {
-      return yield* next;
+      return yield next;
     }
     // only proxy read requests
     if (this.method !== 'GET' && this.method !== 'HEAD') {
-      return yield* next;
+      return yield next;
     }
 
     var pathname = this.path;
@@ -49,7 +40,7 @@ module.exports = function (options) {
       }
     }
     if (!match) {
-      return yield* next;
+      return yield next;
     }
 
     var url = redirectUrl + this.url;

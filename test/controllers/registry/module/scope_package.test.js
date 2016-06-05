@@ -1,13 +1,3 @@
-/**!
- * cnpmjs.org - test/controllers/registry/module/scope_package.test.js
- *
- * Copyright(c) fengmk2 and other contributors.
- * MIT Licensed
- *
- * Authors:
- *   fengmk2 <fengmk2@gmail.com> (http://fengmk2.github.com)
- */
-
 'use strict';
 
 /**
@@ -21,7 +11,7 @@ var config = require('../../../../config');
 var app = require('../../../../servers/registry');
 var utils = require('../../../utils');
 
-describe('controllers/registry/module/scope_package.test.js', function () {
+describe('test/controllers/registry/module/scope_package.test.js', function () {
   var pkgname = '@cnpm/test-scope-package';
   var pkgURL = '/@' + encodeURIComponent(pkgname.substring(1));
   before(function (done) {
@@ -52,16 +42,17 @@ describe('controllers/registry/module/scope_package.test.js', function () {
 
   afterEach(mm.restore);
 
-  it('should get 404 when do not support scope', function (done) {
+  it('should get 302 when do not support scope', function (done) {
     mm(config, 'scopes', []);
     request(app)
     .get('/@invalid/test')
-    .expect(404, done);
+    .expect('Location', 'https://registry.npmjs.com/@invalid/test')
+    .expect(302, done);
   });
 
-  it('should get 400 when scope not match', function (done) {
+  it('should get 404 when scope is private', function (done) {
     request(app)
-    .get('/@invalid/test')
+    .get('/@cnpmtest/test')
     .expect(404, done);
   });
 

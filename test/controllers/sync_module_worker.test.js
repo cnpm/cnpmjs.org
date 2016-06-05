@@ -1,11 +1,3 @@
-/**!
- * Copyright(c) cnpmjs.org and other contributors.
- * MIT Licensed
- *
- * Authors:
- *  fengmk2 <fengmk2@gmail.com> (http://fengmk2.com)
- */
-
 'use strict';
 
 /**
@@ -69,6 +61,7 @@ describe('test/controllers/sync_module_worker.test.js', function () {
     var worker = new SyncModuleWorker({
       name: '@sindresorhus/df',
       username: 'fengmk2',
+      noDep: true,
     });
     worker.start();
     var end = thunkify.event(worker, 'end');

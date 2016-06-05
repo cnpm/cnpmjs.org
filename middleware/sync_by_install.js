@@ -1,7 +1,5 @@
-/**!
- * cnpmjs.org - middleware/sync_by_install.js
- *
- * Copyright(c) cnpmjs.org and other contributors.
+/**
+ * Copyright(c) cnpm and other contributors.
  * MIT Licensed
  *
  * Authors:
@@ -17,33 +15,36 @@
 var config = require('../config');
 
 /**
- * this.allowSync  -  allow sync triggle by cnpm install
+ * {Boolean} this.allowSync  -  allow sync triggle by cnpm install
  */
 
 module.exports = function* syncByInstall(next) {
   this.allowSync = false;
   if (!config.syncByInstall) {
     // only config.enablePrivate should enable sync on install
-    return yield* next;
+    return yield next;
   }
-  // request not by node, consider it request from web, dont sync
+  // request not by node, consider it request from web, don't sync
   var ua = this.get('user-agent');
   if (!ua || ua.indexOf('node') < 0) {
-    return yield* next;
+    return yield next;
   }
 
-  // if request with `/xxx?write=true`, meaning the read request using for write, dont sync
+  // if request with `/xxx?write=true`, meaning the read request using for write, don't sync
   if (this.query.write) {
-    return yield* next;
+    return yield next;
   }
 
   var name = this.params.name || this.params[0];
 
-  // scoped package dont sync
+  // private scoped package don't sync
   if (name && name[0] === '@') {
-    return yield* next;
+    var scope = name.split('/')[0];
+    if (config.scopes.indexOf(scope) >= 0) {
+      return yield next;
+    }
   }
 
   this.allowSync = true;
-  yield* next;
+  yield next;
 };
