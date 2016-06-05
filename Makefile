@@ -12,7 +12,7 @@ install-production production:
 	@NODE_ENV=production $(MAKE) install
 
 jshint: install
-	@-node_modules/.bin/jshint ./
+	@node_modules/.bin/jshint .
 
 init-database:
 	@node test/init_db.js

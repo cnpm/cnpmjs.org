@@ -1,11 +1,9 @@
-/**!
- * cnpmjs.org - test/controllers/registry/module/scope_package.test.js
- *
- * Copyright(c) fengmk2 and other contributors.
+/**
+ * Copyright(c) cnpm and other contributors.
  * MIT Licensed
  *
  * Authors:
- *   fengmk2 <fengmk2@gmail.com> (http://fengmk2.github.com)
+ *   fengmk2 <fengmk2@gmail.com> (http://fengmk2.com)
  */
 
 'use strict';
@@ -21,7 +19,7 @@ var config = require('../../../../config');
 var app = require('../../../../servers/registry');
 var utils = require('../../../utils');
 
-describe('controllers/registry/module/scope_package.test.js', function () {
+describe('test/controllers/registry/module/scope_package.test.js', function () {
   var pkgname = '@cnpm/test-scope-package';
   var pkgURL = '/@' + encodeURIComponent(pkgname.substring(1));
   before(function (done) {
@@ -59,9 +57,9 @@ describe('controllers/registry/module/scope_package.test.js', function () {
     .expect(404, done);
   });
 
-  it('should get 400 when scope not match', function (done) {
+  it('should get 404 when scope is private', function (done) {
     request(app)
-    .get('/@invalid/test')
+    .get('/@cnpmtest/test')
     .expect(404, done);
   });
 
