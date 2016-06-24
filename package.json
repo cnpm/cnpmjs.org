@@ -64,7 +64,7 @@
     "mocha": "*",
     "node-dev": "*",
     "pedding": "*",
-    "pg": "~5.1.0",
+    "pg": "~6.0.1",
     "pg-hstore": "~2.3.2",
     "should": "~8.4.0",
     "should-http": "*",
