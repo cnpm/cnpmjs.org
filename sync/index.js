@@ -1,36 +1,23 @@
-/**
- * Copyright(c) cnpm and other contributors.
- * MIT Licensed
- *
- * Authors:
- *  dead_horse <dead_horse@qq.com> (http://deadhorse.me)
- *  fengmk2 <fengmk2@gmail.com> (http://fengmk2.com)
- */
-
 'use strict';
 
-/**
- * Module dependencies.
- */
+const debug = require('debug')('cnpmjs.org:sync:index');
+const co = require('co');
+const ms = require('humanize-ms');
+const util = require('util');
+const config = require('../config');
+const mail = require('../common/mail');
+const logger = require('../common/logger');
+const totalService = require('../services/total');
 
-var debug = require('debug')('cnpmjs.org:sync:index');
-var co = require('co');
-var ms = require('humanize-ms');
-var util = require('util');
-var config = require('../config');
-var mail = require('../common/mail');
-var logger = require('../common/logger');
-var totalService = require('../services/total');
-
-var sync = null;
+let sync = null;
 
 switch (config.syncModel) {
-case 'all':
-  sync = require('./sync_all');
-  break;
-case 'exist':
-  sync = require('./sync_exist');
-  break;
+  case 'all':
+    sync = require('./sync_all');
+    break;
+  case 'exist':
+    sync = require('./sync_exist');
+    break;
 }
 
 if (!sync && config.enableCluster) {
@@ -38,34 +25,72 @@ if (!sync && config.enableCluster) {
   process.exit(0);
 }
 
-console.log('[%s] [sync_worker:%s] syncing with %s mode',
-  Date(), process.pid, config.syncModel);
+console.log('[%s] [sync_worker:%s] syncing with %s mode, changesStreamingSync: %s',
+  Date(), process.pid, config.syncModel, config.changesStreamingSync);
 
 function onerror(err) {
   logger.error(err);
 }
 
-//set sync_status = 0 at first
+// set sync_status = 0 at first
 co(function* () {
   yield totalService.updateSyncStatus(0);
   yield checkSyncStatus();
 }).catch(onerror);
 
-var syncInterval = ms(config.syncInterval);
-var minSyncInterval = ms('5m');
+let syncInterval = ms(config.syncInterval);
+const minSyncInterval = ms('5m');
 if (!syncInterval || syncInterval < minSyncInterval) {
   syncInterval = minSyncInterval;
 }
 
-// the same time only sync once
-var syncing = false;
-var syncFn = co.wrap(function* () {
-  debug('mode: %s, syncing: %s', config.syncModel, syncing);
-  if (!syncing) {
+if (sync) {
+  // the same time only sync once
+  let syncing = false;
+  const syncFn = co.wrap(function*() {
+    debug('mode: %s, syncing: %s', config.syncModel, syncing);
+    if (!syncing) {
+      syncing = true;
+      debug('start syncing');
+      let data;
+      let error;
+      try {
+        data = yield sync();
+      } catch (err) {
+        error = err;
+        error.message += ' (sync package error)';
+        logger.syncError(error);
+      }
+      data && logger.syncInfo(data);
+      if (!config.debug) {
+        sendMailToAdmin(error, data, new Date());
+      }
+      syncing = false;
+    }
+
+    // check last_sync_time and last_exist_sync_time
+    yield checkSyncStatus();
+  });
+
+  syncFn().catch(onerror);
+  setInterval(() => syncFn().catch(onerror), syncInterval);
+}
+
+/**
+ * sync popular modules
+ */
+
+if (config.syncPopular) {
+  const sync = require('./sync_popular');
+  let syncing = false;
+  const syncFn = co.wrap(function*() {
+    if (syncing) {
+      return;
+    }
     syncing = true;
-    debug('start syncing');
-    var data;
-    var error;
+    logger.syncInfo('Start syncing popular modules...');
+    let data;
+    let error;
     try {
       data = yield sync();
     } catch (err) {
@@ -73,76 +98,53 @@ var syncFn = co.wrap(function* () {
       error.message += ' (sync package error)';
       logger.syncError(error);
     }
-    data && logger.syncInfo(data);
+
+    if (data) {
+      logger.syncInfo(data);
+    }
     if (!config.debug) {
       sendMailToAdmin(error, data, new Date());
     }
     syncing = false;
-  }
+  });
 
-  // check last_sync_time and last_exist_sync_time
-  yield checkSyncStatus();
-});
-
-if (sync) {
   syncFn().catch(onerror);
-  setInterval(function () {
-    syncFn().catch(onerror);
-  }, syncInterval);
+  setInterval(() => syncFn().catch(onerror), ms(config.syncPopularInterval));
 }
 
-/**
- * sync popular modules
- */
+if (config.syncChangesStream) {
+  const sync = require('./changes_stream_syncer');
+  let syncing = false;
+  const syncFn = co.wrap(function*() {
+    if (syncing) {
+      return;
+    }
+    syncing = true;
+    logger.syncInfo('Start changes stream syncing...');
+    try {
+      yield sync();
+    } catch (err) {
+      err.message += ' (sync changes stream error)';
+      logger.syncError(err);
+    }
+    syncing = false;
+  });
 
-var startSyncPopular = require('./sync_popular');
-var syncingPopular = false;
-var syncPopularFn = co.wrap(function* syncPopular() {
-  if (syncingPopular) {
-    return;
-  }
-  syncingPopular = true;
-  logger.syncInfo('Start syncing popular modules...');
-  var data;
-  var error;
-  try {
-    data = yield startSyncPopular();
-  } catch (err) {
-    error = err;
-    error.message += ' (sync package error)';
-    logger.syncError(error);
-  }
-
-  if (data) {
-    logger.syncInfo(data);
-  }
-  if (!config.debug) {
-    sendMailToAdmin(error, data, new Date());
-  }
-
-  syncingPopular = false;
-});
-
-if (config.syncPopular) {
-  syncPopularFn().catch(onerror);
-  setInterval(function () {
-    syncPopularFn().catch(onerror);
-  }, ms(config.syncPopularInterval));
-} else {
-  logger.syncInfo('sync popular module disable');
+  syncFn().catch(onerror);
+  setInterval(() => syncFn().catch(onerror), ms('1m'));
 }
 
 function sendMailToAdmin(err, result, syncTime) {
   result = result || {};
-  var to = [];
+  const to = [];
   for (var name in config.admins) {
     to.push(config.admins[name]);
   }
   debug('Send email to all admins: %j, with err message: %s, result: %j, start sync time: %s.',
     to, err ? err.message : '', result, syncTime);
-  var subject;
-  var type;
-  var html;
+  let subject;
+  let type;
+  let html;
   if (err) {
     // ignore 503 error
     if (err.status === 503) {
@@ -169,7 +171,7 @@ function sendMailToAdmin(err, result, syncTime) {
   debug('send email with type: %s, subject: %s, html: %s', type, subject, html);
   logger.syncInfo('send email with type: %s, subject: %s, html: %s', type, subject, html);
   if (type && type !== 'log') {
-    mail[type](to, subject, html, function (err) {
+    mail[type](to, subject, html, err => {
       if (err) {
         logger.error(err);
       }
@@ -182,8 +184,8 @@ function* checkSyncStatus() {
   if (!config.sourceNpmRegistryIsCNpm) {
     return;
   }
-  var total = yield totalService.getTotalInfo();
-  var lastSyncTime;
+  const total = yield totalService.getTotalInfo();
+  let lastSyncTime;
   if (config.syncModel === 'all') {
     lastSyncTime = total.last_sync_time;
   } else if (config.syncModel === 'exist') {
@@ -193,11 +195,11 @@ function* checkSyncStatus() {
   if (!lastSyncTime) {
     return;
   }
-  var diff = Date.now() - lastSyncTime;
-  var oneDay = 3600000 * 24;
-  var maxTime = Math.max(oneDay, syncInterval * 2);
+  const diff = Date.now() - lastSyncTime;
+  const oneDay = 3600000 * 24;
+  const maxTime = Math.max(oneDay, syncInterval * 2);
   if (diff > maxTime) {
-    var err = new Error('Last sync time is expired in ' + diff + ' ms, lastSyncTime: ' +
+    const err = new Error('Last sync time is expired in ' + diff + ' ms, lastSyncTime: ' +
       new Date(lastSyncTime) + ', maxTime: ' + maxTime + ' ms');
     err.name = 'SyncExpiredError';
     sendMailToAdmin(err, null, new Date());

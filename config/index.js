@@ -1,17 +1,4 @@
-/**
- * Copyright(c) cnpmjs.org and other contributors.
- * MIT Licensed
- *
- * Authors:
- *  dead_horse <dead_horse@qq.com>
- *  fengmk2 <m@fengmk2.com> (http://fengmk2.com)
- */
-
 'use strict';
-
-/**
- * Module dependencies.
- */
 
 var mkdirp = require('mkdirp');
 var copy = require('copy-to');
@@ -26,6 +13,7 @@ var dataDir = path.join(process.env.HOME || root, '.cnpmjs.org');
 
 var config = {
   version: version,
+  dataDir: dataDir,
 
   /**
    * Cluster mode
@@ -208,6 +196,10 @@ var config = {
 
   // sync devDependencies or not, default is false
   syncDevDependencies: false,
+
+  // changes streaming sync
+  syncChangesStream: false,
+  handleSyncRegistry: 'http://127.0.0.1:7001',
 
   // badge subject on http://shields.io/
   badgePrefixURL: 'https://img.shields.io/badge',

@@ -1,18 +1,4 @@
-/*!
- * cnpmjs.org - sync/sync_popular.js
- *
- * Copyright(c) cnpmjs.org and other contributors.
- * MIT Licensed
- *
- * Authors:
- *  dead_horse <dead_horse@qq.com> (http://deadhorse.me)
- */
-
 'use strict';
-
-/**
- * Module dependencies.
- */
 
 var debug = require('debug')('cnpmjs.org:sync:sync_popular');
 var thunkify = require('thunkify-wrap');

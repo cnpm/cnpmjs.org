@@ -1,17 +1,4 @@
-/**!
- * Copyright(c) cnpm and other contributors.
- * MIT Licensed
- *
- * Authors:
- *  fengmk2 <fengmk2@gmail.com> (http://fengmk2.com)
- *  dead_horse <dead_horse@qq.com> (http://deadhorse.me)
- */
-
 'use strict';
-
-/**
- * Module dependencies.
- */
 
 const Total = require('../services/total');
 const version = require('../package.json').version;

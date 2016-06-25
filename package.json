@@ -14,8 +14,10 @@
   },
   "dependencies": {
     "agentkeepalive": "~2.1.0",
+    "await-event": "^1.0.0",
     "bytes": "~2.4.0",
     "cfork": "~1.4.0",
+    "changes-stream": "^1.1.0",
     "co": "~4.6.0",
     "co-defer": "~1.0.0",
     "co-gather": "~0.0.1",
@@ -44,6 +46,7 @@
     "mkdirp": "~0.5.0",
     "moment": "~2.12.0",
     "mysql": "~2.10.2",
+    "mz": "^2.4.0",
     "nodemailer": "~1.3.0",
     "semver": "~5.1.0",
     "sequelize": "~3.21.0",
