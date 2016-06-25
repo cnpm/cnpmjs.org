@@ -1,4 +1,10 @@
 
+2.11.0 / 2016-06-25
+==================
+
+  * feat: add changes stream syncer ([#970](https://github.com/cnpm/cnpmjs.org/issues/970))
+  * chore(package): update pg to version 5.1.0 ([#953](https://github.com/cnpm/cnpmjs.org/issues/953))
+
 2.10.1 / 2016-06-05
 ==================
 
