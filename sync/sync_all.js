@@ -1,19 +1,4 @@
-/**!
- * cnpmjs.org - sync/sync_all.js
- *
- * Copyright(c) cnpmjs.org and other contributors.
- * MIT Licensed
- *
- * Authors:
- *  dead_horse <dead_horse@qq.com> (http://deadhorse.me)
- *  fengmk2 <m@fengmk2.com> (http://fengmk2.com)
- */
-
 'use strict';
-
-/**
- * Module dependencies.
- */
 
 var thunkify = require('thunkify-wrap');
 var config = require('../config');

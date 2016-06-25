@@ -1,18 +1,4 @@
-/**!
- * sync packages since by some days ago
- *
- * Copyright(c) cnpmjs.org and other contributors.
- * MIT Licensed
- *
- * Authors:
- *   fengmk2 <m@fengmk2.com> (http://fengmk2.com)
- */
-
 'use strict';
-
-/**
- * Module dependencies.
- */
 
 const thunkify = require('thunkify-wrap');
 const co = require('co');

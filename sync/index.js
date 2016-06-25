@@ -1,17 +1,4 @@
-/**
- * Copyright(c) cnpm and other contributors.
- * MIT Licensed
- *
- * Authors:
- *  dead_horse <dead_horse@qq.com> (http://deadhorse.me)
- *  fengmk2 <fengmk2@gmail.com> (http://fengmk2.com)
- */
-
 'use strict';
-
-/**
- * Module dependencies.
- */
 
 var debug = require('debug')('cnpmjs.org:sync:index');
 var co = require('co');
@@ -25,12 +12,12 @@ var totalService = require('../services/total');
 var sync = null;
 
 switch (config.syncModel) {
-case 'all':
-  sync = require('./sync_all');
-  break;
-case 'exist':
-  sync = require('./sync_exist');
-  break;
+  case 'all':
+    sync = require('./sync_all');
+    break;
+  case 'exist':
+    sync = require('./sync_exist');
+    break;
 }
 
 if (!sync && config.enableCluster) {
@@ -38,14 +25,14 @@ if (!sync && config.enableCluster) {
   process.exit(0);
 }
 
-console.log('[%s] [sync_worker:%s] syncing with %s mode',
-  Date(), process.pid, config.syncModel);
+console.log('[%s] [sync_worker:%s] syncing with %s mode, changesStreamingSync: %s',
+  Date(), process.pid, config.syncModel, config.changesStreamingSync);
 
 function onerror(err) {
   logger.error(err);
 }
 
-//set sync_status = 0 at first
+// set sync_status = 0 at first
 co(function* () {
   yield totalService.updateSyncStatus(0);
   yield checkSyncStatus();
@@ -57,34 +44,34 @@ if (!syncInterval || syncInterval < minSyncInterval) {
   syncInterval = minSyncInterval;
 }
 
-// the same time only sync once
-var syncing = false;
-var syncFn = co.wrap(function* () {
-  debug('mode: %s, syncing: %s', config.syncModel, syncing);
-  if (!syncing) {
-    syncing = true;
-    debug('start syncing');
-    var data;
-    var error;
-    try {
-      data = yield sync();
-    } catch (err) {
-      error = err;
-      error.message += ' (sync package error)';
-      logger.syncError(error);
-    }
-    data && logger.syncInfo(data);
-    if (!config.debug) {
-      sendMailToAdmin(error, data, new Date());
-    }
-    syncing = false;
-  }
-
-  // check last_sync_time and last_exist_sync_time
-  yield checkSyncStatus();
-});
-
 if (sync) {
+  // the same time only sync once
+  var syncing = false;
+  var syncFn = co.wrap(function* () {
+    debug('mode: %s, syncing: %s', config.syncModel, syncing);
+    if (!syncing) {
+      syncing = true;
+      debug('start syncing');
+      var data;
+      var error;
+      try {
+        data = yield sync();
+      } catch (err) {
+        error = err;
+        error.message += ' (sync package error)';
+        logger.syncError(error);
+      }
+      data && logger.syncInfo(data);
+      if (!config.debug) {
+        sendMailToAdmin(error, data, new Date());
+      }
+      syncing = false;
+    }
+
+    // check last_sync_time and last_exist_sync_time
+    yield checkSyncStatus();
+  });
+
   syncFn().catch(onerror);
   setInterval(function () {
     syncFn().catch(onerror);
@@ -95,41 +82,67 @@ if (sync) {
  * sync popular modules
  */
 
-var startSyncPopular = require('./sync_popular');
-var syncingPopular = false;
-var syncPopularFn = co.wrap(function* syncPopular() {
-  if (syncingPopular) {
-    return;
-  }
-  syncingPopular = true;
-  logger.syncInfo('Start syncing popular modules...');
-  var data;
-  var error;
-  try {
-    data = yield startSyncPopular();
-  } catch (err) {
-    error = err;
-    error.message += ' (sync package error)';
-    logger.syncError(error);
-  }
-
-  if (data) {
-    logger.syncInfo(data);
-  }
-  if (!config.debug) {
-    sendMailToAdmin(error, data, new Date());
-  }
-
-  syncingPopular = false;
-});
-
 if (config.syncPopular) {
+  var startSyncPopular = require('./sync_popular');
+  var syncingPopular = false;
+  var syncPopularFn = co.wrap(function* syncPopular() {
+    if (syncingPopular) {
+      return;
+    }
+    syncingPopular = true;
+    logger.syncInfo('Start syncing popular modules...');
+    var data;
+    var error;
+    try {
+      data = yield startSyncPopular();
+    } catch (err) {
+      error = err;
+      error.message += ' (sync package error)';
+      logger.syncError(error);
+    }
+
+    if (data) {
+      logger.syncInfo(data);
+    }
+    if (!config.debug) {
+      sendMailToAdmin(error, data, new Date());
+    }
+
+    syncingPopular = false;
+  });
+
   syncPopularFn().catch(onerror);
   setInterval(function () {
     syncPopularFn().catch(onerror);
   }, ms(config.syncPopularInterval));
 } else {
   logger.syncInfo('sync popular module disable');
+}
+
+if (config.syncChangesStream) {
+  const sync = require('./changes_stream_syncer');
+  let syncing = false;
+  const syncFn = co.wrap(function* syncPopular() {
+    if (syncing) {
+      return;
+    }
+    syncing = true;
+    logger.syncInfo('Start changes stream syncing...');
+    var error;
+    try {
+      yield sync();
+    } catch (err) {
+      error = err;
+      error.message += ' (sync package error)';
+      logger.syncError(error);
+    }
+    syncing = false;
+  });
+
+  syncFn().catch(onerror);
+  setInterval(() => {
+    syncFn().catch(onerror);
+  }, ms('1m'));
 }
 
 function sendMailToAdmin(err, result, syncTime) {
