@@ -54,7 +54,7 @@
     "thunkify-wrap": "~1.0.4",
     "treekill": "~1.0.0",
     "tunnel-agent": "^0.4.0",
-    "urllib": "~2.9.0",
+    "urllib": "~2.11.0",
     "utility": "~1.7.0",
     "xss": "~0.2.10"
   },
