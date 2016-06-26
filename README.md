@@ -3,18 +3,21 @@ cnpmjs.org
 
 [![NPM version][npm-image]][npm-url]
 [![build status][travis-image]][travis-url]
-[![Test coverage][cov-image]][cov-url]
+[![Test coverage][codecov-image]][codecov-url]
 [![David deps][david-image]][david-url]
+[![Known Vulnerabilities][snyk-image]][snyk-url]
 [![npm download][download-image]][download-url]
 
 [npm-image]: http://cnpmjs.org/badge/v/cnpmjs.org.svg?style=flat-square
 [npm-url]: http://cnpmjs.org/package/cnpmjs.org
 [travis-image]: https://img.shields.io/travis/cnpm/cnpmjs.org.svg?style=flat-square
 [travis-url]: https://travis-ci.org/cnpm/cnpmjs.org
-[cov-image]: http://codecov.io/github/cnpm/cnpmjs.org/coverage.svg?branch=master
-[cov-url]: http://codecov.io/github/cnpm/cnpmjs.org?branch=master
+[codecov-image]: https://codecov.io/gh/cnpm/cnpmjs.org/branch/master/graph/badge.svg
+[codecov-url]: https://codecov.io/gh/cnpm/cnpmjs.org
 [david-image]: https://img.shields.io/david/cnpm/cnpmjs.org.svg?style=flat-square
 [david-url]: https://david-dm.org/cnpm/cnpmjs.org
+[snyk-image]: https://snyk.io/test/npm/cnpmjs.org/badge.svg?style=flat-square
+[snyk-url]: https://snyk.io/test/npm/cnpmjs.org
 [download-image]: https://img.shields.io/npm/dm/cnpmjs.org.svg?style=flat-square
 [download-url]: https://npmjs.org/package/cnpmjs.org
 

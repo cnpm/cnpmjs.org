@@ -15,13 +15,16 @@
       <% } %>
       <div class="pack-ver">
         <img title="<%= package.version %>" src="/badge/v/<%= package.name %>.svg?style=flat-square">
-        <% if (package.engines) {%>
+        <% if (package.engines) { %>
           <% for (var k in package.engines) {
             var engine = package.engines[k];
           %>
             <img title="<%= engine.title %>" src="<%- engine.badgeURL %>">
         <% }
-        }%>
+        } %>
+        <% if (package.snyk) { %>
+        <a class="badge-link" href="<%= package.snyk.url %>" target="_blank"><img title="Known Vulnerabilities" src="<%- package.snyk.badge %>"></a>
+        <% } %>
       </div>
       <div class="pack-repo">
         <% if (package.fromNow) { %>
@@ -52,7 +55,7 @@
 
         <% if (package.license || package.repository || package.bugs.url) {%> &middot; <% } %>
 
-        <% if (!package._publish_on_cnpm) { %>
+        <% if (!package.isPrivate) { %>
         <a href="https://www.npmjs.org/package/<%= package.name %>" target="_blank">Original npm</a>
         <% } %>
 
@@ -64,7 +67,7 @@
       <div class="pack-install">
         <pre class="sh">$ <%- config.npmClientName %> install <%= package.name %> <% if (package.preferGlobal) { %>-g<% } %></pre>
         <div class="pack-sync">
-          <% if (package._publish_on_cnpm) { %>
+          <% if (package.isPrivate) { %>
             Private package
           <% } else { %>
             <a href="/sync/<%= package.name %>" target="_blank">SYNC</a> missed versions from
