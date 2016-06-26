@@ -1,28 +1,14 @@
-/*!
- * cnpmjs.org - test/controllers/web/package/show.test.js
- *
- * Copyright(c) cnpmjs.org and other contributors.
- * MIT Licensed
- *
- * Authors:
- *  dead_horse <dead_horse@qq.com> (http://deadhorse.me)
- */
-
 'use strict';
 
-/**
- * Module dependencies.
- */
-
 var should = require('should');
-var request = require('supertest');
+var request = require('supertest-as-promised');
 var mm = require('mm');
 var config = require('../../../../config');
 var app = require('../../../../servers/web');
 var registry = require('../../../../servers/registry');
 var utils = require('../../../utils');
 
-describe('controllers/web/package/show.test.js', function () {
+describe('controllers/web/package/show.test.js', () => {
   before(function (done) {
     var pkg = utils.getPackage('@cnpmtest/testmodule-web-show', '0.0.1', utils.admin);
     pkg.versions['0.0.1'].dependencies = {
@@ -113,17 +99,17 @@ describe('controllers/web/package/show.test.js', function () {
     });
   });
 
-  describe('unpublished package', function () {
-    before(function (done) {
-      utils.sync('tfs', done);
+  describe('unpublished package', () => {
+    before(done => {
+      utils.sync('mk2testmodule', done);
     });
 
-    it('should display unpublished info', function (done) {
+    it('should display unpublished info', () => {
       mm(config, 'syncModel', 'all');
-      request(app)
-      .get('/package/moduletest1')
-      .expect(200)
-      .expect(/This package has been unpublished\./, done);
+      return request(app)
+        .get('/package/mk2testmodule')
+        .expect(200)
+        .expect(/This package has been unpublished\./);
     });
   });
 
@@ -149,20 +135,22 @@ describe('controllers/web/package/show.test.js', function () {
     });
   });
 
-  describe('show npm package', function () {
-    before(function (done) {
+  describe('show npm package', () => {
+    before(done => {
       mm(config, 'syncModel', 'exists');
       utils.sync('pedding', done);
     });
 
-    it('should show pedding package info and contributors', function (done) {
+    it('should show pedding package info and contributors', () => {
       mm(config, 'syncModel', 'exists');
-      request(app)
-      .get('/package/pedding')
-      .expect(200)
-      // https://github.com/cnpm/cnpmjs.org/issues/497
-      .expect(/by <a href="\/\~fengmk2">fengmk2<\/a>/)
-      .expect(/pedding/, done);
+      return request(app)
+        .get('/package/pedding')
+        .expect(200)
+        // https://github.com/cnpm/cnpmjs.org/issues/497
+        .expect(/by <a href="\/\~fengmk2">fengmk2<\/a>/)
+        // snyk link
+        .expect(/<a class="badge-link" href="https:\/\/snyk\.io\/test\/npm\/pedding" target="_blank"><img title="Known Vulnerabilities" src="https:\/\/snyk\.io\/test\/npm\/pedding\/badge\.svg\?style=flat-square"><\/a>/)
+        .expect(/pedding/);
     });
   });
 });

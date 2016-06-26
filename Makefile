@@ -93,7 +93,7 @@ test-travis-pg:
 	@psql -c 'CREATE DATABASE cnpmjs_test;' -U postgres
 	@DB_PORT=5432 DB_USER=postgres $(MAKE) test-travis DB=postgres
 
-test-travis-all: test-travis-sqlite test-travis-mysql test-travis-pg
+test-travis-all: jshint test-travis-sqlite test-travis-mysql test-travis-pg
 
 dev:
 	@NODE_ENV=development node node_modules/.bin/node-dev dispatch.js

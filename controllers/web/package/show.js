@@ -1,17 +1,4 @@
-/**!
- * Copyright(c) cnpm and other contributors.
- * MIT Licensed
- *
- * Authors:
- *  dead_horse <dead_horse@qq.com> (http://deadhorse.me)
- *  fengmk2 <fengmk2@gmail.com> (http://fengmk2.com)
- */
-
 'use strict';
-
-/**
- * Module dependencies.
- */
 
 var debug = require('debug')('cnpmjs.org:controllers:web:package:show');
 var bytes = require('bytes');
@@ -181,6 +168,17 @@ module.exports = function* show(next) {
           '-' + encodeURIComponent(engine) + '-' + color + '.svg?style=flat-square',
       };
     }
+  }
+
+  if (pkg._publish_on_cnpm) {
+    pkg.isPrivate = true;
+  } else {
+    pkg.isPrivate = false;
+    // add security check badge
+    pkg.snyk = {
+      badge: `https://snyk.io/test/npm/${pkg.name}/badge.svg?style=flat-square`,
+      url: `https://snyk.io/test/npm/${pkg.name}`,
+    };
   }
 
   yield this.render('package', {

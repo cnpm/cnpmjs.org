@@ -201,6 +201,12 @@ pre code {
   font-size: 28px;
   line-height: 48px;
 }
+
+.pack-ver a.badge-link {
+  font-size: inherit;
+  border-bottom: 0px;
+}
+
 .pack-lastup {
   font-size: 14px;
   display: inline-block;

@@ -3,9 +3,8 @@
 const ChangesStream = require('changes-stream');
 const path = require('path');
 const fs = require('mz/fs');
-const os = require('os');
 const urllib = require('urllib');
-const streamAwait = require('await-event')
+const streamAwait = require('await-event');
 const logger = require('../common/logger');
 const config = require('../config');
 
@@ -35,7 +34,7 @@ function syncPackage(change) {
     method: 'PUT',
     dataType: 'json',
     timeout: 10000,
-  }, (err, data, res) => {
+  }, (err, data) => {
     if (err) {
       logger.syncInfo('%s:%s PUT %s error: %s, retry after 5s',
         change.seq, change.id, url, err);
