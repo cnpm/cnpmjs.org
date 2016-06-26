@@ -14,7 +14,7 @@
     "cnpmjs.org": "bin/cli.js"
   },
   "dependencies": {
-    "agentkeepalive": "~2.1.0",
+    "agentkeepalive": "~2.2.0",
     "await-event": "^1.0.0",
     "bytes": "~2.4.0",
     "cfork": "~1.4.0",
