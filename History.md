@@ -1,4 +1,10 @@
 
+2.12.0 / 2016-06-26
+==================
+
+  * fix: logger seperator should be one EOL ([#972](https://github.com/cnpm/cnpmjs.org/issues/972))
+  * feat: add security check badge for public package ([#971](https://github.com/cnpm/cnpmjs.org/issues/971))
+
 2.11.0 / 2016-06-25
 ==================
 
