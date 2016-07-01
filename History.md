@@ -1,4 +1,12 @@
 
+2.12.1 / 2016-07-01
+==================
+
+  * fix: make sure chagnes stream destroy (#982)
+  * chore(package): update semver to version 5.2.0 (#978)
+  * deps: use ^ instead of ~ (#976)
+  * chore(package): update mini-logger to version 1.1.1 (#973)
+
 2.12.0 / 2016-06-26
 ==================
 
