@@ -10,10 +10,12 @@ const config = require('../config');
 
 const db = 'https://replicate.npmjs.com';
 const lastSeqFile = path.join(config.dataDir, '.cnpmjs.org.last_seq.txt');
+let _STREAM_ID = 0;
 
 module.exports = function* sync() {
   const since = yield getLastSequence();
-  logger.syncInfo('start changes stream, since: %s', since);
+  const streamId = _STREAM_ID++;
+  logger.syncInfo('start changes stream#%d, since: %s', streamId, since);
   const changes = new ChangesStream({
     db,
     since,
@@ -21,11 +23,18 @@ module.exports = function* sync() {
   });
   changes.await = streamAwait;
   changes.on('data', change => {
-    logger.syncInfo('Get change: %j', change);
+    logger.syncInfo('stream#%d get change: %j', streamId, change);
     syncPackage(change);
   });
 
-  yield changes.await('error');
+  try {
+    yield changes.await('error');
+  } catch (err) {
+    // make sure changes steam is destroy
+    changes.destroy();
+    err.message += `, stream#${streamId}`;
+    throw err;
+  }
 };
 
 function syncPackage(change) {
@@ -56,7 +65,7 @@ function* getLastSequence() {
     lastSeq = Number(lastSeq);
   }
   if (!lastSeq) {
-    lastSeq = 2614765;
+    lastSeq = 2649694;
   }
   // const r = yield urllib.request(db, {
   //   dataType: 'json',
