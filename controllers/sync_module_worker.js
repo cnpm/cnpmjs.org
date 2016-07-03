@@ -59,6 +59,7 @@ function SyncModuleWorker(options) {
 
   this.successes = [];
   this.fails = [];
+  this.updates = [];
 }
 
 util.inherits(SyncModuleWorker, EventEmitter);
@@ -127,7 +128,7 @@ SyncModuleWorker.prototype.start = function () {
     // sync upstream
     if (that.syncUpstreamFirst) {
       try {
-        yield* that.syncUpstream(that.startName);
+        yield that.syncUpstream(that.startName);
       } catch (err) {
         logger.error(err);
       }
@@ -180,7 +181,7 @@ SyncModuleWorker.prototype._doneOne = function* (concurrencyId, name, success) {
   var that = this;
   // relase the stack: https://github.com/cnpm/cnpmjs.org/issues/328
   defer.setImmediate(function* () {
-    yield* that.next(concurrencyId);
+    yield that.next(concurrencyId);
   });
 };
 
@@ -300,13 +301,13 @@ SyncModuleWorker.prototype.next = function* (concurrencyId) {
   if (common.isPrivateScopedPackage(name)) {
     this.log('[c#%d] [%s] ignore sync private scoped %j package',
       concurrencyId, name, config.scopes);
-    yield* this._doneOne(concurrencyId, name, true);
+    yield this._doneOne(concurrencyId, name, true);
     return;
   }
 
   // get from npm
   try {
-    var result = yield* npmSerivce.request('/' + name.replace('/', '%2f'));
+    var result = yield npmSerivce.request('/' + name.replace('/', '%2f'));
     pkg = result.data;
     status = result.status;
   } catch (err) {
@@ -333,7 +334,7 @@ SyncModuleWorker.prototype.next = function* (concurrencyId) {
   if (!pkg) {
     that.log('[c#%s] [error] [%s] get package error: package not exists, status: %s',
       concurrencyId, name, status);
-    yield* that._doneOne(concurrencyId, name, true);
+    yield that._doneOne(concurrencyId, name, true);
     return;
   }
 
@@ -341,31 +342,36 @@ SyncModuleWorker.prototype.next = function* (concurrencyId) {
 
   if (unpublishedInfo) {
     try {
-      yield* that._unpublished(name, unpublishedInfo);
+      yield that._unpublished(name, unpublishedInfo);
     } catch (err) {
       that.log('[c#%s] [error] [%s] sync error: %s', concurrencyId, name, err.stack);
-      yield* that._doneOne(concurrencyId, name, false);
+      yield that._doneOne(concurrencyId, name, false);
       return;
     }
-    return yield* that._doneOne(concurrencyId, name, true);
+    return yield that._doneOne(concurrencyId, name, true);
   }
 
   var versions;
   try {
-    versions = yield* that._sync(name, pkg);
+    versions = yield that._sync(name, pkg);
   } catch (err) {
     that.log('[c#%s] [error] [%s] sync error: %s', concurrencyId, name, err.stack);
-    yield* that._doneOne(concurrencyId, name, false);
+    yield that._doneOne(concurrencyId, name, false);
     return;
+  }
+
+  // has new version
+  if (versions.length > 0) {
+    that.updates.push(name);
   }
 
   this.log('[c#%d] [%s] synced success, %d versions: %s',
     concurrencyId, name, versions.length, versions.join(', '));
-  yield* this._doneOne(concurrencyId, name, true);
+  yield this._doneOne(concurrencyId, name, true);
 };
 
 function* _listStarUsers(modName) {
-  var users = yield* packageService.listStarUserNames(modName);
+  var users = yield packageService.listStarUserNames(modName);
   var userMap = {};
   users.forEach(function (user) {
     userMap[user] = true;
@@ -663,7 +669,7 @@ SyncModuleWorker.prototype._sync = function* (name, pkg) {
       continue;
     }
     try {
-      yield* that._syncOneVersion(index, syncModule);
+      yield that._syncOneVersion(index, syncModule);
       syncedVersionNames.push(syncModule.version);
     } catch (err) {
       that.log('    [%s:%d] sync error, version: %s, %s: %s',
@@ -923,7 +929,7 @@ SyncModuleWorker.prototype._syncOneVersion = function *(versionIndex, sourcePack
   }
 
   // add module dependence
-  yield* packageService.addDependencies(sourcePackage.name, dependencies);
+  yield packageService.addDependencies(sourcePackage.name, dependencies);
 
   var shasum = crypto.createHash('sha1');
   var dataSize = 0;
@@ -945,6 +951,7 @@ SyncModuleWorker.prototype._syncOneVersion = function *(versionIndex, sourcePack
       var err = new Error('Download ' + downurl + ' fail, status: ' + statusCode);
       err.name = 'DownloadTarballError';
       err.data = sourcePackage;
+      logger.syncInfo('[sync_module_worker] %s', err.message);
       throw err;
     }
 
@@ -961,6 +968,7 @@ SyncModuleWorker.prototype._syncOneVersion = function *(versionIndex, sourcePack
       var err = new Error('Download ' + downurl + ' file size is zero');
       err.name = 'DownloadTarballSizeZeroError';
       err.data = sourcePackage;
+      logger.syncInfo('[sync_module_worker] %s', err.message);
       throw err;
     }
 
@@ -971,6 +979,7 @@ SyncModuleWorker.prototype._syncOneVersion = function *(versionIndex, sourcePack
         ' not match ' + sourcePackage.dist.shasum);
       err.name = 'DownloadTarballShasumError';
       err.data = sourcePackage;
+      logger.syncInfo('[sync_module_worker] %s', err.message);
       throw err;
     }
 
@@ -989,8 +998,9 @@ SyncModuleWorker.prototype._syncOneVersion = function *(versionIndex, sourcePack
       throw err;
     }
     logger.syncInfo('[sync_module_worker] uploaded, saving %j to database', result);
-    var r = yield *afterUpload(result);
-    logger.syncInfo('[sync_module_worker] sync %s@%s done!', sourcePackage.name, sourcePackage.version);
+    var r = yield afterUpload(result);
+    logger.syncInfo('[sync_module_worker] sync %s@%s done!',
+      sourcePackage.name, sourcePackage.version);
     return r;
   } finally {
     // remove tmp file whatever
@@ -1034,7 +1044,7 @@ SyncModuleWorker.prototype._syncOneVersion = function *(versionIndex, sourcePack
     }
 
     mod.package.dist = dist;
-    var r = yield* packageService.saveModule(mod);
+    var r = yield packageService.saveModule(mod);
 
     that.log('    [%s:%s] done, insertId: %s, author: %s, version: %s, '
       + 'size: %d, publish_time: %j, publish on cnpm: %s',
