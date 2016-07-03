@@ -57,19 +57,22 @@ module.exports = function* sync() {
     concurrency: config.syncConcurrency,
     syncUpstreamFirst: false,
   });
-  Status.init({need: packages.length}, worker);
+  Status.init({
+    need: packages.length,
+  }, worker);
   worker.start();
   var end = thunkify.event(worker);
   yield end();
 
-  logger.syncInfo('All packages sync done, successes %d, fails %d',
-      worker.successes.length, worker.fails.length);
+  logger.syncInfo('All packages sync done, successes %d, fails %d, updates %d',
+      worker.successes.length, worker.fails.length, worker.updates.length);
   //only when all succss, set last sync time
   if (!worker.fails.length) {
-    yield* totalService.setLastSyncTime(syncTime);
+    yield totalService.setLastSyncTime(syncTime);
   }
   return {
     successes: worker.successes,
-    fails: worker.fails
+    fails: worker.fails,
+    updates: worker.updates,
   };
 };

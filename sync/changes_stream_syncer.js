@@ -15,6 +15,7 @@ let _STREAM_ID = 0;
 module.exports = function* sync() {
   const since = yield getLastSequence();
   const streamId = _STREAM_ID++;
+  let changesCount = 0;
   logger.syncInfo('start changes stream#%d, since: %s', streamId, since);
   const changes = new ChangesStream({
     db,
@@ -23,7 +24,8 @@ module.exports = function* sync() {
   });
   changes.await = streamAwait;
   changes.on('data', change => {
-    logger.syncInfo('stream#%d get change: %j', streamId, change);
+    changesCount++;
+    logger.syncInfo('stream#%d get change#%d: %j', streamId, changesCount, change);
     syncPackage(change);
   });
 
@@ -32,7 +34,7 @@ module.exports = function* sync() {
   } catch (err) {
     // make sure changes steam is destroy
     changes.destroy();
-    err.message += `, stream#${streamId}`;
+    err.message += `, stream#${streamId}, changesCount#${changesCount}`;
     throw err;
   }
 };

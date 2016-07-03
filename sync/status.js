@@ -22,7 +22,7 @@ Status.prototype.log = function (syncDone) {
     lastSyncModule: this.lastSyncModule,
   };
   co(function* () {
-    yield* Total.updateSyncNum(params);
+    yield Total.updateSyncNum(params);
   }).catch(function () {});
 };
 
