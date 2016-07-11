@@ -1,4 +1,10 @@
 
+2.12.2 / 2016-07-11
+==================
+
+  * fix: getModuleByRange don't list all packages (#990)
+  * fix: should show new version package count (#984)
+
 2.12.1 / 2016-07-01
 ==================
 
