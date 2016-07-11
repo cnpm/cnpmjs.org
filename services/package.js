@@ -75,7 +75,7 @@ exports.getModuleByTag = function* (name, tag) {
 };
 
 exports.getModuleByRange = function* (name, range) {
-  var rows = yield exports.listModulesByName(name);
+  var rows = yield exports.listModulesByName(name, [ 'id', 'version' ]);
   var versionMap = {};
   var versions = rows.map(function(row) {
     versionMap[row.version] = row;
@@ -85,7 +85,12 @@ exports.getModuleByRange = function* (name, range) {
   });
 
   var version = semver.maxSatisfying(versions, range);
-  return versionMap[version];
+  if (!versionMap[version]) {
+    return null;
+  }
+
+  var id = versionMap[version].id;
+  return yield exports.getModuleById(id);
 };
 
 exports.getLatestModule = function* (name) {
@@ -241,12 +246,13 @@ exports.listAllPublicModuleNames = function* () {
   });
 };
 
-exports.listModulesByName = function* (moduleName) {
+exports.listModulesByName = function* (moduleName, attributes) {
   var mods = yield Module.findAll({
     where: {
       name: moduleName
     },
-    order: [ ['id', 'DESC'] ]
+    order: [ ['id', 'DESC'] ],
+    attributes,
   });
 
   for (var mod of mods) {
