@@ -1,19 +1,4 @@
-/**!
- * cnpmjs.org - servers/web.js
- *
- * Copyright(c) cnpmjs.org and other contributors.
- * MIT Licensed
- *
- * Authors:
- *  dead_horse <dead_horse@qq.com>
- *  fengmk2 <m@fengmk2.com> (http://fengmk2.com)
- */
-
-"use strict";
-
-/**
- * Module dependencies.
- */
+'use strict';
 
 var opensearch = require('../middleware/opensearch');
 var notFound = require('../middleware/web_not_found');
@@ -32,6 +17,7 @@ var path = require('path');
 var http = require('http');
 var koa = require('koa');
 var fs = require('fs');
+var maxrequests = require('koa-maxrequests');
 
 var app = koa();
 
@@ -39,6 +25,7 @@ jsonp(app);
 
 var rootdir = path.dirname(__dirname);
 
+app.use(maxrequests());
 app.use(block());
 app.use(middlewares.rt({headerName: 'X-ReadTime'}));
 app.use(middlewares.rewrite('/favicon.ico', '/favicon.png'));
