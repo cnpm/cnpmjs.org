@@ -146,8 +146,12 @@ function sendMailToAdmin(err, result, syncTime) {
   let type;
   let html;
   if (err) {
-    // ignore 503 error
-    if (err.status === 503) {
+    // ignore 503, 504 error
+    // 504: Gateway Time-out
+    if (err.status === 503 || err.status === 504) {
+      return;
+    }
+    if (err.name === 'JSONResponseFormatError') {
       return;
     }
     subject = 'Sync Error';
@@ -161,6 +165,10 @@ function sendMailToAdmin(err, result, syncTime) {
       'Start sync time is %s.\n %d packges sync failed: %j ...\n %d packages sync successes :%j ...',
       syncTime, result.fails.length, result.fails.slice(0, 10),
       result.successes.length, result.successes.slice(0, 10));
+    // skip email notice when fails items small then 3
+    if (result.fails.length < 3) {
+      type = 'log';
+    }
   } else if (result.successes && result.successes.length) {
     subject = 'Sync Finished';
     type = 'log';
