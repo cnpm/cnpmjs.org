@@ -25,6 +25,7 @@ var usernames = [
   'cnpmjstest101',
   'cnpmjstest102',
   'cnpmjstest103',
+  ['cnpmjstest104', 'cnpmjs:test104'],
   'cnpmjstest10', // admin
   'cnpmjstestAdmin2', // other admin
   'cnpmjstestAdmin3', // other admin
@@ -33,6 +34,13 @@ var usernames = [
 
 var count = usernames.length;
 usernames.forEach(function (name) {
+  var pass;
+  if (Array.isArray(name)) {
+    name = name[0];
+    pass = name[1];
+  } else {
+    pass = name;
+  }
   var user = User.build({
     name: name,
     email: 'fengmk2@gmail.com',
@@ -40,7 +48,7 @@ usernames.forEach(function (name) {
     rev: '1',
   });
   user.salt = crypto.randomBytes(30).toString('hex');
-  user.password_sha = User.createPasswordSha(name, user.salt);
+  user.password_sha = User.createPasswordSha(pass, user.salt);
   user.save().then(function () {
     count--;
     if (count === 0) {
