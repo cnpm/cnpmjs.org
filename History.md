@@ -1,4 +1,10 @@
 
+2.14.0 / 2016-08-04
+==================
+
+  * feat: password may contains ":" (#999)
+  * fix: limit sync fails email notice (#1006)
+
 2.13.0 / 2016-07-26
 ==================
 

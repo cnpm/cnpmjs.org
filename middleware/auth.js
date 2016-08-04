@@ -34,13 +34,14 @@ module.exports = function () {
       return yield* unauthorized.call(this, next);
     }
 
-    authorization = new Buffer(authorization, 'base64').toString().split(':');
-    if (authorization.length !== 2) {
-      return yield* unauthorized.call(this, next);
+    authorization = new Buffer(authorization, 'base64').toString();
+    var pos = authorization.indexOf(':');
+    if (pos === -1) {
+       return yield* unauthorized.call(this, next);
     }
 
-    var username = authorization[0];
-    var password = authorization[1];
+    var username = authorization.slice(0, pos);
+    var password = authorization.slice(pos + 1);
 
     var row;
     try {
