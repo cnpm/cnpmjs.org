@@ -53,6 +53,13 @@ describe('middleware/auth.test.js', function () {
       .expect(200, done);
     });
 
+    it('should pass with authorization (password contains ":") and check ok', function (done) {
+      request(app)
+      .get('/-/user/org.couchdb.user:cnpmjstest104')
+      .set('authorization', 'basic ' + new Buffer('cnpmjstest104:cnpmjs:test104').toString('base64'))
+      .expect(200, done);
+    });
+
     describe('config.customUserService = true', function () {
       beforeEach(function () {
         mm(config, 'customUserService', true);
