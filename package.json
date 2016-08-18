@@ -64,7 +64,7 @@
     "chunkstream": "*",
     "contributors": "*",
     "istanbul": "*",
-    "jshint": "*",
+    "jshint": "2.9.3",
     "mm": "*",
     "mocha": "*",
     "node-dev": "*",
