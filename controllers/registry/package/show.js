@@ -1,16 +1,4 @@
-/**!
- * Copyright(c) cnpm and other contributors.
- * MIT Licensed
- *
- * Authors:
- *   fengmk2 <fengmk2@gmail.com> (http://fengmk2.com)
- */
-
 'use strict';
-
-/**
- * Module dependencies.
- */
 
 var debug = require('debug')('cnpmjs.org:controllers:registry:package:show');
 var semver = require('semver');
@@ -47,10 +35,22 @@ module.exports = function* show() {
   if (mod) {
     setDownloadURL(mod.package, this);
     mod.package._cnpm_publish_time = mod.publish_time;
-    var maintainers = yield* packageService.listMaintainers(name);
+    var rs = yield [
+      packageService.listMaintainers(name),
+      packageService.listModuleTags(name),
+    ];
+    var maintainers = rs[0];
     if (maintainers.length > 0) {
       mod.package.maintainers = maintainers;
     }
+    var tags = rs[1];
+    var distTags = {};
+    for (var i = 0; i < tags.length; i++) {
+      var t = tags[i];
+      distTags[t.tag] = t.version;
+    }
+    // show tags for npminstall faster download
+    mod.package['dist-tags'] = distTags;
     this.jsonp = mod.package;
     return;
   }
