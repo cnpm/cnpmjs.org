@@ -1,16 +1,4 @@
-/**
- * Copyright(c) cnpm and other contributors.
- * MIT Licensed
- *
- * Authors:
- *  fengmk2 <fengmk2@gmail.com> (http://fengmk2.com)
- */
-
 'use strict';
-
-/**
- * Module dependencies.
- */
 
 var should = require('should');
 var request = require('supertest');
@@ -55,6 +43,9 @@ describe('test/controllers/registry/package/show.test.js', function () {
       var data = res.body;
       data.name.should.equal('@cnpmtest/testmodule-show');
       data.version.should.equal('0.0.1');
+      data['dist-tags'].should.eql({
+        latest: '1.1.0',
+      });
       data.dist.tarball.should.containEql('/@cnpmtest/testmodule-show/download/@cnpmtest/testmodule-show-0.0.1.tgz');
       done();
     });
@@ -68,6 +59,9 @@ describe('test/controllers/registry/package/show.test.js', function () {
       var data = res.body;
       data.name.should.equal('@cnpmtest/testmodule-show');
       data.version.should.equal('1.1.0');
+      data['dist-tags'].should.eql({
+        latest: '1.1.0',
+      });
       data.dist.tarball.should.containEql('/@cnpmtest/testmodule-show/download/@cnpmtest/testmodule-show-1.1.0.tgz');
       done();
     });
@@ -81,6 +75,9 @@ describe('test/controllers/registry/package/show.test.js', function () {
       var data = res.body;
       data.name.should.equal('@cnpmtest/testmodule-show');
       data.version.should.equal('0.0.1');
+      data['dist-tags'].should.eql({
+        latest: '1.1.0',
+      });
       data.dist.tarball.should.containEql('/@cnpmtest/testmodule-show/download/@cnpmtest/testmodule-show-0.0.1.tgz');
       done();
     });
@@ -94,6 +91,9 @@ describe('test/controllers/registry/package/show.test.js', function () {
       var data = res.body;
       data.name.should.equal('@cnpmtest/testmodule-show');
       data.version.should.equal('1.1.0');
+      data['dist-tags'].should.eql({
+        latest: '1.1.0',
+      });
       data.dist.tarball.should.containEql('/@cnpmtest/testmodule-show/download/@cnpmtest/testmodule-show-1.1.0.tgz');
       done();
     });
@@ -107,6 +107,9 @@ describe('test/controllers/registry/package/show.test.js', function () {
       var data = res.body;
       data.name.should.equal('@cnpmtest/testmodule-only-beta');
       data.version.should.equal('1.0.0-beta.1');
+      data['dist-tags'].should.eql({
+        latest: '1.0.0-beta.1',
+      });
       data.dist.tarball.should.containEql('/@cnpmtest/testmodule-only-beta/download/@cnpmtest/testmodule-only-beta-1.0.0-beta.1.tgz');
       done();
     });
@@ -127,6 +130,9 @@ describe('test/controllers/registry/package/show.test.js', function () {
       var data = res.body;
       data.name.should.equal('@cnpmtest/testmodule-show');
       data.version.should.equal('1.1.0');
+      data['dist-tags'].should.eql({
+        latest: '1.1.0',
+      });
       done();
     });
   });
@@ -145,6 +151,9 @@ describe('test/controllers/registry/package/show.test.js', function () {
       var data = res.body;
       data.name.should.equal('@cnpmtest/testmodule-show');
       data.version.should.equal('0.0.1');
+      data['dist-tags'].should.eql({
+        latest: '1.1.0',
+      });
       done();
     });
   });
