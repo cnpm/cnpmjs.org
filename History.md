@@ -1,28 +1,34 @@
 
+2.15.0 / 2016-08-22
+==================
+
+  * feat: return dist-tag on package registry ([#1020](https://github.com/cnpm/cnpmjs.org/issues/1020))
+  * chore(package): update supertest to version 2.0.0 ([#1004](https://github.com/cnpm/cnpmjs.org/issues/1004))
+
 2.14.0 / 2016-08-04
 ==================
 
-  * feat: password may contains ":" (#999)
-  * fix: limit sync fails email notice (#1006)
+  * feat: password may contains ":" ([#999](https://github.com/cnpm/cnpmjs.org/issues/999))
+  * fix: limit sync fails email notice ([#1006](https://github.com/cnpm/cnpmjs.org/issues/1006))
 
 2.13.0 / 2016-07-26
 ==================
 
-  * feat: enable maxrequests middleware (#1003)
+  * feat: enable maxrequests middleware ([#1003](https://github.com/cnpm/cnpmjs.org/issues/1003))
 
 2.12.2 / 2016-07-11
 ==================
 
-  * fix: getModuleByRange don't list all packages (#990)
-  * fix: should show new version package count (#984)
+  * fix: getModuleByRange don't list all packages ([#990](https://github.com/cnpm/cnpmjs.org/issues/990))
+  * fix: should show new version package count ([#984](https://github.com/cnpm/cnpmjs.org/issues/984))
 
 2.12.1 / 2016-07-01
 ==================
 
-  * fix: make sure chagnes stream destroy (#982)
-  * chore(package): update semver to version 5.2.0 (#978)
-  * deps: use ^ instead of ~ (#976)
-  * chore(package): update mini-logger to version 1.1.1 (#973)
+  * fix: make sure chagnes stream destroy ([#982](https://github.com/cnpm/cnpmjs.org/issues/982))
+  * chore(package): update semver to version 5.2.0 ([#978](https://github.com/cnpm/cnpmjs.org/issues/978))
+  * deps: use ^ instead of ~ ([#976](https://github.com/cnpm/cnpmjs.org/issues/976))
+  * chore(package): update mini-logger to version 1.1.1 ([#973](https://github.com/cnpm/cnpmjs.org/issues/973))
 
 2.12.0 / 2016-06-26
 ==================
