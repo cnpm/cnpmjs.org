@@ -19,8 +19,13 @@ var config = require('../config');
 var debug = require('debug')('cnpmjs.org:middlewares/publishable');
 
 module.exports = function *publishable(next) {
-  // private mode, only admin user can publish
-  if (config.enablePrivate && !this.user.isAdmin) {
+  // admins always can publish and unpublish
+  if (this.user.isAdmin) {
+    return yield next;
+  }
+
+  // private mode, normal user can't publish and unpublish
+  if (config.enablePrivate) {
     this.status = 403;
     this.body = {
       error: 'no_perms',
@@ -29,27 +34,27 @@ module.exports = function *publishable(next) {
     return;
   }
 
-  // public mode, all user have permission to publish `scoped package`
+  // public mode, normal user have permission to publish `scoped package`
   // and only can publish with scopes in `ctx.user.scopes`, default is `config.scopes`
 
   var name = this.params.name || this.params[0];
 
   // check if is private package list in config
   if (config.privatePackages && config.privatePackages.indexOf(name) !== -1) {
-    return yield* next;
+    return yield next;
   }
 
-  // scope
+  // scoped module
   if (name[0] === '@') {
     if (checkScope(name, this)) {
-      return yield* next;
+      return yield next;
     }
     return;
   }
 
   // none-scope
   if (checkNoneScope(name, this)) {
-    return yield* next;
+    return yield next;
   }
 };
 
@@ -58,9 +63,6 @@ module.exports = function *publishable(next) {
  */
 
 function checkScope(name, ctx) {
-  if (ctx.user.isAdmin) {
-    return true;
-  }
   if (!ctx.user.scopes || !ctx.user.scopes.length) {
     ctx.status = 404;
     return false;
@@ -85,11 +87,6 @@ function checkScope(name, ctx) {
  */
 
 function checkNoneScope(name, ctx) {
-  // admins can do everything
-  if (ctx.user.isAdmin) {
-    return true;
-  }
-
   ctx.status = 403;
   if (ctx.user.scopes.length === 0) {
     ctx.body = {
