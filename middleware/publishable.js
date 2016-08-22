@@ -58,6 +58,9 @@ module.exports = function *publishable(next) {
  */
 
 function checkScope(name, ctx) {
+  if (ctx.user.isAdmin) {
+    return true;
+  }
   if (!ctx.user.scopes || !ctx.user.scopes.length) {
     ctx.status = 404;
     return false;
@@ -82,8 +85,8 @@ function checkScope(name, ctx) {
  */
 
 function checkNoneScope(name, ctx) {
-  // admins unpublished everything
-  if (ctx.user.isAdmin && ctx.method === 'DELETE') {
+  // admins can do everything
+  if (ctx.user.isAdmin) {
     return true;
   }
 
