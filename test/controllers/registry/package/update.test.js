@@ -411,45 +411,6 @@ describe('controllers/registry/package/update.test.js', function () {
       .expect(404, done);
     });
 
-    it('should not 403 when admin put to public package', function (done) {
-      request(app)
-      .put('/koa/-rev/1')
-      .set('authorization', utils.adminAuth)
-      .send({
-        versions: {
-          '0.0.1': {},
-          '0.0.2': {}
-        }
-      })
-      .expect(404, done);
-    });
-
-    it('should not 403 when admin put to unsupported scope package', function (done) {
-      request(app)
-      .put('/@unsupported/koa/-rev/1')
-      .set('authorization', utils.adminAuth)
-      .send({
-        versions: {
-          '0.0.1': {},
-          '0.0.2': {}
-        }
-      })
-      .expect(404, done);
-    });
-
-    it('should 403 when common user put to public package', function (done) {
-      request(app)
-      .put('/koa/-rev/1')
-      .set('authorization', utils.otherUserAuth)
-      .send({
-        versions: {
-          '0.0.1': {},
-          '0.0.2': {}
-        }
-      })
-      .expect(403, done);
-    });
-
     it('should remove all version ok', function (done) {
       request(app)
       .put('/@cnpmtest/testmodule-update-1/-rev/1')

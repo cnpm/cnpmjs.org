@@ -53,9 +53,7 @@ module.exports = function *publishable(next) {
   }
 
   // none-scope
-  if (checkNoneScope(name, this)) {
-    return yield next;
-  }
+  assertNoneScope(name, this);
 };
 
 /**
@@ -86,7 +84,7 @@ function checkScope(name, ctx) {
  * check if user have permission to publish without scope
  */
 
-function checkNoneScope(name, ctx) {
+function assertNoneScope(name, ctx) {
   ctx.status = 403;
   if (ctx.user.scopes.length === 0) {
     ctx.body = {
