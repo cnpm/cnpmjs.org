@@ -17,6 +17,7 @@
 var util = require('util');
 var config = require('../config');
 var debug = require('debug')('cnpmjs.org:middlewares/publishable');
+var common = require('../lib/common');
 
 module.exports = function *publishable(next) {
   // admins always can publish and unpublish
@@ -33,6 +34,9 @@ module.exports = function *publishable(next) {
     };
     return;
   }
+
+  // See more at npm/npm#9616 and cnpmjs/cnpmjs.org#1024
+  common.decodeScopedPackageName(this.params);
 
   // public mode, normal user have permission to publish `scoped package`
   // and only can publish with scopes in `ctx.user.scopes`, default is `config.scopes`

@@ -15,6 +15,10 @@ var config = require('../../../config');
  * GET /:name
  */
 module.exports = function* list() {
+  // Notice, this is a workaround because of NPM bug npm/npm#9616.
+  // After npm fixed this bug, you shall delete this line.
+  common.decodeScopedPackageName(this.params);
+
   var orginalName = this.params.name || this.params[0];
   var name = orginalName;
   var rs = yield [
