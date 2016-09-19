@@ -9,7 +9,7 @@ var os = require('os');
 var version = require('../package.json').version;
 
 var root = path.dirname(__dirname);
-var dataDir = path.join(process.env.HOME || root, '.cnpmjs.org');
+var dataDir = process.env.cnpmDataDir || path.join(process.env.HOME || root, '.cnpmjs.org');
 
 var config = {
   version: version,
@@ -226,7 +226,7 @@ if (process.env.NODE_ENV !== 'test') {
   } else {
     // 1. try to load `$dataDir/config.json` first, not exists then goto 2.
     // 2. load config/config.js, everything in config.js will cover the same key in index.js
-    customConfig = path.join(dataDir, 'config.json');
+    customConfig = path.resolve(dataDir, 'config.json');
     if (!fs.existsSync(customConfig)) {
       customConfig = path.join(root, 'config', 'config.js');
     }

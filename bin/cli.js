@@ -50,9 +50,10 @@ program.parse(process.argv);
 function start(options) {
   stop(options);
   var dataDir = options.dataDir || path.join(process.env.HOME, '.cnpmjs.org');
+  process.env.cnpmDataDir = dataDir;
   mkdirp.sync(dataDir);
 
-  var configfile = path.join(dataDir, 'config.json');
+  var configfile = path.resolve(dataDir, 'config.json');
   var config = {};
   if (fs.existsSync(configfile)) {
     try {
