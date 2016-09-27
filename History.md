@@ -1,4 +1,9 @@
 
+2.16.2 / 2016-09-27
+==================
+
+  * fix: try to use config.registryHost first on setDownloadURL (#1044)
+
 2.16.1 / 2016-08-22
 ==================
 
