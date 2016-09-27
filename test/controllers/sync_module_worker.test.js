@@ -57,6 +57,7 @@ describe('test/controllers/sync_module_worker.test.js', function () {
   });
 
   it('should sync public scoped package', function* () {
+    mm(config, 'registryHost', '');
     mm(config, 'sourceNpmRegistry', 'https://registry.npmjs.org');
     var worker = new SyncModuleWorker({
       name: '@sindresorhus/df',
@@ -92,6 +93,7 @@ describe('test/controllers/sync_module_worker.test.js', function () {
     yield checkResult();
 
     var r = yield urllib.request(tgzUrl);
+    console.log(r.status, r.headers);
     r.status.should.equal(200);
   });
 
