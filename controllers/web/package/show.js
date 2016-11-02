@@ -176,8 +176,8 @@ module.exports = function* show(next) {
     pkg.isPrivate = false;
     // add security check badge
     pkg.snyk = {
-      badge: `https://snyk.io/test/npm/${pkg.name}/badge.svg?style=flat-square`,
-      url: `https://snyk.io/test/npm/${pkg.name}`,
+      badge: `${config.snykUrl}/test/npm/${pkg.name}/badge.svg?style=flat-square`,
+      url: `${config.snykUrl}/test/npm/${pkg.name}`,
     };
   }
 
