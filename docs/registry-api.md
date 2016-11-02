@@ -9,6 +9,8 @@
 * [User](/docs/registry-api.md#user)
 * [Search](/docs/registry-api.md#search)
 
+[![Run in Postman](https://run.pstmn.io/button.svg)](https://app.getpostman.com/run-collection/f6c8cb46358039bcd689#?env%5BRegistry%5D=W3sia2V5IjoicmVnaXN0cnkiLCJ0eXBlIjoidGV4dCIsInZhbHVlIjoiaHR0cHM6Ly9yZWdpc3RyeS5ucG0udGFvYmFvLm9yZyIsImVuYWJsZWQiOnRydWV9LHsia2V5IjoicGFja2FnZSIsInZhbHVlIjoiY25wbSIsInR5cGUiOiJ0ZXh0IiwiZW5hYmxlZCI6dHJ1ZX1d)
+
 ## Schema
 
 All API access is over HTTPS or HTTP,

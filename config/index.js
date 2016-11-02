@@ -217,6 +217,9 @@ var config = {
   // if you're behind firewall, need to request through http proxy, please set this
   // e.g.: `httpProxy: 'http://proxy.mycompany.com:8080'`
   httpProxy: null,
+
+  // snyk.io root url
+  snykUrl: 'https://snyk.io',
 };
 
 if (process.env.NODE_ENV !== 'test') {
