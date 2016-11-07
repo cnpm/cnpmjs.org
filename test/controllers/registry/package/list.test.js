@@ -85,6 +85,7 @@ describe('controllers/registry/package/list.test.js', function () {
         fengmk2: true,
         foouser: true
       });
+      data.versions['0.0.1'].publish_time.should.equal(data.versions['0.0.1']._cnpm_publish_time);
       done();
     });
   });

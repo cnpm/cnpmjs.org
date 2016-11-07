@@ -47,6 +47,7 @@ describe('test/controllers/registry/package/show.test.js', function () {
         latest: '1.1.0',
       });
       data.dist.tarball.should.containEql('/@cnpmtest/testmodule-show/download/@cnpmtest/testmodule-show-0.0.1.tgz');
+      data._cnpm_publish_time.should.equal(data.publish_time);
       done();
     });
   });
