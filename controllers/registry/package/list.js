@@ -126,6 +126,8 @@ module.exports = function* list() {
     }
     common.setDownloadURL(pkg, this);
     pkg._cnpm_publish_time = row.publish_time;
+    pkg.publish_time = pkg.publish_time || row.publish_time;
+
     versions[pkg.version] = pkg;
 
     var t = times[pkg.version] = row.publish_time ? new Date(row.publish_time) : row.gmt_modified;

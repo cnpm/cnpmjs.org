@@ -35,6 +35,7 @@ module.exports = function* show() {
   if (mod) {
     setDownloadURL(mod.package, this);
     mod.package._cnpm_publish_time = mod.publish_time;
+    mod.package.publish_time = mod.package.publish_time || mod.publish_time;
     var rs = yield [
       packageService.listMaintainers(name),
       packageService.listModuleTags(name),
