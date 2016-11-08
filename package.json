@@ -68,7 +68,7 @@
     "mm": "*",
     "mocha": "*",
     "node-dev": "*",
-    "pedding": "*",
+    "pedding": "1.0.0",
     "pg": "5",
     "pg-hstore": "2",
     "should": "8",
