@@ -30,7 +30,7 @@
     "fs-cnpm": "^1.2.0",
     "giturl": "^1.0.0",
     "graceful": "^1.0.0",
-    "gravatar": "^1.5.0",
+    "gravatar": "^1.6.0",
     "humanize-ms": "^1.2.0",
     "humanize-number": "^0.0.2",
     "is-type-of": "^1.0.0",
