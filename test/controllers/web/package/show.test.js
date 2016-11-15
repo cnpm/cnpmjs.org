@@ -8,7 +8,7 @@ var app = require('../../../../servers/web');
 var registry = require('../../../../servers/registry');
 var utils = require('../../../utils');
 
-describe('controllers/web/package/show.test.js', () => {
+describe('test/controllers/web/package/show.test.js', () => {
   before(function (done) {
     var pkg = utils.getPackage('@cnpmtest/testmodule-web-show', '0.0.1', utils.admin);
     pkg.versions['0.0.1'].dependencies = {
@@ -101,6 +101,7 @@ describe('controllers/web/package/show.test.js', () => {
 
   describe('unpublished package', () => {
     before(done => {
+      mm(config, 'syncModel', 'all');
       utils.sync('mk2testmodule', done);
     });
 
@@ -115,7 +116,8 @@ describe('controllers/web/package/show.test.js', () => {
 
   describe('xss filter', function () {
     before(function (done) {
-      var pkg = utils.getPackage('@cnpmtest/xss-test-ut', '0.0.1', utils.admin, null, '[xss link](javascript:alert(2)) \n\nfoo<script>alert(1)</script>/xss\'"&#');
+      var pkg = utils.getPackage('@cnpmtest/xss-test-ut', '0.0.1', utils.admin,
+        null, '[xss link](javascript:alert(2)) \n\nfoo<script>alert(1)</script>/xss\'"&#');
       request(registry.listen())
       .put('/' + pkg.name)
       .set('authorization', utils.adminAuth)
