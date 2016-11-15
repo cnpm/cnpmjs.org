@@ -122,7 +122,7 @@ describe('test/controllers/registry/package/list.test.js', () => {
     }, done);
   });
 
-  describe('unpublished', () => {
+  describe.skip('unpublished', () => {
     before(done => {
       mm(config, 'syncModel', 'all');
       utils.sync('moduletest1', done);

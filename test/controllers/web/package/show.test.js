@@ -99,7 +99,7 @@ describe('test/controllers/web/package/show.test.js', () => {
     });
   });
 
-  describe('unpublished package', () => {
+  describe.skip('unpublished package', () => {
     before(done => {
       mm(config, 'syncModel', 'all');
       utils.sync('mk2testmodule', done);
