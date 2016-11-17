@@ -187,8 +187,10 @@ SyncModuleWorker.prototype._doneOne = function* (concurrencyId, name, success) {
 
 SyncModuleWorker.prototype.syncUpstream = function* (name) {
   if (config.sourceNpmRegistry.indexOf('registry.npmjs.org') >= 0 ||
-      config.sourceNpmRegistry.indexOf('registry.npmjs.com') >= 0) {
-    this.log('----------------- upstream is npm registry: %s, ignore it -------------------', config.sourceNpmRegistry);
+      config.sourceNpmRegistry.indexOf('registry.npmjs.com') >= 0 ||
+      config.sourceNpmRegistry.indexOf('replicate.npmjs.com') >= 0) {
+    this.log('----------------- upstream is npm registry: %s, ignore it -------------------',
+      config.sourceNpmRegistry);
     return;
   }
   var syncname = name;
@@ -306,17 +308,18 @@ SyncModuleWorker.prototype.next = function* (concurrencyId) {
   }
 
   // get from npm
+  const packageUrl = '/' + name.replace('/', '%2f');
   try {
-    var result = yield npmSerivce.request('/' + name.replace('/', '%2f'));
+    var result = yield npmSerivce.request(packageUrl);
     pkg = result.data;
     status = result.status;
   } catch (err) {
     // if 404
     if (!err.res || err.res.statusCode !== 404) {
       var errMessage = err.name + ': ' + err.message;
-      that.log('[c#%s] [error] [%s] get package error: %s, status: %s',
-        concurrencyId, name, errMessage, status);
-      yield *that._doneOne(concurrencyId, name, false);
+      that.log('[c#%s] [error] [%s] get package(%s%s) error: %s, status: %s',
+        concurrencyId, name, config.sourceNpmRegistry, packageUrl, errMessage, status);
+      yield that._doneOne(concurrencyId, name, false);
       return;
     }
   }
@@ -333,13 +336,15 @@ SyncModuleWorker.prototype.next = function* (concurrencyId) {
   }
 
   if (!pkg) {
-    that.log('[c#%s] [error] [%s] get package error: package not exists, status: %s',
-      concurrencyId, name, status);
+    that.log('[c#%s] [error] [%s] get package(%s%s) error: package not exists, status: %s',
+      concurrencyId, name, config.sourceNpmRegistry, packageUrl, status);
     yield that._doneOne(concurrencyId, name, true);
     return;
   }
 
-  that.log('[c#%d] [%s] pkg status: %d, start...', concurrencyId, name, status);
+  that.log('[c#%d] [%s] package(%s%s) status: %s, dist-tags: %j, time.modified: %s, start...',
+    concurrencyId, name, config.sourceNpmRegistry, packageUrl, status,
+    pkg['dist-tags'], pkg.time && pkg.time.modified);
 
   if (unpublishedInfo) {
     try {
@@ -677,7 +682,6 @@ SyncModuleWorker.prototype._sync = function* (name, pkg) {
         syncModule.name, index, syncModule.version, err.name, err.stack);
     }
   }
-
 
   if (deletedVersionNames.length === 0) {
     that.log('  [%s] no versions need to deleted', name);
