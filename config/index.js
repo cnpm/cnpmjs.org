@@ -163,6 +163,7 @@ var config = {
   // but sometimes will request it for some package infomations
   // please don't change it if not necessary
   officialNpmRegistry: 'https://registry.npmjs.com',
+  officialNpmReplicate: 'https://replicate.npmjs.com',
 
   // sync source, upstream registry
   // If you want to directly sync from official npm's registry

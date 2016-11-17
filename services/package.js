@@ -205,7 +205,7 @@ exports.listPublicModuleNamesByUser = function* (username) {
 };
 
 // start must be a date or timestamp
-exports.listPublicModuleNamesSince = function* (start) {
+exports.listPublicModuleNamesSince = function* listPublicModuleNamesSince(start) {
   if (!(start instanceof Date)) {
     start = new Date(Number(start));
   }
