@@ -1,45 +1,32 @@
-/**!
- * cnpmjs.org - test/services/npm.test.js
- *
- * Copyright(c) cnpmjs.org and other contributors.
- * MIT Licensed
- *
- * Authors:
- *  fengmk2 <fengmk2@gmail.com> (http://fengmk2.github.com)
- */
-
 'use strict';
-
-/**
- * Module dependencies.
- */
 
 var should = require('should');
 var mm = require('mm');
 var fs = require('fs');
 var path = require('path');
 var ChunkStream = require('chunkstream');
+var config = require('../../config');
 var npm = require('../../services/npm');
 
 var fixtures = path.join(path.dirname(__dirname), 'fixtures');
 
-describe('services/npm.test.js', function () {
+describe('services/npm.test.js', () => {
   afterEach(mm.restore);
 
   it('should return a module info from source npm', function* () {
-    var data = yield* npm.get('pedding');
+    var data = yield npm.get('pedding');
     data.name.should.equal('pedding');
   });
 
   it('should return null when module not exist', function *() {
-    var data = yield* npm.get('pedding-not-exists');
+    var data = yield npm.get('pedding-not-exists');
     should.not.exist(data);
   });
 
   it.skip('should return error when http error', function* () {
     mm.http.request(/\//, new ChunkStream(['{']));
     try {
-      yield* npm.get('pedding-not-exists');
+      yield npm.get('pedding-not-exists');
       throw new Error('should not run this');
     } catch (err) {
       err.name.should.equal('JSONResponseFormatError');
@@ -51,7 +38,7 @@ describe('services/npm.test.js', function () {
     mm.http.request(/\//, content, { statusCode: 500 });
     // http://registry.npmjs.org/octopie
     try {
-      yield* npm.get('octopie');
+      yield npm.get('octopie');
       throw new Error('should not run this');
     } catch (err) {
       err.name.should.equal('NPMServerError');
@@ -60,7 +47,31 @@ describe('services/npm.test.js', function () {
     }
   });
 
-  describe('getPopular()', function () {
+  describe('request()', () => {
+    it('should request from replicate and clean meta data', function* () {
+      const result = yield npm.request('/shelljs', {
+        registry: config.officialNpmReplicate,
+      });
+      const pkg = result.data;
+      pkg.name.should.equal('shelljs');
+      pkg.time['0.0.1-alpha1'].should.equal('2012-03-02T21:46:14.725Z');
+      pkg.versions['0.0.1-alpha1'].version.should.equal('0.0.1-alpha1');
+      pkg.versions['0.0.1-alpha1'].dist.shasum.should.equal('cfa9394e29c3eb0fe58998f5bf5bda79aa7d3e2e');
+      pkg.versions['0.0.1-alpha1'].dist.tarball.should.equal('http://registry.npmjs.org/shelljs/-/shelljs-0.0.1alpha1.tgz');
+
+      pkg.time['0.7.5'].should.equal('2016-10-27T05:50:21.479Z');
+      pkg.versions['0.7.5'].version.should.equal('0.7.5');
+      pkg.versions['0.7.5'].dist.shasum.should.equal('2eef7a50a21e1ccf37da00df767ec69e30ad0675');
+      pkg.versions['0.7.5'].dist.tarball.should.equal('http://registry.npmjs.org/shelljs/-/shelljs-0.7.5.tgz');
+
+      pkg.time['0.0.6-pre2'].should.equal('2012-05-25T18:14:25.441Z');
+      pkg.versions['0.0.6-pre2'].version.should.equal('0.0.6-pre2');
+      pkg.versions['0.0.6-pre2'].dist.shasum.should.equal('8c3eecaddba6f425bd5cae001f80a4d224750911');
+      pkg.versions['0.0.6-pre2'].dist.tarball.should.equal('http://registry.npmjs.org/shelljs/-/shelljs-0.0.6pre2.tgz');
+    });
+  });
+
+  describe('getPopular()', () => {
     it('should return popular modules', function* () {
       mm.http.request(/\//, JSON.stringify({
         rows: [
@@ -82,7 +93,7 @@ describe('services/npm.test.js', function () {
           { key: ['foo15'], value: 1 },
         ]
       }));
-      var rows = yield* npm.getPopular(10);
+      var rows = yield npm.getPopular(10);
       rows.should.length(2);
       rows[0][0].should.equal('underscore');
     });
