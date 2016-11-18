@@ -1,19 +1,4 @@
-/**!
- * cnpmjs.org - routes/web.js
- *
- * Copyright(c) cnpmjs.org and other contributors.
- * MIT Licensed
- *
- * Authors:
- *  dead_horse <dead_horse@qq.com>
- *  fengmk2 <m@fengmk2.com> (http://fengmk2.com)
- */
-
-"use strict";
-
-/**
- * Module dependencies.
- */
+'use strict';
 
 var showPackage = require('../controllers/web/package/show');
 var searchPackage = require('../controllers/web/package/search');
