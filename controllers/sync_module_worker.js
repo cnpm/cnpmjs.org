@@ -309,8 +309,10 @@ SyncModuleWorker.prototype.next = function* (concurrencyId) {
 
   // get from npm
   const packageUrl = '/' + name.replace('/', '%2f');
+  // try to sync from official replicate when source npm registry is not cnpmjs.org
+  const registry = config.sourceNpmRegistryIsCNpm ? config.sourceNpmRegistry : config.officialNpmReplicate;
   try {
-    var result = yield npmSerivce.request(packageUrl);
+    var result = yield npmSerivce.request(packageUrl, { registry: registry });
     pkg = result.data;
     status = result.status;
   } catch (err) {
@@ -318,7 +320,7 @@ SyncModuleWorker.prototype.next = function* (concurrencyId) {
     if (!err.res || err.res.statusCode !== 404) {
       var errMessage = err.name + ': ' + err.message;
       that.log('[c#%s] [error] [%s] get package(%s%s) error: %s, status: %s',
-        concurrencyId, name, config.sourceNpmRegistry, packageUrl, errMessage, status);
+        concurrencyId, name, registry, packageUrl, errMessage, status);
       yield that._doneOne(concurrencyId, name, false);
       return;
     }
@@ -337,14 +339,13 @@ SyncModuleWorker.prototype.next = function* (concurrencyId) {
 
   if (!pkg) {
     that.log('[c#%s] [error] [%s] get package(%s%s) error: package not exists, status: %s',
-      concurrencyId, name, config.sourceNpmRegistry, packageUrl, status);
+      concurrencyId, name, registry, packageUrl, status);
     yield that._doneOne(concurrencyId, name, true);
     return;
   }
 
   that.log('[c#%d] [%s] package(%s%s) status: %s, dist-tags: %j, time.modified: %s, start...',
-    concurrencyId, name, config.sourceNpmRegistry, packageUrl, status,
-    pkg['dist-tags'], pkg.time && pkg.time.modified);
+    concurrencyId, name, registry, packageUrl, status, pkg['dist-tags'], pkg.time && pkg.time.modified);
 
   if (unpublishedInfo) {
     try {
@@ -884,7 +885,10 @@ SyncModuleWorker.prototype._sync = function* (name, pkg) {
 };
 
 SyncModuleWorker.prototype._syncOneVersion = function *(versionIndex, sourcePackage) {
-  logger.syncInfo('[sync_module_worker] start sync %s@%s', sourcePackage.name, sourcePackage.version);
+  var delay = Date.now() - sourcePackage.publish_time;
+  logger.syncInfo('[sync_module_worker] delay: %s ms, publish_time: %s, start sync %s@%s',
+    delay, utility.logDate(new Date(sourcePackage.publish_time)),
+    sourcePackage.name, sourcePackage.version);
   var that = this;
   var username = this.username;
   var downurl = sourcePackage.dist.tarball;
@@ -908,9 +912,11 @@ SyncModuleWorker.prototype._syncOneVersion = function *(versionIndex, sourcePack
     devDependencies = Object.keys(sourcePackage.devDependencies || {});
   }
 
-  that.log('    [%s:%d] syncing, version: %s, dist: %j, no deps: %s, ' +
+  that.log('    [%s:%d] syncing, delay: %s ms, version: %s, dist: %j, no deps: %s, ' +
    'publish on cnpm: %s, dependencies: %d, devDependencies: %d, syncDevDependencies: %s',
-    sourcePackage.name, versionIndex, sourcePackage.version,
+    sourcePackage.name, versionIndex,
+    delay,
+    sourcePackage.version,
     sourcePackage.dist, that.noDep, that._publish,
     dependencies.length,
     devDependencies.length, this.syncDevDependencies);
@@ -942,7 +948,14 @@ SyncModuleWorker.prototype._syncOneVersion = function *(versionIndex, sourcePack
   try {
     // get tarball
     logger.syncInfo('[sync_module_worker] downloading %j to %j', downurl, filepath);
-    var r = yield urllib.request(downurl, options);
+    var r;
+    try {
+      r = yield urllib.request(downurl, options);
+    } catch (err) {
+      logger.syncInfo('[sync_module_worker] download %j to %j error: %s', downurl, filepath, err);
+      throw err;
+    }
+
     var statusCode = r.status || -1;
     // https://github.com/cnpm/cnpmjs.org/issues/325
     // if (statusCode === 404) {

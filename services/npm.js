@@ -1,6 +1,7 @@
 'use strict';
 
 var ms = require('humanize-ms');
+var cleanNpmMetadata = require('normalize-registry-metadata');
 var urllib = require('../common/urllib');
 var config = require('../config');
 
@@ -19,7 +20,11 @@ function* request(url, options) {
   url = registry + url;
   var r;
   try {
-    r = yield urllib.requestThunk(url, options);
+    r = yield urllib.request(url, options);
+    // https://github.com/npm/registry/issues/87#issuecomment-261450090
+    if (options.dataType === 'json' && r.data && config.officialNpmReplicate === registry) {
+      cleanNpmMetadata(r.data);
+    }
   } catch (err) {
     var statusCode = err.status || -1;
     var data = err.data || '[empty]';

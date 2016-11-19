@@ -1,17 +1,4 @@
-/**!
- * Copyright(c) cnpmjs.org and other contributors.
- * MIT Licensed
- *
- * Authors:
- *  dead_horse <dead_horse@qq.com>
- *  fengmk2 <fengmk2@gmail.com> (http://fengmk2.com)
- */
-
-"use strict";
-
-/**
- * Module dependencies.
- */
+'use strict';
 
 var limit = require('../middleware/limit');
 var login = require('../middleware/login');
