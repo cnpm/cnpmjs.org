@@ -75,7 +75,7 @@
     "should": "8",
     "should-http": "*",
     "sqlite3": "*",
-    "supertest": "2.0.0",
+    "supertest": "2.0.1",
     "supertest-as-promised": "3",
     "thunk-mocha": "1"
   },
