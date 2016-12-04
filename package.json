@@ -76,7 +76,7 @@
     "should-http": "*",
     "sqlite3": "*",
     "supertest": "2.0.0",
-    "supertest-as-promised": "3",
+    "supertest-as-promised": "4.0.0",
     "thunk-mocha": "1"
   },
   "homepage": "https://github.com/cnpm/cnpmjs.org",
