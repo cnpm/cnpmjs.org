@@ -1,25 +1,11 @@
-/*!
- * cnpmjs.org - controllers/registry/package/download_total.js
- *
- * Copyright(c) cnpmjs.org and other contributors.
- * MIT Licensed
- *
- * Authors:
- *   dead_horse <dead_horse@qq.com> (https://github.com/dead-horse)
- */
-
 'use strict';
-
-/**
- * Module dependencies.
- */
 
 var DownloadTotal = require('../../../services/download_total');
 var DATE_REG = /^\d{4}-\d{2}-\d{2}$/;
 
-module.exports = function* downloadTotal () {
-  var range = this.params.range;
-  var name = this.params.name;
+module.exports = function* downloadTotal() {
+  var range = this.params.range || this.params[0] || '';
+  var name = this.params.name || this.params[1];
 
   range = range.split(':');
   if (range.length !== 2

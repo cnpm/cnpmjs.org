@@ -105,6 +105,7 @@ function routes(app) {
 
   // download times
   app.get('/downloads/range/:range/:name', downloadTotal);
+  app.get(/^\/downloads\/range\/([^\/]+)\/(@[\w\-\.]+\/[\w\-\.]+)$/, downloadTotal);
   app.get('/downloads/range/:range', downloadTotal);
 
   // GET /-/package/:pkg/dependents
