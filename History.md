@@ -1,4 +1,14 @@
 
+2.18.0 / 2016-12-05
+==================
+
+  * fix: support downloads total on scope package (#1088)
+  * fix: try to sync from official replicate (#1076)
+  * feat: add change password script (#1070)
+  * test: skip always fail tests
+  * test: add node v7
+  * feat: show more sync info
+
 2.17.2 / 2016-11-13
 ==================
 
