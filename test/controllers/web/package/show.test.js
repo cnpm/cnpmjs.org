@@ -1,7 +1,7 @@
 'use strict';
 
 var should = require('should');
-var request = require('supertest-as-promised');
+var request = require('supertest');
 var mm = require('mm');
 var config = require('../../../../config');
 var app = require('../../../../servers/web');
