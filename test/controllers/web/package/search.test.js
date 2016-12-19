@@ -22,6 +22,9 @@ var registry = require('../../../../servers/registry');
 var utils = require('../../../utils');
 
 describe('controllers/web/package/search.test.js', function () {
+
+  var app_reg;
+
   before(function (done) {
     var pkg = utils.getPackage('@cnpmtest/testmodule-web-search', '0.0.1', utils.admin);
     pkg.versions['0.0.1'].dependencies = {
@@ -29,7 +32,10 @@ describe('controllers/web/package/search.test.js', function () {
       mocha: '~1.0.0',
       'testmodule-web-show': '0.0.1'
     };
-    request(registry.listen())
+
+    app_reg = registry.listen();
+    
+    request(app_reg)
     .put('/' + pkg.name)
     .set('authorization', utils.adminAuth)
     .send(pkg)
@@ -72,6 +78,52 @@ describe('controllers/web/package/search.test.js', function () {
       .get('/browse/keyword/notexistpackage')
       .expect(200)
       .expect(/Can not found package match notexistpackage/, done);
+    });
+
+
+    describe('GET /browse/keyword/:word searchlist', function () {
+
+      before(function (done) {
+        var pkg = utils.getPackage('@cnpmtest/testmodule-web-search_a', '0.0.1', utils.admin);
+        pkg.versions['0.0.1'].dependencies = {
+          bytetest: '~0.0.1',
+          mocha: '~1.0.0',
+          'testmodule-web-show': '0.0.1'
+        };
+        request(app_reg)
+          .put('/' + pkg.name)
+          .set('authorization', utils.adminAuth)
+          .send(pkg)
+          .expect(201, done);
+      });
+
+      it('should list by keyword with json(default limit=100)', function (done) {
+          request(app)
+          .get('/browse/keyword/@cnpmtest/testmodule-web-searc?type=json')
+          .expect(200)
+          .expect({
+            keyword: '@cnpmtest/testmodule-web-searc',
+            match: null,
+            packages: [ { name: '@cnpmtest/testmodule-web-search', description: '' },
+            { name: '@cnpmtest/testmodule-web-search_a', description: '' }],
+            keywords: []
+          })
+          .expect('content-type', 'application/json; charset=utf-8', done);
+      });
+
+      it('should list by keyword with json(use limit)', function (done) {
+          request(app)
+          .get('/browse/keyword/@cnpmtest/testmodule-web-searc?type=json&limit=1')
+          .expect(200)
+          .expect({
+            keyword: '@cnpmtest/testmodule-web-searc',
+            match: null,
+            packages: [ { name: '@cnpmtest/testmodule-web-search', description: '' }],
+            keywords: []
+          })
+          .expect('content-type', 'application/json; charset=utf-8', done);
+      });
+
     });
   });
 });

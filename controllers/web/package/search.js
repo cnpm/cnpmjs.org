@@ -21,8 +21,16 @@ var packageService = require('../../../services/package');
 module.exports = function* search() {
   var params = this.params;
   var word = params.word || params[0];
+  var limit = Number(this.query.limit) || 100;
+
+  if (limit > 10000) {
+    limit = 10000;
+  }
+
   debug('search %j', word);
-  var result = yield* packageService.search(word);
+  var result = yield* packageService.search(word, {
+    limit: limit
+  });
 
   var match = null;
   for (var i = 0; i < result.searchMatchs.length; i++) {
