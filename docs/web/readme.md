@@ -67,9 +67,9 @@ Default style is `flat-square`.
 
 Badge URL: `https://cnpmjs.org/badge/v/cnpmjs.org.svg` ![cnpmjs.org-version-badge](//cnpmjs.org/badge/v/cnpmjs.org.svg)
 
-* `<0.1.0 & >=0.0.0`: ![red-badge](https://dn-img-shields-io.qbox.me/badge/cnpm-0.0.1-red.svg?style=flat-square)
-* `<1.0.0 & >=0.1.0`: ![red-badge](https://dn-img-shields-io.qbox.me/badge/cnpm-0.1.0-green.svg?style=flat-square)
-* `>=1.0.0`: ![red-badge](https://dn-img-shields-io.qbox.me/badge/cnpm-1.0.0-blue.svg?style=flat-square)
+* `<0.1.0 & >=0.0.0`: ![red-badge](https://img.shields.io/badge/cnpm-0.0.1-red.svg?style=flat-square)
+* `<1.0.0 & >=0.1.0`: ![red-badge](https://img.shields.io/badge/cnpm-0.1.0-green.svg?style=flat-square)
+* `>=1.0.0`: ![red-badge](https://img.shields.io/badge/cnpm-1.0.0-blue.svg?style=flat-square)
 
 ### Downloads
 
@@ -147,7 +147,7 @@ Release [History](/history).
 
 ## npmjs.org, cnpmjs.org and npm.taobao.org relation
 
-[![npm&cnpm](https://dn-cnpm.qbox.me/network.png)](https://dn-cnpm.qbox.me/network.png)
+![npm&cnpm](https://cloud.githubusercontent.com/assets/543405/21505401/fd0b6220-cca1-11e6-86ed-599cc81bb03b.png)
 
 ## Sponsors
 
