@@ -155,4 +155,196 @@ describe('test/controllers/web/package/show.test.js', () => {
         .expect(/pedding/);
     });
   });
+
+  describe('show repository url in git syntax', () => {
+    before(function (done) {
+      var pkg = utils.getPackage('@cnpmtest/testmodule-repo-git', '0.0.1', utils.admin);
+      pkg.versions['0.0.1'].repository = {
+        type: 'git',
+        url: 'git://github.com/cnpm/cnpmjs.org.git'
+      }
+      request(registry.listen())
+      .put('/' + pkg.name)
+      .set('authorization', utils.adminAuth)
+      .send(pkg)
+      .expect(201, done);
+    });
+
+    it('should get 200', function (done) {
+      request(app.listen())
+      .get('/package/@cnpmtest/testmodule-repo-git')
+      .expect(200)
+      .expect('content-type', 'text/html; charset=utf-8')
+      .expect(/testmodule-repo-git/)
+      .expect(/Maintainers/)
+      .expect(/Dependencies/)
+      .expect(/https:\/\/github\.com\/cnpm\/cnpmjs\.org/)
+      .expect(/Downloads/, function (err, res) {
+        should.not.exist(err);
+        res.should.have.header('etag');
+        res.text.should.containEql('<meta charset="utf-8">');
+        done();
+      });
+    });
+  });
+
+   describe('show repository url in ssh syntax', () => {
+    before(function (done) {
+      var pkg = utils.getPackage('@cnpmtest/testmodule-repo-ssh', '0.0.1', utils.admin);
+      pkg.versions['0.0.1'].repository = {
+        type: 'git',
+        url: 'git@github.com:cnpm/cnpmjs.org.git'
+      }
+      request(registry.listen())
+      .put('/' + pkg.name)
+      .set('authorization', utils.adminAuth)
+      .send(pkg)
+      .expect(201, done);
+    });
+
+    it('should get 200', function (done) {
+      request(app.listen())
+      .get('/package/@cnpmtest/testmodule-repo-ssh')
+      .expect(200)
+      .expect('content-type', 'text/html; charset=utf-8')
+      .expect(/testmodule-repo-ssh/)
+      .expect(/Maintainers/)
+      .expect(/Dependencies/)
+      .expect(/https:\/\/github\.com\/cnpm\/cnpmjs\.org/)
+      .expect(/Downloads/, function (err, res) {
+        should.not.exist(err);
+        res.should.have.header('etag');
+        res.text.should.containEql('<meta charset="utf-8">');
+        done();
+      });
+    });
+  });
+
+  describe('show repository url in raw ssh syntax', () => {
+    before(function (done) {
+      var pkg = utils.getPackage('@cnpmtest/testmodule-repo-raw-ssh', '0.0.1', utils.admin);
+      pkg.versions['0.0.1'].repository = {
+        type: 'git',
+        url: 'ssh://git@github.com/cnpm/cnpmjs.org.git'
+      }
+      request(registry.listen())
+      .put('/' + pkg.name)
+      .set('authorization', utils.adminAuth)
+      .send(pkg)
+      .expect(201, done);
+    });
+
+    it('should get 200', function (done) {
+      request(app.listen())
+      .get('/package/@cnpmtest/testmodule-repo-raw-ssh')
+      .expect(200)
+      .expect('content-type', 'text/html; charset=utf-8')
+      .expect(/testmodule-repo-raw-ssh/)
+      .expect(/Maintainers/)
+      .expect(/Dependencies/)
+      .expect(/https:\/\/github\.com\/cnpm\/cnpmjs\.org/)
+      .expect(/Downloads/, function (err, res) {
+        should.not.exist(err);
+        res.should.have.header('etag');
+        res.text.should.containEql('<meta charset="utf-8">');
+        done();
+      });
+    });
+  });
+
+  describe('show repository url in https syntax', () => {
+    before(function (done) {
+      var pkg = utils.getPackage('@cnpmtest/testmodule-repo-https', '0.0.1', utils.admin);
+      pkg.versions['0.0.1'].repository = {
+        type: 'git',
+        url: 'https://github.com/cnpm/cnpmjs.org.git'
+      }
+      request(registry.listen())
+      .put('/' + pkg.name)
+      .set('authorization', utils.adminAuth)
+      .send(pkg)
+      .expect(201, done);
+    });
+
+    it('should get 200', function (done) {
+      request(app.listen())
+      .get('/package/@cnpmtest/testmodule-repo-https')
+      .expect(200)
+      .expect('content-type', 'text/html; charset=utf-8')
+      .expect(/testmodule-repo-https/)
+      .expect(/Maintainers/)
+      .expect(/Dependencies/)
+      .expect(/https:\/\/github\.com\/cnpm\/cnpmjs\.org\.git/)
+      .expect(/Downloads/, function (err, res) {
+        should.not.exist(err);
+        res.should.have.header('etag');
+        res.text.should.containEql('<meta charset="utf-8">');
+        done();
+      });
+    });
+  });
+
+   describe('show repository url in short https syntax', () => {
+    before(function (done) {
+      var pkg = utils.getPackage('@cnpmtest/testmodule-repo-short-https', '0.0.1', utils.admin);
+      pkg.versions['0.0.1'].repository = {
+        type: 'git',
+        url: 'https://github.com/cnpm/cnpmjs.org'
+      }
+      request(registry.listen())
+      .put('/' + pkg.name)
+      .set('authorization', utils.adminAuth)
+      .send(pkg)
+      .expect(201, done);
+    });
+
+    it('should get 200', function (done) {
+      request(app.listen())
+      .get('/package/@cnpmtest/testmodule-repo-short-https')
+      .expect(200)
+      .expect('content-type', 'text/html; charset=utf-8')
+      .expect(/testmodule-repo-short-https/)
+      .expect(/Maintainers/)
+      .expect(/Dependencies/)
+      .expect(/https:\/\/github\.com\/cnpm\/cnpmjs\.org/)
+      .expect(/Downloads/, function (err, res) {
+        should.not.exist(err);
+        res.should.have.header('etag');
+        res.text.should.containEql('<meta charset="utf-8">');
+        done();
+      });
+    });
+  });
+
+  describe('show repository url in short http syntax', () => {
+    before(function (done) {
+      var pkg = utils.getPackage('@cnpmtest/testmodule-repo-short-http', '0.0.1', utils.admin);
+      pkg.versions['0.0.1'].repository = {
+        type: 'git',
+        url: 'http://github.com/cnpm/cnpmjs.org.git'
+      }
+      request(registry.listen())
+      .put('/' + pkg.name)
+      .set('authorization', utils.adminAuth)
+      .send(pkg)
+      .expect(201, done);
+    });
+
+    it('should get 200', function (done) {
+      request(app.listen())
+      .get('/package/@cnpmtest/testmodule-repo-short-http')
+      .expect(200)
+      .expect('content-type', 'text/html; charset=utf-8')
+      .expect(/testmodule-repo-short-http/)
+      .expect(/Maintainers/)
+      .expect(/Dependencies/)
+      .expect(/http:\/\/github\.com\/cnpm\/cnpmjs\.org/)
+      .expect(/Downloads/, function (err, res) {
+        should.not.exist(err);
+        res.should.have.header('etag');
+        res.text.should.containEql('<meta charset="utf-8">');
+        done();
+      });
+    });
+  });
 });
