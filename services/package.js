@@ -333,7 +333,7 @@ exports.updateModulePackage = function* (id, pkg) {
 };
 
 exports.updateModulePackageFields = function* (id, fields) {
-  var mod = yield* exports.getModuleById(id);
+  var mod = yield exports.getModuleById(id);
   if (!mod) {
     return null;
   }
@@ -341,7 +341,7 @@ exports.updateModulePackageFields = function* (id, fields) {
   for (var k in fields) {
     pkg[k] = fields[k];
   }
-  return yield* exports.updateModulePackage(id, pkg);
+  return yield exports.updateModulePackage(id, pkg);
 };
 
 exports.updateModuleReadme = function* (id, readme) {
