@@ -624,6 +624,13 @@ SyncModuleWorker.prototype._sync = function* (name, pkg) {
             deprecated: version.deprecated
           });
         }
+        if (exists.package.deprecated && !version.deprecated) {
+          // remove deprecated info
+          missingDeprecateds.push({
+            id: exists.id,
+            deprecated: undefined,
+          });
+        }
         continue;
       }
     }
@@ -789,7 +796,7 @@ SyncModuleWorker.prototype._sync = function* (name, pkg) {
       if (r.error) {
         that.log('    save error, id: %s, error: %s', item.id, r.error.message);
       } else {
-        that.log('    saved, id: %s', item.id);
+        that.log('    saved, id: %s, deprecated: %j', item.id, item.deprecated);
       }
     }
   }
