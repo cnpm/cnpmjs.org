@@ -1,15 +1,11 @@
 'use strict';
 
-/**
- * Module dependencies.
- */
+const debug = require('debug')('cnpmjs.org:middleware:proxy_to_npm');
+const config = require('../config');
 
-var debug = require('debug')('cnpmjs.org:middleware:proxy_to_npm');
-var config = require('../config');
-
-module.exports = function (options) {
-  var redirectUrl = config.sourceNpmRegistry;
-  var proxyUrls = [
+module.exports = function(options) {
+  let redirectUrl = config.sourceNpmRegistry;
+  let proxyUrls = [
     // /:pkg, dont contains scoped package
     /^\/[\w\-\.]+$/,
     // /-/package/:pkg/dist-tags
@@ -31,9 +27,9 @@ module.exports = function (options) {
       return yield next;
     }
 
-    var pathname = this.path;
-    var match;
-    for (var i = 0; i < proxyUrls.length; i++) {
+    const pathname = this.path;
+    let match;
+    for (let i = 0; i < proxyUrls.length; i++) {
       match = proxyUrls[i].test(pathname);
       if (match) {
         break;
@@ -43,7 +39,7 @@ module.exports = function (options) {
       return yield next;
     }
 
-    var url = redirectUrl + this.url;
+    const url = redirectUrl + this.url;
     debug('proxy to %s', url);
     this.redirect(url);
   };

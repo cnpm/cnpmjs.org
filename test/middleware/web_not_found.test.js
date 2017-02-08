@@ -14,14 +14,14 @@
  * Module dependencies.
  */
 
-var request = require('supertest');
-var utils = require('../utils');
-var app = require('../../servers/web');
-var registry = require('../../servers/registry');
+const request = require('supertest');
+const utils = require('../utils');
+const app = require('../../servers/web');
+const registry = require('../../servers/registry');
 
-describe('middleware/web_not_found.test.js', function () {
-  before(function (done) {
-    var pkg = utils.getPackage('@cnpmtest/mk2testmodule');
+describe('middleware/web_not_found.test.js', function() {
+  before(function(done) {
+    const pkg = utils.getPackage('@cnpmtest/mk2testmodule');
     request(registry)
     .put('/' + pkg.name)
     .set('authorization', utils.adminAuth)
@@ -29,27 +29,27 @@ describe('middleware/web_not_found.test.js', function () {
     .end(done);
   });
 
-  describe('web_not_found()', function () {
-    it('should redirect /mk2testmodule to /package/mk2testmodule', function (done) {
+  describe('web_not_found()', function() {
+    it('should redirect /mk2testmodule to /package/mk2testmodule', function(done) {
       request(app)
       .get('/@cnpmtest/mk2testmodule')
       .expect('Location', '/package/@cnpmtest/mk2testmodule')
       .expect(302, done);
     });
 
-    it('should 404 /~byte', function (done) {
+    it('should 404 /~byte', function(done) {
       request(app)
       .get('/~byte')
       .expect(404, done);
     });
 
-    it('should 200 /package/mk2testmodule', function (done) {
+    it('should 200 /package/mk2testmodule', function(done) {
       request(app)
       .get('/package/@cnpmtest/mk2testmodule')
       .expect(200, done);
     });
 
-    it('should 404 /package/byte404', function (done) {
+    it('should 404 /package/byte404', function(done) {
       request(app)
       .get('/package/@cnpmtest/byte404')
       .expect(404, done);

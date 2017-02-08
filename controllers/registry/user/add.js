@@ -15,9 +15,9 @@
  * Module dependencies.
  */
 
-var ensurePasswordSalt = require('./common').ensurePasswordSalt;
-var userService = require('../../../services/user');
-var config = require('../../../config');
+const ensurePasswordSalt = require('./common').ensurePasswordSalt;
+const userService = require('../../../services/user');
+const config = require('../../../config');
 
 // npm 1.4.4
 // add new user first
@@ -53,9 +53,9 @@ var config = require('../../../config');
 //   roles: [],
 //   date: '2014-03-15T02:39:25.696Z' }
 module.exports = function* addUser() {
-  var name = this.params.name;
-  var body = this.request.body || {};
-  var user = {
+  const name = this.params.name;
+  const body = this.request.body || {};
+  const user = {
     name: body.name,
     // salt: body.salt,
     // password_sha: body.password_sha,
@@ -70,19 +70,19 @@ module.exports = function* addUser() {
     this.status = 422;
     this.body = {
       error: 'paramError',
-      reason: 'params missing, name, email or password missing.'
+      reason: 'params missing, name, email or password missing.',
     };
     return;
   }
 
-  var loginedUser;
+  let loginedUser;
   try {
-    loginedUser = yield* userService.authAndSave(body.name, body.password);
+    loginedUser = yield userService.authAndSave(body.name, body.password);
   } catch (err) {
     this.status = err.status || 500;
     this.body = {
       error: err.name,
-      reason: err.message
+      reason: err.message,
     };
     return;
   }
@@ -91,7 +91,7 @@ module.exports = function* addUser() {
     this.body = {
       ok: true,
       id: 'org.couchdb.user:' + loginedUser.login,
-      rev: Date.now() + '-' + loginedUser.login
+      rev: Date.now() + '-' + loginedUser.login,
     };
     return;
   }
@@ -101,28 +101,28 @@ module.exports = function* addUser() {
     this.status = 401;
     this.body = {
       error: 'unauthorized',
-      reason: 'Login fail, please check your login name and password'
+      reason: 'Login fail, please check your login name and password',
     };
     return;
   }
 
-  var existUser = yield* userService.get(name);
+  const existUser = yield userService.get(name);
   if (existUser) {
     this.status = 409;
     this.body = {
       error: 'conflict',
-      reason: 'User ' + name + ' already exists.'
+      reason: 'User ' + name + ' already exists.',
     };
     return;
   }
 
   // add new user
-  var result = yield* userService.add(user);
+  const result = yield userService.add(user);
   this.etag = '"' + result.rev + '"';
   this.status = 201;
   this.body = {
     ok: true,
     id: 'org.couchdb.user:' + name,
-    rev: result.rev
+    rev: result.rev,
   };
 };

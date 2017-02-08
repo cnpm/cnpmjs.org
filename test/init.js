@@ -1,10 +1,6 @@
 'use strict';
 
-/**
- * Module dependencies.
- */
-
-var config = require('../config');
+const config = require('../config');
 
 if (process.env.DB) {
   config.database.dialect = process.env.DB;

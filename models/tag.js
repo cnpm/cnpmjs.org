@@ -29,7 +29,7 @@ CREATE TABLE IF NOT EXISTS `tag` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='module tag';
  */
 
-module.exports = function (sequelize, DataTypes) {
+module.exports = function(sequelize, DataTypes) {
   return sequelize.define('Tag', {
     name: {
       type: DataTypes.STRING(100),
@@ -49,24 +49,24 @@ module.exports = function (sequelize, DataTypes) {
     module_id: {
       type: DataTypes.BIGINT(20),
       allowNull: false,
-      comment: 'module id'
-    }
+      comment: 'module id',
+    },
   }, {
     tableName: 'tag',
     comment: 'module tag',
     indexes: [
       {
         unique: true,
-        fields: ['name', 'tag']
+        fields: [ 'name', 'tag' ],
       },
       {
-        fields: ['gmt_modified']
-      }
+        fields: [ 'gmt_modified' ],
+      },
     ],
     classMethods: {
-      findByNameAndTag: function* (name, tag) {
-        return yield this.find({ where: { name: name, tag: tag } });
-      }
-    }
+      * findByNameAndTag(name, tag) {
+        return yield this.find({ where: { name, tag } });
+      },
+    },
   });
 };

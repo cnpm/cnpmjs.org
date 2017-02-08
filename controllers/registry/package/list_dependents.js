@@ -16,11 +16,11 @@
 
 const packageService = require('../../../services/package');
 
-module.exports = function*() {
+module.exports = function* () {
   const name = this.params.name || this.params[0];
   const dependents = yield packageService.listDependents(name);
 
   this.body = {
-    dependents: dependents,
+    dependents,
   };
 };

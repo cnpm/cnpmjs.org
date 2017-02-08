@@ -12,7 +12,7 @@
  * Module dependencies.
  */
 
-var packageService = require('../../../services/package');
+const packageService = require('../../../services/package');
 
 // GET /-/short
 // List all packages names only

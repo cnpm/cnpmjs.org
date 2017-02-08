@@ -14,19 +14,19 @@
  * Module dependencies.
  */
 
-var request = require('supertest');
-var app = require('../../servers/web');
+const request = require('supertest');
+const app = require('../../servers/web');
 
-describe('middleware/opensearch.test.js', function () {
-  before(function (done) {
+describe('middleware/opensearch.test.js', function() {
+  before(function(done) {
     app.listen(0, done);
   });
-  after(function (done) {
+  after(function(done) {
     app.close(done);
   });
 
-  describe('GET /opensearch.xml', function () {
-    it('should get 200', function (done) {
+  describe('GET /opensearch.xml', function() {
+    it('should get 200', function(done) {
       request(app)
       .get('/opensearch.xml')
       .set('host', 'localhost')

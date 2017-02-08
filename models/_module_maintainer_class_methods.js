@@ -1,18 +1,4 @@
-/**!
- * cnpmjs.org - models/_module_maintainer_class_methods.js
- *
- * Copyright(c) fengmk2 and other contributors.
- * MIT Licensed
- *
- * Authors:
- *   fengmk2 <fengmk2@gmail.com> (http://fengmk2.github.com)
- */
-
 'use strict';
-
-/**
- * Module dependencies.
- */
 
 /**
  * list all module names by user
@@ -20,13 +6,13 @@
  */
 
 exports.listModuleNamesByUser = function* (user) {
-  var rows = yield this.findAll({
-    attributrs: ['name'],
+  const rows = yield this.findAll({
+    attributrs: [ 'name' ],
     where: {
-      user: user
-    }
+      user,
+    },
   });
-  return rows.map(function (row) {
+  return rows.map(function(row) {
     return row.name;
   });
 };
@@ -37,13 +23,13 @@ exports.listModuleNamesByUser = function* (user) {
  */
 
 exports.listMaintainers = function* (name) {
-  var rows = yield this.findAll({
-    attributrs: ['user'],
+  const rows = yield this.findAll({
+    attributrs: [ 'user' ],
     where: {
-      name: name
-    }
+      name,
+    },
   });
-  return rows.map(function (row) {
+  return rows.map(function(row) {
     return row.user;
   });
 };
@@ -55,16 +41,16 @@ exports.listMaintainers = function* (name) {
  */
 
 exports.addMaintainer = function* (name, user) {
-  var row = yield this.find({
+  let row = yield this.find({
     where: {
-      user: user,
-      name: name
-    }
+      user,
+      name,
+    },
   });
   if (!row) {
     row = yield this.build({
-      user: user,
-      name: name
+      user,
+      name,
     }).save();
   }
   return row;
@@ -77,7 +63,7 @@ exports.addMaintainer = function* (name, user) {
  */
 
 exports.addMaintainers = function* (name, users) {
-  return yield users.map(function (user) {
+  return yield users.map(function(user) {
     return this.addMaintainer(name, user);
   }.bind(this));
 };
@@ -91,16 +77,16 @@ exports.addMaintainers = function* (name, users) {
 exports.removeMaintainers = function* (name, users) {
   // removeMaintainers(name, oneUserName)
   if (typeof users === 'string') {
-    users = [users];
+    users = [ users ];
   }
   if (users.length === 0) {
     return;
   }
   yield this.destroy({
     where: {
-      name: name,
+      name,
       user: users,
-    }
+    },
   });
 };
 
@@ -112,8 +98,8 @@ exports.removeMaintainers = function* (name, users) {
 exports.removeAllMaintainers = function* (name) {
   yield this.destroy({
     where: {
-      name: name
-    }
+      name,
+    },
   });
 };
 
@@ -131,17 +117,17 @@ exports.updateMaintainers = function* (name, users) {
   if (users.length === 0) {
     return {
       add: [],
-      remove: []
+      remove: [],
     };
   }
-  var exists = yield* this.listMaintainers(name);
+  const exists = yield this.listMaintainers(name);
 
-  var addUsers = users.filter(function (username) {
+  const addUsers = users.filter(function(username) {
     // add user which in `users` but do not in `exists`
     return exists.indexOf(username) === -1;
   });
 
-  var removeUsers = exists.filter(function (username) {
+  const removeUsers = exists.filter(function(username) {
     // remove user which in `exists` by not in `users`
     return users.indexOf(username) === -1;
   });
@@ -153,7 +139,6 @@ exports.updateMaintainers = function* (name, users) {
 
   return {
     add: addUsers,
-    remove: removeUsers
+    remove: removeUsers,
   };
 };
-

@@ -15,7 +15,7 @@ module.exports = function* showTotal() {
     return;
   }
 
-  const r = yield [Total.get(), getDownloadTotal()];
+  const r = yield [ Total.get(), getDownloadTotal() ];
   const total = r[0];
   const download = r[1];
 

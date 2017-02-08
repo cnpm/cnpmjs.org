@@ -14,9 +14,9 @@
  * Module dependencies.
  */
 
-exports.JSONGetter = function (propertyName) {
+exports.JSONGetter = function(propertyName) {
   return function JSONGetter() {
-    var value = this.getDataValue(propertyName);
+    let value = this.getDataValue(propertyName);
     if (value && typeof value === 'string') {
       value = JSON.parse(value);
     }
@@ -24,7 +24,7 @@ exports.JSONGetter = function (propertyName) {
   };
 };
 
-exports.JSONSetter = function (propertyName) {
+exports.JSONSetter = function(propertyName) {
   return function JSONSetter(value) {
     if (typeof value !== 'string') {
       value = JSON.stringify(value);

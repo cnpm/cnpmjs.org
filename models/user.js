@@ -14,8 +14,8 @@
  * Module dependencies.
  */
 
-var utility = require('utility');
-var utils = require('./utils');
+const utility = require('utility');
+const utils = require('./utils');
 
 /*
 CREATE TABLE IF NOT EXISTS `user` (
@@ -37,7 +37,7 @@ CREATE TABLE IF NOT EXISTS `user` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='user base info';
 */
 
-module.exports = function (sequelize, DataTypes) {
+module.exports = function(sequelize, DataTypes) {
   return sequelize.define('User', {
     name: {
       type: DataTypes.STRING(100),
@@ -83,65 +83,65 @@ module.exports = function (sequelize, DataTypes) {
       allowNull: false,
       defaultValue: false,
       comment: 'user sync from npm or not, 1: true, other: false',
-    }
+    },
   }, {
     tableName: 'user',
     comment: 'user base info',
     indexes: [
       {
         unique: true,
-        fields: ['name']
+        fields: [ 'name' ],
       },
       {
-        fields: ['gmt_modified']
-      }
+        fields: [ 'gmt_modified' ],
+      },
     ],
     classMethods: {
       // utils
-      createPasswordSha: function (password, salt) {
+      createPasswordSha(password, salt) {
         return utility.sha1(password + salt);
       },
 
       // read
-      auth: function* (name, password) {
-        var user = yield* this.findByName(name);
+      * auth(name, password) {
+        let user = yield this.findByName(name);
         if (user) {
-          var sha = this.createPasswordSha(password, user.salt);
+          const sha = this.createPasswordSha(password, user.salt);
           if (user.password_sha !== sha) {
             user = null;
           }
         }
         return user;
       },
-      findByName: function* (name) {
-        return yield this.find({ where: { name: name } });
+      * findByName(name) {
+        return yield this.find({ where: { name } });
       },
-      listByNames: function* (names) {
+      * listByNames(names) {
         if (!names || names.length === 0) {
           return [];
         }
         return yield this.findAll({
           where: {
             name: {
-              in: names
-            }
-          }
+              in: names,
+            },
+          },
         });
       },
-      search: function* (query, options) {
+      * search(query, options) {
         return yield this.findAll({
           where: {
             name: {
-              like: query + '%'
-            }
+              like: query + '%',
+            },
           },
-          limit: options.limit
+          limit: options.limit,
         });
       },
 
       // write
-      saveNpmUser: function* (data) {
-        var user = yield* this.findByName(data.name);
+      * saveNpmUser(data) {
+        let user = yield this.findByName(data.name);
         if (!user) {
           user = this.build({
             isNpmUser: true,
@@ -160,20 +160,20 @@ module.exports = function (sequelize, DataTypes) {
         }
         return user;
       },
-      saveCustomUser: function* (data) {
-        var name = data.user.login;
-        var user = yield* this.findByName(name);
+      * saveCustomUser(data) {
+        const name = data.user.login;
+        let user = yield this.findByName(name);
         if (!user) {
           user = this.build({
             isNpmUser: false,
-            name: name,
+            name,
           });
         }
 
-        var rev = '1-' + data.user.login;
-        var salt = data.salt || '0';
-        var passwordSha = data.password_sha || '0';
-        var ip = data.ip || '0';
+        const rev = '1-' + data.user.login;
+        const salt = data.salt || '0';
+        const passwordSha = data.password_sha || '0';
+        const ip = data.ip || '0';
 
         user.isNpmUser = false;
         user.email = data.user.email;
@@ -189,48 +189,48 @@ module.exports = function (sequelize, DataTypes) {
       },
 
       // add cnpm user
-      add: function* (user) {
-        var roles = user.roles || [];
+      * add(user) {
+        let roles = user.roles || [];
         try {
           roles = JSON.stringify(roles);
         } catch (e) {
           roles = '[]';
         }
-        var rev = '1-' + utility.md5(JSON.stringify(user));
+        const rev = '1-' + utility.md5(JSON.stringify(user));
 
-        var row = this.build({
-          rev: rev,
+        const row = this.build({
+          rev,
           name: user.name,
           email: user.email,
           salt: user.salt,
           password_sha: user.password_sha,
           ip: user.ip,
-          roles: roles,
+          roles,
           isNpmUser: false,
         });
 
         return yield row.save();
       },
 
-      update: function* (user) {
-        var rev = user.rev || user._rev;
-        var revNo = Number(rev.split('-', 1));
+      * update(user) {
+        const rev = user.rev || user._rev;
+        let revNo = Number(rev.split('-', 1));
         if (!revNo) {
-          var err = new Error(rev + ' format error');
+          const err = new Error(rev + ' format error');
           err.name = 'RevFormatError';
-          err.data = {user: user};
+          err.data = { user };
           throw err;
         }
         revNo++;
-        var newRev = revNo + '-' + utility.md5(JSON.stringify(user));
-        var roles = user.roles || [];
+        const newRev = revNo + '-' + utility.md5(JSON.stringify(user));
+        let roles = user.roles || [];
         try {
           roles = JSON.stringify(roles);
         } catch (e) {
           roles = '[]';
         }
 
-        var row = yield* this.findByName(user.name);
+        const row = yield this.findByName(user.name);
         if (!row) {
           return null;
         }
@@ -243,8 +243,8 @@ module.exports = function (sequelize, DataTypes) {
         row.roles = roles;
         row.isNpmUser = false;
 
-        return yield row.save(['rev', 'email', 'salt', 'password_sha', 'ip', 'roles', 'isNpmUser']);
-      }
-    }
+        return yield row.save([ 'rev', 'email', 'salt', 'password_sha', 'ip', 'roles', 'isNpmUser' ]);
+      },
+    },
   });
 };

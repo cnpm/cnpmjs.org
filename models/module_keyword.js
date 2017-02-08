@@ -27,7 +27,7 @@ CREATE TABLE IF NOT EXISTS `module_keyword` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='module keyword';
  */
 
-module.exports = function (sequelize, DataTypes) {
+module.exports = function(sequelize, DataTypes) {
   return sequelize.define('ModuleKeyword', {
     keyword: {
       type: DataTypes.STRING(100),
@@ -41,7 +41,7 @@ module.exports = function (sequelize, DataTypes) {
     description: {
       type: DataTypes.LONGTEXT,
       allowNull: true,
-    }
+    },
   }, {
     tableName: 'module_keyword',
     comment: 'module keyword',
@@ -49,21 +49,21 @@ module.exports = function (sequelize, DataTypes) {
     indexes: [
       {
         unique: true,
-        fields: ['keyword', 'name']
+        fields: [ 'keyword', 'name' ],
       },
       {
-        fields: ['name']
-      }
+        fields: [ 'name' ],
+      },
     ],
     classMethods: {
-      findByKeywordAndName: function* (keyword, name) {
+      * findByKeywordAndName(keyword, name) {
         return yield this.find({
           where: {
-            keyword: keyword,
-            name: name
-          }
+            keyword,
+            name,
+          },
         });
-      }
-    }
+      },
+    },
   });
 };

@@ -15,17 +15,17 @@
  * Module dependencies.
  */
 
-var userService = require('../../../services/user');
+const userService = require('../../../services/user');
 
 // GET /-/user/org.couchdb.user::name
 module.exports = function* show(next) {
-  var name = this.params.name;
-  var user = yield* userService.getAndSave(name);
+  const name = this.params.name;
+  const user = yield userService.getAndSave(name);
   if (!user) {
-    return yield* next;
+    return yield next;
   }
 
-  var data = user.json;
+  let data = user.json;
   if (!data) {
     data = {
       _id: 'org.couchdb.user:' + user.name,
@@ -53,7 +53,7 @@ module.exports = function* show(next) {
       fullname: data.name || data.login,
       homepage: data.html_url,
       scopes: data.scopes,
-      site_admin: data.site_admin
+      site_admin: data.site_admin,
     };
   }
 

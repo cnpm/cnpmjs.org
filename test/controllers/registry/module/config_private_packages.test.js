@@ -1,4 +1,4 @@
-/*!
+/* !
  * cnpmjs.org - test/controllers/registry/module/public_mode.test.js
  * Copyright(c) 2014 dead_horse <dead_horse@qq.com>
  * MIT Licensed
@@ -10,28 +10,28 @@
  * Module dependencies.
  */
 
-var should = require('should');
-var request = require('supertest');
-var mm = require('mm');
-var config = require('../../../../config');
-var app = require('../../../../servers/registry');
-var utils = require('../../../utils');
+const should = require('should');
+const request = require('supertest');
+const mm = require('mm');
+const config = require('../../../../config');
+const app = require('../../../../servers/registry');
+const utils = require('../../../utils');
 
-describe('controllers/registry/module/config_private_packages.test.js', function () {
-  beforeEach(function () {
+describe('controllers/registry/module/config_private_packages.test.js', function() {
+  beforeEach(function() {
     mm(config, 'enablePrivate', false);
     mm(config, 'forcePublishWithScope', true);
-    mm(config, 'privatePackages', ['private-package']);
+    mm(config, 'privatePackages', [ 'private-package' ]);
   });
 
   after(mm.restore);
-  it('should publish with tgz base64, addPackageAndDist()', function (done) {
-    var pkg = utils.getPackage('private-package', '0.0.1', utils.otherUser);
+  it('should publish with tgz base64, addPackageAndDist()', function(done) {
+    let pkg = utils.getPackage('private-package', '0.0.1', utils.otherUser);
     request(app)
     .put('/' + pkg.name)
     .set('authorization', utils.otherUserAuth)
     .send(pkg)
-    .expect(201, function (err, res) {
+    .expect(201, function(err, res) {
       should.not.exist(err);
       res.body.should.have.keys('ok', 'rev');
       res.body.ok.should.equal(true);
@@ -41,19 +41,19 @@ describe('controllers/registry/module/config_private_packages.test.js', function
       .put('/' + pkg.name)
       .set('authorization', utils.otherUserAuth)
       .send(pkg)
-      .expect(403, function (err, res) {
+      .expect(403, function(err, res) {
         should.not.exist(err);
         res.body.should.eql({
           error: 'forbidden',
-          reason: 'cannot modify pre-existing version: 0.0.1'
+          reason: 'cannot modify pre-existing version: 0.0.1',
         });
         done();
       });
     });
   });
 
-  it('should other user publish 403', function (done) {
-    var pkg = utils.getPackage('private-package', '0.0.2', utils.secondUser);
+  it('should other user publish 403', function(done) {
+    const pkg = utils.getPackage('private-package', '0.0.2', utils.secondUser);
     request(app)
     .put('/' + pkg.name)
     .set('authorization', utils.secondUserAuth)
@@ -62,8 +62,8 @@ describe('controllers/registry/module/config_private_packages.test.js', function
     .expect(403, done);
   });
 
-  it('should admin publish 403', function (done) {
-    var pkg = utils.getPackage('private-package', '0.0.2', utils.admin);
+  it('should admin publish 403', function(done) {
+    const pkg = utils.getPackage('private-package', '0.0.2', utils.admin);
     request(app)
     .put('/' + pkg.name)
     .set('authorization', utils.adminAuth)
@@ -72,31 +72,31 @@ describe('controllers/registry/module/config_private_packages.test.js', function
     .expect(403, done);
   });
 
-  it('should add again new maintainers', function (done) {
+  it('should add again new maintainers', function(done) {
     request(app)
     .put('/private-package/-rev/1')
     .send({
       maintainers: [{
         name: 'cnpmjstest101',
-        email: 'cnpmjstest101@cnpmjs.org'
+        email: 'cnpmjstest101@cnpmjs.org',
       }, {
         name: 'fengmk2',
-        email: 'fengmk2@cnpmjs.org'
-      }]
+        email: 'fengmk2@cnpmjs.org',
+      }],
     })
     .set('authorization', utils.otherUserAuth)
     .expect(201)
     .expect('content-type', 'application/json; charset=utf-8', done);
   });
 
-  it('should remove maintainers', function (done) {
+  it('should remove maintainers', function(done) {
     request(app)
     .put('/private-package/-rev/1')
     .send({
       maintainers: [{
         name: 'cnpmjstest101',
-        email: 'cnpmjstest101@cnpmjs.org'
-      }]
+        email: 'cnpmjstest101@cnpmjs.org',
+      }],
     })
     .set('authorization', utils.otherUserAuth)
     .expect(201)

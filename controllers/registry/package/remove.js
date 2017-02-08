@@ -14,25 +14,25 @@
  * Module dependencies.
  */
 
-var debug = require('debug')('cnpmjs.org:controllers:registry:package:remove');
-var urlparse = require('url').parse;
-var packageService = require('../../../services/package');
-var totalService = require('../../../services/total');
-var nfs = require('../../../common/nfs');
-var logger = require('../../../common/logger');
+const debug = require('debug')('cnpmjs.org:controllers:registry:package:remove');
+const urlparse = require('url').parse;
+const packageService = require('../../../services/package');
+const totalService = require('../../../services/total');
+const nfs = require('../../../common/nfs');
+const logger = require('../../../common/logger');
 
 // DELETE /:name/-rev/:rev
 // https://github.com/npm/npm-registry-client/blob/master/lib/unpublish.js#L25
 module.exports = function* remove(next) {
-  var name = this.params.name || this.params[0];
-  var rev = this.params.rev || this.params[1];
+  const name = this.params.name || this.params[0];
+  const rev = this.params.rev || this.params[1];
   debug('remove all the module with name: %s, id: %s', name, rev);
 
-  var mods = yield* packageService.listModulesByName(name);
+  const mods = yield packageService.listModulesByName(name);
   debug('removeAll module %s: %d', name, mods.length);
-  var mod = mods[0];
+  const mod = mods[0];
   if (!mod) {
-    return yield* next;
+    return yield next;
   }
 
   yield [
@@ -41,11 +41,11 @@ module.exports = function* remove(next) {
     totalService.plusDeleteModule(),
   ];
 
-  var keys = [];
-  for (var i = 0; i < mods.length; i++) {
-    var row = mods[i];
-    var dist = row.package.dist;
-    var key = dist.key;
+  const keys = [];
+  for (let i = 0; i < mods.length; i++) {
+    const row = mods[i];
+    const dist = row.package.dist;
+    let key = dist.key;
     if (!key) {
       key = urlparse(dist.tarball).pathname;
     }
@@ -53,7 +53,7 @@ module.exports = function* remove(next) {
   }
 
   try {
-    yield keys.map(function (key) {
+    yield keys.map(function(key) {
       return nfs.remove(key);
     });
   } catch (err) {
@@ -61,7 +61,7 @@ module.exports = function* remove(next) {
   }
 
   // remove the maintainers
-  yield* packageService.removeAllMaintainers(name);
+  yield packageService.removeAllMaintainers(name);
 
   this.body = { ok: true };
 };

@@ -14,26 +14,26 @@
  * Module dependencies.
  */
 
-var should = require('should');
-var request = require('supertest');
-var mm = require('mm');
-var config = require('../../../../config');
-var app = require('../../../../servers/registry');
-var utils = require('../../../utils');
+const should = require('should');
+const request = require('supertest');
+const mm = require('mm');
+const config = require('../../../../config');
+const app = require('../../../../servers/registry');
+const utils = require('../../../utils');
 
-describe('controllers/registry/package/list_all.test.js', function () {
+describe('controllers/registry/package/list_all.test.js', function() {
   afterEach(mm.restore);
 
-  before(function (done) {
+  before(function(done) {
     mm(config, 'syncModel', 'all');
     utils.sync('pedding', done);
   });
 
-  describe('GET /-/all', function () {
-    it('should get 200', function (done) {
+  describe('GET /-/all', function() {
+    it('should get 200', function(done) {
       request(app)
       .get('/-/all')
-      .expect(200, function (err, res) {
+      .expect(200, function(err, res) {
         should.not.exist(err);
         res.body.should.be.an.Object;
         res.body._updated.should.be.a.Number;

@@ -26,18 +26,18 @@ CREATE TABLE IF NOT EXISTS `npm_module_maintainer` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='npm original module maintainers';
  */
 
-module.exports = function (sequelize, DataTypes) {
+module.exports = function(sequelize, DataTypes) {
   return sequelize.define('NpmModuleMaintainer', {
     user: {
       type: DataTypes.STRING(100),
       allowNull: false,
-      comment: 'user name'
+      comment: 'user name',
     },
     name: {
       type: DataTypes.STRING(100),
       allowNull: false,
       comment: 'module name',
-    }
+    },
   }, {
     tableName: 'npm_module_maintainer',
     comment: 'npm original module maintainers',
@@ -45,11 +45,11 @@ module.exports = function (sequelize, DataTypes) {
     indexes: [
       {
         unique: true,
-        fields: ['user', 'name']
+        fields: [ 'user', 'name' ],
       },
       {
-        fields: ['name']
-      }
+        fields: [ 'name' ],
+      },
     ],
     classMethods: require('./_module_maintainer_class_methods'),
   });

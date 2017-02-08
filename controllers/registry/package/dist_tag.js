@@ -1,20 +1,20 @@
 'use strict';
 
-var packageService = require('../../../services/package');
+const packageService = require('../../../services/package');
 
 function ok() {
   return {
-    ok: "dist-tags updated"
+    ok: 'dist-tags updated',
   };
 }
 
 // GET /-/package/:pkg/dist-tags -- returns the package's dist-tags
 exports.index = function* () {
-  var name = this.params.name || this.params[0];
-  var rows = yield packageService.listModuleTags(name);
-  var tags = {};
-  for (var i = 0; i < rows.length; i++) {
-    var row = rows[i];
+  const name = this.params.name || this.params[0];
+  const rows = yield packageService.listModuleTags(name);
+  const tags = {};
+  for (let i = 0; i < rows.length; i++) {
+    const row = rows[i];
     tags[row.tag] = row.version;
   }
   this.body = tags;
@@ -22,17 +22,17 @@ exports.index = function* () {
 
 // PUT /-/package/:pkg/dist-tags -- Set package's dist-tags to provided object body (removing missing)
 exports.save = function* () {
-  var name = this.params.name || this.params[0];
+  const name = this.params.name || this.params[0];
   yield packageService.removeModuleTags(name);
-  yield* exports.update.call(this);
+  yield exports.update.call(this);
 };
 
 // POST /-/package/:pkg/dist-tags -- Add/modify dist-tags from provided object body (merge)
 exports.update = function* () {
-  var name = this.params.name || this.params[0];
-  var tags = this.request.body;
-  for (var tag in tags) {
-    var version = tags[tag];
+  const name = this.params.name || this.params[0];
+  const tags = this.request.body;
+  for (const tag in tags) {
+    const version = tags[tag];
     yield packageService.addModuleTag(name, tag, version);
   }
   this.status = 201;
@@ -42,16 +42,16 @@ exports.update = function* () {
 // PUT /-/package/:pkg/dist-tags/:tag -- Set package's dist-tags[tag] to provided string body
 // POST /-/package/:pkg/dist-tags/:tag -- Same as PUT /-/package/:pkg/dist-tags/:tag
 exports.set = function* () {
-  var name = this.params.name || this.params[0];
-  var tag = this.params.tag || this.params[1];
-  var version = this.request.body;
+  const name = this.params.name || this.params[0];
+  const tag = this.params.tag || this.params[1];
+  const version = this.request.body;
   // make sure version exists
-  var pkg = yield packageService.getModule(name, version);
+  const pkg = yield packageService.getModule(name, version);
   if (!pkg) {
     this.status = 400;
     this.body = {
       error: 'version_error',
-      reason: name + '@' + version + ' not exists'
+      reason: name + '@' + version + ' not exists',
     };
     return;
   }
@@ -63,8 +63,8 @@ exports.set = function* () {
 
 // DELETE /-/package/:pkg/dist-tags/:tag -- Remove tag from dist-tags
 exports.destroy = function* () {
-  var name = this.params.name || this.params[0];
-  var tag = this.params.tag || this.params[1];
+  const name = this.params.name || this.params[0];
+  const tag = this.params.tag || this.params[1];
   if (tag === 'latest') {
     this.status = 400;
     this.body = {

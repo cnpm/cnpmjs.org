@@ -3,5 +3,5 @@ module.exports = {
     name: 'koa',
     repository: null,
   },
-  __requires: ['./default']
+  __requires: [ './default' ],
 };

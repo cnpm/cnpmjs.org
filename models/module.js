@@ -1,18 +1,4 @@
-/**!
- * cnpmjs.org - models/module.js
- *
- * Copyright(c) fengmk2 and other contributors.
- * MIT Licensed
- *
- * Authors:
- *   fengmk2 <fengmk2@gmail.com> (http://fengmk2.github.com)
- */
-
 'use strict';
-
-/**
- * Module dependencies.
- */
 
 /*
 CREATE TABLE IF NOT EXISTS `module` (
@@ -38,22 +24,22 @@ CREATE INDEX `module_publish_time` ON `module` (`publish_time`);
 CREATE INDEX `module_author` ON `module` (`author`);
 */
 
-module.exports = function (sequelize, DataTypes) {
+module.exports = function(sequelize, DataTypes) {
   return sequelize.define('Module', {
     author: {
       type: DataTypes.STRING(100),
       allowNull: false,
-      comment: 'first maintainer name'
+      comment: 'first maintainer name',
     },
     name: {
       type: DataTypes.STRING(100),
       allowNull: false,
-      comment: 'module name'
+      comment: 'module name',
     },
     version: {
       type: DataTypes.STRING(30),
       allowNull: false,
-      comment: 'module version'
+      comment: 'module version',
     },
     description: {
       type: DataTypes.LONGTEXT,
@@ -78,31 +64,31 @@ module.exports = function (sequelize, DataTypes) {
     publish_time: {
       type: DataTypes.BIGINT(20),
       allowNull: true,
-    }
+    },
   }, {
     tableName: 'module',
     comment: 'module info',
     indexes: [
       {
         unique: true,
-        fields: ['name', 'version']
+        fields: [ 'name', 'version' ],
       },
       {
-        fields: ['gmt_modified']
+        fields: [ 'gmt_modified' ],
       },
       {
-        fields: ['publish_time']
+        fields: [ 'publish_time' ],
       },
       {
-        fields: ['author']
-      }
+        fields: [ 'author' ],
+      },
     ],
     classMethods: {
-      findByNameAndVersion: function* (name, version) {
+      * findByNameAndVersion(name, version) {
         return yield this.find({
-          where: { name: name, version: version }
+          where: { name, version },
         });
-      }
-    }
+      },
+    },
   });
 };

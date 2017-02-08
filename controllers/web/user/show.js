@@ -1,41 +1,25 @@
-/**!
- * cnpmjs.org - controllers/web/user/show.js
- *
- * Copyright(c) cnpmjs.org and other contributors.
- * MIT Licensed
- *
- * Authors:
- *  dead_horse <dead_horse@qq.com> (http://deadhorse.me)
- *  fengmk2 <fengmk2@gmail.com> (http://fengmk2.github.com)
- */
-
 'use strict';
 
-/**
- * Module dependencies.
- */
-
-var config = require('../../../config');
-var packageService = require('../../../services/package');
-var userService = require('../../../services/user');
-var common = require('../../../lib/common');
+const config = require('../../../config');
+const packageService = require('../../../services/package');
+const userService = require('../../../services/user');
+const common = require('../../../lib/common');
 
 module.exports = function* showUser(next) {
-  var name = this.params.name;
-  var isAdmin = common.isAdmin(name);
-  var scopes = config.scopes || [];
-  var user;
-  var r = yield [packageService.listModulesByUser(name), userService.getAndSave(name)];
-  var packages = r[0];
-  var user = r[1];
+  const name = this.params.name;
+  const isAdmin = common.isAdmin(name);
+  const scopes = config.scopes || [];
+  const r = yield [ packageService.listModulesByUser(name), userService.getAndSave(name) ];
+  const packages = r[0];
+  let user = r[1];
   if (!user && !packages.length) {
-    return yield* next;
+    return yield next;
   }
 
   user = user || {};
 
-  var data = {
-    name: name,
+  const data = {
+    name,
     email: user.email,
     json: user.json || {},
     isNpmUser: user.isNpmUser,
@@ -44,7 +28,7 @@ module.exports = function* showUser(next) {
   if (data.json.login) {
     // custom user format
     // convert to npm user format
-    var json = data.json;
+    const json = data.json;
     data.json = {
       _id: 'org.couchdb.user:' + user.name,
       _rev: user.rev,
@@ -56,16 +40,16 @@ module.exports = function* showUser(next) {
       avatar: json.avatar_url,
       fullname: json.name || json.login,
       homepage: json.html_url,
-      im: json.im_url
+      im: json.im_url,
     };
   }
 
   yield this.render('profile', {
     title: 'User - ' + name,
-    packages: packages,
+    packages,
     user: data,
     lastModified: user.gmt_modified,
-    isAdmin: isAdmin,
-    scopes: scopes
+    isAdmin,
+    scopes,
   });
 };

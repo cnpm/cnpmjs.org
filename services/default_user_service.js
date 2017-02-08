@@ -1,24 +1,9 @@
-/**!
- * cnpmjs.org - services/default_user_service.js
- *
- * Copyright(c) fengmk2 and other contributors.
- * MIT Licensed
- *
- * Authors:
- *   fengmk2 <fengmk2@gmail.com> (http://fengmk2.github.com)
- */
-
 'use strict';
 
-/**
- * Module dependencies.
- */
-
-var gravatar = require('gravatar');
-// var User = require('../proxy/user');
-var User = require('../models').User;
-var isAdmin = require('../lib/common').isAdmin;
-var config = require('../config');
+const gravatar = require('gravatar');
+const User = require('../models').User;
+const isAdmin = require('../lib/common').isAdmin;
+const config = require('../config');
 
 // User: https://github.com/cnpm/cnpmjs.org/wiki/Use-Your-Own-User-Authorization#user-data-structure
 // {
@@ -35,7 +20,7 @@ var config = require('../config');
 module.exports = DefaultUserService;
 
 function convertToUser(row) {
-  var user = {
+  let user = {
     login: row.name,
     email: row.email,
     name: row.name,
@@ -46,7 +31,7 @@ function convertToUser(row) {
     scopes: config.scopes,
   };
   if (row.json) {
-    var data = row.json;
+    const data = row.json;
     if (data.login) {
       // custom user
       user = data;
@@ -67,23 +52,23 @@ function convertToUser(row) {
     }
   }
   if (!user.avatar_url) {
-    user.avatar_url = gravatar.url(user.email, {s: '50', d: 'retro'}, true);
+    user.avatar_url = gravatar.url(user.email, { s: '50', d: 'retro' }, true);
   }
   return user;
 }
 
 function DefaultUserService() {}
 
-var proto = DefaultUserService.prototype;
+const proto = DefaultUserService.prototype;
 
 /**
  * Auth user with login name and password
  * @param  {String} login    login name
  * @param  {String} password login password
- * @return {User}
+ * @return {User} user
  */
 proto.auth = function* (login, password) {
-  var row = yield* User.auth(login, password);
+  const row = yield User.auth(login, password);
   if (!row) {
     return null;
   }
@@ -93,10 +78,10 @@ proto.auth = function* (login, password) {
 /**
  * Get user by login name
  * @param  {String} login  login name
- * @return {User}
+ * @return {User} user
  */
 proto.get = function* (login) {
-  var row = yield User.findByName(login);
+  const row = yield User.findByName(login);
   if (!row) {
     return null;
   }
@@ -106,12 +91,12 @@ proto.get = function* (login) {
 /**
  * List users
  * @param  {Array<String>} logins  login names
- * @return {Array<User>}
+ * @return {Array<User>} users
  */
 proto.list = function* (logins) {
-  var rows = yield* User.listByNames(logins);
-  var users = [];
-  rows.forEach(function (row) {
+  const rows = yield User.listByNames(logins);
+  const users = [];
+  rows.forEach(function(row) {
     users.push(convertToUser(row));
   });
   return users;
@@ -122,7 +107,7 @@ proto.list = function* (logins) {
  * @param  {String} query  query keyword
  * @param  {Object} [options] optional query params
  *  - {Number} limit match users count, default is `20`
- * @return {Array<User>}
+ * @return {Array<User>} users
  */
 proto.search = function* (query, options) {
   options = options || {};
@@ -131,9 +116,9 @@ proto.search = function* (query, options) {
     options.limit = 20;
   }
 
-  var rows = yield* User.search(query, options);
-  var users = [];
-  rows.forEach(function (row) {
+  const rows = yield User.search(query, options);
+  const users = [];
+  rows.forEach(function(row) {
     users.push(convertToUser(row));
   });
   return users;

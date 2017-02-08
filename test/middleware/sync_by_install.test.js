@@ -1,14 +1,8 @@
 'use strict';
 
-/**
- * Module dependencies.
- */
-
-var request = require('supertest');
-var app = require('../../servers/registry');
-var mm = require('mm');
-var config = require('../../config');
-var userService = require('../../services/user');
+const request = require('supertest');
+const app = require('../../servers/registry');
+const mm = require('mm');
 
 describe('test/middleware/sync_by_install.test.js', () => {
   afterEach(mm.restore);

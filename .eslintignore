@@ -1,0 +1,6 @@
+test/fixtures
+test/mocks
+examples/**/app/public
+logs
+run
+public/

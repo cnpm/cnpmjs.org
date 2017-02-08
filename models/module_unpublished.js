@@ -14,7 +14,7 @@
  * Module dependencies.
  */
 
-var utils = require('./utils');
+const utils = require('./utils');
 
 /*
 CREATE TABLE IF NOT EXISTS `module_unpublished` (
@@ -29,7 +29,7 @@ CREATE TABLE IF NOT EXISTS `module_unpublished` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='module unpublished info';
  */
 
-module.exports = function (sequelize, DataTypes) {
+module.exports = function(sequelize, DataTypes) {
   return sequelize.define('ModuleUnpublished', {
     name: {
       type: DataTypes.STRING(100),
@@ -41,47 +41,47 @@ module.exports = function (sequelize, DataTypes) {
       comment: 'base info: tags, time, maintainers, description, versions',
       get: utils.JSONGetter('package'),
       set: utils.JSONSetter('package'),
-    }
+    },
   }, {
     tableName: 'module_unpublished',
     comment: 'module unpublished info',
     indexes: [
       {
         unique: true,
-        fields: ['name']
+        fields: [ 'name' ],
       },
       {
-        fields: ['gmt_modified']
-      }
+        fields: [ 'gmt_modified' ],
+      },
     ],
     classMethods: {
-      findByName: function* (name) {
+      * findByName(name) {
         return yield this.find({
           where: {
-            name: name
-          }
+            name,
+          },
         });
       },
-      save: function* (name, pkg) {
-        var row = yield this.find({
+      * save(name, pkg) {
+        let row = yield this.find({
           where: {
-            name: name
-          }
+            name,
+          },
         });
         if (row) {
           row.package = pkg;
           if (row.changed()) {
-            row = yield row.save(['package']);
+            row = yield row.save([ 'package' ]);
           }
           return row;
         }
 
         row = this.build({
-          name: name,
+          name,
           package: pkg,
         });
         return yield row.save();
-      }
-    }
+      },
+    },
   });
 };

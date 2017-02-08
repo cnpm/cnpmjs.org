@@ -12,15 +12,15 @@
  * Module dependencies.
  */
 
-var request = require('supertest');
-var mm = require('mm');
-var config = require('../../../../config');
-var app = require('../../../../servers/registry');
-var utils = require('../../../utils');
+const request = require('supertest');
+const mm = require('mm');
+const config = require('../../../../config');
+const app = require('../../../../servers/registry');
+const utils = require('../../../utils');
 
-describe('test/controllers/registry/package/download.test.js', function () {
-  before(function (done) {
-    var pkg = utils.getPackage('@cnpmtest/download-test-module', '1.0.0', utils.admin);
+describe('test/controllers/registry/package/download.test.js', function() {
+  before(function(done) {
+    const pkg = utils.getPackage('@cnpmtest/download-test-module', '1.0.0', utils.admin);
     request(app)
     .put('/' + pkg.name)
     .set('authorization', utils.adminAuth)
@@ -30,20 +30,20 @@ describe('test/controllers/registry/package/download.test.js', function () {
 
   afterEach(mm.restore);
 
-  describe('GET /:name/download/:filename', function () {
-    it('should download a file with 200', function (done) {
+  describe('GET /:name/download/:filename', function() {
+    it('should download a file with 200', function(done) {
       request(app)
       .get('/@cnpmtest/download-test-module/download/@cnpmtest/download-test-module-1.0.0.tgz')
       .expect(200, done);
     });
 
-    it('should alias /:name/-/:filename to /:name/download/:filename', function (done) {
+    it('should alias /:name/-/:filename to /:name/download/:filename', function(done) {
       request(app)
       .get('/@cnpmtest/download-test-module/-/@cnpmtest/download-test-module-1.0.0.tgz')
       .expect(200, done);
     });
 
-    it('should 404 when package not exists', function (done) {
+    it('should 404 when package not exists', function(done) {
       request(app)
       .get('/@cnpmtest/download-test-module-not-exists/download/@cnpmtest/download-test-module-not-exists-1.0.0.tgz')
       .expect(404, done);
@@ -51,7 +51,7 @@ describe('test/controllers/registry/package/download.test.js', function () {
 
     describe('nfs.url is function', function() {
       it('should work with nfs.url is generatorFunction', function(done) {
-        mm(config.nfs, 'url', function*(key) {
+        mm(config.nfs, 'url', function* (key) {
           return 'http://foo.test.com' + key;
         });
         mm(config, 'downloadRedirectToNFS', true);

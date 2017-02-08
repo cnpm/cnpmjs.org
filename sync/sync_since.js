@@ -8,8 +8,8 @@ const SyncModuleWorker = require('../controllers/sync_module_worker');
 
 function* sync(sinceTimestamp) {
   console.log('Fetching packages since: %s', new Date(sinceTimestamp));
-  var result = yield npmService.fetchAllPackagesSince(sinceTimestamp);
-  var packages = result.names;
+  const result = yield npmService.fetchAllPackagesSince(sinceTimestamp);
+  let packages = result.names;
 
   packages = packages || [];
   if (!packages.length) {
@@ -27,7 +27,7 @@ function* sync(sinceTimestamp) {
   console.log('lastModified: %s, lastModified package: %s, total %d packages to sync: %j',
     new Date(result.lastModified), result.lastModifiedName, packages.length, packages);
 
-  var worker = new SyncModuleWorker({
+  const worker = new SyncModuleWorker({
     username: 'sync_since',
     name: packages,
     noDep: true,
@@ -35,7 +35,7 @@ function* sync(sinceTimestamp) {
     syncUpstreamFirst: false,
   });
   worker.start();
-  var end = thunkify.event(worker);
+  const end = thunkify.event(worker);
   yield end();
 
   console.log('All packages sync done, successes %d, fails %d',
@@ -44,9 +44,9 @@ function* sync(sinceTimestamp) {
 }
 
 co(function* () {
-  var timestamp = Date.now() - ms(process.argv[2] || '30d');
+  const timestamp = Date.now() - ms(process.argv[2] || '30d');
   yield sync(timestamp);
-}).catch(function (err) {
+}).catch(function(err) {
   console.error(err.stack);
   process.exit(1);
 });

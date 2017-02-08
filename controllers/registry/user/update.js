@@ -15,9 +15,9 @@
  * Module dependencies.
  */
 
-var debug = require('debug')('cnpmjs.org:controllers:registry:user:update');
-var ensurePasswordSalt = require('./common').ensurePasswordSalt;
-var userService = require('../../../services/user');
+const debug = require('debug')('cnpmjs.org:controllers:registry:user:update');
+const ensurePasswordSalt = require('./common').ensurePasswordSalt;
+const userService = require('../../../services/user');
 
 // logined before update, no need to auth user again
 // { name: 'admin',
@@ -37,10 +37,10 @@ var userService = require('../../../services/user');
 //    admin: true,
 //    scopes: [ '@cnpm', '@cnpmtest' ] } }
 module.exports = function* updateUser(next) {
-  var name = this.params.name;
-  var rev = this.params.rev;
+  const name = this.params.name;
+  const rev = this.params.rev;
   if (!name || !rev) {
-    return yield* next;
+    return yield next;
   }
   debug('update: %s, rev: %s, user.name: %s', name, rev, this.user.name);
 
@@ -49,13 +49,13 @@ module.exports = function* updateUser(next) {
     this.status = 401;
     this.body = {
       error: 'unauthorized',
-      reason: 'Name is incorrect.'
+      reason: 'Name is incorrect.',
     };
     return;
   }
 
-  var body = this.request.body || {};
-  var user = {
+  const body = this.request.body || {};
+  const user = {
     name: body.name,
     // salt: body.salt,
     // password_sha: body.password_sha,
@@ -73,17 +73,17 @@ module.exports = function* updateUser(next) {
     this.status = 422;
     this.body = {
       error: 'paramError',
-      reason: 'params missing, name, email or password missing.'
+      reason: 'params missing, name, email or password missing.',
     };
     return;
   }
 
-  var result = yield* userService.update(user);
+  const result = yield userService.update(user);
   if (!result) {
     this.status = 409;
     this.body = {
       error: 'conflict',
-      reason: 'Document update conflict.'
+      reason: 'Document update conflict.',
     };
     return;
   }
@@ -92,6 +92,6 @@ module.exports = function* updateUser(next) {
   this.body = {
     ok: true,
     id: 'org.couchdb.user:' + user.name,
-    rev: result.rev
+    rev: result.rev,
   };
 };

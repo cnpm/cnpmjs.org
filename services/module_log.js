@@ -14,26 +14,26 @@
  * Module dependencies.
  */
 
-var models = require('../models');
-var ModuleLog = models.ModuleLog;
+const models = require('../models');
+const ModuleLog = models.ModuleLog;
 
 exports.create = function* (data) {
-  var row = ModuleLog.build({
+  const row = ModuleLog.build({
     name: data.name,
     username: data.username || 'anonymous',
-    log: ''
+    log: '',
   });
   return yield row.save();
 };
 
-var ONE_MB = 1024 * 1024;
+const ONE_MB = 1024 * 1024;
 
 exports.append = function* (id, log) {
   if (!log) {
     return null;
   }
 
-  var row = yield* exports.get(id);
+  const row = yield exports.get(id);
   if (!row) {
     return null;
   }
@@ -46,7 +46,7 @@ exports.append = function* (id, log) {
   if (row.log.length >= ONE_MB) {
     row.log = '...\n' + row.log.substring(ONE_MB / 2);
   }
-  return yield row.save(['log']);
+  return yield row.save([ 'log' ]);
 };
 
 exports.get = function* (id) {

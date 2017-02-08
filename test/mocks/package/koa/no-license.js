@@ -3,5 +3,5 @@ module.exports = {
     name: 'no-license',
     license: null,
   },
-  __requires: ['./default']
+  __requires: [ './default' ],
 };

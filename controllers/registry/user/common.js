@@ -14,10 +14,10 @@
  * Module dependencies.
  */
 
-var crypto = require('crypto');
-var utility = require('utility');
+const crypto = require('crypto');
+const utility = require('utility');
 
-exports.ensurePasswordSalt = function (user, body) {
+exports.ensurePasswordSalt = function(user, body) {
   if (!user.password_sha && body.password) {
     // create password_sha on server
     user.salt = crypto.randomBytes(30).toString('hex');

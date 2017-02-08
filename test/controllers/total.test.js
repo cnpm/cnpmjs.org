@@ -15,16 +15,16 @@
  * Module dependencies.
  */
 
-var should = require('should');
-var request = require('supertest');
-var app = require('../../servers/registry');
+const should = require('should');
+const request = require('supertest');
+const app = require('../../servers/registry');
 
-describe('test/controllers/total.test.js', function () {
-  describe('GET / in registry', function () {
-    it('should return total info', function (done) {
+describe('test/controllers/total.test.js', function() {
+  describe('GET / in registry', function() {
+    it('should return total info', function(done) {
       request(app.listen())
       .get('/')
-      .expect(200, function (err, res) {
+      .expect(200, function(err, res) {
         should.not.exist(err);
         res.body.db_name.should.equal('registry');
         res.body.store_engine.should.be.a.String;
@@ -40,7 +40,7 @@ describe('test/controllers/total.test.js', function () {
       });
     });
 
-    it('should return total info by jsonp', function (done) {
+    it('should return total info by jsonp', function(done) {
       request(app.listen())
       .get('?callback=totalCallback')
       .expect(200)

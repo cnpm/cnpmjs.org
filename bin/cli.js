@@ -1,26 +1,14 @@
 #!/usr/bin/env node
 
-/**!
- * Copyright(c) cnpm and other contributors.
- * MIT Licensed
- *
- * Authors:
- *   fengmk2 <m@fengmk2.com> (http://fengmk2.com)
- */
-
 'use strict';
 
-/**
- * Module dependencies.
- */
-
-var debug = require('debug')('cnpmjs.org:cli');
-var program = require('commander');
-var path = require('path');
-var fs = require('fs');
-var mkdirp = require('mkdirp');
-var treekill = require('treekill');
-var version = require('../package.json').version;
+const debug = require('debug')('cnpmjs.org:cli');
+const program = require('commander');
+const path = require('path');
+const fs = require('fs');
+const mkdirp = require('mkdirp');
+const treekill = require('treekill');
+const version = require('../package.json').version;
 
 function list(val) {
   return val.split(',');
@@ -49,11 +37,11 @@ program.parse(process.argv);
 
 function start(options) {
   stop(options);
-  var dataDir = options.dataDir || path.join(process.env.HOME, '.cnpmjs.org');
+  const dataDir = options.dataDir || path.join(process.env.HOME, '.cnpmjs.org');
   mkdirp.sync(dataDir);
 
-  var configfile = path.join(dataDir, 'config.json');
-  var config = {};
+  const configfile = path.join(dataDir, 'config.json');
+  let config = {};
   if (fs.existsSync(configfile)) {
     try {
       config = require(configfile);
@@ -64,12 +52,12 @@ function start(options) {
   // config.enableCluster = !!options.cluster;
   if (options.admins) {
     config.admins = {};
-    for (var i = 0; i < options.admins.length; i++) {
+    for (let i = 0; i < options.admins.length; i++) {
       config.admins[options.admins[i]] = options.admins[i] + '@localhost.com';
     }
   }
   if (options.scopes) {
-    config.scopes = options.scopes.map(function (name) {
+    config.scopes = options.scopes.map(function(name) {
       if (name[0] !== '@') {
         name = '@' + name;
       }
@@ -77,7 +65,7 @@ function start(options) {
     });
   }
 
-  var configJSON = JSON.stringify(config, null, 2);
+  const configJSON = JSON.stringify(config, null, 2);
   fs.writeFileSync(configfile, configJSON);
 
   debug('save config %s to %s', configJSON, configfile);
@@ -91,11 +79,11 @@ function start(options) {
 }
 
 function stop(options) {
-  var dataDir = options.dataDir || path.join(process.env.HOME, '.cnpmjs.org');
-  var pidfile = path.join(dataDir, 'pid');
+  const dataDir = options.dataDir || path.join(process.env.HOME, '.cnpmjs.org');
+  const pidfile = path.join(dataDir, 'pid');
   if (fs.existsSync(pidfile)) {
-    var pid = Number(fs.readFileSync(pidfile, 'utf8'));
-    treekill(pid, function (err) {
+    const pid = Number(fs.readFileSync(pidfile, 'utf8'));
+    treekill(pid, function(err) {
       if (err) {
         console.log(err);
         throw err;
@@ -107,11 +95,11 @@ function stop(options) {
 }
 
 function initDatabase(callback) {
-  var models = require('../models');
+  const models = require('../models');
 
   models.sequelize.sync({ force: false })
-    .then(function () {
-      models.Total.init(function (err) {
+    .then(function() {
+      models.Total.init(function(err) {
         if (err) {
           console.error('[models/init_script.js] sequelize init fail');
           console.error(err);
@@ -122,7 +110,7 @@ function initDatabase(callback) {
         }
       });
     })
-    .catch(function (err) {
+    .catch(function(err) {
       console.error('[models/init_script.js] sequelize sync fail');
       console.error(err);
       throw err;

@@ -15,7 +15,7 @@
  */
 
 module.exports = function* notFound(next) {
-  yield* next;
+  yield next;
 
   if (this.status && this.status !== 404) {
     return;
@@ -27,6 +27,6 @@ module.exports = function* notFound(next) {
   this.status = 404;
   this.body = {
     error: 'not_found',
-    reason: 'document not found'
+    reason: 'document not found',
   };
 };

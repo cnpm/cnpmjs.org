@@ -1,4 +1,4 @@
-/*!
+/* !
  * Copyright(c) cnpmjs.org and other contributors.
  * MIT Licensed
  *
@@ -12,6 +12,6 @@
  * Module dependencies.
  */
 
-var config = require('../config');
+const config = require('../config');
 
 module.exports = config.nfs;

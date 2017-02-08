@@ -14,18 +14,18 @@
  * Module dependencies.
  */
 
-var utility = require('utility');
-var util = require('util');
-var config = require('../../config');
-var packageService = require('../../services/package');
-var DownloadTotal = require('../../services/download_total');
+const utility = require('utility');
+const util = require('util');
+const config = require('../../config');
+const packageService = require('../../services/package');
+const DownloadTotal = require('../../services/download_total');
 
 exports.version = function* () {
-  var color = 'lightgrey';
-  var version = 'invalid';
-  var name = this.params[0];
-  var tag = this.query.tag || 'latest';
-  var info = yield* packageService.getModuleByTag(name, tag);
+  let color = 'lightgrey';
+  let version = 'invalid';
+  const name = this.params[0];
+  const tag = this.query.tag || 'latest';
+  const info = yield packageService.getModuleByTag(name, tag);
   if (info) {
     version = info.version;
     if (/^0\.0\./.test(version)) {
@@ -40,23 +40,23 @@ exports.version = function* () {
     }
   }
 
-  var subject = config.badgeSubject.replace(/\-/g, '--');
+  let subject = config.badgeSubject.replace(/\-/g, '--');
   if (this.query.subject) {
     subject = this.query.subject.replace(/\-/g, '--');
   }
   version = version.replace(/\-/g, '--');
-  var style = this.query.style || 'flat-square';
-  var url = util.format(config.badgePrefixURL + '/%s-%s-%s.svg?style=%s',
+  const style = this.query.style || 'flat-square';
+  const url = util.format(config.badgePrefixURL + '/%s-%s-%s.svg?style=%s',
     utility.encodeURIComponent(subject), version, color, utility.encodeURIComponent(style));
   this.redirect(url);
 };
 
 exports.downloads = function* () {
   // https://dn-img-shields-io.qbox.me/badge/downloads-100k/month-brightgreen.svg?style=flat-square
-  var name = this.params[0];
-  var count = yield DownloadTotal.getTotalByName(name);
-  var style = this.query.style || 'flat-square';
-  var url = util.format(config.badgePrefixURL + '/downloads-%s-brightgreen.svg?style=%s',
+  const name = this.params[0];
+  const count = yield DownloadTotal.getTotalByName(name);
+  const style = this.query.style || 'flat-square';
+  const url = util.format(config.badgePrefixURL + '/downloads-%s-brightgreen.svg?style=%s',
     count, utility.encodeURIComponent(style));
   this.redirect(url);
 };

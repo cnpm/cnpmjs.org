@@ -1,42 +1,42 @@
 'use strict';
 
-var limit = require('../middleware/limit');
-var login = require('../middleware/login');
-var publishable = require('../middleware/publishable');
-var syncByInstall = require('../middleware/sync_by_install');
-var editable = require('../middleware/editable');
-var existsPackage = require('../middleware/exists_package');
-var unpublishable = require('../middleware/unpublishable');
+const limit = require('../middleware/limit');
+const login = require('../middleware/login');
+const publishable = require('../middleware/publishable');
+const syncByInstall = require('../middleware/sync_by_install');
+const editable = require('../middleware/editable');
+const existsPackage = require('../middleware/exists_package');
+const unpublishable = require('../middleware/unpublishable');
 
-var showTotal = require('../controllers/total');
+const showTotal = require('../controllers/total');
 
-var listAll = require('../controllers/registry/package/list_all');
-var listShorts = require('../controllers/registry/package/list_shorts');
-var listSince = require('../controllers/registry/package/list_since');
-var listAllVersions = require('../controllers/registry/package/list');
-var listDependents = require('../controllers/registry/package/list_dependents');
-var getOneVersion = require('../controllers/registry/package/show');
-var savePackage = require('../controllers/registry/package/save');
-var tag = require('../controllers/registry/package/tag');
-var removePackage = require('../controllers/registry/package/remove');
-var removeOneVersion = require('../controllers/registry/package/remove_version');
-var updatePackage = require('../controllers/registry/package/update');
-var downloadPackage = require('../controllers/registry/package/download');
-var downloadTotal = require('../controllers/registry/package/download_total');
-var listPackagesByUser = require('../controllers/registry/package/list_by_user');
+const listAll = require('../controllers/registry/package/list_all');
+const listShorts = require('../controllers/registry/package/list_shorts');
+const listSince = require('../controllers/registry/package/list_since');
+const listAllVersions = require('../controllers/registry/package/list');
+const listDependents = require('../controllers/registry/package/list_dependents');
+const getOneVersion = require('../controllers/registry/package/show');
+const savePackage = require('../controllers/registry/package/save');
+const tag = require('../controllers/registry/package/tag');
+const removePackage = require('../controllers/registry/package/remove');
+const removeOneVersion = require('../controllers/registry/package/remove_version');
+const updatePackage = require('../controllers/registry/package/update');
+const downloadPackage = require('../controllers/registry/package/download');
+const downloadTotal = require('../controllers/registry/package/download_total');
+const listPackagesByUser = require('../controllers/registry/package/list_by_user');
 
-var addUser = require('../controllers/registry/user/add');
-var showUser = require('../controllers/registry/user/show');
-var updateUser = require('../controllers/registry/user/update');
+const addUser = require('../controllers/registry/user/add');
+const showUser = require('../controllers/registry/user/show');
+const updateUser = require('../controllers/registry/user/update');
 
-var sync = require('../controllers/sync');
-var userPackage = require('../controllers/registry/user_package');
-var tags = require('../controllers/registry/package/dist_tag');
+const sync = require('../controllers/sync');
+const userPackage = require('../controllers/registry/user_package');
+const tags = require('../controllers/registry/package/dist_tag');
 
 function routes(app) {
 
   function* jsonp(next) {
-    yield* next;
+    yield next;
     if (this.body) {
       this.jsonp = this.body;
     }

@@ -1,19 +1,19 @@
 'use strict';
 
-var mkdirp = require('mkdirp');
-var copy = require('copy-to');
-var path = require('path');
-var fs = require('fs');
-var os = require('os');
+const mkdirp = require('mkdirp');
+const copy = require('copy-to');
+const path = require('path');
+const fs = require('fs');
+const os = require('os');
 
-var version = require('../package.json').version;
+const version = require('../package.json').version;
 
-var root = path.dirname(__dirname);
-var dataDir = path.join(process.env.HOME || root, '.cnpmjs.org');
+const root = path.dirname(__dirname);
+const dataDir = path.join(process.env.HOME || root, '.cnpmjs.org');
 
-var config = {
-  version: version,
-  dataDir: dataDir,
+const config = {
+  version,
+  dataDir,
 
   /**
    * Cluster mode
@@ -77,8 +77,8 @@ var config = {
     service: 'gmail',
     auth: {
       user: 'address@gmail.com',
-      pass: 'your password'
-    }
+      pass: 'your password',
+    },
   },
 
   logoURL: 'https://os.alipayobjects.com/rmsportal/oygxuIUkkrRccUz.jpg', // cnpm logo image url
@@ -117,7 +117,7 @@ var config = {
     pool: {
       maxConnections: 10,
       minConnections: 0,
-      maxIdleTime: 30000
+      maxIdleTime: 30000,
     },
 
     // the storage engine for 'sqlite'
@@ -129,7 +129,7 @@ var config = {
 
   // package tarball store in local filesystem by default
   nfs: require('fs-cnpm')({
-    dir: path.join(dataDir, 'nfs')
+    dir: path.join(dataDir, 'nfs'),
   }),
   // if set true, will 302 redirect to `nfs.url(dist.key)`
   downloadRedirectToNFS: false,
@@ -224,7 +224,7 @@ var config = {
 };
 
 if (process.env.NODE_ENV !== 'test') {
-  var customConfig;
+  let customConfig;
   if (process.env.NODE_ENV === 'development') {
     customConfig = path.join(root, 'config', 'config.js');
   } else {
@@ -245,7 +245,7 @@ mkdirp.sync(config.uploadDir);
 
 module.exports = config;
 
-config.loadConfig = function (customConfig) {
+config.loadConfig = function(customConfig) {
   if (!customConfig) {
     return;
   }

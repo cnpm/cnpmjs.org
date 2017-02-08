@@ -1,30 +1,30 @@
 'use strict';
 
-var should = require('should');
-var mm = require('mm');
-var thunkify = require('thunkify-wrap');
-var request = require('supertest');
-var urllib = require('urllib');
-var config = require('../../config');
-var SyncModuleWorker = require('../../controllers/sync_module_worker');
-var logService = require('../../services/module_log');
-var packageService = require('../../services/package');
-var utils = require('../utils');
-var app = require('../../servers/registry');
-var User = require('../../models').User;
+const should = require('should');
+const mm = require('mm');
+const thunkify = require('thunkify-wrap');
+const request = require('supertest');
+const urllib = require('urllib');
+const config = require('../../config');
+const SyncModuleWorker = require('../../controllers/sync_module_worker');
+const logService = require('../../services/module_log');
+const packageService = require('../../services/package');
+const utils = require('../utils');
+const app = require('../../servers/registry');
+const User = require('../../models').User;
 
-describe('test/controllers/sync_module_worker.test.js', function () {
+describe('test/controllers/sync_module_worker.test.js', () => {
   afterEach(mm.restore);
 
-  beforeEach(function () {
+  beforeEach(function() {
     mm(config, 'syncModel', 'all');
     mm(config, 'sourceNpmRegistryIsCNpm', false);
-    mm(config, 'privatePackages', ['google']);
+    mm(config, 'privatePackages', [ 'google' ]);
   });
 
-  before(function (done) {
-    mm(config, 'privatePackages', ['google']);
-    var pkg = utils.getPackage('google', '0.0.1', utils.admin);
+  before(function(done) {
+    mm(config, 'privatePackages', [ 'google' ]);
+    const pkg = utils.getPackage('google', '0.0.1', utils.admin);
     request(app.listen())
     .put('/' + pkg.name)
     .set('authorization', utils.adminAuth)
@@ -33,53 +33,53 @@ describe('test/controllers/sync_module_worker.test.js', function () {
   });
 
   it('should not sync local package', function* () {
-    var worker = new SyncModuleWorker({
+    const worker = new SyncModuleWorker({
       name: 'google',
       username: 'fengmk2',
     });
     worker.start();
-    var end = thunkify.event(worker, 'end');
+    const end = thunkify.event(worker, 'end');
     yield end();
   });
 
   it('should not sync private scoped package', function* () {
-    var worker = new SyncModuleWorker({
+    const worker = new SyncModuleWorker({
       name: '@cnpmtest/google',
       username: 'fengmk2',
     });
     worker.start();
-    var end = thunkify.event(worker, 'end');
+    const end = thunkify.event(worker, 'end');
     yield end();
   });
 
   it('should sync public scoped package', function* () {
     mm(config, 'registryHost', '');
     mm(config, 'sourceNpmRegistry', 'https://registry.npmjs.org');
-    var worker = new SyncModuleWorker({
+    let worker = new SyncModuleWorker({
       name: '@sindresorhus/df',
       username: 'fengmk2',
       noDep: true,
     });
     worker.start();
-    var end = thunkify.event(worker, 'end');
+    let end = thunkify.event(worker, 'end');
     yield end();
 
     // sync again
-    var worker = new SyncModuleWorker({
+    worker = new SyncModuleWorker({
       name: '@sindresorhus/df',
       username: 'fengmk2',
     });
     worker.start();
-    var end = thunkify.event(worker, 'end');
+    end = thunkify.event(worker, 'end');
     yield end();
 
-    var tgzUrl;
+    let tgzUrl;
     function checkResult() {
-      return function (done) {
+      return function(done) {
         request(app.listen())
         .get('/@sindresorhus/df')
-        .expect(function (res) {
-          var latest = res.body.versions[res.body['dist-tags']['latest']];
+        .expect(function(res) {
+          const latest = res.body.versions[res.body['dist-tags'].latest];
           tgzUrl = latest.dist.tarball;
         })
         .expect(200, done);
@@ -88,31 +88,31 @@ describe('test/controllers/sync_module_worker.test.js', function () {
 
     yield checkResult();
 
-    var r = yield urllib.request(tgzUrl);
+    const r = yield urllib.request(tgzUrl);
     console.log(r.status, r.headers);
     r.status.should.equal(200);
   });
 
   it('should start a sync worker and dont sync deps', function* () {
-    var log = yield* logService.create({
+    const log = yield logService.create({
       name: 'byte',
       username: 'fengmk2',
     });
     log.id.should.above(0);
-    var worker = new SyncModuleWorker({
+    let worker = new SyncModuleWorker({
       logId: log.id,
       name: 'byte',
       username: 'fengmk2',
       noDep: true,
     });
     worker.start();
-    setTimeout(function () {
+    setTimeout(function() {
       worker.add('pedding');
       worker.add('byte');
       worker.add('tair');
       worker.add('byte-not-exists');
     }, 10);
-    var end = thunkify.event(worker, 'end');
+    let end = thunkify.event(worker, 'end');
     yield end();
 
     // sync again
@@ -128,41 +128,41 @@ describe('test/controllers/sync_module_worker.test.js', function () {
 
   it('should sync upstream first', function* () {
     mm(config, 'sourceNpmRegistryIsCNpm', true);
-    var log = yield* logService.create({
+    const log = yield logService.create({
       name: 'mk2testmodule',
       username: 'fengmk2',
     });
-    var worker = new SyncModuleWorker({
+    const worker = new SyncModuleWorker({
       logId: log.id,
       name: 'mk2testmodule',
       username: 'fengmk2',
       noDep: true,
     });
     worker.start();
-    var end = thunkify.event(worker, 'end');
+    const end = thunkify.event(worker, 'end');
     yield end();
   });
 
-  it('should start a sync worker with names and noDep', function (done) {
-    var worker = new SyncModuleWorker({
-      name: ['mk2testmodule'],
+  it('should start a sync worker with names and noDep', function(done) {
+    const worker = new SyncModuleWorker({
+      name: [ 'mk2testmodule' ],
       noDep: true,
-      username: 'fengmk2'
+      username: 'fengmk2',
     });
 
     worker.start();
-    worker.on('end', function () {
-      var names = worker.successes.concat(worker.fails);
+    worker.on('end', function() {
+      const names = worker.successes.concat(worker.fails);
       names.sort();
-      names.should.eql(['mk2testmodule']);
+      names.should.eql([ 'mk2testmodule' ]);
       done();
     });
   });
 
-  it('should start a sync worker with names', function (done) {
-    var worker = new SyncModuleWorker({
-      name: ['mk2testmodule'],
-      username: 'fengmk2'
+  it('should start a sync worker with names', function(done) {
+    const worker = new SyncModuleWorker({
+      name: [ 'mk2testmodule' ],
+      username: 'fengmk2',
     });
 
     worker.start();
@@ -170,107 +170,107 @@ describe('test/controllers/sync_module_worker.test.js', function () {
   });
 
   it('should sync unpublished module by name', function* () {
-    var result = yield* SyncModuleWorker.sync('tnpm', 'fengmk2');
+    const result = yield SyncModuleWorker.sync('tnpm', 'fengmk2');
     result.should.be.Number;
   });
 
   it('should sync not exists module', function* () {
-    var result = yield* SyncModuleWorker.sync('tnpm-not-exists', 'fengmk2');
+    const result = yield SyncModuleWorker.sync('tnpm-not-exists', 'fengmk2');
     result.should.be.Number;
   });
 
-  it('should sync unpublished info', function (done) {
-    var worker = new SyncModuleWorker({
-      name: ['tnpm'],
-      username: 'fengmk2'
+  it('should sync unpublished info', function(done) {
+    const worker = new SyncModuleWorker({
+      name: [ 'tnpm' ],
+      username: 'fengmk2',
     });
 
     worker.start();
-    worker.on('end', function () {
-      var names = worker.successes.concat(worker.fails);
+    worker.on('end', function() {
+      const names = worker.successes.concat(worker.fails);
       names.sort();
-      names.should.eql(['tnpm']);
+      names.should.eql([ 'tnpm' ]);
       done();
     });
   });
 
   it('should sync missing description, readme', function* () {
-    var listModulesByName = packageService.listModulesByName;
+    const listModulesByName = packageService.listModulesByName;
     mm(packageService, 'listModulesByName', function* (name) {
-      var mods = yield* listModulesByName.call(packageService, name);
-      mods.forEach(function (mod) {
+      const mods = yield listModulesByName.call(packageService, name);
+      mods.forEach(function(mod) {
         mod.description = null;
         mod.package.readme = '';
       });
       return mods;
     });
 
-    var worker = new SyncModuleWorker({
+    const worker = new SyncModuleWorker({
       name: 'byte',
       username: 'fengmk2',
     });
     worker.start();
-    var end = thunkify.event(worker, 'end');
+    const end = thunkify.event(worker, 'end');
     yield end();
   });
 
   it('should delete not exists   version', function* () {
-    var listModulesByName = packageService.listModulesByName;
+    const listModulesByName = packageService.listModulesByName;
     mm(packageService, 'listModulesByName', function* (name) {
-      var mods = yield* listModulesByName.call(packageService, name);
+      const mods = yield listModulesByName.call(packageService, name);
       if (mods[0]) {
         mods[0].version = '100.0.0';
       }
       return mods;
     });
 
-    var worker = new SyncModuleWorker({
+    const worker = new SyncModuleWorker({
       name: 'byte',
       username: 'fengmk2',
       noDep: true,
     });
     worker.start();
-    var end = thunkify.event(worker, 'end');
+    const end = thunkify.event(worker, 'end');
     yield end();
   });
 
   it('should not sync unpublished info on local package', function* () {
-    var listModulesByName = packageService.listModulesByName;
+    const listModulesByName = packageService.listModulesByName;
     mm(packageService, 'listModulesByName', function* () {
-      var mods = yield* listModulesByName.call(packageService, 'google');
+      const mods = yield listModulesByName.call(packageService, 'google');
       return mods;
     });
 
-    var worker = new SyncModuleWorker({
+    const worker = new SyncModuleWorker({
       name: 'tnpm',
       username: 'fengmk2',
     });
     worker.start();
-    var end = thunkify.event(worker, 'end');
+    const end = thunkify.event(worker, 'end');
     yield end();
   });
 
   it('should sync unpublished package', function* () {
-    var listModulesByName = packageService.listModulesByName;
+    const listModulesByName = packageService.listModulesByName;
     mm(packageService, 'listModulesByName', function* () {
-      var mods = yield* listModulesByName.call(packageService, 'byte');
+      const mods = yield listModulesByName.call(packageService, 'byte');
       return mods;
     });
 
-    var worker = new SyncModuleWorker({
+    const worker = new SyncModuleWorker({
       name: 'tnpm',
       username: 'fengmk2',
     });
     worker.start();
-    var end = thunkify.event(worker, 'end');
+    const end = thunkify.event(worker, 'end');
     yield end();
   });
 
-  describe('syncUpstream()', function () {
+  describe('syncUpstream()', function() {
     it('should sync upstream work', function* () {
-      var worker = new SyncModuleWorker({
-        name: ['tnpm'],
-        username: 'fengmk2'
+      const worker = new SyncModuleWorker({
+        name: [ 'tnpm' ],
+        username: 'fengmk2',
       });
       yield [
         worker.syncUpstream('tnpm'),
@@ -295,13 +295,13 @@ describe('test/controllers/sync_module_worker.test.js', function () {
       const listModulesByName = packageService.listModulesByName;
       mm(packageService, 'listModulesByName', function* (name) {
         const mods = yield listModulesByName.call(packageService, name);
-        mods.forEach(function (mod) {
+        mods.forEach(function(mod) {
           mod.package.deprecated = 'mock deprecated';
         });
         return mods;
       });
 
-      var worker = new SyncModuleWorker({
+      const worker = new SyncModuleWorker({
         name: 'ms',
         username: 'fengmk2',
       });
@@ -317,27 +317,27 @@ describe('test/controllers/sync_module_worker.test.js', function () {
     });
   });
 
-  describe('sync user', function () {
+  describe('sync user', function() {
     it('should sync fengmk2', function* () {
-      var worker = new SyncModuleWorker({
+      const worker = new SyncModuleWorker({
         type: 'user',
         name: 'fengmk2',
         username: 'fengmk2',
       });
       worker.start();
-      var end = thunkify.event(worker, 'end');
+      const end = thunkify.event(worker, 'end');
       yield end();
     });
 
     describe('sync deleted user', function() {
-      before(function*() {
-        var user = {
+      before(function* () {
+        let user = {
           name: 'notexistsuserscnpmtest',
           email: 'notexistsuserscnpmtest@gmail.com',
         };
         yield User.saveNpmUser(user);
 
-        var user = {
+        user = {
           name: 'existsuserscnpmtest',
           email: 'existsuserscnpmtest@gmail.com',
           password_sha: '0',
@@ -347,43 +347,43 @@ describe('test/controllers/sync_module_worker.test.js', function () {
         yield User.add(user);
       });
 
-      it('should not delete when cnpm user exists', function*() {
-        var worker = new SyncModuleWorker({
+      it('should not delete when cnpm user exists', function* () {
+        const worker = new SyncModuleWorker({
           type: 'user',
           name: 'existsuserscnpmtest',
           username: 'fengmk2',
         });
         worker.start();
-        var end = thunkify.event(worker, 'end');
+        const end = thunkify.event(worker, 'end');
         yield end();
-        var user = yield User.findByName('existsuserscnpmtest');
+        const user = yield User.findByName('existsuserscnpmtest');
         should.exists(user);
         user.name.should.equal('existsuserscnpmtest');
       });
 
-      it('should delete when user exists', function*() {
-        var worker = new SyncModuleWorker({
+      it('should delete when user exists', function* () {
+        const worker = new SyncModuleWorker({
           type: 'user',
           name: 'notexistsuserscnpmtest',
           username: 'fengmk2',
         });
         worker.start();
-        var end = thunkify.event(worker, 'end');
+        const end = thunkify.event(worker, 'end');
         yield end();
-        var user = yield User.findByName('notexistsuserscnpmtest');
+        const user = yield User.findByName('notexistsuserscnpmtest');
         should.not.exists(user);
       });
 
-      it('should not delete when user not exists', function*() {
-        var worker = new SyncModuleWorker({
+      it('should not delete when user not exists', function* () {
+        const worker = new SyncModuleWorker({
           type: 'user',
           name: 'notexistsuserscnpmtest',
           username: 'fengmk2',
         });
         worker.start();
-        var end = thunkify.event(worker, 'end');
+        const end = thunkify.event(worker, 'end');
         yield end();
-        var user = yield User.findByName('notexistsuserscnpmtest');
+        const user = yield User.findByName('notexistsuserscnpmtest');
         should.not.exists(user);
       });
     });

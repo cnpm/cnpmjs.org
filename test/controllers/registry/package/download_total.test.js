@@ -24,7 +24,7 @@ describe('test/controllers/registry/package/download_total.test.js', () => {
     .expect(400)
     .expect({
       error: 'range_error',
-      reason: 'range must be YYYY-MM-DD:YYYY-MM-DD style'
+      reason: 'range must be YYYY-MM-DD:YYYY-MM-DD style',
     });
   });
 
@@ -33,17 +33,17 @@ describe('test/controllers/registry/package/download_total.test.js', () => {
       id: 1,
       count: 10,
       date: '2014-12-03',
-      name: 'koa'
+      name: 'koa',
     }, {
       id: 1,
       count: 8,
       date: '2014-12-01',
-      name: 'koa'
+      name: 'koa',
     }, {
       id: 1,
       count: 5,
       date: '2014-12-02',
-      name: 'koa'
+      name: 'koa',
     }]);
 
     return request(app.listen())
@@ -55,14 +55,14 @@ describe('test/controllers/registry/package/download_total.test.js', () => {
       package: 'koa',
       downloads: [{
         day: '2014-12-01',
-        downloads: 8
+        downloads: 8,
       }, {
         day: '2014-12-02',
-        downloads: 5
+        downloads: 5,
       }, {
         day: '2014-12-03',
-        downloads: 10
-      }]
+        downloads: 10,
+      }],
     });
   });
 
@@ -86,14 +86,14 @@ describe('test/controllers/registry/package/download_total.test.js', () => {
       end: '2014-12-03',
       downloads: [{
         day: '2014-12-01',
-        downloads: 8
+        downloads: 8,
       }, {
         day: '2014-12-02',
-        downloads: 5
+        downloads: 5,
       }, {
         day: '2014-12-03',
-        downloads: 20
-      }]
+        downloads: 20,
+      }],
     });
   });
 
@@ -102,17 +102,17 @@ describe('test/controllers/registry/package/download_total.test.js', () => {
       id: 1,
       count: 10,
       date: '2014-12-03',
-      name: '@cnpmtest/download_total_test_module'
+      name: '@cnpmtest/download_total_test_module',
     }, {
       id: 1,
       count: 8,
       date: '2014-12-01',
-      name: '@cnpmtest/download_total_test_module'
+      name: '@cnpmtest/download_total_test_module',
     }, {
       id: 1,
       count: 5,
       date: '2014-12-02',
-      name: '@cnpmtest/download_total_test_module'
+      name: '@cnpmtest/download_total_test_module',
     }]);
 
     return request(app.listen())
@@ -124,14 +124,14 @@ describe('test/controllers/registry/package/download_total.test.js', () => {
       package: '@cnpmtest/download_total_test_module',
       downloads: [{
         day: '2014-12-01',
-        downloads: 8
+        downloads: 8,
       }, {
         day: '2014-12-02',
-        downloads: 5
+        downloads: 5,
       }, {
         day: '2014-12-03',
-        downloads: 10
-      }]
+        downloads: 10,
+      }],
     });
   });
 });

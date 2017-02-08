@@ -1,39 +1,27 @@
-/**!
- * Copyright(c) cnpm and other contributors.
- * MIT Licensed
- *
- * Authors:
- *   fengmk2 <fengmk2@gmail.com> (http://fengmk2.com)
- */
-
 'use strict';
 
-/**
- * Module dependencies.
- */
+const debug = require('debug')('cnpmjs.org:controllers:registry:download');
+const mime = require('mime');
+const utility = require('utility');
+const defer = require('co-defer');
+const is = require('is-type-of');
+const nfs = require('../../../common/nfs');
+const logger = require('../../../common/logger');
+const common = require('../../../lib/common');
+const downloadAsReadStream = require('../../utils').downloadAsReadStream;
+const packageService = require('../../../services/package');
+const downloadTotalService = require('../../../services/download_total');
+const config = require('../../../config');
 
-var debug = require('debug')('cnpmjs.org:controllers:registry:download');
-var mime = require('mime');
-var utility = require('utility');
-var defer = require('co-defer');
-var is = require('is-type-of');
-var nfs = require('../../../common/nfs');
-var logger = require('../../../common/logger');
-var common = require('../../../lib/common');
-var downloadAsReadStream = require('../../utils').downloadAsReadStream;
-var packageService = require('../../../services/package');
-var downloadTotalService = require('../../../services/download_total');
-var config = require('../../../config');
-
-var _downloads = {};
+let _downloads = {};
 
 module.exports = function* download(next) {
-  var name = this.params.name || this.params[0];
-  var filename = this.params.filename || this.params[1];
-  var version = filename.slice(name.length + 1, -4);
-  var row = yield packageService.getModule(name, version);
+  const name = this.params.name || this.params[0];
+  const filename = this.params.filename || this.params[1];
+  const version = filename.slice(name.length + 1, -4);
+  const row = yield packageService.getModule(name, version);
   // can not get dist
-  var url = null;
+  let url = null;
 
   if (typeof nfs.url === 'function') {
     if (is.generatorFunction(nfs.url)) {
@@ -47,7 +35,7 @@ module.exports = function* download(next) {
 
   if (!row || !row.package || !row.package.dist) {
     if (!url) {
-      return yield* next;
+      return yield next;
     }
     this.status = 302;
     this.set('Location', url);
@@ -63,7 +51,7 @@ module.exports = function* download(next) {
     return;
   }
 
-  var dist = row.package.dist;
+  const dist = row.package.dist;
   if (!dist.key) {
     // try to use nsf.url() first
     url = url || dist.tarball;
@@ -86,10 +74,10 @@ module.exports = function* download(next) {
 
 defer.setInterval(function* () {
   // save download count
-  var totals = [];
-  for (var name in _downloads) {
-    var count = _downloads[name];
-    totals.push([name, count]);
+  const totals = [];
+  for (const name in _downloads) {
+    const count = _downloads[name];
+    totals.push([ name, count ]);
   }
   _downloads = {};
 
@@ -99,13 +87,13 @@ defer.setInterval(function* () {
 
   debug('save download total: %j', totals);
 
-  var date = utility.YYYYMMDD();
-  for (var i = 0; i < totals.length; i++) {
-    var item = totals[i];
-    var name = item[0];
-    var count = item[1];
+  const date = utility.YYYYMMDD();
+  for (let i = 0; i < totals.length; i++) {
+    const item = totals[i];
+    const name = item[0];
+    const count = item[1];
     try {
-      yield* downloadTotalService.plusModuleTotal({ name: name, date: date, count: count });
+      yield downloadTotalService.plusModuleTotal({ name, date, count });
     } catch (err) {
       if (err.name !== 'SequelizeUniqueConstraintError') {
         err.message += '; name: ' + name + ', count: ' + count + ', date: ' + date;

@@ -1,19 +1,20 @@
 'use strict';
 
-var koa = require('koa');
-var app = module.exports = koa();
-var http = require('http');
-var middlewares = require('koa-middlewares');
-var routes = require('../routes/registry');
-var logger = require('../common/logger');
-var config = require('../config');
-var block = require('../middleware/block');
-var auth = require('../middleware/auth');
-var staticCache = require('../middleware/static');
-var notFound = require('../middleware/registry_not_found');
-var cors = require('kcors');
-var proxyToNpm = require('../middleware/proxy_to_npm');
-var maxrequests = require('koa-maxrequests');
+const koa = require('koa');
+let app = module.exports = koa();
+const http = require('http');
+const middlewares = require('koa-middlewares');
+const router = require('koa-router');
+const routes = require('../routes/registry');
+const logger = require('../common/logger');
+const config = require('../config');
+const block = require('../middleware/block');
+const auth = require('../middleware/auth');
+const staticCache = require('../middleware/static');
+const notFound = require('../middleware/registry_not_found');
+const cors = require('kcors');
+const proxyToNpm = require('../middleware/proxy_to_npm');
+const maxrequests = require('koa-maxrequests');
 
 app.use(maxrequests());
 app.use(block());
@@ -22,7 +23,7 @@ app.use(middlewares.rt({ headerName: 'X-ReadTime' }));
 app.use(middlewares.rewrite('/favicon.ico', '/favicon.png'));
 app.use(staticCache);
 
-app.keys = ['todokey', config.sessionSecret];
+app.keys = [ 'todokey', config.sessionSecret ];
 app.proxy = true;
 app.use(middlewares.bodyParser({ jsonLimit: config.jsonLimit }));
 app.use(cors({
@@ -42,14 +43,14 @@ app.use(middlewares.etag());
  * Routes
  */
 
-app.use(middlewares.router(app));
+app.use(router(app));
 routes(app);
 
 /**
  * Error handler
  */
 
-app.on('error', function (err, ctx) {
+app.on('error', function(err, ctx) {
   console.log(err);
   console.log(err.stack);
   err.url = err.url || ctx.request.url;

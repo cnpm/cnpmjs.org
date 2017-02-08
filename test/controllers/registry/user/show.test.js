@@ -14,29 +14,29 @@
  * Module dependencies.
  */
 
-var should = require('should');
-var request = require('supertest');
-var mm = require('mm');
-var app = require('../../../../servers/registry');
-var config = require('../../../../config');
-var userService = require('../../../../services/user');
-var utils = require('../../../utils');
+const should = require('should');
+const request = require('supertest');
+const mm = require('mm');
+const app = require('../../../../servers/registry');
+const config = require('../../../../config');
+const userService = require('../../../../services/user');
+const utils = require('../../../utils');
 
-describe('controllers/registry/user/show.test.js, GET /-/user/org.couchdb.user:name', function () {
+describe('controllers/registry/user/show.test.js, GET /-/user/org.couchdb.user:name', function() {
   afterEach(mm.restore);
 
-  before(function (done) {
+  before(function(done) {
     utils.sync('pedding', done);
   });
 
-  beforeEach(function () {
+  beforeEach(function() {
     mm(config, 'customUserService', false);
   });
 
-  it('should return user info', function (done) {
+  it('should return user info', function(done) {
     request(app.listen())
     .get('/-/user/org.couchdb.user:cnpmjstest101')
-    .expect(200, function (err, res) {
+    .expect(200, function(err, res) {
       should.not.exist(err);
       res.body.should.have.keys('_id', '_rev', 'name', 'email', 'type',
         '_cnpm_meta', 'roles', 'date');
@@ -45,10 +45,10 @@ describe('controllers/registry/user/show.test.js, GET /-/user/org.couchdb.user:n
     });
   });
 
-  it('should return npm user info', function (done) {
+  it('should return npm user info', function(done) {
     request(app.listen())
     .get('/-/user/org.couchdb.user:fengmk2')
-    .expect(200, function (err, res) {
+    .expect(200, function(err, res) {
       should.not.exist(err);
       res.body.name.should.equal('fengmk2');
       // res.body.github.should.equal('fengmk2');
@@ -60,28 +60,28 @@ describe('controllers/registry/user/show.test.js, GET /-/user/org.couchdb.user:n
     });
   });
 
-  it('should return 404 when not eixst', function (done) {
+  it('should return 404 when not eixst', function(done) {
     request(app.listen())
     .get('/-/user/org.couchdb.user:cnpmjstest_notexist')
     .expect(404, done);
   });
 
-  describe('config.customUserSerivce = true', function () {
-    beforeEach(function () {
+  describe('config.customUserSerivce = true', function() {
+    beforeEach(function() {
       mm(config, 'customUserService', true);
     });
 
-    it('should show npm user', function (done) {
+    it('should show npm user', function(done) {
       request(app.listen())
       .get('/-/user/org.couchdb.user:fengmk2')
-      .expect(200, function (err, res) {
+      .expect(200, function(err, res) {
         should.not.exist(err);
         res.body.name.should.equal('fengmk2');
         done();
       });
     });
 
-    it('should show custom user info: admin', function (done) {
+    it('should show custom user info: admin', function(done) {
       mm(userService, 'get', function* () {
         return {
           login: 'mock_custom_user',
@@ -91,14 +91,14 @@ describe('controllers/registry/user/show.test.js, GET /-/user/org.couchdb.user:n
           html_url: 'html_url',
           im_url: '',
           site_admin: true,
-          scopes: ['@test-user-scope']
+          scopes: [ '@test-user-scope' ],
         };
       });
       request(app)
       .get('/-/user/org.couchdb.user:mock_custom_user')
-      .expect(200, function (err, res) {
+      .expect(200, function(err, res) {
         should.not.exist(err);
-        var user = res.body;
+        const user = res.body;
         delete user._cnpm_meta;
         delete user.date;
 
@@ -114,13 +114,13 @@ describe('controllers/registry/user/show.test.js, GET /-/user/org.couchdb.user:n
           fullname: 'mock_custom_user fullname',
           homepage: 'html_url',
           scopes: [ '@test-user-scope' ],
-          site_admin: true
+          site_admin: true,
         });
         done();
       });
     });
 
-    it('should show custom user info: not admin', function (done) {
+    it('should show custom user info: not admin', function(done) {
       mm(userService, 'get', function* () {
         return {
           login: 'mock_custom_not_admin_user',
@@ -130,14 +130,14 @@ describe('controllers/registry/user/show.test.js, GET /-/user/org.couchdb.user:n
           html_url: 'html_url',
           im_url: '',
           site_admin: false,
-          scopes: ['@test-user-scope']
+          scopes: [ '@test-user-scope' ],
         };
       });
       request(app)
       .get('/-/user/org.couchdb.user:mock_custom_not_admin_user')
-      .expect(200, function (err, res) {
+      .expect(200, function(err, res) {
         should.not.exist(err);
-        var user = res.body;
+        const user = res.body;
         delete user._cnpm_meta;
         delete user.date;
 

@@ -1,47 +1,35 @@
-/**!
- * Copyright(c) cnpm and other contributors.
- * MIT Licensed
- *
- * Authors:
- *   fengmk2 <fengmk2@gmail.com> (http://fengmk2.com)
- */
-
 'use strict';
 
-/**
- * Module dependencies.
- */
-
-var utility = require('utility');
-var DownloadTotal = require('../models').DownloadTotal;
+const utility = require('utility');
+const DownloadTotal = require('../models').DownloadTotal;
 
 exports.getModuleTotal = function* (name, start, end) {
-  var startMonth = parseYearMonth(start);
-  var endMonth = parseYearMonth(end);
-  var rows = yield DownloadTotal.findAll({
+  const startMonth = parseYearMonth(start);
+  const endMonth = parseYearMonth(end);
+  const rows = yield DownloadTotal.findAll({
     where: {
       date: {
         gte: startMonth,
-        lte: endMonth
+        lte: endMonth,
       },
-      name: name
-    }
+      name,
+    },
   });
   return formatRows(rows, start, end);
 };
 
 exports.getTotalByName = function* (name) {
-  var rows = yield DownloadTotal.findAll({
+  const rows = yield DownloadTotal.findAll({
     where: {
-      name: name
-    }
+      name,
+    },
   });
-  var count = 0;
-  rows.forEach(function (row) {
-    for (var i = 1; i <= 31; i++) {
-      var day = i < 10 ? '0' + i : String(i);
-      var field = 'd' + day;
-      var val = row[field];
+  let count = 0;
+  rows.forEach(function(row) {
+    for (let i = 1; i <= 31; i++) {
+      const day = i < 10 ? '0' + i : String(i);
+      const field = 'd' + day;
+      let val = row[field];
       if (typeof val === 'string') {
         val = utility.toSafeNumber(val);
       }
@@ -52,13 +40,13 @@ exports.getTotalByName = function* (name) {
 };
 
 exports.plusModuleTotal = function* (data) {
-  var yearMonth = parseYearMonth(data.date);
+  const yearMonth = parseYearMonth(data.date);
   // all module download total
-  var row = yield DownloadTotal.find({
+  let row = yield DownloadTotal.find({
     where: {
       name: '__all__',
-      date: yearMonth
-    }
+      date: yearMonth,
+    },
   });
   if (!row) {
     row = DownloadTotal.build({
@@ -66,7 +54,7 @@ exports.plusModuleTotal = function* (data) {
       date: yearMonth,
     });
   }
-  var field = 'd' + data.date.substring(8, 10);
+  let field = 'd' + data.date.substring(8, 10);
   if (typeof row[field] === 'string') {
     // pg bigint is string...
     row[field] = utility.toSafeNumber(row[field]);
@@ -80,7 +68,7 @@ exports.plusModuleTotal = function* (data) {
     where: {
       name: data.name,
       date: yearMonth,
-    }
+    },
   });
   if (!row) {
     row = DownloadTotal.build({
@@ -88,7 +76,7 @@ exports.plusModuleTotal = function* (data) {
       date: yearMonth,
     });
   }
-  var field = 'd' + data.date.substring(8, 10);
+  field = 'd' + data.date.substring(8, 10);
   if (typeof row[field] === 'string') {
     // pg bigint is string...
     row[field] = utility.toSafeNumber(row[field]);
@@ -109,25 +97,25 @@ function parseYearMonth(date) {
 }
 
 function formatRows(rows, startDate, endDate) {
-  var dates = [];
-  rows.forEach(function (row) {
-    var date = String(row.date);
-    var month = date.substring(4, 6);
-    var year = date.substring(0, 4);
-    var yearMonth = year + '-' + month;
-    for (var i = 1; i <= 31; i++) {
-      var day = i < 10 ? '0' + i : String(i);
-      var field = 'd' + day;
-      var d = yearMonth + '-' + day;
-      var count = row[field];
+  const dates = [];
+  rows.forEach(function(row) {
+    const date = String(row.date);
+    const month = date.substring(4, 6);
+    const year = date.substring(0, 4);
+    const yearMonth = year + '-' + month;
+    for (let i = 1; i <= 31; i++) {
+      const day = i < 10 ? '0' + i : String(i);
+      const field = 'd' + day;
+      const d = yearMonth + '-' + day;
+      let count = row[field];
       if (typeof count === 'string') {
         count = utility.toSafeNumber(count);
       }
       if (count > 0 && d >= startDate && d <= endDate) {
         dates.push({
           name: row.name,
-          count: count,
-          date: d
+          count,
+          date: d,
         });
       }
     }

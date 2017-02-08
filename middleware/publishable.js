@@ -1,24 +1,10 @@
-/**!
- * cnpmjs.org - middleware/publishable.js
- *
- * Copyright(c) cnpmjs.org and other contributors.
- * MIT Licensed
- *
- * Authors:
- *  fengmk2 <fengmk2@gmail.com> (http://fengmk2.github.com)
- */
-
 'use strict';
 
-/**
- * Module dependencies.
- */
+const util = require('util');
+const config = require('../config');
+const debug = require('debug')('cnpmjs.org:middlewares/publishable');
 
-var util = require('util');
-var config = require('../config');
-var debug = require('debug')('cnpmjs.org:middlewares/publishable');
-
-module.exports = function *publishable(next) {
+module.exports = function* publishable(next) {
   // admins always can publish and unpublish
   if (this.user.isAdmin) {
     return yield next;
@@ -29,7 +15,7 @@ module.exports = function *publishable(next) {
     this.status = 403;
     this.body = {
       error: 'no_perms',
-      reason: 'Private mode enable, only admin can publish this module'
+      reason: 'Private mode enable, only admin can publish this module',
     };
     return;
   }
@@ -37,7 +23,7 @@ module.exports = function *publishable(next) {
   // public mode, normal user have permission to publish `scoped package`
   // and only can publish with scopes in `ctx.user.scopes`, default is `config.scopes`
 
-  var name = this.params.name || this.params[0];
+  const name = this.params.name || this.params[0];
 
   // check if is private package list in config
   if (config.privatePackages && config.privatePackages.indexOf(name) !== -1) {
@@ -66,13 +52,13 @@ function checkScope(name, ctx) {
     return false;
   }
 
-  var scope = name.split('/')[0];
+  const scope = name.split('/')[0];
   if (ctx.user.scopes.indexOf(scope) === -1) {
     debug('assert scope  %s error', name);
     ctx.status = 400;
     ctx.body = {
       error: 'invalid scope',
-      reason: util.format('scope %s not match legal scopes: %s', scope, ctx.user.scopes.join(', '))
+      reason: util.format('scope %s not match legal scopes: %s', scope, ctx.user.scopes.join(', ')),
     };
     return false;
   }
@@ -89,13 +75,13 @@ function assertNoneScope(name, ctx) {
   if (ctx.user.scopes.length === 0) {
     ctx.body = {
       error: 'no_perms',
-      reason: 'can\'t publish non-scoped package, please set `config.scopes`'
+      reason: 'can\'t publish non-scoped package, please set `config.scopes`',
     };
     return;
   }
 
   ctx.body = {
     error: 'no_perms',
-    reason: 'only allow publish with ' + ctx.user.scopes.join(', ') + ' scope(s)'
+    reason: 'only allow publish with ' + ctx.user.scopes.join(', ') + ' scope(s)',
   };
 }

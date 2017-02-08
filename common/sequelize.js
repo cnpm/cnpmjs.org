@@ -14,9 +14,9 @@
  * Module dependencies.
  */
 
-var Sequelize = require('sequelize');
-var DataTypes = require('sequelize/lib/data-types');
-var config = require('../config');
+const Sequelize = require('sequelize');
+const DataTypes = require('sequelize/lib/data-types');
+const config = require('../config');
 
 if (config.mysqlServers && config.database.dialect === 'sqlite') {
   // https://github.com/cnpm/cnpmjs.org/wiki/Migrating-from-1.x-to-2.x
@@ -34,7 +34,7 @@ if (config.mysqlServers && config.database.dialect === 'sqlite') {
   // mysqlQueryTimeout: 5000,
 
   console.warn('[WARNNING] your config.js was too old, please @see https://github.com/cnpm/cnpmjs.org/wiki/Migrating-from-1.x-to-2.x');
-  var server = config.mysqlServers[0];
+  const server = config.mysqlServers[0];
   config.database = {
     db: config.mysqlDatabase,
     username: server.user,
@@ -45,13 +45,13 @@ if (config.mysqlServers && config.database.dialect === 'sqlite') {
     pool: {
       maxConnections: config.mysqlMaxConnections || 10,
       minConnections: 0,
-      maxIdleTime: 30000
+      maxIdleTime: 30000,
     },
     logging: !!process.env.SQL_DEBUG,
   };
 }
 
-var database = config.database;
+const database = config.database;
 
 // sync database before app start, defaul is false
 database.syncFirst = false;
@@ -70,6 +70,6 @@ database.define = {
   collate: 'utf8_general_ci',
 };
 
-var sequelize = new Sequelize(database.db, database.username, database.password, database);
+const sequelize = new Sequelize(database.db, database.username, database.password, database);
 
 module.exports = sequelize;

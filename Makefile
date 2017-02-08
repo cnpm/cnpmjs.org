@@ -88,17 +88,4 @@ test-travis-pg:
 
 test-travis-all: jshint test-travis-sqlite test-travis-mysql test-travis-pg
 
-dev:
-	@NODE_ENV=development node node_modules/.bin/node-dev dispatch.js
-
-contributors:
-	@node_modules/.bin/contributors -f plain -o AUTHORS
-
-autod:
-	@node_modules/.bin/autod -w \
-		--prefix "~" \
-		--exclude public,view,docs,backup,coverage \
-		--dep mysql \
-		--keep should,supertest,should-http,chunkstream,mm,pedding
-
 .PHONY: test

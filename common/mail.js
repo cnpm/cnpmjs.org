@@ -1,25 +1,11 @@
-/**!
- * cnpmjs.org - common/mail.js
- *
- * Copyright(c) cnpmjs.org and other contributors.
- * MIT Licensed
- *
- * Authors:
- *  dead_horse <dead_horse@qq.com> (http://deadhorse.me)
- */
-
 'use strict';
 
-/**
- * Module dependencies.
- */
+const nodemailer = require('nodemailer');
+const utility = require('utility');
+const os = require('os');
+const mailConfig = require('../config').mail;
 
-var nodemailer = require('nodemailer');
-var utility = require('utility');
-var os = require('os');
-var mailConfig = require('../config').mail;
-
-var smtpConfig;
+let smtpConfig;
 if (mailConfig.auth) {
   // new style
   smtpConfig = mailConfig;
@@ -33,12 +19,12 @@ if (mailConfig.auth) {
     debug: mailConfig.debug,
     auth: {
       user: mailConfig.user,
-      pass: mailConfig.pass
-    }
+      pass: mailConfig.pass,
+    },
   };
 }
 
-var transport;
+let transport;
 
 /**
  * Send notice email with mail level and appname.
@@ -49,15 +35,16 @@ var transport;
  * @param {String} html
  * @param {Function(err, result)} callback
  */
+
 exports.notice = function sendLogMail(to, level, subject, html, callback) {
   subject = '[' + mailConfig.appname + '] [' + level + '] [' + os.hostname() + '] ' + subject;
   html = String(html);
   exports.send(to, subject, html.replace(/\n/g, '<br/>'), callback);
 };
 
-var LEVELS = [ 'log', 'warn', 'error' ];
-LEVELS.forEach(function (level) {
-  exports[level] = function (to, subject, html, callback) {
+const LEVELS = [ 'log', 'warn', 'error' ];
+LEVELS.forEach(function(level) {
+  exports[level] = function(to, subject, html, callback) {
     exports.notice(to, level, subject, html, callback);
   };
 });
@@ -69,7 +56,8 @@ LEVELS.forEach(function (level) {
  * @param {String} html
  * @param {Function(err, result)} callback
  */
-exports.send = function (to, subject, html, callback) {
+
+exports.send = function(to, subject, html, callback) {
   callback = callback || utility.noop;
 
   if (mailConfig.enable === false) {
@@ -81,14 +69,14 @@ exports.send = function (to, subject, html, callback) {
     transport = nodemailer.createTransport(smtpConfig);
   }
 
-  var message = {
+  const message = {
     from: mailConfig.from || mailConfig.sender,
-    to: to,
-    subject: subject,
-    html: html,
+    to,
+    subject,
+    html,
   };
 
-  transport.sendMail(message, function (err, result) {
+  transport.sendMail(message, function(err, result) {
     callback(err, result);
   });
 };

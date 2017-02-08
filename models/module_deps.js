@@ -26,7 +26,7 @@ CREATE TABLE IF NOT EXISTS `module_deps` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='module deps';
  */
 
-module.exports = function (sequelize, DataTypes) {
+module.exports = function(sequelize, DataTypes) {
   return sequelize.define('ModuleDependency', {
     name: {
       type: DataTypes.STRING(100),
@@ -36,8 +36,8 @@ module.exports = function (sequelize, DataTypes) {
     dependent: {
       field: 'deps',
       type: DataTypes.STRING(100),
-      comment: '`name` is depended by `deps`. `deps` == depend => `name`'
-    }
+      comment: '`name` is depended by `deps`. `deps` == depend => `name`',
+    },
   }, {
     tableName: 'module_deps',
     comment: 'module deps',
@@ -46,13 +46,13 @@ module.exports = function (sequelize, DataTypes) {
     indexes: [
       {
         unique: true,
-        fields: ['name', 'deps']
+        fields: [ 'name', 'deps' ],
       },
       {
-        fields: ['deps']
-      }
+        fields: [ 'deps' ],
+      },
     ],
     classMethods: {
-    }
+    },
   });
 };

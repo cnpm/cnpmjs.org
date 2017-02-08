@@ -27,12 +27,12 @@ CREATE TABLE IF NOT EXISTS `module_log` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='module sync log';
  */
 
-module.exports = function (sequelize, DataTypes) {
+module.exports = function(sequelize, DataTypes) {
   return sequelize.define('ModuleLog', {
     username: {
       type: DataTypes.STRING(100),
       allowNull: false,
-      comment: 'user name'
+      comment: 'user name',
     },
     name: {
       type: DataTypes.STRING(100),
@@ -40,17 +40,17 @@ module.exports = function (sequelize, DataTypes) {
       comment: 'module name',
     },
     log: {
-      type: DataTypes.LONGTEXT
-    }
+      type: DataTypes.LONGTEXT,
+    },
   }, {
     tableName: 'module_log',
     comment: 'module sync log',
     indexes: [
       {
-        fields: ['name']
-      }
+        fields: [ 'name' ],
+      },
     ],
     classMethods: {
-    }
+    },
   });
 };

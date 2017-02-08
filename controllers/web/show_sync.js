@@ -16,19 +16,19 @@
  */
 
 module.exports = function* showSync() {
-  var name = this.params.name || this.params[0] || this.query.name;
+  let name = this.params.name || this.params[0] || this.query.name;
   if (!name) {
     return this.redirect('/');
   }
-  var type = 'package';
+  let type = 'package';
   if (name.indexOf(':') > 0) {
-    var splits = name.split(':');
+    const splits = name.split(':');
     name = splits[1];
     type = splits[0];
   }
   yield this.render('sync', {
-    type: type,
-    name: name,
+    type,
+    name,
     title: 'Sync ' + type + ' - ' + name,
   });
 };

@@ -16,15 +16,15 @@
 
 // usage: http_proxy=$http_proxy node test/request_with_httpproxy.js $url
 
-var config = require('../config');
+const config = require('../config');
 config.httpProxy = process.env.http_proxy || process.env.https_proxy;
-var urllib = require('../common/urllib');
+const urllib = require('../common/urllib');
 
-var url = process.argv[2] || 'https://registry.npmjs.com';
+const url = process.argv[2] || 'https://registry.npmjs.com';
 
 urllib.request(url, {
   timeout: 15000,
-}, function (err, data, res) {
+}, function(err, data, res) {
   console.log(err);
   console.log(res.status, res.headers);
   // console.log(data.toString());

@@ -1,77 +1,77 @@
 'use strict';
 
-var debug = require('debug')('cnpmjs.org:controllers:web:package:show');
-var bytes = require('bytes');
-var giturl = require('giturl');
-var moment = require('moment');
-var semver = require('semver');
-var gravatar = require('gravatar');
-var humanize = require('humanize-number');
-var config = require('../../../config');
-var utils = require('../../utils');
-var setDownloadURL = require('../../../lib/common').setDownloadURL;
-var renderMarkdown = require('../../../common/markdown').render;
-var packageService = require('../../../services/package');
+const debug = require('debug')('cnpmjs.org:controllers:web:package:show');
+const bytes = require('bytes');
+const giturl = require('giturl');
+const moment = require('moment');
+const semver = require('semver');
+const gravatar = require('gravatar');
+const humanize = require('humanize-number');
+const config = require('../../../config');
+const utils = require('../../utils');
+const setDownloadURL = require('../../../lib/common').setDownloadURL;
+const renderMarkdown = require('../../../common/markdown').render;
+const packageService = require('../../../services/package');
 
 module.exports = function* show(next) {
-  var params = this.params;
+  const params = this.params;
   // normal: {name: $name, version: $version}
   // scope: [$name, $version]
-  var orginalName = params.name || params[0];
-  var name = orginalName;
-  var tag = params.version || params[1];
+  const orginalName = params.name || params[0];
+  const name = orginalName;
+  const tag = params.version || params[1];
   debug('display %s with %j', name, params);
 
-  var getPackageMethod;
-  var getPackageArgs;
-  var version = semver.valid(tag || '');
+  let getPackageMethod;
+  let getPackageArgs;
+  const version = semver.valid(tag || '');
   if (version) {
     getPackageMethod = 'getModule';
-    getPackageArgs = [name, version];
+    getPackageArgs = [ name, version ];
   } else {
     getPackageMethod = 'getModuleByTag';
-    getPackageArgs = [name, tag || 'latest'];
+    getPackageArgs = [ name, tag || 'latest' ];
   }
 
-  var pkg = yield packageService[getPackageMethod].apply(packageService, getPackageArgs);
+  let pkg = yield packageService[getPackageMethod].apply(packageService, getPackageArgs);
   if (!pkg || !pkg.package) {
     // check if unpublished
-    var unpublishedInfo = yield* packageService.getUnpublishedModule(name);
+    const unpublishedInfo = yield packageService.getUnpublishedModule(name);
     debug('show unpublished %j', unpublishedInfo);
     if (unpublishedInfo) {
-      var data = {
-        name: name,
-        unpublished: unpublishedInfo.package
+      const data = {
+        name,
+        unpublished: unpublishedInfo.package,
       };
       data.unpublished.time = new Date(data.unpublished.time);
       if (data.unpublished.maintainers) {
-        for (var i = 0; i < data.unpublished.maintainers.length; i++) {
-          var maintainer = data.unpublished.maintainers[i];
+        for (let i = 0; i < data.unpublished.maintainers.length; i++) {
+          const maintainer = data.unpublished.maintainers[i];
           if (maintainer.email) {
-            maintainer.gravatar = gravatar.url(maintainer.email, {s: '50', d: 'retro'}, true);
+            maintainer.gravatar = gravatar.url(maintainer.email, { s: '50', d: 'retro' }, true);
           }
         }
       }
       yield this.render('package_unpublished', {
         package: data,
-        title: 'Package - ' + name
+        title: 'Package - ' + name,
       });
       return;
     }
 
-    return yield* next;
+    return yield next;
   }
 
-  var r = yield [
+  const r = yield [
     utils.getDownloadTotal(name),
     packageService.listDependents(name),
     packageService.listStarUserNames(name),
-    packageService.listMaintainers(name)
+    packageService.listMaintainers(name),
   ];
-  var download = r[0];
-  var dependents = r[1];
-  var users = r[2];
-  var maintainers = r[3];
+  const download = r[0];
+  const dependents = r[1];
+  const users = r[2];
+  const maintainers = r[3];
 
   pkg.package.fromNow = moment(pkg.publish_time).fromNow();
   pkg = pkg.package;
@@ -91,10 +91,10 @@ module.exports = function* show(next) {
   }
 
   if (pkg.maintainers) {
-    for (var i = 0; i < pkg.maintainers.length; i++) {
-      var maintainer = pkg.maintainers[i];
+    for (let i = 0; i < pkg.maintainers.length; i++) {
+      const maintainer = pkg.maintainers[i];
       if (maintainer.email) {
-        maintainer.gravatar = gravatar.url(maintainer.email, {s: '50', d: 'retro'}, true);
+        maintainer.gravatar = gravatar.url(maintainer.email, { s: '50', d: 'retro' }, true);
       }
     }
   }
@@ -102,7 +102,7 @@ module.exports = function* show(next) {
   if (pkg._npmUser) {
     pkg.lastPublishedUser = pkg._npmUser;
     if (pkg.lastPublishedUser.email) {
-      pkg.lastPublishedUser.gravatar = gravatar.url(pkg.lastPublishedUser.email, {s: '50', d: 'retro'}, true);
+      pkg.lastPublishedUser.gravatar = gravatar.url(pkg.lastPublishedUser.email, { s: '50', d: 'retro' }, true);
     }
   }
 
@@ -118,7 +118,7 @@ module.exports = function* show(next) {
 
   utils.setLicense(pkg);
 
-  for (var k in download) {
+  for (const k in download) {
     download[k] = humanize(download[k]);
   }
   setDownloadURL(pkg, this, config.registryHost);
@@ -143,12 +143,12 @@ module.exports = function* show(next) {
   //   "node3": ">= 0.6.9",
   // };
   if (pkg.engines) {
-    for (var k in pkg.engines) {
-      var engine = String(pkg.engines[k] || '').trim();
-      var color = 'blue';
+    for (const k in pkg.engines) {
+      const engine = String(pkg.engines[k] || '').trim();
+      let color = 'blue';
       if (k.indexOf('node') === 0) {
         color = 'yellowgreen';
-        var version = /(\d+\.\d+\.\d+)/.exec(engine);
+        let version = /(\d+\.\d+\.\d+)/.exec(engine);
         if (version) {
           version = version[0];
           if (/^0\.11\.\d+/.test(version)) {
@@ -184,6 +184,6 @@ module.exports = function* show(next) {
   yield this.render('package', {
     title: 'Package - ' + pkg.name,
     package: pkg,
-    download: download
+    download,
   });
 };

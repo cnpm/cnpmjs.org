@@ -1,19 +1,19 @@
-$(function () {
+$(function() {
   function humanize(n, options) {
     options = options || {};
-    var d = options.delimiter || ',';
-    var s = options.separator || '.';
+    const d = options.delimiter || ',';
+    const s = options.separator || '.';
     n = n.toString().split('.');
     n[0] = n[0].replace(/(\d)(?=(\d\d\d)+(?!\d))/g, '$1' + d);
     return n.join(s);
   }
 
-  $.getJSON('/total', function (data) {
+  $.getJSON('/total', function(data) {
     $('#total-packages').html(humanize(data.doc_count));
     $('#total-versions').html(humanize(data.doc_version_count));
     $('#total-deletes').html(humanize(data.doc_del_count));
 
-    var downloads = $('table.downloads');
+    const downloads = $('table.downloads');
     downloads.find('td.count:eq(3)').html(humanize(data.download.today));
     downloads.find('td.count:eq(4)').html(humanize(data.download.thisweek));
     downloads.find('td.count:eq(5)').html(humanize(data.download.thismonth));

@@ -18,6 +18,8 @@ switch (config.syncModel) {
   case 'exist':
     sync = require('./sync_exist');
     break;
+  default:
+    break;
 }
 
 if (!sync && config.enableCluster) {
@@ -47,7 +49,7 @@ if (!syncInterval || syncInterval < minSyncInterval) {
 if (sync) {
   // the same time only sync once
   let syncing = false;
-  const syncFn = co.wrap(function*() {
+  const syncFn = co.wrap(function* () {
     debug('mode: %s, syncing: %s', config.syncModel, syncing);
     if (!syncing) {
       syncing = true;
@@ -83,7 +85,7 @@ if (sync) {
 if (config.syncPopular) {
   const sync = require('./sync_popular');
   let syncing = false;
-  const syncFn = co.wrap(function*() {
+  const syncFn = co.wrap(function* () {
     if (syncing) {
       return;
     }
@@ -115,7 +117,7 @@ if (config.syncPopular) {
 if (config.syncChangesStream) {
   const sync = require('./changes_stream_syncer');
   let syncing = false;
-  const syncFn = co.wrap(function*() {
+  const syncFn = co.wrap(function* () {
     if (syncing) {
       return;
     }
@@ -137,7 +139,7 @@ if (config.syncChangesStream) {
 function sendMailToAdmin(err, result, syncTime) {
   result = result || {};
   const to = [];
-  for (var name in config.admins) {
+  for (const name in config.admins) {
     to.push(config.admins[name]);
   }
   debug('Send email to all admins: %j, with err message: %s, result: %j, start sync time: %s.',

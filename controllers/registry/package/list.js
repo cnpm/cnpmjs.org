@@ -1,35 +1,31 @@
 'use strict';
 
-/**
- * Module dependencies.
- */
-
-var debug = require('debug')('cnpmjs.org:controllers:registry:package:list');
-var packageService = require('../../../services/package');
-var common = require('../../../lib/common');
-var SyncModuleWorker = require('../../sync_module_worker');
-var config = require('../../../config');
+const debug = require('debug')('cnpmjs.org:controllers:registry:package:list');
+const packageService = require('../../../services/package');
+const common = require('../../../lib/common');
+const SyncModuleWorker = require('../../sync_module_worker');
+const config = require('../../../config');
 
 /**
  * list all version of a module
  * GET /:name
  */
+
 module.exports = function* list() {
-  var orginalName = this.params.name || this.params[0];
-  var name = orginalName;
-  var rs = yield [
+  const orginalName = this.params.name || this.params[0];
+  const name = orginalName;
+  const rs = yield [
     packageService.getModuleLastModified(name),
-    packageService.listModuleTags(name)
+    packageService.listModuleTags(name),
   ];
-  var modifiedTime = rs[0];
-  var tags = rs[1];
+  let modifiedTime = rs[0];
+  const tags = rs[1];
 
   debug('show %s(%s), last modified: %s, tags: %j', name, orginalName, modifiedTime, tags);
   if (modifiedTime) {
     // find out the latest modfied time
     // because update tags only modfied tag, wont change module gmt_modified
-    for (var i = 0; i < tags.length; i++) {
-      var tag = tags[i];
+    for (const tag of tags) {
       if (tag.gmt_modified > modifiedTime) {
         modifiedTime = tag.gmt_modified;
       }
@@ -44,21 +40,20 @@ module.exports = function* list() {
     }
   }
 
-  var r = yield [
+  const r = yield [
     packageService.listModulesByName(name),
     packageService.listStarUserNames(name),
     packageService.listMaintainers(name),
   ];
-  var rows = r[0];
-  var starUsers = r[1];
-  var maintainers = r[2];
+  const rows = r[0];
+  let starUsers = r[1];
+  const maintainers = r[2];
 
   debug('show %s got %d rows, %d tags, %d star users, maintainers: %j',
     name, rows.length, tags.length, starUsers.length, maintainers);
 
-  var starUserMap = {};
-  for (var i = 0; i < starUsers.length; i++) {
-    var starUser = starUsers[i];
+  const starUserMap = {};
+  for (const starUser of starUsers) {
     if (starUser[0] !== '"' && starUser[0] !== "'") {
       starUserMap[starUser] = true;
     }
@@ -67,7 +62,7 @@ module.exports = function* list() {
 
   if (rows.length === 0) {
     // check if unpublished
-    var unpublishedInfo = yield* packageService.getUnpublishedModule(name);
+    const unpublishedInfo = yield packageService.getUnpublishedModule(name);
     debug('show unpublished %j', unpublishedInfo);
     if (unpublishedInfo) {
       this.status = 404;
@@ -78,7 +73,7 @@ module.exports = function* list() {
           modified: unpublishedInfo.package.time,
           unpublished: unpublishedInfo.package,
         },
-        _attachments: {}
+        _attachments: {},
       };
       return;
     }
@@ -97,29 +92,27 @@ module.exports = function* list() {
     }
 
     // start sync
-    var logId = yield* SyncModuleWorker.sync(name, 'sync-by-install');
+    const logId = yield SyncModuleWorker.sync(name, 'sync-by-install');
     debug('start sync %s, get log id %s', name, logId);
 
     return this.redirect(config.officialNpmRegistry + this.url);
   }
 
-  var latestMod = null;
-  var readme = null;
+  let latestMod = null;
+  let readme = null;
   // set tags
-  var distTags = {};
-  for (var i = 0; i < tags.length; i++) {
-    var t = tags[i];
+  const distTags = {};
+  for (const t of tags) {
     distTags[t.tag] = t.version;
   }
 
   // set versions and times
-  var versions = {};
-  var times = {};
-  var attachments = {};
-  var createdTime = null;
-  for (var i = 0; i < rows.length; i++) {
-    var row = rows[i];
-    var pkg = row.package;
+  const versions = {};
+  let times = {};
+  const attachments = {};
+  let createdTime = null;
+  for (const row of rows) {
+    const pkg = row.package;
     // pkg is string ... ignore it
     if (typeof pkg === 'string') {
       continue;
@@ -130,7 +123,7 @@ module.exports = function* list() {
 
     versions[pkg.version] = pkg;
 
-    var t = times[pkg.version] = row.publish_time ? new Date(row.publish_time) : row.gmt_modified;
+    const t = times[pkg.version] = row.publish_time ? new Date(row.publish_time) : row.gmt_modified;
     if ((!distTags.latest && !latestMod) || distTags.latest === pkg.version) {
       latestMod = row;
       readme = pkg.readme;
@@ -147,11 +140,11 @@ module.exports = function* list() {
   }
 
   if (modifiedTime && createdTime) {
-    var ts = {
+    const ts = {
       modified: modifiedTime,
       created: createdTime,
     };
-    for (var t in times) {
+    for (const t in times) {
       ts[t] = times[t];
     }
     times = ts;
@@ -161,8 +154,8 @@ module.exports = function* list() {
     latestMod = rows[0];
   }
 
-  var rev = String(latestMod.id);
-  var pkg = latestMod.package;
+  const rev = String(latestMod.id);
+  const pkg = latestMod.package;
 
   if (tags.length === 0) {
     // some sync error reason, will cause tags missing
@@ -170,19 +163,19 @@ module.exports = function* list() {
     distTags.latest = pkg.version;
   }
 
-  var info = {
+  const info = {
     _id: orginalName,
     _rev: rev,
     name: orginalName,
     description: pkg.description,
-    "dist-tags": distTags,
+    'dist-tags': distTags,
     maintainers: pkg.maintainers,
     time: times,
     users: starUsers,
     author: pkg.author,
     repository: pkg.repository,
-    versions: versions,
-    readme: readme,
+    versions,
+    readme,
     _attachments: attachments,
   };
 

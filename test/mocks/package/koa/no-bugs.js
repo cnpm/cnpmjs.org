@@ -5,5 +5,5 @@ module.exports = {
       url: null,
     },
   },
-  __requires: ['./default']
+  __requires: [ './default' ],
 };

@@ -2,5 +2,5 @@ module.exports = {
   package: {
     readme: '',
   },
-  __requires: ['./default']
+  __requires: [ './default' ],
 };

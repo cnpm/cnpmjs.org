@@ -1,7 +1,0 @@
-node_modules/
-coverage/
-.tmp/
-.git/
-tools/
-public/
-test/

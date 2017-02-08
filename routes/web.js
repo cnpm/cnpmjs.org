@@ -1,14 +1,14 @@
 'use strict';
 
-var showPackage = require('../controllers/web/package/show');
-var searchPackage = require('../controllers/web/package/search');
-var searchRange = require('../controllers/web/package/search_range');
-var listPrivates = require('../controllers/web/package/list_privates');
-var showSync = require('../controllers/web/show_sync');
-var showUser = require('../controllers/web/user/show');
-var sync = require('../controllers/sync');
-var showTotal = require('../controllers/total');
-var badge = require('../controllers/web/badge');
+const showPackage = require('../controllers/web/package/show');
+const searchPackage = require('../controllers/web/package/search');
+const searchRange = require('../controllers/web/package/search_range');
+const listPrivates = require('../controllers/web/package/list_privates');
+const showSync = require('../controllers/web/show_sync');
+const showUser = require('../controllers/web/user/show');
+const sync = require('../controllers/sync');
+const showTotal = require('../controllers/total');
+const badge = require('../controllers/web/badge');
 
 function routes(app) {
   app.get('/total', showTotal);

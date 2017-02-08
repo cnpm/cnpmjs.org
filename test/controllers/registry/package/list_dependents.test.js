@@ -18,10 +18,10 @@ const mm = require('mm');
 const app = require('../../../../servers/registry');
 const utils = require('../../../utils');
 
-describe('test/controllers/registry/package/list_dependents.test.js', function () {
+describe('test/controllers/registry/package/list_dependents.test.js', function() {
   afterEach(mm.restore);
 
-  before(function (done) {
+  before(function(done) {
     done = pedding(2, done);
     const pkg = utils.getPackage('@cnpmtest/testmodule-list-dependents1', '1.0.0', utils.admin);
     pkg.versions['1.0.0'].dependencies = {
@@ -41,7 +41,7 @@ describe('test/controllers/registry/package/list_dependents.test.js', function (
     .expect(201, done);
   });
 
-  it('should list package dependents', function (done) {
+  it('should list package dependents', function(done) {
     request(app)
     .get('/-/package/@cnpmtest/testmodule-list-dependents2/dependents')
     .expect({

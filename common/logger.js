@@ -10,20 +10,20 @@ const config = require('../config');
 const mail = require('./mail');
 
 const isTEST = process.env.NODE_ENV === 'test';
-const categories = ['sync_info', 'sync_error'];
+const categories = [ 'sync_info', 'sync_error' ];
 
 const logger = module.exports = Logger({
-  categories: categories,
+  categories,
   dir: config.logdir,
   duration: '1d',
   format: '[{category}.]YYYY-MM-DD[.log]',
   stdout: config.debug && !isTEST,
-  errorFormater: errorFormater,
+  errorFormater,
   seperator: os.EOL,
 });
 
 const to = [];
-for (var user in config.admins) {
+for (const user in config.admins) {
   to.push(config.admins[user]);
 }
 
@@ -33,7 +33,7 @@ function errorFormater(err) {
   return msg.text;
 }
 
-logger.syncInfo = function () {
+logger.syncInfo = function() {
   const args = [].slice.call(arguments);
   if (typeof args[0] === 'string') {
     args[0] = util.format('[%s][%s] ', utility.logDate(), process.pid) + args[0];
@@ -44,7 +44,7 @@ logger.syncInfo = function () {
   logger.sync_info.apply(logger, args);
 };
 
-logger.syncError =function () {
+logger.syncError = function() {
   const args = [].slice.call(arguments);
   if (typeof args[0] === 'string') {
     args[0] = util.format('[%s][%s] ', utility.logDate(), process.pid) + args[0];

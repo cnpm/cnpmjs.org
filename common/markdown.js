@@ -14,19 +14,19 @@
  * Module dependencies.
  */
 
-var xss = require('xss');
-var MarkdownIt = require('markdown-it');
+const xss = require('xss');
+const MarkdownIt = require('markdown-it');
 
 // allow class attr on code
-xss.whiteList.code = ['class'];
+xss.whiteList.code = [ 'class' ];
 
-var md = new MarkdownIt({
+const md = new MarkdownIt({
   html: true,
   linkify: true,
 });
 
-exports.render = function (content, filterXss) {
-  var html = md.render(content);
+exports.render = function(content, filterXss) {
+  let html = md.render(content);
   if (filterXss !== false) {
     html = xss(html);
   }

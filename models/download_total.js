@@ -1,13 +1,3 @@
-/**!
- * cnpmjs.org - models/download_total.js
- *
- * Copyright(c) fengmk2 and other contributors.
- * MIT Licensed
- *
- * Authors:
- *   fengmk2 <fengmk2@gmail.com> (http://fengmk2.github.com)
- */
-
 'use strict';
 
 /**
@@ -56,7 +46,7 @@
 //  KEY `date` (`date`)
 // ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='module download total info';
 
-module.exports = function (sequelize, DataTypes) {
+module.exports = function(sequelize, DataTypes) {
   return sequelize.define('DownloadTotal', {
     name: {
       type: DataTypes.STRING(100),
@@ -260,14 +250,14 @@ module.exports = function (sequelize, DataTypes) {
     indexes: [
       {
         unique: true,
-        fields: ['name', 'date']
+        fields: [ 'name', 'date' ],
       },
       {
-        fields: ['date']
-      }
+        fields: [ 'date' ],
+      },
     ],
     classMethods: {
 
-    }
+    },
   });
 };

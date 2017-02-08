@@ -1,19 +1,21 @@
-var co = require('co');
-var moment = require('moment');
-var models = require('../models');
-var DownloadTotal = models.DownloadTotal;
+'use strict';
+
+const co = require('co');
+const moment = require('moment');
+const models = require('../models');
+const DownloadTotal = models.DownloadTotal;
 
 function parseYearMonth(date) {
   return Number(date.substring(0, 7).replace('-', ''));
 }
 
 function* plusModuleTotal(data) {
-  var yearMonth = parseYearMonth(data.date);
-  row = yield DownloadTotal.find({
+  const yearMonth = parseYearMonth(data.date);
+  let row = yield DownloadTotal.find({
     where: {
       name: data.name,
       date: yearMonth,
-    }
+    },
   });
   if (!row) {
     row = DownloadTotal.build({
@@ -21,7 +23,7 @@ function* plusModuleTotal(data) {
       date: yearMonth,
     });
   }
-  var field = 'd' + data.date.substring(8, 10);
+  const field = 'd' + data.date.substring(8, 10);
   row[field] += data.count;
   if (row.isDirty) {
     return yield row.save();
@@ -30,28 +32,29 @@ function* plusModuleTotal(data) {
 }
 
 co(function* () {
-  var result = yield models.query('select count(*) as count from downloads;');
+  const result = yield models.query('select count(*) as count from downloads;');
   if (result[0].count > 0) {
     console.log('downloads has %d rows, no need to sync', result[0].count);
     return;
   }
-  var lastId = 0;
-  var count = 0;
+  let lastId = 0;
+  let count = 0;
+  /* eslint no-constant-condition: 0 */
   while (true) {
-    var rows = yield models.query('select id, name, date, count from download_total where id > ? limit 10000;', [lastId]);
+    const rows = yield models.query('select id, name, date, count from download_total where id > ? limit 10000;', [ lastId ]);
     count += rows.length;
     console.log('[%s] last id: %s, got %d rows, total %d', Date(), lastId, rows.length, count);
     if (rows.length === 0) {
       break;
     }
     console.log('%j', rows[0]);
-    var tasks = [];
-    var currentDate = null;
-    var allCount = 0;
-    for (var i = 0; i < rows.length; i++) {
-      var row = rows[i];
+    let tasks = [];
+    let currentDate = null;
+    let allCount = 0;
+    for (let i = 0; i < rows.length; i++) {
+      const row = rows[i];
       lastId = row.id;
-      var date = row.date;
+      let date = row.date;
       if (typeof date !== 'string') {
         date = moment(date).format('YYYY-MM-DD');
       }
@@ -64,7 +67,7 @@ co(function* () {
         tasks.push(plusModuleTotal({
           date: currentDate,
           name: '__all__',
-          count: allCount
+          count: allCount,
         }));
         allCount = 0;
         yield tasks;
@@ -73,7 +76,7 @@ co(function* () {
       }
 
       tasks.push(plusModuleTotal({
-        date: date,
+        date,
         name: row.name,
         count: row.count,
       }));
@@ -84,7 +87,7 @@ co(function* () {
         tasks.push(plusModuleTotal({
           date: currentDate,
           name: '__all__',
-          count: allCount
+          count: allCount,
         }));
         allCount = 0;
         yield tasks;
@@ -97,7 +100,7 @@ co(function* () {
       tasks.push({
         date: currentDate,
         name: '__all__',
-        count: allCount
+        count: allCount,
       });
     }
     if (tasks.length > 0) {
@@ -105,10 +108,10 @@ co(function* () {
       yield tasks;
     }
   }
-}).then(function () {
+}).then(function() {
   console.log('sync done, you can upgrade to 2.x now.');
   process.exit(0);
-}).catch(function (err) {
+}).catch(function(err) {
   console.error(err);
   throw err;
 });

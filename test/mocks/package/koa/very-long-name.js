@@ -1,15 +1,17 @@
+'use strict';
+
 module.exports = {
   package: {
     name: 'inch-plugin-socket-behaviour-desktop',
-    description: description()
+    description: description(),
   },
-  __requires: ['./default']
+  __requires: [ './default' ],
 };
 
 function description() {
-  var s = ''
-  for (var i = 0; i < 10; i++) {
-    s += 'description: Koa web app framework'
+  let s = '';
+  for (let i = 0; i < 10; i++) {
+    s += 'description: Koa web app framework';
   }
-  return s
+  return s;
 }

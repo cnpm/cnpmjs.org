@@ -16,7 +16,7 @@
 
 const packageService = require('../../../services/package');
 
-module.exports = function*() {
+module.exports = function* () {
   const username = this.params.user;
   const packages = yield packageService.listModulesByUser(username);
 
@@ -24,6 +24,6 @@ module.exports = function*() {
     user: {
       name: username,
     },
-    packages: packages,
+    packages,
   };
 };

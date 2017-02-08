@@ -1,11 +1,11 @@
 'use strict';
 
-var debug = require('debug')('cnpmjs.org:controllers:registry:package:show');
-var semver = require('semver');
-var packageService = require('../../../services/package');
-var setDownloadURL = require('../../../lib/common').setDownloadURL;
-var SyncModuleWorker = require('../../sync_module_worker');
-var config = require('../../../config');
+const debug = require('debug')('cnpmjs.org:controllers:registry:package:show');
+const semver = require('semver');
+const packageService = require('../../../services/package');
+const setDownloadURL = require('../../../lib/common').setDownloadURL;
+const SyncModuleWorker = require('../../sync_module_worker');
+const config = require('../../../config');
 
 /**
  * [deprecate] api
@@ -16,14 +16,14 @@ var config = require('../../../config');
  * GET /:name/:tag
  */
 module.exports = function* show() {
-  var name = this.params.name || this.params[0];
-  var tag = this.params.version || this.params[1];
+  const name = this.params.name || this.params[0];
+  let tag = this.params.version || this.params[1];
   if (tag === '*') {
     tag = 'latest';
   }
-  var version = semver.valid(tag);
-  var range = semver.validRange(tag);
-  var mod;
+  const version = semver.valid(tag);
+  const range = semver.validRange(tag);
+  let mod;
   if (version) {
     mod = yield packageService.getModule(name, version);
   } else if (range) {
@@ -36,18 +36,18 @@ module.exports = function* show() {
     setDownloadURL(mod.package, this);
     mod.package._cnpm_publish_time = mod.publish_time;
     mod.package.publish_time = mod.package.publish_time || mod.publish_time;
-    var rs = yield [
+    const rs = yield [
       packageService.listMaintainers(name),
       packageService.listModuleTags(name),
     ];
-    var maintainers = rs[0];
+    const maintainers = rs[0];
     if (maintainers.length > 0) {
       mod.package.maintainers = maintainers;
     }
-    var tags = rs[1];
-    var distTags = {};
-    for (var i = 0; i < tags.length; i++) {
-      var t = tags[i];
+    const tags = rs[1];
+    const distTags = {};
+    for (let i = 0; i < tags.length; i++) {
+      const t = tags[i];
       distTags[t.tag] = t.version;
     }
     // show tags for npminstall faster download
@@ -61,13 +61,13 @@ module.exports = function* show() {
     this.status = 404;
     this.jsonp = {
       error: 'not exist',
-      reason: 'version not found: ' + version
+      reason: 'version not found: ' + version,
     };
     return;
   }
 
   // start sync
-  var logId = yield SyncModuleWorker.sync(name, 'sync-by-install');
+  const logId = yield SyncModuleWorker.sync(name, 'sync-by-install');
   debug('start sync %s, get log id %s', name, logId);
 
   this.redirect(config.officialNpmRegistry + this.url);

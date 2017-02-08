@@ -1,4 +1,4 @@
-var config = require('../../../../config')
+const config = require('../../../../config');
 module.exports = {
   title: 'Package - koa',
   package: {
@@ -11,23 +11,23 @@ module.exports = {
         version: '>= 0.11.13',
         title: 'node: >=0.11.13',
         badgeURL: config.badgePrefixURL + '/badge/node-%3E%3D%200.11.13-red.svg?style=flat-square',
-      }
+      },
     },
     _publish_on_cnpm: false,
     preferGlobal: false,
     fromNow: 'a month ago',
     lastPublishedUser: {
-      name: 'dead-horse'
+      name: 'dead-horse',
     },
     license: {
       name: 'MIT',
-      url: 'http://opensource.org/licenses/MIT'
+      url: 'http://opensource.org/licenses/MIT',
     },
     repository: {
       weburl: 'https://github.com/koajs/koa',
     },
     bugs: {
-      url: 'https://github.com/koajs/koa/issues'
+      url: 'https://github.com/koajs/koa/issues',
     },
     dependencies: {
       accepts: '^1.1.0',
@@ -51,7 +51,7 @@ module.exports = {
       parseurl: '^1.3.0',
       statuses: '^1.1.0',
       'type-is': '^1.5.0',
-      vary: '^1.0.0'
+      vary: '^1.0.0',
     },
     devDependencies: {
       'istanbul-harmony': '~0.3.0',
@@ -59,7 +59,7 @@ module.exports = {
       mocha: '^1.17.0',
       should: '^3.1.0',
       supertest: '~0.13.0',
-      'test-console': '^0.7.1'
+      'test-console': '^0.7.1',
     },
     dependents: [
       'cnpmjs.org',
@@ -113,12 +113,12 @@ module.exports = {
     lastweek: 800,
     lastmonth: 4000,
   },
-  __view: 'package'
+  __view: 'package',
 };
 
 function readme() {
-  var markdown = require('../../../../common/markdown');
-  var fs = require('fs');
-  var path = require('path');
+  const markdown = require('../../../../common/markdown');
+  const fs = require('fs');
+  const path = require('path');
   return markdown.render(fs.readFileSync(path.join(__dirname, 'readme.md'), 'utf8'));
 }

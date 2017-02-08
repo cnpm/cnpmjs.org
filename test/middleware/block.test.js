@@ -14,27 +14,27 @@
  * Module dependencies.
  */
 
-var request = require('supertest');
-var app = require('../../servers/registry');
-var web = require('../../servers/web');
+const request = require('supertest');
+const app = require('../../servers/registry');
+const web = require('../../servers/web');
 
-describe('middleware/block.test.js', function () {
-  it('should registry 403 when user-agent is Ruby', function (done) {
+describe('middleware/block.test.js', function() {
+  it('should registry 403 when user-agent is Ruby', function(done) {
     request(app.listen())
     .get('/')
     .set('User-Agent', 'Ruby')
     .expect({
-      message: 'forbidden Ruby user-agent, ip: ::ffff:127.0.0.1'
+      message: 'forbidden Ruby user-agent, ip: ::ffff:127.0.0.1',
     })
     .expect(403, done);
   });
 
-  it('should web 403 when user-agent is Ruby', function (done) {
+  it('should web 403 when user-agent is Ruby', function(done) {
     request(web.listen())
     .get('/')
     .set('User-Agent', 'Ruby')
     .expect({
-      message: 'forbidden Ruby user-agent, ip: ::ffff:127.0.0.1'
+      message: 'forbidden Ruby user-agent, ip: ::ffff:127.0.0.1',
     })
     .expect(403, done);
   });

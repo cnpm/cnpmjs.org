@@ -1,11 +1,11 @@
 'use strict';
 
-var DownloadTotal = require('../../../services/download_total');
-var DATE_REG = /^\d{4}-\d{2}-\d{2}$/;
+const DownloadTotal = require('../../../services/download_total');
+const DATE_REG = /^\d{4}-\d{2}-\d{2}$/;
 
 module.exports = function* downloadTotal() {
-  var range = this.params.range || this.params[0] || '';
-  var name = this.params.name || this.params[1];
+  let range = this.params.range || this.params[0] || '';
+  const name = this.params.name || this.params[1];
 
   range = range.split(':');
   if (range.length !== 2
@@ -14,7 +14,7 @@ module.exports = function* downloadTotal() {
     this.status = 400;
     this.body = {
       error: 'range_error',
-      reason: 'range must be YYYY-MM-DD:YYYY-MM-DD style'
+      reason: 'range must be YYYY-MM-DD:YYYY-MM-DD style',
     };
     return;
   }
@@ -25,42 +25,42 @@ module.exports = function* downloadTotal() {
 };
 
 function* getPackageTotal(name, start, end) {
-  var res = yield DownloadTotal.getModuleTotal(name, start, end);
-  var downloads = res.map(function (row) {
+  const res = yield DownloadTotal.getModuleTotal(name, start, end);
+  const downloads = res.map(function(row) {
     return {
       day: row.date,
-      downloads: row.count
+      downloads: row.count,
     };
   });
 
-  downloads.sort(function (a, b) {
+  downloads.sort(function(a, b) {
     return a.day > b.day ? 1 : -1;
   });
 
   return {
-    downloads: downloads,
+    downloads,
     package: name,
-    start: start,
-    end: end
+    start,
+    end,
   };
 }
 
 function* getTotal(start, end) {
-  var res = yield DownloadTotal.getTotal(start, end);
-  var downloads = res.map(function (row) {
+  const res = yield DownloadTotal.getTotal(start, end);
+  const downloads = res.map(function(row) {
     return {
       day: row.date,
-      downloads: row.count
+      downloads: row.count,
     };
   });
 
-  downloads.sort(function (a, b) {
+  downloads.sort(function(a, b) {
     return a.day > b.day ? 1 : -1;
   });
 
   return {
-    downloads: downloads,
-    start: start,
-    end: end
+    downloads,
+    start,
+    end,
   };
 }

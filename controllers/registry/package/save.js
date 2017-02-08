@@ -1,26 +1,12 @@
-/**!
- * cnpmjs.org - controllers/registry/package/save.js
- *
- * Copyright(c) fengmk2 and other contributors.
- * MIT Licensed
- *
- * Authors:
- *   fengmk2 <fengmk2@gmail.com> (http://fengmk2.github.com)
- */
-
 'use strict';
 
-/**
- * Module dependencies.
- */
-
-var debug = require('debug')('cnpmjs.org:controllers:registry:package:save');
-var crypto = require('crypto');
-var deprecateVersions = require('./deprecate');
-var packageService = require('../../../services/package');
-var common = require('../../../lib/common');
-var nfs = require('../../../common/nfs');
-var config = require('../../../config');
+const debug = require('debug')('cnpmjs.org:controllers:registry:package:save');
+const crypto = require('crypto');
+const deprecateVersions = require('./deprecate');
+const packageService = require('../../../services/package');
+const common = require('../../../lib/common');
+const nfs = require('../../../common/nfs');
+const config = require('../../../config');
 
 // old flows:
 // 1. add()
@@ -37,63 +23,63 @@ module.exports = function* save(next) {
   //    { content_type: 'application/octet-stream',
   //      data: 'H4sIAAAAA
   //      length: 9883
-  var pkg = this.request.body;
-  var username = this.user.name;
-  var name = this.params.name || this.params[0];
-  var filename = Object.keys(pkg._attachments || {})[0];
-  var version = Object.keys(pkg.versions || {})[0];
+  const pkg = this.request.body;
+  const username = this.user.name;
+  const name = this.params.name || this.params[0];
+  const filename = Object.keys(pkg._attachments || {})[0];
+  const version = Object.keys(pkg.versions || {})[0];
   if (!version) {
     this.status = 400;
     this.body = {
       error: 'version_error',
-      reason: 'package.versions is empty'
+      reason: 'package.versions is empty',
     };
     return;
   }
 
   // check maintainers
-  var result = yield* packageService.authMaintainer(name, username);
+  const result = yield packageService.authMaintainer(name, username);
   if (!result.isMaintainer) {
     this.status = 403;
     this.body = {
       error: 'forbidden user',
       reason: username + ' not authorized to modify ' + name +
-        ', please contact maintainers: ' + result.maintainers.join(', ')
+        ', please contact maintainers: ' + result.maintainers.join(', '),
     };
     return;
   }
 
   if (!filename) {
-    var hasDeprecated = false;
-    for (var v in pkg.versions) {
-      var row = pkg.versions[v];
+    let hasDeprecated = false;
+    for (const v in pkg.versions) {
+      const row = pkg.versions[v];
       if (typeof row.deprecated === 'string') {
         hasDeprecated = true;
         break;
       }
     }
     if (hasDeprecated) {
-      return yield* deprecateVersions.call(this, next);
+      return yield deprecateVersions.call(this, next);
     }
 
     this.status = 400;
     this.body = {
       error: 'attachment_error',
-      reason: 'package._attachments is empty'
+      reason: 'package._attachments is empty',
     };
     return;
   }
 
-  var attachment = pkg._attachments[filename];
-  var versionPackage = pkg.versions[version];
-  var maintainers = versionPackage.maintainers;
+  const attachment = pkg._attachments[filename];
+  const versionPackage = pkg.versions[version];
+  const maintainers = versionPackage.maintainers;
 
   // should never happened in normal request
   if (!maintainers) {
     this.status = 400;
     this.body = {
       error: 'maintainers error',
-      reason: 'request body need maintainers'
+      reason: 'request body need maintainers',
     };
     return;
   }
@@ -103,31 +89,31 @@ module.exports = function* save(next) {
 
   // make sure user in auth is in maintainers
   // should never happened in normal request
-  var m = maintainers.filter(function (maintainer) {
+  const m = maintainers.filter(function(maintainer) {
     return maintainer.name === username;
   });
   if (m.length === 0) {
     this.status = 403;
     this.body = {
       error: 'maintainers error',
-      reason: username + ' does not in maintainer list'
+      reason: username + ' does not in maintainer list',
     };
     return;
   }
 
   // TODO: add this info into some table
   versionPackage._publish_on_cnpm = true;
-  var distTags = pkg['dist-tags'] || {};
-  var tags = []; // tag, version
-  for (var t in distTags) {
-    tags.push([t, distTags[t]]);
+  const distTags = pkg['dist-tags'] || {};
+  const tags = []; // tag, version
+  for (const t in distTags) {
+    tags.push([ t, distTags[t] ]);
   }
 
   if (tags.length === 0) {
     this.status = 400;
     this.body = {
       error: 'invalid',
-      reason: 'dist-tags should not be empty'
+      reason: 'dist-tags should not be empty',
     };
     return;
   }
@@ -135,20 +121,19 @@ module.exports = function* save(next) {
   debug('%s publish new %s:%s, attachment size: %s, maintainers: %j, distTags: %j',
     username, name, version, attachment.length, versionPackage.maintainers, distTags);
 
-  var exists = yield* packageService.getModule(name, version);
-  var shasum;
+  const exists = yield packageService.getModule(name, version);
+  let shasum;
   if (exists) {
     this.status = 403;
     this.body = {
       error: 'forbidden',
-      reason: 'cannot modify pre-existing version: ' + version
+      reason: 'cannot modify pre-existing version: ' + version,
     };
     return;
   }
 
   // upload attachment
-  var tarballBuffer;
-  tarballBuffer = new Buffer(attachment.data, 'base64');
+  const tarballBuffer = new Buffer(attachment.data, 'base64');
 
   if (tarballBuffer.length !== attachment.length) {
     this.status = 403;
@@ -162,10 +147,10 @@ module.exports = function* save(next) {
 
   if (!distTags.latest) {
     // need to check if latest tag exists or not
-    var latest = yield* packageService.getModuleByTag(name, 'latest');
+    const latest = yield packageService.getModuleByTag(name, 'latest');
     if (!latest) {
       // auto add latest
-      tags.push(['latest', tags[0][1]]);
+      tags.push([ 'latest', tags[0][1] ]);
       debug('auto add latest tag: %j', tags);
     }
   }
@@ -174,16 +159,16 @@ module.exports = function* save(next) {
   shasum.update(tarballBuffer);
   shasum = shasum.digest('hex');
 
-  var options = {
+  const options = {
     key: common.getCDNKey(name, filename),
-    shasum: shasum
+    shasum,
   };
-  var uploadResult = yield nfs.uploadBuffer(tarballBuffer, options);
+  const uploadResult = yield nfs.uploadBuffer(tarballBuffer, options);
   debug('upload %j', uploadResult);
 
-  var dist = {
-    shasum: shasum,
-    size: attachment.length
+  const dist = {
+    shasum,
+    size: attachment.length,
   };
 
   // if nfs upload return a key, record it
@@ -194,42 +179,42 @@ module.exports = function* save(next) {
     dist.tarball = uploadResult.key;
   }
 
-  var mod = {
-    name: name,
-    version: version,
+  const mod = {
+    name,
+    version,
     author: username,
-    package: versionPackage
+    package: versionPackage,
   };
 
   mod.package.dist = dist;
-  yield* addDepsRelations(mod.package);
+  yield addDepsRelations(mod.package);
 
-  var addResult = yield* packageService.saveModule(mod);
+  const addResult = yield packageService.saveModule(mod);
   debug('%s module: save file to %s, size: %d, sha1: %s, dist: %j, version: %s',
     addResult.id, dist.tarball, dist.size, shasum, dist, version);
 
   if (tags.length) {
-    yield tags.map(function (tag) {
+    yield tags.map(function(tag) {
       // tag: [tagName, version]
       return packageService.addModuleTag(name, tag[0], tag[1]);
     });
   }
 
   // ensure maintainers exists
-  var maintainerNames = maintainers.map(function (item) {
+  const maintainerNames = maintainers.map(function(item) {
     return item.name;
   });
-  yield* packageService.addPrivateModuleMaintainers(name, maintainerNames);
+  yield packageService.addPrivateModuleMaintainers(name, maintainerNames);
 
   this.status = 201;
   this.body = {
     ok: true,
-    rev: String(addResult.id)
+    rev: String(addResult.id),
   };
 };
 
 function* addDepsRelations(pkg) {
-  var dependencies = Object.keys(pkg.dependencies || {});
+  let dependencies = Object.keys(pkg.dependencies || {});
   if (dependencies.length > config.maxDependencies) {
     dependencies = dependencies.slice(0, config.maxDependencies);
   }

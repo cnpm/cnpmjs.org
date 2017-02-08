@@ -1,18 +1,4 @@
-/**!
- * cnpmjs.org - models/total.js
- *
- * Copyright(c) fengmk2 and other contributors.
- * MIT Licensed
- *
- * Authors:
- *   fengmk2 <fengmk2@gmail.com> (http://fengmk2.github.com)
- */
-
 'use strict';
-
-/**
- * Module dependencies.
- */
 
 // CREATE TABLE IF NOT EXISTS `total` (
 //  `name` varchar(100) NOT NULL COMMENT 'total name',
@@ -32,12 +18,12 @@
 // INSERT INTO total(name, gmt_modified) VALUES('total', now())
 //   ON DUPLICATE KEY UPDATE gmt_modified=now();
 
-module.exports = function (sequelize, DataTypes) {
+module.exports = function(sequelize, DataTypes) {
   return sequelize.define('Total', {
     name: {
       type: DataTypes.STRING(100),
       primaryKey: true,
-      comment: 'total name'
+      comment: 'total name',
     },
     module_delete: {
       type: DataTypes.BIGINT(20),
@@ -97,14 +83,14 @@ module.exports = function (sequelize, DataTypes) {
     comment: 'total info',
     createdAt: false,
     classMethods: {
-      init: function (callback) {
-        var that = this;
+      init(callback) {
+        const that = this;
         that.find({
-          where: { name: 'total' }
-        }).then(function (row) {
+          where: { name: 'total' },
+        }).then(function(row) {
           if (!row) {
-            that.build({name: 'total'}).save()
-              .then(function () {
+            that.build({ name: 'total' }).save()
+              .then(function() {
                 callback();
               })
               .catch(callback);
@@ -112,7 +98,7 @@ module.exports = function (sequelize, DataTypes) {
           }
           callback();
         }).catch(callback);
-      }
-    }
+      },
+    },
   });
 };

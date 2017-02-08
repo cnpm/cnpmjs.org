@@ -4,10 +4,10 @@
  * Module dependencies.
  */
 
-var request = require('supertest');
-var mm = require('mm');
-var app = require('../../servers/registry');
-var config = require('../../config');
+const request = require('supertest');
+const mm = require('mm');
+const app = require('../../servers/registry');
+const config = require('../../config');
 
 describe('test/middleware/proxy_to_npm.test.js', () => {
   beforeEach(() => {

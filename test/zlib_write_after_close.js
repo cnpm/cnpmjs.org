@@ -1,6 +1,8 @@
-var zlib = require('zlib');
+'use strict';
 
-var stream = zlib.createGzip();
+const zlib = require('zlib');
+
+const stream = zlib.createGzip();
 
 stream.write('foo');
 stream.close();

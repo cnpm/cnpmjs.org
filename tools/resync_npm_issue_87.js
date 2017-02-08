@@ -1,3 +1,5 @@
+'use strict';
+
 // try to fix https://github.com/npm/registry/issues/87
 
 const urllib = require('urllib');
