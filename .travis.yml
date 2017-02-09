@@ -6,6 +6,6 @@ node_js:
 addons:
   - postgresql: '9.3'
 script:
-  - CNPM_SOURCE_NPM=https://registry.npmjs.org CNPM_SOURCE_NPM_ISCNPM=false npm run test-all
+  - TEST_TIMEOUT=60000 CNPM_SOURCE_NPM=https://registry.npmjs.org CNPM_SOURCE_NPM_ISCNPM=false npm run test-all
 after_script:
   - npm i codecov && codecov
