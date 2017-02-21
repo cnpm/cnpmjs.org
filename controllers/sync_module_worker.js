@@ -326,6 +326,26 @@ SyncModuleWorker.prototype.next = function* (concurrencyId) {
     }
   }
 
+  if (status === 404 && pkg && pkg.reason === 'deleted' && registry === config.officialNpmReplicate) {
+    // unpublished package on replicate.npmjs.com
+    // 404 { error: 'not_found', reason: 'deleted' }
+    // try to read from registry.npmjs.com and get the whole unpublished info
+    try {
+      var result = yield npmSerivce.request(packageUrl, { registry: config.sourceNpmRegistry });
+      pkg = result.data;
+      status = result.status;
+    } catch (err) {
+      // if 404
+      if (!err.res || err.res.statusCode !== 404) {
+        var errMessage = err.name + ': ' + err.message;
+        that.log('[c#%s] [error] [%s] get package(%s%s) error: %s, status: %s',
+          concurrencyId, name, config.sourceNpmRegistry, packageUrl, errMessage, status);
+        yield that._doneOne(concurrencyId, name, false);
+        return;
+      }
+    }
+  }
+
   var unpublishedInfo = null;
   if (status === 404) {
     // check if it's unpublished
@@ -334,6 +354,11 @@ SyncModuleWorker.prototype.next = function* (concurrencyId) {
       unpublishedInfo = pkg.time.unpublished;
     } else {
       pkg = null;
+    }
+  } else {
+    // unpublished package status become to 200
+    if (name.length < 80 && pkg && pkg.time && pkg.time.unpublished && pkg.time.unpublished.time) {
+      unpublishedInfo = pkg.time.unpublished;
     }
   }
 
@@ -344,8 +369,10 @@ SyncModuleWorker.prototype.next = function* (concurrencyId) {
     return;
   }
 
-  that.log('[c#%d] [%s] package(%s%s) status: %s, dist-tags: %j, time.modified: %s, start...',
-    concurrencyId, name, registry, packageUrl, status, pkg['dist-tags'], pkg.time && pkg.time.modified);
+  that.log('[c#%d] [%s] package(%s%s) status: %s, dist-tags: %j, time.modified: %s, unpublished: %j, start...',
+    concurrencyId, name, registry, packageUrl, status,
+    pkg['dist-tags'], pkg.time && pkg.time.modified,
+    unpublishedInfo);
 
   if (unpublishedInfo) {
     try {
@@ -366,6 +393,13 @@ SyncModuleWorker.prototype.next = function* (concurrencyId) {
     yield that._doneOne(concurrencyId, name, false);
     return;
   }
+
+  // if (versions.length === 0 && registry === config.officialNpmReplicate) {
+  //   // TODO:
+  //   // need to sync sourceNpmRegistry also
+  //   // make sure package data be update event replicate down.
+  //   // https://github.com/npm/registry/issues/129
+  // }
 
   // has new version
   if (versions.length > 0) {

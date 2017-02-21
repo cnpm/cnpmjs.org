@@ -23,7 +23,6 @@ test: init-database
 		--reporter $(REPORTER) \
 		--timeout $(TIMEOUT) \
 		--require should \
-		--require should-http \
 		--require thunk-mocha \
 		--require ./test/init.js \
 		$(MOCHA_OPTS) \
@@ -48,7 +47,6 @@ test-cov cov: init-database
 		--reporter $(REPORTER) \
 		--timeout $(TIMEOUT) \
 		--require should \
-		--require should-http \
 		--require thunk-mocha \
 		--require ./test/init.js \
 		$(MOCHA_OPTS) \
@@ -69,7 +67,6 @@ test-travis: init-database
 		--reporter dot \
 		--timeout $(TIMEOUT) \
 		--require should \
-		--require should-http \
 		--require thunk-mocha \
 		--require ./test/init.js \
 		$(MOCHA_OPTS) \
@@ -99,6 +96,6 @@ autod:
 		--prefix "~" \
 		--exclude public,view,docs,backup,coverage \
 		--dep mysql \
-		--keep should,supertest,should-http,chunkstream,mm,pedding
+		--keep should,supertest,chunkstream,mm,pedding
 
 .PHONY: test
