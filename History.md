@@ -1,4 +1,9 @@
 
+2.19.3 / 2017-02-22
+==================
+
+  * fix: should get package from orginal registry when package is unpublished (#1130)
+
 2.19.2 / 2017-01-05
 ==================
 
