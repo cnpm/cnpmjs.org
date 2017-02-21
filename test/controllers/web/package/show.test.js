@@ -36,7 +36,7 @@ describe('test/controllers/web/package/show.test.js', () => {
       .expect(/Dependencies/)
       .expect(/Downloads/, function (err, res) {
         should.not.exist(err);
-        res.should.have.header('etag');
+        should.exist(res.headers.etag);
         res.text.should.containEql('<meta charset="utf-8">');
         done();
       });
@@ -52,7 +52,7 @@ describe('test/controllers/web/package/show.test.js', () => {
       .expect(/Dependencies/)
       .expect(/Downloads/, function (err, res) {
         should.not.exist(err);
-        res.should.have.header('etag');
+        should.exist(res.headers.etag);
         res.text.should.containEql('<meta charset="utf-8">');
         done();
       });
@@ -181,7 +181,7 @@ describe('test/controllers/web/package/show.test.js', () => {
       .expect(/https:\/\/github\.com\/cnpm\/cnpmjs\.org/)
       .expect(/Downloads/, function (err, res) {
         should.not.exist(err);
-        res.should.have.header('etag');
+        should.exist(res.headers.etag);
         res.text.should.containEql('<meta charset="utf-8">');
         done();
       });
@@ -213,7 +213,7 @@ describe('test/controllers/web/package/show.test.js', () => {
       .expect(/https:\/\/github\.com\/cnpm\/cnpmjs\.org/)
       .expect(/Downloads/, function (err, res) {
         should.not.exist(err);
-        res.should.have.header('etag');
+        should.exist(res.headers.etag);
         res.text.should.containEql('<meta charset="utf-8">');
         done();
       });
@@ -245,7 +245,7 @@ describe('test/controllers/web/package/show.test.js', () => {
       .expect(/https:\/\/github\.com\/cnpm\/cnpmjs\.org/)
       .expect(/Downloads/, function (err, res) {
         should.not.exist(err);
-        res.should.have.header('etag');
+        should.exist(res.headers.etag);
         res.text.should.containEql('<meta charset="utf-8">');
         done();
       });
@@ -277,7 +277,7 @@ describe('test/controllers/web/package/show.test.js', () => {
       .expect(/https:\/\/github\.com\/cnpm\/cnpmjs\.org\.git/)
       .expect(/Downloads/, function (err, res) {
         should.not.exist(err);
-        res.should.have.header('etag');
+        should.exist(res.headers.etag);
         res.text.should.containEql('<meta charset="utf-8">');
         done();
       });
@@ -309,7 +309,7 @@ describe('test/controllers/web/package/show.test.js', () => {
       .expect(/https:\/\/github\.com\/cnpm\/cnpmjs\.org/)
       .expect(/Downloads/, function (err, res) {
         should.not.exist(err);
-        res.should.have.header('etag');
+        should.exist(res.headers.etag);
         res.text.should.containEql('<meta charset="utf-8">');
         done();
       });
@@ -341,7 +341,7 @@ describe('test/controllers/web/package/show.test.js', () => {
       .expect(/http:\/\/github\.com\/cnpm\/cnpmjs\.org/)
       .expect(/Downloads/, function (err, res) {
         should.not.exist(err);
-        res.should.have.header('etag');
+        should.exist(res.headers.etag);
         res.text.should.containEql('<meta charset="utf-8">');
         done();
       });

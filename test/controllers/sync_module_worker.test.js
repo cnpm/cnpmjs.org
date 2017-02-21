@@ -181,7 +181,7 @@ describe('test/controllers/sync_module_worker.test.js', function () {
 
   it('should sync unpublished info', function (done) {
     var worker = new SyncModuleWorker({
-      name: ['tnpm'],
+      name: ['afp'],
       username: 'fengmk2'
     });
 
@@ -189,7 +189,7 @@ describe('test/controllers/sync_module_worker.test.js', function () {
     worker.on('end', function () {
       var names = worker.successes.concat(worker.fails);
       names.sort();
-      names.should.eql(['tnpm']);
+      names.should.eql([ 'afp' ]);
       done();
     });
   });
