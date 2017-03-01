@@ -14,6 +14,7 @@ var notFound = require('../middleware/registry_not_found');
 var cors = require('kcors');
 var proxyToNpm = require('../middleware/proxy_to_npm');
 var maxrequests = require('koa-maxrequests');
+var bodyParser = require('koa-bodyparser');
 
 app.use(maxrequests());
 app.use(block());
@@ -24,7 +25,7 @@ app.use(staticCache);
 
 app.keys = ['todokey', config.sessionSecret];
 app.proxy = true;
-app.use(middlewares.bodyParser({ jsonLimit: config.jsonLimit }));
+app.use(bodyParser({ jsonLimit: config.jsonLimit }));
 app.use(cors({
   allowMethods: 'GET,HEAD',
 }));

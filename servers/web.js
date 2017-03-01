@@ -18,6 +18,7 @@ var http = require('http');
 var koa = require('koa');
 var fs = require('fs');
 var maxrequests = require('koa-maxrequests');
+var bodyParser = require('koa-bodyparser');
 
 var app = koa();
 
@@ -43,7 +44,7 @@ app.proxy = true;
 app.use(proxyToNpm({
   isWeb: true
 }));
-app.use(middlewares.bodyParser());
+app.use(bodyParser({ jsonLimit: config.jsonLimit }));
 app.use(auth());
 app.use(notFound);
 
