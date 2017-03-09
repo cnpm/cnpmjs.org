@@ -18,6 +18,7 @@ CREATE TABLE IF NOT EXISTS `user` (
 -- ALTER TABLE `user`
 --   ADD `json` longtext CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'json details',
 --   ADD `npm_user` tinyint(1) DEFAULT '0' COMMENT 'user sync from npm or not, 1: true, other: false';
+-- ALTER TABLE `user` CHANGE `json` `json` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci COMMENT 'json details';
 
 CREATE TABLE IF NOT EXISTS `module_keyword` (
  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'primary key',
