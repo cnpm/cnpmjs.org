@@ -142,32 +142,36 @@ module.exports = function* show(next) {
   //   "node2": ">= 0.10.9",
   //   "node3": ">= 0.6.9",
   // };
-  if (pkg.engines) {
-    for (var k in pkg.engines) {
-      var engine = String(pkg.engines[k] || '').trim();
-      var color = 'blue';
-      if (k.indexOf('node') === 0) {
-        color = 'yellowgreen';
-        var version = /(\d+\.\d+\.\d+)/.exec(engine);
-        if (version) {
-          version = version[0];
-          if (/^0\.11\.\d+/.test(version)) {
-            color = 'red';
-          } else if (/^0\.10\./.test(version) ||
-              /^0\.12\./.test(version) ||
-              /^0\.14\./.test(version) ||
-              /^[^0]+\./.test(version)) {
-            color = 'brightgreen';
-          }
+  // "engines": "0.10.24",
+  // invalid engines
+  if (pkg.engines && typeof pkg.engines !== 'object') {
+    pkg.engines = {};
+  }
+
+  for (var k in pkg.engines) {
+    var engine = String(pkg.engines[k] || '').trim();
+    var color = 'blue';
+    if (k.indexOf('node') === 0) {
+      color = 'yellowgreen';
+      var version = /(\d+\.\d+\.\d+)/.exec(engine);
+      if (version) {
+        version = version[0];
+        if (/^0\.11\.\d+/.test(version)) {
+          color = 'red';
+        } else if (/^0\.10\./.test(version) ||
+            /^0\.12\./.test(version) ||
+            /^0\.14\./.test(version) ||
+            /^[^0]+\./.test(version)) {
+          color = 'brightgreen';
         }
       }
-      pkg.engines[k] = {
-        version: engine,
-        title: k + ': ' + engine,
-        badgeURL: config.badgePrefixURL + '/' + encodeURIComponent(k) +
-          '-' + encodeURIComponent(engine) + '-' + color + '.svg?style=flat-square',
-      };
     }
+    pkg.engines[k] = {
+      version: engine,
+      title: k + ': ' + engine,
+      badgeURL: config.badgePrefixURL + '/' + encodeURIComponent(k) +
+        '-' + encodeURIComponent(engine) + '-' + color + '.svg?style=flat-square',
+    };
   }
 
   if (pkg._publish_on_cnpm) {
