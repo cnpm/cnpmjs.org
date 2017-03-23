@@ -36,8 +36,8 @@ describe('test/sync/sync_exist.test.js', function () {
     it('should sync first time ok', function *() {
       mm.data(npmService, 'getShort', ['byte']);
       mm.data(totalService, 'getTotalInfo', {last_exist_sync_time: 0});
-      var data = yield* sync();
-      data.successes.should.eql(['byte']);
+      var data = yield sync();
+      data.successes[0].should.equal('byte');
     });
 
     it('should sync common ok', function *() {
@@ -47,7 +47,7 @@ describe('test/sync/sync_exist.test.js', function () {
       });
       mm.data(totalService, 'getTotalInfo', {last_exist_sync_time: Date.now()});
       var data = yield* sync();
-      data.successes.should.eql(['byte']);
+      data.successes[0].should.equal('byte');
 
       mm.data(npmService, 'getAllSince', []);
       var data = yield* sync();
@@ -62,7 +62,7 @@ describe('test/sync/sync_exist.test.js', function () {
       ]);
       mm.data(totalService, 'getTotalInfo', {last_exist_sync_time: Date.now()});
       var data = yield* sync();
-      data.successes.should.eql(['byte']);
+      data.successes[0].should.equal('byte');
 
       mm.data(npmService, 'getAllSince', []);
       var data = yield* sync();

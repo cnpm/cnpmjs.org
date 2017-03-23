@@ -292,6 +292,19 @@ SyncModuleWorker.prototype.next = function* (concurrencyId) {
     return setImmediate(this.finish.bind(this));
   }
 
+  // try to sync from official replicate when source npm registry is not cnpmjs.org
+  const registry = config.sourceNpmRegistryIsCNpm ? config.sourceNpmRegistry : config.officialNpmReplicate;
+
+  const versions = yield this.syncByName(concurrencyId, name, registry);
+  if (versions && versions.length === 0 && registry === config.officialNpmReplicate) {
+    // need to sync sourceNpmRegistry also
+    // make sure package data be update event replicate down.
+    // https://github.com/npm/registry/issues/129
+    yield this.syncByName(concurrencyId, name, config.officialNpmRegistry);
+  }
+};
+
+SyncModuleWorker.prototype.syncByName = function* (concurrencyId, name, registry) {
   var that = this;
   that.syncingNames[name] = true;
   var pkg = null;
@@ -309,8 +322,6 @@ SyncModuleWorker.prototype.next = function* (concurrencyId) {
 
   // get from npm
   const packageUrl = '/' + name.replace('/', '%2f');
-  // try to sync from official replicate when source npm registry is not cnpmjs.org
-  const registry = config.sourceNpmRegistryIsCNpm ? config.sourceNpmRegistry : config.officialNpmReplicate;
   try {
     var result = yield npmSerivce.request(packageUrl, { registry: registry });
     pkg = result.data;
@@ -394,13 +405,6 @@ SyncModuleWorker.prototype.next = function* (concurrencyId) {
     return;
   }
 
-  // if (versions.length === 0 && registry === config.officialNpmReplicate) {
-  //   // TODO:
-  //   // need to sync sourceNpmRegistry also
-  //   // make sure package data be update event replicate down.
-  //   // https://github.com/npm/registry/issues/129
-  // }
-
   // has new version
   if (versions.length > 0) {
     that.updates.push(name);
@@ -409,6 +413,8 @@ SyncModuleWorker.prototype.next = function* (concurrencyId) {
   this.log('[c#%d] [%s] synced success, %d versions: %s',
     concurrencyId, name, versions.length, versions.join(', '));
   yield this._doneOne(concurrencyId, name, true);
+
+  return versions;
 };
 
 function* _listStarUsers(modName) {
