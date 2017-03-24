@@ -1,9 +1,5 @@
 'use strict';
 
-/**
- * Module dependencies.
- */
-
 var debug = require('debug')('cnpmjs.org:controllers:registry:package:list');
 var packageService = require('../../../services/package');
 var common = require('../../../lib/common');
@@ -15,16 +11,15 @@ var config = require('../../../config');
  * GET /:name
  */
 module.exports = function* list() {
-  var orginalName = this.params.name || this.params[0];
-  var name = orginalName;
+  var name = this.params.name || this.params[0];
   var rs = yield [
     packageService.getModuleLastModified(name),
-    packageService.listModuleTags(name)
+    packageService.listModuleTags(name),
   ];
   var modifiedTime = rs[0];
   var tags = rs[1];
 
-  debug('show %s(%s), last modified: %s, tags: %j', name, orginalName, modifiedTime, tags);
+  debug('show %s, last modified: %s, tags: %j', name, modifiedTime, tags);
   if (modifiedTime) {
     // find out the latest modfied time
     // because update tags only modfied tag, wont change module gmt_modified
@@ -44,9 +39,14 @@ module.exports = function* list() {
     }
   }
 
-  if (config.enableAbbreviatedMetadata && this.accepts('application/vnd.npm.install-v1+json')) {
-    yield handleAbbreviatedMetaRequest(this, name, modifiedTime, tags);
-    return;
+  var abbreviatedMetaType = 'application/vnd.npm.install-v1+json';
+  if (config.enableAbbreviatedMetadata && this.accepts([ 'json', abbreviatedMetaType ]) === abbreviatedMetaType) {
+    var rows = yield packageService.listModuleAbbreviatedsByName(name);
+    if (rows.length > 0) {
+      yield handleAbbreviatedMetaRequest(this, name, modifiedTime, tags, rows);
+      return;
+    }
+    // no abbreviated meta, return the full meta
   }
 
   var r = yield [
@@ -72,18 +72,18 @@ module.exports = function* list() {
 
   if (rows.length === 0) {
     // check if unpublished
-    var unpublishedInfo = yield* packageService.getUnpublishedModule(name);
+    var unpublishedInfo = yield packageService.getUnpublishedModule(name);
     debug('show unpublished %j', unpublishedInfo);
     if (unpublishedInfo) {
       this.status = 404;
       this.jsonp = {
-        _id: orginalName,
-        name: orginalName,
+        _id: name,
+        name: name,
         time: {
           modified: unpublishedInfo.package.time,
           unpublished: unpublishedInfo.package,
         },
-        _attachments: {}
+        _attachments: {},
       };
       return;
     }
@@ -102,7 +102,7 @@ module.exports = function* list() {
     }
 
     // start sync
-    var logId = yield* SyncModuleWorker.sync(name, 'sync-by-install');
+    var logId = yield SyncModuleWorker.sync(name, 'sync-by-install');
     debug('start sync %s, get log id %s', name, logId);
 
     return this.redirect(config.officialNpmRegistry + this.url);
@@ -175,12 +175,19 @@ module.exports = function* list() {
     distTags.latest = pkg.version;
   }
 
+  if (!readme && config.enableAbbreviatedMetadata) {
+    var packageReadme = yield packageService.getPackageReadme(name);
+    if (packageReadme) {
+      readme = packageReadme.readme;
+    }
+  }
+
   var info = {
-    _id: orginalName,
+    _id: name,
     _rev: rev,
-    name: orginalName,
+    name: name,
     description: pkg.description,
-    "dist-tags": distTags,
+    'dist-tags': distTags,
     maintainers: pkg.maintainers,
     time: times,
     users: starUsers,
@@ -196,52 +203,12 @@ module.exports = function* list() {
   info.bugs = pkg.bugs;
   info.license = pkg.license;
 
-  debug('show module %s: %s, latest: %s', orginalName, rev, latestMod.version);
+  debug('show module %s: %s, latest: %s', name, rev, latestMod.version);
   this.jsonp = info;
 };
 
-function* handleAbbreviatedMetaRequest(ctx, name, modifiedTime, tags) {
-  var rows = yield packageService.listModuleAbbreviatedsByName(name);
+function* handleAbbreviatedMetaRequest(ctx, name, modifiedTime, tags, rows) {
   debug('show %s got %d rows, %d tags, modifiedTime: %s', name, rows.length, tags.length, modifiedTime);
-
-  if (rows.length === 0) {
-    // check if unpublished
-    var unpublishedInfo = yield packageService.getUnpublishedModule(name);
-    debug('show unpublished %j', unpublishedInfo);
-    if (unpublishedInfo) {
-      ctx.status = 404;
-      ctx.jsonp = {
-        _id: name,
-        name: name,
-        time: {
-          modified: unpublishedInfo.package.time,
-          unpublished: unpublishedInfo.package,
-        },
-        _attachments: {}
-      };
-      return;
-    }
-  }
-
-  // if module not exist in this registry,
-  // sync the module backend and return package info from official registry
-  if (rows.length === 0) {
-    if (!ctx.allowSync) {
-      ctx.status = 404;
-      ctx.jsonp = {
-        error: 'not_found',
-        reason: 'document not found',
-      };
-      return;
-    }
-
-    // start sync
-    var logId = yield SyncModuleWorker.sync(name, 'sync-by-install');
-    debug('start sync %s, get log id %s', name, logId);
-
-    return ctx.redirect(config.officialNpmRegistry + this.url);
-  }
-
   var latestMod = null;
   // set tags
   var distTags = {};
@@ -279,7 +246,7 @@ function* handleAbbreviatedMetaRequest(ctx, name, modifiedTime, tags) {
   var info = {
     name: name,
     modified: modifiedTime,
-    "dist-tags": distTags,
+    'dist-tags': distTags,
     versions: versions,
   };
 

@@ -401,13 +401,18 @@ exports.updateModulePackageFields = function* (id, fields) {
 exports.updateModuleAbbreviatedPackage = function* (item) {
   // item => { id, name, version, _hasShrinkwrap }
   var mod = yield models.ModuleAbbreviated.findByNameAndVersion(item.name, item.version);
-  mod.package = JSON.parse(mod.package);
+  if (!mod) {
+    return null;
+  }
+  var pkg = JSON.parse(mod.package);
   for (var key in item) {
     if (key === 'name' || key === 'version' || key === 'id') {
       continue;
     }
-    mod.package[key] = item[key];
+    pkg[key] = item[key];
   }
+  mod.package = JSON.stringify(pkg);
+
   return yield mod.save([ 'package' ]);
 };
 
@@ -484,16 +489,23 @@ exports.savePackageReadme = function* (name, readme, latestVersion) {
 exports.removeModulesByName = function* (name) {
   yield Module.destroy({
     where: {
-      name: name
-    }
+      name: name,
+    },
   });
+  if (config.enableAbbreviatedMetadata) {
+    yield models.ModuleAbbreviated.destroy({
+      where: {
+        name: name,
+      },
+    });
+  }
 };
 
 exports.removeModulesByNameAndVersions = function* (name, versions) {
   yield Module.destroy({
     where: {
       name: name,
-      version: versions
+      version: versions,
     }
   });
 };
