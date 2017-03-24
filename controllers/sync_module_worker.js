@@ -295,12 +295,12 @@ SyncModuleWorker.prototype.next = function* (concurrencyId) {
   // try to sync from official replicate when source npm registry is not cnpmjs.org
   const registry = config.sourceNpmRegistryIsCNpm ? config.sourceNpmRegistry : config.officialNpmReplicate;
 
-  const versions = yield this.syncByName(concurrencyId, name, registry);
+  let versions = yield this.syncByName(concurrencyId, name, registry);
   if (versions && versions.length === 0 && registry === config.officialNpmReplicate) {
     // need to sync sourceNpmRegistry also
     // make sure package data be update event replicate down.
     // https://github.com/npm/registry/issues/129
-    yield this.syncByName(concurrencyId, name, config.officialNpmRegistry);
+    versions = yield this.syncByName(concurrencyId, name, config.officialNpmRegistry);
   }
 };
 
@@ -447,14 +447,14 @@ function* _saveNpmUser(username) {
 
 function* _saveMaintainer(modName, username, action) {
   if (action === 'add') {
-    yield* packageService.addPublicModuleMaintainer(modName, username);
+    yield packageService.addPublicModuleMaintainer(modName, username);
   } else if (action === 'remove') {
-    yield* packageService.removePublicModuleMaintainer(modName, username);
+    yield packageService.removePublicModuleMaintainer(modName, username);
   }
 }
 
 SyncModuleWorker.prototype._unpublished = function* (name, unpublishedInfo) {
-  var mods = yield* packageService.listModulesByName(name);
+  var mods = yield packageService.listModulesByName(name);
   this.log('  [%s] start unpublished %d versions from local cnpm registry',
     name, mods.length);
   if (common.isLocalModule(mods)) {
@@ -463,13 +463,13 @@ SyncModuleWorker.prototype._unpublished = function* (name, unpublishedInfo) {
     return [];
   }
 
-  var r = yield* packageService.saveUnpublishedModule(name, unpublishedInfo);
+  var r = yield packageService.saveUnpublishedModule(name, unpublishedInfo);
   this.log('    [%s] save unpublished info: %j to row#%s',
     name, unpublishedInfo, r.id);
   if (mods.length === 0) {
     return;
   }
-  yield [packageService.removeModulesByName(name), packageService.removeModuleTags(name)];
+  yield [ packageService.removeModulesByName(name), packageService.removeModuleTags(name) ];
   var keys = [];
   for (var i = 0; i < mods.length; i++) {
     var row = mods[i];
@@ -531,6 +531,11 @@ SyncModuleWorker.prototype._sync = function* (name, pkg) {
     localVersionNames.push(r.version);
   }
 
+  var latestVersionPackageReadme = {
+    version: pkg['dist-tags'].latest,
+    readme: pkg.readme,
+  };
+
   var tags = {};
   for (var i = 0; i < tagRows.length; i++) {
     var r = tagRows[i];
@@ -539,6 +544,37 @@ SyncModuleWorker.prototype._sync = function* (name, pkg) {
       continue;
     }
     tags[r.tag] = r.version;
+  }
+
+  // get package AbbreviatedMetadata
+  var abbreviatedMetadatas = {};
+  if (config.enableAbbreviatedMetadata) {
+    var packageUrl = '/' + name.replace('/', '%2f');
+    var result = yield npmSerivce.request(packageUrl, {
+      dataType: 'text',
+      registry: config.sourceNpmRegistry,
+      headers: {
+        Accept: 'application/vnd.npm.install-v1+json',
+      },
+    });
+    if (result.status === 200) {
+      var data;
+      try {
+        data = JSON.parse(result.data);
+      } catch (err) {
+        that.log('  [%s] get abbreviated meta error: %s, headers: %j, %j',
+          name, err, result.headers, result.data);
+      }
+      if (data) {
+        var versions = data && data.versions || {};
+        for (var version in versions) {
+          const item = versions[version];
+          if (item && typeof item._hasShrinkwrap === 'boolean') {
+            abbreviatedMetadatas[version] = { _hasShrinkwrap: item._hasShrinkwrap };
+          }
+        }
+      }
+    }
   }
 
   var missingVersions = [];
@@ -550,6 +586,11 @@ SyncModuleWorker.prototype._sync = function* (name, pkg) {
   var missingDeprecateds = [];
   // [[user, 'add or remove'], ...]
   var diffNpmMaintainers = [];
+
+  // [
+  //   { name, version, _hasShrinkwrap }
+  // ]
+  var missingAbbreviatedMetadatas = [];
 
   // find out new maintainers
   var pkgMaintainers = pkg.maintainers || [];
@@ -624,7 +665,7 @@ SyncModuleWorker.prototype._sync = function* (name, pkg) {
     if (!version || !version.dist || !version.dist.tarball) {
       continue;
     }
-    //patch for readme
+    // patch for readme
     if (!version.readme) {
       version.readme = pkg.readme;
     }
@@ -633,8 +674,9 @@ SyncModuleWorker.prototype._sync = function* (name, pkg) {
     if (!version.maintainers || !version.maintainers[0]) {
       version.maintainers = pkg.maintainers;
     }
-    if (exists.package &&
-        exists.package.dist.shasum === version.dist.shasum) {
+    var abbreviatedMetadata = abbreviatedMetadatas[version.version];
+
+    if (exists.package && exists.package.dist.shasum === version.dist.shasum) {
       // * shasum make sure equal
       if ((version.publish_time === exists.publish_time) ||
           (!version.publish_time && exists.publish_time)) {
@@ -671,8 +713,27 @@ SyncModuleWorker.prototype._sync = function* (name, pkg) {
             deprecated: undefined,
           });
         }
+        // find missing abbreviatedMetadata
+        if (abbreviatedMetadata) {
+          for (var key in abbreviatedMetadata) {
+            if (!(key in exists.package) || abbreviatedMetadata[key] !== exists.package[key]) {
+              missingAbbreviatedMetadatas.push(Object.assign({
+                id: exists.id,
+                name: exists.package.name,
+                version: exists.package.version,
+              }, abbreviatedMetadata));
+              break;
+            }
+          }
+        }
+
         continue;
       }
+    }
+
+    // set abbreviatedMetadata to version package
+    if (abbreviatedMetadata) {
+      Object.assign(version, abbreviatedMetadata);
     }
     missingVersions.push(version);
   }
@@ -769,7 +830,7 @@ SyncModuleWorker.prototype._sync = function* (name, pkg) {
   // sync missing tags
   function* syncTag() {
     if (deletedTags.length > 0) {
-      yield* packageService.removeModuleTagsByNames(name, deletedTags);
+      yield packageService.removeModuleTagsByNames(name, deletedTags);
       that.log('  [%s] deleted %d tags: %j',
         name, deletedTags.length, deletedTags);
     }
@@ -814,6 +875,48 @@ SyncModuleWorker.prototype._sync = function* (name, pkg) {
         that.log('    save error, id: %s, error: %s', item.id, r.error.message);
       } else {
         that.log('    saved, id: %s', item.id);
+      }
+    }
+  }
+
+  function* syncAbbreviatedMetadatas() {
+    if (missingAbbreviatedMetadatas.length === 0) {
+      return;
+    }
+    that.log('  [%s] saving %d abbreviated meta datas', name, missingAbbreviatedMetadatas.length);
+
+    var res = yield gather(missingAbbreviatedMetadatas.map(function (item) {
+      return packageService.updateModuleAbbreviatedPackage(item);
+    }));
+
+    for (var i = 0; i < res.length; i++) {
+      var item = missingAbbreviatedMetadatas[i];
+      var r = res[i];
+      if (r.error) {
+        that.log('    save error, module: %s@%s, error: %s', item.name, item.version, r.error.message);
+      } else {
+        that.log('    saved, module_abbreviated: %s@%s, %j', item.name, item.version, item);
+      }
+    }
+
+    var res = yield gather(missingAbbreviatedMetadatas.map(function (item) {
+      var fields = {};
+      for (var key in item) {
+        if (key === 'id' || key === 'name' || key === 'version') {
+          continue;
+        }
+        fields[key] = item[key];
+      }
+      return packageService.updateModulePackageFields(item.id, fields);
+    }));
+
+    for (var i = 0; i < res.length; i++) {
+      var item = missingAbbreviatedMetadatas[i];
+      var r = res[i];
+      if (r.error) {
+        that.log('    save error, module id: %s, error: %s', item.id, r.error.message);
+      } else {
+        that.log('    saved, module id: %s, %j', item.id, item);
       }
     }
   }
@@ -919,15 +1022,25 @@ SyncModuleWorker.prototype._sync = function* (name, pkg) {
     }
   }
 
-  yield [
-    syncDes(),
-    syncTag(),
-    syncReadme(),
-    syncDeprecateds(),
-    syncMissingStarUsers(),
-    syncMissingUsers(),
-    syncNpmPackageMaintainers(),
-  ];
+  if ( latestVersionPackageReadme.version && latestVersionPackageReadme.readme) {
+    var existsPackageReadme = yield packageService.getPackageReadme(name);
+    if (!existsPackageReadme ||
+        existsPackageReadme.version !== latestVersionPackageReadme.version ||
+        existsPackageReadme.readme !== latestVersionPackageReadme.readme) {
+      var r = yield packageService.savePackageReadme(name, latestVersionPackageReadme.readme, latestVersionPackageReadme.version);
+      that.log('    save packageReadme: %j', r);
+    }
+  }
+
+  yield syncDes();
+  yield syncTag();
+  yield syncReadme();
+  yield syncDeprecateds();
+  yield syncMissingStarUsers();
+  yield syncMissingUsers();
+  yield syncNpmPackageMaintainers();
+  yield syncAbbreviatedMetadatas();
+
   return syncedVersionNames;
 };
 
@@ -1110,14 +1223,21 @@ SyncModuleWorker.prototype._syncOneVersion = function *(versionIndex, sourcePack
 
     mod.package.dist = dist;
     var r = yield packageService.saveModule(mod);
+    var moduleAbbreviatedId = null;
+    if (config.enableAbbreviatedMetadata) {
+      var moduleAbbreviatedResult = yield packageService.saveModuleAbbreviated(mod);
+      moduleAbbreviatedId = moduleAbbreviatedResult.id;
+    }
 
     that.log('    [%s:%s] done, insertId: %s, author: %s, version: %s, '
-      + 'size: %d, publish_time: %j, publish on cnpm: %s',
+      + 'size: %d, publish_time: %j, publish on cnpm: %s, '
+      + 'moduleAbbreviatedId: %s',
       sourcePackage.name, versionIndex,
       r.id,
       author, mod.version, dataSize,
       new Date(mod.publish_time),
-      that._publish);
+      that._publish,
+      moduleAbbreviatedId);
 
     return r;
   }

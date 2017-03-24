@@ -1,6 +1,7 @@
 'use strict';
 
 var should = require('should');
+var assert = require('assert');
 var request = require('supertest');
 var mm = require('mm');
 var pedding = require('pedding');
@@ -191,6 +192,87 @@ describe('test/controllers/registry/package/list.test.js', () => {
         data.time.modified.should.equal(tagModified);
         done();
       });
+    });
+  });
+
+  describe('list AbbreviatedMeta', () => {
+    before(done => {
+      mm(config, 'sourceNpmRegistry', config.officialNpmRegistry);
+      mm(config, 'syncModel', 'all');
+      mm(config, 'enableAbbreviatedMetadata', true);
+      utils.sync('pedding', done);
+    });
+
+    it('should return abbreviated meta when Accept: application/vnd.npm.install-v1+json', () => {
+      mm(config, 'syncModel', 'all');
+      mm(config, 'enableAbbreviatedMetadata', true);
+      return request(app.listen())
+        .get('/pedding')
+        .set('Accept', 'application/vnd.npm.install-v1+json')
+        .expect(200)
+        .expect(res => {
+          const data = res.body;
+          assert(data.name === 'pedding');
+          assert(data.modified);
+          assert(data['dist-tags'].latest);
+          assert(Object.keys(data.versions).length > 0);
+          for (const v in data.versions) {
+            assert('_hasShrinkwrap' in data.versions[v]);
+          }
+        });
+    });
+
+    it('should 404 when package not exists', () => {
+      mm(config, 'syncModel', 'all');
+      mm(config, 'enableAbbreviatedMetadata', true);
+      return request(app.listen())
+        .get('/@cnpmtest/not-exists-package')
+        .set('Accept', 'application/vnd.npm.install-v1+json')
+        .expect(404)
+        .expect({
+          error: 'not_found',
+          reason: 'document not found'
+        });
+    });
+
+    it('should return full meta when enableAbbreviatedMetadata is false and Accept is application/vnd.npm.install-v1+json', () => {
+      mm(config, 'syncModel', 'all');
+      mm(config, 'enableAbbreviatedMetadata', false);
+      return request(app.listen())
+        .get('/pedding')
+        .set('Accept', 'application/vnd.npm.install-v1+json')
+        .expect(200)
+        .expect(res => {
+          const data = res.body;
+          assert(data.name === 'pedding');
+          assert(data.description);
+          assert(data.readme);
+          assert(data['dist-tags'].latest);
+          assert(Object.keys(data.versions).length > 0);
+          for (const v in data.versions) {
+            assert('_hasShrinkwrap' in data.versions[v]);
+          }
+        });
+    });
+
+    it('should return full meta when Accept is not application/vnd.npm.install-v1+json', () => {
+      mm(config, 'syncModel', 'all');
+      mm(config, 'enableAbbreviatedMetadata', true);
+      return request(app.listen())
+        .get('/pedding')
+        .set('Accept', 'application/json')
+        .expect(200)
+        .expect(res => {
+          const data = res.body;
+          assert(data.name === 'pedding');
+          assert(data.description);
+          assert(data.readme);
+          assert(data['dist-tags'].latest);
+          assert(Object.keys(data.versions).length > 0);
+          for (const v in data.versions) {
+            assert('_hasShrinkwrap' in data.versions[v]);
+          }
+        });
     });
   });
 });

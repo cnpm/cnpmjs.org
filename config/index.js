@@ -221,7 +221,15 @@ var config = {
 
   // snyk.io root url
   snykUrl: 'https://snyk.io',
+
+  // https://github.com/cnpm/cnpmjs.org/issues/1149
+  // if enable this option, must create module_abbreviated and package_readme table in database
+  enableAbbreviatedMetadata: false,
 };
+
+if (process.env.NODE_ENV === 'test') {
+  config.enableAbbreviatedMetadata = true;
+}
 
 if (process.env.NODE_ENV !== 'test') {
   var customConfig;

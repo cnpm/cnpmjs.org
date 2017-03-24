@@ -1,9 +1,5 @@
 'use strict';
 
-/**
- * Module dependencies.
- */
-
 var crypto = require('crypto');
 var path = require('path');
 var childProcess = require('child_process');

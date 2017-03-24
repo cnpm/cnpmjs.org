@@ -1,23 +1,15 @@
-/**!
- * Copyright(c) fengmk2 and other contributors.
- * MIT Licensed
- *
- * Authors:
- *   fengmk2 <fengmk2@gmail.com> (http://fengmk2.com)
- */
-
 'use strict';
 
-/**
- * Module dependencies.
- */
-
 var path = require('path');
+var config = require('../config');
 var sequelize = require('../common/sequelize');
 
 function load(name) {
   return sequelize.import(path.join(__dirname, name));
 }
+
+var _ModuleAbbreviated = config.enableAbbreviatedMetadata ? load('module_abbreviated') : null;
+var _PackageReadme = config.enableAbbreviatedMetadata ? load('package_readme') : null;
 
 module.exports = {
   sequelize: sequelize,
@@ -44,7 +36,27 @@ module.exports = {
     return data[1];
   },
   queryOne: function* (sql, args) {
-    var rows = yield* this.query(sql, args);
+    var rows = yield this.query(sql, args);
     return rows && rows[0];
-  }
+  },
+
+  get ModuleAbbreviated() {
+    if (!config.enableAbbreviatedMetadata) {
+      return null;
+    }
+    if (!_ModuleAbbreviated) {
+      _ModuleAbbreviated = load('module_abbreviated');
+    }
+    return _ModuleAbbreviated;
+  },
+
+  get PackageReadme() {
+    if (!config.enableAbbreviatedMetadata) {
+      return null;
+    }
+    if (!_PackageReadme) {
+      _PackageReadme = load('package_readme');
+    }
+    return _PackageReadme;
+  },
 };

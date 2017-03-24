@@ -11,9 +11,9 @@ function* request(url, options) {
   options = options || {};
   options.dataType = options.dataType || 'json';
   options.timeout = options.timeout || 120000;
-  options.headers = {
+  options.headers = Object.assign({
     'user-agent': USER_AGENT
-  };
+  }, options.headers);
   options.gzip = true;
   options.followRedirect = true;
   var registry = options.registry || config.sourceNpmRegistry;
@@ -52,7 +52,7 @@ exports.getUser = function* (name) {
 };
 
 exports.get = function* (name) {
-  var r = yield* request('/' + name);
+  var r = yield request('/' + name);
   var data = r.data;
   if (r.status === 404) {
     data = null;

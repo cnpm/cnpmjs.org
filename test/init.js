@@ -1,9 +1,5 @@
 'use strict';
 
-/**
- * Module dependencies.
- */
-
 var config = require('../config');
 
 if (process.env.DB) {

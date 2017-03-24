@@ -44,6 +44,11 @@ module.exports = function* list() {
     }
   }
 
+  if (config.enableAbbreviatedMetadata && this.accepts('application/vnd.npm.install-v1+json')) {
+    yield handleAbbreviatedMetaRequest(this, name, modifiedTime, tags);
+    return;
+  }
+
   var r = yield [
     packageService.listModulesByName(name),
     packageService.listStarUserNames(name),
@@ -71,7 +76,7 @@ module.exports = function* list() {
     debug('show unpublished %j', unpublishedInfo);
     if (unpublishedInfo) {
       this.status = 404;
-      this.body = {
+      this.jsonp = {
         _id: orginalName,
         name: orginalName,
         time: {
@@ -89,7 +94,7 @@ module.exports = function* list() {
   if (rows.length === 0) {
     if (!this.allowSync) {
       this.status = 404;
-      this.body = {
+      this.jsonp = {
         error: 'not_found',
         reason: 'document not found',
       };
@@ -194,3 +199,90 @@ module.exports = function* list() {
   debug('show module %s: %s, latest: %s', orginalName, rev, latestMod.version);
   this.jsonp = info;
 };
+
+function* handleAbbreviatedMetaRequest(ctx, name, modifiedTime, tags) {
+  var rows = yield packageService.listModuleAbbreviatedsByName(name);
+  debug('show %s got %d rows, %d tags, modifiedTime: %s', name, rows.length, tags.length, modifiedTime);
+
+  if (rows.length === 0) {
+    // check if unpublished
+    var unpublishedInfo = yield packageService.getUnpublishedModule(name);
+    debug('show unpublished %j', unpublishedInfo);
+    if (unpublishedInfo) {
+      ctx.status = 404;
+      ctx.jsonp = {
+        _id: name,
+        name: name,
+        time: {
+          modified: unpublishedInfo.package.time,
+          unpublished: unpublishedInfo.package,
+        },
+        _attachments: {}
+      };
+      return;
+    }
+  }
+
+  // if module not exist in this registry,
+  // sync the module backend and return package info from official registry
+  if (rows.length === 0) {
+    if (!ctx.allowSync) {
+      ctx.status = 404;
+      ctx.jsonp = {
+        error: 'not_found',
+        reason: 'document not found',
+      };
+      return;
+    }
+
+    // start sync
+    var logId = yield SyncModuleWorker.sync(name, 'sync-by-install');
+    debug('start sync %s, get log id %s', name, logId);
+
+    return ctx.redirect(config.officialNpmRegistry + this.url);
+  }
+
+  var latestMod = null;
+  // set tags
+  var distTags = {};
+  for (var i = 0; i < tags.length; i++) {
+    var t = tags[i];
+    distTags[t.tag] = t.version;
+  }
+
+  // set versions and times
+  var versions = {};
+  for (var i = 0; i < rows.length; i++) {
+    var row = rows[i];
+    var pkg = row.package;
+    common.setDownloadURL(pkg, ctx);
+    pkg._cnpm_publish_time = row.publish_time;
+    pkg.publish_time = pkg.publish_time || row.publish_time;
+
+    versions[pkg.version] = pkg;
+
+    if ((!distTags.latest && !latestMod) || distTags.latest === pkg.version) {
+      latestMod = row;
+    }
+  }
+
+  if (!latestMod) {
+    latestMod = rows[0];
+  }
+
+  if (tags.length === 0) {
+    // some sync error reason, will cause tags missing
+    // set latest tag at least
+    distTags.latest = latestMod.package.version;
+  }
+
+  var info = {
+    name: name,
+    modified: modifiedTime,
+    "dist-tags": distTags,
+    versions: versions,
+  };
+
+  debug('show %j', info);
+  ctx.jsonp = info;
+}
