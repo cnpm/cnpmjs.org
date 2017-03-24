@@ -13,10 +13,10 @@ var utils = require('../utils');
 var app = require('../../servers/registry');
 var User = require('../../models').User;
 
-describe('test/controllers/sync_module_worker.test.js', function () {
+describe('test/controllers/sync_module_worker.test.js', () => {
   afterEach(mm.restore);
 
-  beforeEach(function () {
+  beforeEach(() => {
     mm(config, 'syncModel', 'all');
     mm(config, 'sourceNpmRegistryIsCNpm', false);
     mm(config, 'privatePackages', ['google']);
@@ -89,12 +89,12 @@ describe('test/controllers/sync_module_worker.test.js', function () {
     yield checkResult();
 
     var r = yield urllib.request(tgzUrl);
-    console.log(r.status, r.headers);
+    // console.log(r.status, r.headers);
     r.status.should.equal(200);
   });
 
   it('should start a sync worker and dont sync deps', function* () {
-    var log = yield* logService.create({
+    var log = yield logService.create({
       name: 'byte',
       username: 'fengmk2',
     });

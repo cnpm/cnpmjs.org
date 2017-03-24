@@ -36,7 +36,7 @@ module.exports = function* show(next) {
   var pkg = yield packageService[getPackageMethod].apply(packageService, getPackageArgs);
   if (!pkg || !pkg.package) {
     // check if unpublished
-    var unpublishedInfo = yield* packageService.getUnpublishedModule(name);
+    var unpublishedInfo = yield packageService.getUnpublishedModule(name);
     debug('show unpublished %j', unpublishedInfo);
     if (unpublishedInfo) {
       var data = {
@@ -59,7 +59,7 @@ module.exports = function* show(next) {
       return;
     }
 
-    return yield* next;
+    return yield next;
   }
 
   var r = yield [
@@ -76,6 +76,12 @@ module.exports = function* show(next) {
   pkg.package.fromNow = moment(pkg.publish_time).fromNow();
   pkg = pkg.package;
   pkg.users = users;
+  if (!pkg.readme && config.enableAbbreviatedMetadata) {
+    var packageReadme = yield packageService.getPackageReadme(name);
+    if (packageReadme) {
+      pkg.readme = packageReadme.readme;
+    }
+  }
   if (pkg.readme && typeof pkg.readme !== 'string') {
     pkg.readme = 'readme is not string: ' + JSON.stringify(pkg.readme);
   } else {

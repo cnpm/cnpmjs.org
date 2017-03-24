@@ -1,6 +1,6 @@
 TESTS = $(shell ls -S `find test -type f -name "*.test.js" -print`)
 REPORTER = spec
-TIMEOUT = 30000
+TIMEOUT = 60000
 MOCHA_OPTS =
 DB = sqlite
 
@@ -22,6 +22,7 @@ test: init-database
 	@NODE_ENV=test DB=${DB} node_modules/.bin/mocha \
 		--reporter $(REPORTER) \
 		--timeout $(TIMEOUT) \
+		--require intelli-espower-loader \
 		--require should \
 		--require thunk-mocha \
 		--require ./test/init.js \
@@ -46,6 +47,7 @@ test-cov cov: init-database
 		-- -u exports \
 		--reporter $(REPORTER) \
 		--timeout $(TIMEOUT) \
+		--require intelli-espower-loader \
 		--require should \
 		--require thunk-mocha \
 		--require ./test/init.js \
@@ -66,6 +68,7 @@ test-travis: init-database
 		-- -u exports \
 		--reporter dot \
 		--timeout $(TIMEOUT) \
+		--require intelli-espower-loader \
 		--require should \
 		--require thunk-mocha \
 		--require ./test/init.js \

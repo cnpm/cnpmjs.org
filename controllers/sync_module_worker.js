@@ -469,7 +469,10 @@ SyncModuleWorker.prototype._unpublished = function* (name, unpublishedInfo) {
   if (mods.length === 0) {
     return;
   }
-  yield [ packageService.removeModulesByName(name), packageService.removeModuleTags(name) ];
+  yield [
+    packageService.removeModulesByName(name),
+    packageService.removeModuleTags(name),
+  ];
   var keys = [];
   for (var i = 0; i < mods.length; i++) {
     var row = mods[i];
@@ -503,16 +506,24 @@ SyncModuleWorker.prototype._sync = function* (name, pkg) {
     packageService.listModuleTags(name),
     _listStarUsers(name),
     packageService.listPublicModuleMaintainers(name),
+    packageService.listModuleAbbreviatedsByName(name),
   ];
   var moduleRows = result[0];
   var tagRows = result[1];
   var existsStarUsers = result[2];
   var existsNpmMaintainers = result[3];
+  var existsModuleAbbreviateds = result[4];
 
   if (common.isLocalModule(moduleRows)) {
     // publish on cnpm, dont sync this version package
     that.log('  [%s] publish on local cnpm registry, don\'t sync', name);
     return [];
+  }
+
+  var missingModuleAbbreviateds = [];
+  var existsModuleAbbreviatedsMap = {};
+  for (var item of existsModuleAbbreviateds) {
+    existsModuleAbbreviatedsMap[item.version] = item;
   }
 
   hasModules = moduleRows.length > 0;
@@ -665,18 +676,29 @@ SyncModuleWorker.prototype._sync = function* (name, pkg) {
     if (!version || !version.dist || !version.dist.tarball) {
       continue;
     }
-    // patch for readme
-    if (!version.readme) {
-      version.readme = pkg.readme;
+    // remove readme
+    if (config.enableAbbreviatedMetadata) {
+      version.readme = undefined;
+    } else {
+      // patch for readme
+      if (!version.readme) {
+        version.readme = pkg.readme;
+      }
     }
+
     var publish_time = times[v];
     version.publish_time = publish_time ? Date.parse(publish_time) : null;
     if (!version.maintainers || !version.maintainers[0]) {
       version.maintainers = pkg.maintainers;
     }
+
     var abbreviatedMetadata = abbreviatedMetadatas[version.version];
 
     if (exists.package && exists.package.dist.shasum === version.dist.shasum) {
+      if (!existsModuleAbbreviatedsMap[exists.package.version]) {
+        missingModuleAbbreviateds.push(exists);
+      }
+
       // * shasum make sure equal
       if ((version.publish_time === exists.publish_time) ||
           (!version.publish_time && exists.publish_time)) {
@@ -691,19 +713,29 @@ SyncModuleWorker.prototype._sync = function* (name, pkg) {
           });
         }
 
-        if (!exists.package.readme && version.readme) {
-          // * make sure readme exists
-          missingReadmes.push({
-            id: exists.id,
-            readme: version.readme
-          });
+        if (config.enableAbbreviatedMetadata) {
+          // remove readme
+          if (exists.package.readme) {
+            missingReadmes.push({
+              id: exists.id,
+              readme: undefined,
+            });
+          }
+        } else {
+          if (!exists.package.readme && version.readme) {
+            // * make sure readme exists
+            missingReadmes.push({
+              id: exists.id,
+              readme: version.readme,
+            });
+          }
         }
 
         if (version.deprecated && version.deprecated !== exists.package.deprecated) {
           // need to sync deprecated field
           missingDeprecateds.push({
             id: exists.id,
-            deprecated: version.deprecated
+            deprecated: version.deprecated,
           });
         }
         if (exists.package.deprecated && !version.deprecated) {
@@ -879,6 +911,27 @@ SyncModuleWorker.prototype._sync = function* (name, pkg) {
     }
   }
 
+  function* syncModuleAbbreviateds() {
+    if (missingModuleAbbreviateds.length === 0) {
+      return;
+    }
+    that.log('  [%s] saving %d missing moduleAbbreviateds', name, missingModuleAbbreviateds.length);
+
+    var res = yield gather(missingModuleAbbreviateds.map(function (item) {
+      return packageService.saveModuleAbbreviated(item);
+    }));
+
+    for (var i = 0; i < res.length; i++) {
+      var item = missingModuleAbbreviateds[i];
+      var r = res[i];
+      if (r.error) {
+        that.log('    save moduleAbbreviateds error, module: %s@%s, error: %s', item.name, item.version, r.error.message);
+      } else {
+        that.log('    saved moduleAbbreviateds, module: %s@%s', item.name, item.version);
+      }
+    }
+  }
+
   function* syncAbbreviatedMetadatas() {
     if (missingAbbreviatedMetadatas.length === 0) {
       return;
@@ -893,7 +946,8 @@ SyncModuleWorker.prototype._sync = function* (name, pkg) {
       var item = missingAbbreviatedMetadatas[i];
       var r = res[i];
       if (r.error) {
-        that.log('    save error, module: %s@%s, error: %s', item.name, item.version, r.error.message);
+        that.log('    save error, module_abbreviated: %s@%s, error: %s',
+          item.name, item.version, r.error.stack);
       } else {
         that.log('    saved, module_abbreviated: %s@%s, %j', item.name, item.version, item);
       }
@@ -914,7 +968,7 @@ SyncModuleWorker.prototype._sync = function* (name, pkg) {
       var item = missingAbbreviatedMetadatas[i];
       var r = res[i];
       if (r.error) {
-        that.log('    save error, module id: %s, error: %s', item.id, r.error.message);
+        that.log('    save error, module id: %s, error: %s', item.id, r.error.stack);
       } else {
         that.log('    saved, module id: %s, %j', item.id, item);
       }
@@ -1022,13 +1076,13 @@ SyncModuleWorker.prototype._sync = function* (name, pkg) {
     }
   }
 
-  if ( latestVersionPackageReadme.version && latestVersionPackageReadme.readme) {
+  if (latestVersionPackageReadme.version && latestVersionPackageReadme.readme) {
     var existsPackageReadme = yield packageService.getPackageReadme(name);
     if (!existsPackageReadme ||
         existsPackageReadme.version !== latestVersionPackageReadme.version ||
         existsPackageReadme.readme !== latestVersionPackageReadme.readme) {
       var r = yield packageService.savePackageReadme(name, latestVersionPackageReadme.readme, latestVersionPackageReadme.version);
-      that.log('    save packageReadme: %j', r);
+      that.log('    save packageReadme: %s %s %s', r.id, r.name, r.version);
     }
   }
 
@@ -1039,6 +1093,7 @@ SyncModuleWorker.prototype._sync = function* (name, pkg) {
   yield syncMissingStarUsers();
   yield syncMissingUsers();
   yield syncNpmPackageMaintainers();
+  yield syncModuleAbbreviateds();
   yield syncAbbreviatedMetadatas();
 
   return syncedVersionNames;
