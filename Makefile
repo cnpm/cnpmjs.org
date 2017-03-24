@@ -8,7 +8,7 @@ jshint:
 	@node_modules/.bin/jshint .
 
 init-database:
-	@node test/init_db.js
+	@NODE_ENV=test node test/init_db.js
 
 init-mysql:
 	@mysql -uroot -e 'DROP DATABASE IF EXISTS cnpmjs_test;'

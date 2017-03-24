@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS `user` (
  `roles` varchar(200) NOT NULL DEFAULT '[]',
  `rev` varchar(40) NOT NULL,
  `email` varchar(400) NOT NULL,
- `json` longtext CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'json details',
+ `json` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci COMMENT 'json details',
  `npm_user` tinyint(1) DEFAULT '0' COMMENT 'user sync from npm or not, 1: true, other: false',
  PRIMARY KEY (`id`),
  UNIQUE KEY `name` (`name`),
@@ -86,6 +86,32 @@ CREATE TABLE IF NOT EXISTS `module` (
 -- ALTER TABLE `module` CHANGE `description` `description` LONGTEXT CHARACTER SET utf8 COLLATE utf8_general_ci;
 -- show create table module\G
 -- ALTER TABLE  `module` CHANGE  `name`  `name` VARCHAR( 100 ) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL COMMENT  'module name';
+
+CREATE TABLE IF NOT EXISTS `module_abbreviated` (
+ `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'primary key',
+ `gmt_create` datetime NOT NULL COMMENT 'create time',
+ `gmt_modified` datetime NOT NULL COMMENT 'modified time',
+ `name` varchar(100) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL COMMENT 'module name',
+ `version` varchar(30) NOT NULL COMMENT 'module version',
+ `package` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci COMMENT 'the abbreviated metadata',
+ `publish_time` bigint(20) unsigned,
+ PRIMARY KEY (`id`),
+ UNIQUE KEY `name` (`name`,`version`),
+ KEY `gmt_modified` (`gmt_modified`),
+ KEY `publish_time` (`publish_time`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='module abbreviated info';
+
+CREATE TABLE IF NOT EXISTS `package_readme` (
+ `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'primary key',
+ `gmt_create` datetime NOT NULL COMMENT 'create time',
+ `gmt_modified` datetime NOT NULL COMMENT 'modified time',
+ `name` varchar(100) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL COMMENT 'module name',
+ `readme` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci COMMENT 'the latest version readme',
+ `version` varchar(30) NOT NULL COMMENT 'module version',
+ PRIMARY KEY (`id`),
+ UNIQUE KEY `name` (`name`),
+ KEY `gmt_modified` (`gmt_modified`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='package latest readme';
 
 CREATE TABLE IF NOT EXISTS `module_log` (
  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'primary key',
