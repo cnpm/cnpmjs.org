@@ -148,7 +148,8 @@ function sendMailToAdmin(err, result, syncTime) {
   if (err) {
     // ignore 503, 504 error
     // 504: Gateway Time-out
-    if (err.status === 503 || err.status === 504) {
+    // 502 Bad Gateway
+    if (err.status === 503 || err.status === 504 || err.status === 502) {
       return;
     }
     if (err.name === 'JSONResponseFormatError') {
