@@ -1,4 +1,10 @@
 
+2.19.4 / 2017-03-26
+==================
+
+  * feat: need to sync sourceNpmRegistry also (#1153)
+  * docs: change user.json to utf8mb4
+
 2.19.3 / 2017-02-22
 ==================
 
