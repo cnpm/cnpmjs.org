@@ -1,4 +1,12 @@
 
+3.0.0-alpha.1 / 2017-03-27
+==================
+
+  * chore: start 3.x
+  * fix: ignore sync npm registry status 502
+  * feat: remove readme from package
+  * feat: [BREAKING_CHANGE] support abbreviated meta
+
 2.19.4 / 2017-03-26
 ==================
 
