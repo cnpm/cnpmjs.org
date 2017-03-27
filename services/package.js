@@ -454,7 +454,7 @@ exports.updateModuleLastModified = function* (name) {
 };
 
 // try to return latest version readme
-exports.getPackageReadme = function* (name) {
+exports.getPackageReadme = function* (name, onlyPackageReadme) {
   if (config.enableAbbreviatedMetadata) {
     var row = yield models.PackageReadme.findByName(name);
     if (row) {
@@ -462,6 +462,9 @@ exports.getPackageReadme = function* (name) {
         version: row.version,
         readme: row.readme,
       };
+    }
+    if (onlyPackageReadme) {
+      return;
     }
   }
 

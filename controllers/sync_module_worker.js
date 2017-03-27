@@ -1077,7 +1077,7 @@ SyncModuleWorker.prototype._sync = function* (name, pkg) {
   }
 
   if (latestVersionPackageReadme.version && latestVersionPackageReadme.readme) {
-    var existsPackageReadme = yield packageService.getPackageReadme(name);
+    var existsPackageReadme = yield packageService.getPackageReadme(name, true);
     if (!existsPackageReadme ||
         existsPackageReadme.version !== latestVersionPackageReadme.version ||
         existsPackageReadme.readme !== latestVersionPackageReadme.readme) {
