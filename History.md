@@ -1,4 +1,9 @@
 
+3.0.0-alpha.2 / 2017-03-27
+==================
+
+  * fix: only get from package_readme table
+
 3.0.0-alpha.1 / 2017-03-27
 ==================
 
