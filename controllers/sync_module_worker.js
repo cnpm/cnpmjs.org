@@ -377,7 +377,8 @@ SyncModuleWorker.prototype.syncByName = function* (concurrencyId, name, registry
     that.log('[c#%s] [error] [%s] get package(%s%s) error: package not exists, status: %s',
       concurrencyId, name, registry, packageUrl, status);
     yield that._doneOne(concurrencyId, name, true);
-    return;
+    // return empty versions, try again on officialNpmRegistry
+    return [];
   }
 
   that.log('[c#%d] [%s] package(%s%s) status: %s, dist-tags: %j, time.modified: %s, unpublished: %j, start...',
