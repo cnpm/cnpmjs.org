@@ -1,5 +1,6 @@
 'use strict';
 
+var assert = require('assert');
 var should = require('should');
 var mm = require('mm');
 var thunkify = require('thunkify-wrap');
