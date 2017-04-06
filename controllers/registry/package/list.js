@@ -46,7 +46,12 @@ module.exports = function* list() {
       yield handleAbbreviatedMetaRequest(this, name, modifiedTime, tags, rows);
       return;
     }
-    // no abbreviated meta, return the full meta
+    var fullRows = yield packageService.listModulesByName(name);
+    if (fullRows.length > 0) {
+      // no abbreviated meta rows, use the full meta convert to abbreviated meta
+      yield handleAbbreviatedMetaRequestWithFullMeta(this, name, modifiedTime, tags, fullRows);
+      return;
+    }
   }
 
   var r = yield [
@@ -223,8 +228,73 @@ function* handleAbbreviatedMetaRequest(ctx, name, modifiedTime, tags, rows) {
     var row = rows[i];
     var pkg = row.package;
     common.setDownloadURL(pkg, ctx);
-    pkg._cnpm_publish_time = row.publish_time;
-    pkg.publish_time = pkg.publish_time || row.publish_time;
+    pkg._cnpm_publish_time = undefined;
+    pkg.publish_time = undefined;
+
+    versions[pkg.version] = pkg;
+
+    if ((!distTags.latest && !latestMod) || distTags.latest === pkg.version) {
+      latestMod = row;
+    }
+  }
+
+  if (!latestMod) {
+    latestMod = rows[0];
+  }
+
+  if (tags.length === 0) {
+    // some sync error reason, will cause tags missing
+    // set latest tag at least
+    distTags.latest = latestMod.package.version;
+  }
+
+  var info = {
+    name: name,
+    modified: modifiedTime,
+    'dist-tags': distTags,
+    versions: versions,
+  };
+
+  debug('show %j', info);
+  ctx.jsonp = info;
+}
+
+function* handleAbbreviatedMetaRequestWithFullMeta(ctx, name, modifiedTime, tags, rows) {
+  debug('show %s got %d rows, %d tags',
+    name, rows.length, tags.length);
+  var latestMod = null;
+  // set tags
+  var distTags = {};
+  for (var i = 0; i < tags.length; i++) {
+    var t = tags[i];
+    distTags[t.tag] = t.version;
+  }
+
+  // set versions and times
+  var versions = {};
+  for (var i = 0; i < rows.length; i++) {
+    var row = rows[i];
+    // pkg is string ... ignore it
+    if (typeof row.package === 'string') {
+      continue;
+    }
+    // https://github.com/npm/registry/blob/master/docs/responses/package-metadata.md#abbreviated-version-object
+    var pkg = {
+      name: row.package.name,
+      version: row.package.version,
+      dependencies: row.package.dependencies,
+      optionalDependencies: row.package.optionalDependencies,
+      devDependencies: row.package.devDependencies,
+      bundleDependencies: row.package.bundleDependencies,
+      peerDependencies: row.package.peerDependencies,
+      bin: row.package.bin,
+      directories: row.package.directories,
+      dist: row.package.dist,
+      engines: row.package.engines,
+      _hasShrinkwrap: row.package._hasShrinkwrap,
+      _publish_on_cnpm: row.package._publish_on_cnpm,
+    };
+    common.setDownloadURL(pkg, ctx);
 
     versions[pkg.version] = pkg;
 

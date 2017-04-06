@@ -58,6 +58,28 @@ describe('test/controllers/registry/package/list.test.js', () => {
     });
   });
 
+  it('should return all versions in abbreviated meta format for private scope package', function(done) {
+    request(app.listen())
+    .get('/@cnpmtest/testmodule-list-1')
+    .set('Accept', 'application/vnd.npm.install-v1+json')
+    .expect(200, function(err, res) {
+      should.not.exist(err);
+      var data = res.body;
+      assert(data.name === '@cnpmtest/testmodule-list-1');
+      assert.deepEqual(Object.keys(data.versions), ['1.0.0', '0.0.1']);
+      assert(data.modified);
+      assert.deepEqual(data['dist-tags'], { latest: '1.0.0' });
+      assert(!data.time);
+
+      // should 304
+      request(app.listen())
+      .get('/@cnpmtest/testmodule-list-1')
+      .set('Accept', 'application/vnd.npm.install-v1+json')
+      .set('If-None-Match', res.headers.etag)
+      .expect(304, done);
+    });
+  });
+
   it('should show star users', function (done) {
     mm(packageService, 'listStarUserNames', function* () {
       return ['fengmk2', 'foouser'];
