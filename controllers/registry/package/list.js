@@ -282,6 +282,7 @@ function* handleAbbreviatedMetaRequestWithFullMeta(ctx, name, modifiedTime, tags
     var pkg = {
       name: row.package.name,
       version: row.package.version,
+      deprecated: row.package.deprecated,
       dependencies: row.package.dependencies,
       optionalDependencies: row.package.optionalDependencies,
       devDependencies: row.package.devDependencies,

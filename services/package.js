@@ -342,6 +342,7 @@ exports.saveModuleAbbreviated = function* (mod) {
   var pkg = JSON.stringify({
     name: mod.package.name,
     version: mod.package.version,
+    deprecated: mod.package.deprecated,
     dependencies: mod.package.dependencies,
     optionalDependencies: mod.package.optionalDependencies,
     devDependencies: mod.package.devDependencies,
