@@ -1,4 +1,9 @@
 
+3.0.0-alpha.4 / 2017-04-12
+==================
+
+  * fix: add missing deprecated on abbreviated meta (#1165)
+
 3.0.0-alpha.2 / 2017-03-27
 ==================
 
