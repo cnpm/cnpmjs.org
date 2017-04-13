@@ -239,7 +239,7 @@ describe('test/controllers/sync_module_worker.test.js', () => {
   it('should not sync unpublished info on local package', function* () {
     var listModulesByName = packageService.listModulesByName;
     mm(packageService, 'listModulesByName', function* () {
-      var mods = yield* listModulesByName.call(packageService, 'google');
+      var mods = yield listModulesByName.call(packageService, 'google');
       return mods;
     });
 
@@ -255,12 +255,49 @@ describe('test/controllers/sync_module_worker.test.js', () => {
   it('should sync unpublished package', function* () {
     var listModulesByName = packageService.listModulesByName;
     mm(packageService, 'listModulesByName', function* () {
-      var mods = yield* listModulesByName.call(packageService, 'byte');
+      var mods = yield listModulesByName.call(packageService, 'byte');
       return mods;
     });
 
     var worker = new SyncModuleWorker({
       name: 'tnpm',
+      username: 'fengmk2',
+    });
+    worker.start();
+    var end = thunkify.event(worker, 'end');
+    yield end();
+  });
+
+  it('should sync missing module abbreviateds deprecated property', function* () {
+    var worker = new SyncModuleWorker({
+      name: 'native-or-bluebird',
+      username: 'fengmk2',
+    });
+    worker.start();
+    var end = thunkify.event(worker, 'end');
+    yield end();
+
+    const rows = yield packageService.listModuleAbbreviatedsByName('native-or-bluebird');
+    console.log('get %d rows', rows.length);
+    rows.forEach(row => {
+      assert(row.package.deprecated);
+      assert(row.package._hasShrinkwrap === false);
+    });
+
+    // mock deprecated missing
+    mm(packageService, 'listModuleAbbreviatedsByName', function* () {
+      rows.forEach((row, index) => {
+        if (index % 2 === 0) {
+          row.package.deprecated = 'foo + ' + row.package.deprecated;
+        } else {
+          row.package.deprecated = undefined;
+        }
+      });
+      return rows;
+    });
+
+    worker = new SyncModuleWorker({
+      name: 'native-or-bluebird',
       username: 'fengmk2',
     });
     worker.start();
