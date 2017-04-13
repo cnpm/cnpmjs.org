@@ -1015,7 +1015,7 @@ SyncModuleWorker.prototype._sync = function* (name, pkg) {
       if (r.error) {
         that.log('    save error, module abbreviated: %s@%s, error: %s', item.name, item.version, r.error.message);
       } else {
-        that.log('    saved, module abbreviated: %s, deprecated: %j', item.name, item.version, item.deprecated);
+        that.log('    saved, module abbreviated: %s@%s, deprecated: %j', item.name, item.version, item.deprecated);
       }
     }
   }
