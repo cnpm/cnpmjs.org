@@ -1,4 +1,9 @@
 
+3.0.0-alpha.5 / 2017-04-14
+==================
+
+  * fix: should auto sync missing deprecated property (#1167)
+
 3.0.0-alpha.4 / 2017-04-12
 ==================
 
