@@ -603,6 +603,10 @@ SyncModuleWorker.prototype._sync = function* (name, pkg) {
   //   { name, version, _hasShrinkwrap }
   // ]
   var missingAbbreviatedMetadatas = [];
+  // [
+  //   { name, version, deprecated },
+  // ]
+  var missingDeprecatedsOnExistsModuleAbbreviated = [];
 
   // find out new maintainers
   var pkgMaintainers = pkg.maintainers || [];
@@ -696,8 +700,26 @@ SyncModuleWorker.prototype._sync = function* (name, pkg) {
     var abbreviatedMetadata = abbreviatedMetadatas[version.version];
 
     if (exists.package && exists.package.dist.shasum === version.dist.shasum) {
-      if (!existsModuleAbbreviatedsMap[exists.package.version]) {
+      var existsModuleAbbreviated = existsModuleAbbreviatedsMap[exists.package.version];
+      if (!existsModuleAbbreviated) {
         missingModuleAbbreviateds.push(exists);
+      } else {
+        // sync missing deprecated on existsModuleAbbreviated
+        if (exists.package.deprecated && exists.package.deprecated !== existsModuleAbbreviated.package.deprecated) {
+          // add deprecated
+          missingDeprecatedsOnExistsModuleAbbreviated.push({
+            name,
+            version: exists.package.version,
+            deprecated: exists.package.deprecated,
+          });
+        } else if (existsModuleAbbreviated.package.deprecated && !exists.package.deprecated) {
+          // remove deprecated
+          missingDeprecatedsOnExistsModuleAbbreviated.push({
+            name,
+            version: exists.package.version,
+            deprecated: undefined,
+          });
+        }
       }
 
       // * shasum make sure equal
@@ -976,6 +998,28 @@ SyncModuleWorker.prototype._sync = function* (name, pkg) {
     }
   }
 
+  function *syncDeprecatedsOnExistsModuleAbbreviated() {
+    if (missingDeprecatedsOnExistsModuleAbbreviated.length === 0) {
+      return;
+    }
+    that.log('  [%s] saving %d module abbreviated deprecated fields',
+      name, missingDeprecatedsOnExistsModuleAbbreviated.length);
+
+    var res = yield gather(missingDeprecatedsOnExistsModuleAbbreviated.map(function (item) {
+      return packageService.updateModuleAbbreviatedPackage(item);
+    }));
+
+    for (var i = 0; i < res.length; i++) {
+      var item = missingDeprecatedsOnExistsModuleAbbreviated[i];
+      var r = res[i];
+      if (r.error) {
+        that.log('    save error, module abbreviated: %s@%s, error: %s', item.name, item.version, r.error.message);
+      } else {
+        that.log('    saved, module abbreviated: %s@%s, deprecated: %j', item.name, item.version, item.deprecated);
+      }
+    }
+  }
+
   function *syncDeprecateds() {
     if (missingDeprecateds.length === 0) {
       return;
@@ -1096,6 +1140,7 @@ SyncModuleWorker.prototype._sync = function* (name, pkg) {
   yield syncNpmPackageMaintainers();
   yield syncModuleAbbreviateds();
   yield syncAbbreviatedMetadatas();
+  yield syncDeprecatedsOnExistsModuleAbbreviated();
 
   return syncedVersionNames;
 };
