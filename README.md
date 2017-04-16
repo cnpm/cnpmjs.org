@@ -1,3 +1,4 @@
+[![Stories in Ready](https://badge.waffle.io/cnpm/cnpmjs.org.png?label=ready&title=Ready)](https://waffle.io/cnpm/cnpmjs.org)
 cnpmjs.org
 =======
 
