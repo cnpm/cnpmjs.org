@@ -80,6 +80,21 @@ describe('test/controllers/registry/package/list.test.js', () => {
     });
   });
 
+  it('should return abbreviated meta when Accept: application/vnd.npm.install-v1+json; q=1.0, application/json; q=0.8, */*', () => {
+    return request(app.listen())
+      .get('/@cnpmtest/testmodule-list-1')
+      .set('Accept', 'application/vnd.npm.install-v1+json; q=1.0, application/json; q=0.8, */*')
+      .expect(res => {
+        var data = res.body;
+        assert(data.name === '@cnpmtest/testmodule-list-1');
+        assert.deepEqual(Object.keys(data.versions), ['1.0.0', '0.0.1']);
+        assert(data.modified);
+        assert.deepEqual(data['dist-tags'], { latest: '1.0.0' });
+        assert(!data.time);
+      })
+      .expect(200);
+  });
+
   it('should show star users', function (done) {
     mm(packageService, 'listStarUserNames', function* () {
       return ['fengmk2', 'foouser'];
