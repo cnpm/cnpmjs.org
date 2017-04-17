@@ -62,7 +62,7 @@
     "xss": "^0.2.13"
   },
   "devDependencies": {
-    "autod": "*",
+    "autod": "2.3.0",
     "chunkstream": "*",
     "contributors": "*",
     "intelli-espower-loader": "^1.0.1",
