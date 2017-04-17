@@ -69,7 +69,7 @@
     "istanbul": "*",
     "jshint": "*",
     "mm": "*",
-    "mocha": "*",
+    "mocha": "2.4.1",
     "node-dev": "*",
     "pedding": "*",
     "pg": "5",
