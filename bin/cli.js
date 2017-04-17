@@ -117,6 +117,7 @@ function initDatabase(callback) {
           console.error(err);
           throw err;
         } else {
+          callback();
           console.log('[models/init_script.js] `sqlite` sequelize sync and init success');
           callback();
         }
