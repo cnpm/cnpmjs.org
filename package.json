@@ -70,7 +70,7 @@
     "jshint": "*",
     "mm": "*",
     "mocha": "*",
-    "node-dev": "*",
+    "node-dev": "3.0.0",
     "pedding": "*",
     "pg": "5",
     "pg-hstore": "2",
