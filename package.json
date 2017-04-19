@@ -68,7 +68,7 @@
     "intelli-espower-loader": "^1.0.1",
     "istanbul": "*",
     "jshint": "*",
-    "mm": "*",
+    "mm": "1.5.0",
     "mocha": "*",
     "node-dev": "*",
     "pedding": "*",
