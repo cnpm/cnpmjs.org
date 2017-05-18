@@ -5,7 +5,9 @@ const config = require('../config');
 const logger = require('../common/logger');
 
 exports.trigger = envelope => {
-  if (!config.globalHook) return;
+  if (!config.globalHook) {
+    return;
+  }
 
   envelope.time = Date.now();
 
