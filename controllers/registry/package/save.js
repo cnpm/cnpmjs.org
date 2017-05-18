@@ -223,8 +223,7 @@ module.exports = function* save(next) {
     hookOwner: null,
     payload: null,
     change: null,
-  }
-
+  };
   hook.trigger(envelope);
 };
 
