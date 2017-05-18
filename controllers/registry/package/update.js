@@ -29,11 +29,11 @@ module.exports = function* update(next) {
 
   var body = this.request.body;
   if (body.versions) {
-    yield* updateVersions.call(this, next);
+    yield updateVersions.call(this, next);
   } else if (body.maintainers) {
-    yield* updateMaintainers.call(this, next);
+    yield updateMaintainers.call(this, next);
   } else {
-    yield* next;
+    yield next;
   }
 };
 

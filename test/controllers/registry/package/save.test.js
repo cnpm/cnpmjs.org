@@ -1,19 +1,9 @@
-/**!
- * Copyright(c) cnpmjs.org and other contributors.
- * MIT Licensed
- *
- * Authors:
- *  fengmk2 <fengmk2@gmail.com> (http://fengmk2.com)
- */
-
 'use strict';
 
-/**
- * Module dependencies.
- */
-
+var assert = require('assert');
 var should = require('should');
 var request = require('supertest');
+var pedding = require('pedding');
 var mm = require('mm');
 var packageService = require('../../../../services/package');
 var app = require('../../../../servers/registry');
@@ -69,6 +59,28 @@ describe('test/controllers/registry/package/save.test.js', function () {
         });
         done();
       });
+    });
+
+    it('should publish new package and fire globalHook', done => {
+      done = pedding(done, 2);
+      mm(config, 'globalHook', function* (envelope) {
+        console.log(envelope);
+        assert(envelope.version === '1.0.1');
+        assert(envelope.name === 'testmodule-new-2');
+        assert(envelope.type === 'package');
+        assert(envelope.event === 'package:publish');
+        done();
+      });
+      var pkg = utils.getPackage('testmodule-new-2', '1.0.1', utils.admin);
+      pkg.versions['1.0.1'].dependencies = {
+        'bytetest-1': '~0.0.1',
+        mocha: '~1.0.0'
+      };
+      request(app.listen())
+      .put('/' + pkg.name)
+      .set('authorization', utils.adminAuth)
+      .send(pkg)
+      .expect(201, done);
     });
 
     it('should save dependents', function* () {

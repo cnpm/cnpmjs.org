@@ -1,18 +1,4 @@
-/**!
- * cnpmjs.org - controllers/registry/package/save.js
- *
- * Copyright(c) fengmk2 and other contributors.
- * MIT Licensed
- *
- * Authors:
- *   fengmk2 <fengmk2@gmail.com> (http://fengmk2.github.com)
- */
-
 'use strict';
-
-/**
- * Module dependencies.
- */
 
 var debug = require('debug')('cnpmjs.org:controllers:registry:package:save');
 var crypto = require('crypto');
@@ -21,6 +7,7 @@ var packageService = require('../../../services/package');
 var common = require('../../../lib/common');
 var nfs = require('../../../common/nfs');
 var config = require('../../../config');
+var hook = require('../../../services/hook');
 
 // old flows:
 // 1. add()
@@ -135,7 +122,7 @@ module.exports = function* save(next) {
   debug('%s publish new %s:%s, attachment size: %s, maintainers: %j, distTags: %j',
     username, name, version, attachment.length, versionPackage.maintainers, distTags);
 
-  var exists = yield* packageService.getModule(name, version);
+  var exists = yield packageService.getModule(name, version);
   var shasum;
   if (exists) {
     this.status = 403;
@@ -202,9 +189,9 @@ module.exports = function* save(next) {
   };
 
   mod.package.dist = dist;
-  yield* addDepsRelations(mod.package);
+  yield addDepsRelations(mod.package);
 
-  var addResult = yield* packageService.saveModule(mod);
+  var addResult = yield packageService.saveModule(mod);
   debug('%s module: save file to %s, size: %d, sha1: %s, dist: %j, version: %s',
     addResult.id, dist.tarball, dist.size, shasum, dist, version);
 
@@ -219,13 +206,25 @@ module.exports = function* save(next) {
   var maintainerNames = maintainers.map(function (item) {
     return item.name;
   });
-  yield* packageService.addPrivateModuleMaintainers(name, maintainerNames);
+  yield packageService.addPrivateModuleMaintainers(name, maintainerNames);
 
   this.status = 201;
   this.body = {
     ok: true,
     rev: String(addResult.id)
   };
+
+  // hooks
+  const envelope = {
+    event: 'package:publish',
+    name: mod.name,
+    type: 'package',
+    version: mod.version,
+    hookOwner: null,
+    payload: null,
+    change: null,
+  };
+  hook.trigger(envelope);
 };
 
 function* addDepsRelations(pkg) {
