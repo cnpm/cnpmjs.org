@@ -1,4 +1,11 @@
 
+3.0.0-alpha.6 / 2017-05-18
+==================
+
+  * feat: add globalHook on config (#1177)
+  * fix: TypeError caused by invalid engines property (#1151)
+  * test: add new test for application/vnd.npm.install-v1+json request
+
 3.0.0-alpha.5 / 2017-04-14
 ==================
 
