@@ -1,0 +1,10 @@
+# Snyk (https://snyk.io) policy file, patches or ignores known vulnerabilities.
+version: v1.7.1
+ignore: {}
+# patches apply the minimum changes required to fix a vulnerability
+patch:
+  'npm:ms:20170412':
+    - koa-mock > debug > ms:
+        patched: '2017-05-28T05:13:06.296Z'
+    - koa-mock > urlmock > debug > ms:
+        patched: '2017-05-28T05:13:06.296Z'
