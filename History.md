@@ -1,4 +1,9 @@
 
+3.0.0-alpha.7 / 2017-06-01
+==================
+
+  * fix: add missing publish_time property on package list api (#1185)
+
 3.0.0-alpha.6 / 2017-05-18
 ==================
 
