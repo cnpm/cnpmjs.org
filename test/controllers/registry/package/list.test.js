@@ -41,7 +41,7 @@ describe('test/controllers/registry/package/list.test.js', () => {
     });
   });
 
-  it('should return all versions', function (done) {
+  it('should return all versions', done => {
     request(app.listen())
     .get('/@cnpmtest/testmodule-list-1')
     .expect(200, function (err, res) {
@@ -49,6 +49,10 @@ describe('test/controllers/registry/package/list.test.js', () => {
       var data = res.body;
       data.name.should.equal('@cnpmtest/testmodule-list-1');
       Object.keys(data.versions).should.eql(['1.0.0', '0.0.1']);
+      for (const v in data.versions) {
+        const pkg = data.versions[v];
+        assert(pkg.publish_time && typeof pkg.publish_time === 'number');
+      }
 
       // should 304
       request(app)
@@ -249,7 +253,10 @@ describe('test/controllers/registry/package/list.test.js', () => {
           assert(data['dist-tags'].latest);
           assert(Object.keys(data.versions).length > 0);
           for (const v in data.versions) {
-            assert('_hasShrinkwrap' in data.versions[v]);
+            const pkg = data.versions[v];
+            assert('_hasShrinkwrap' in pkg);
+            assert(pkg.publish_time && typeof pkg.publish_time === 'number');
+            assert(pkg._publish_on_cnpm === undefined);
           }
         });
     });
@@ -283,7 +290,10 @@ describe('test/controllers/registry/package/list.test.js', () => {
           assert(data['dist-tags'].latest);
           assert(Object.keys(data.versions).length > 0);
           for (const v in data.versions) {
-            assert('_hasShrinkwrap' in data.versions[v]);
+            const pkg = data.versions[v];
+            assert('_hasShrinkwrap' in pkg);
+            assert(pkg.publish_time && typeof pkg.publish_time === 'number');
+            assert(pkg._publish_on_cnpm === undefined);
           }
         });
     });
@@ -304,7 +314,10 @@ describe('test/controllers/registry/package/list.test.js', () => {
           assert(data['dist-tags'].latest);
           assert(Object.keys(data.versions).length > 0);
           for (const v in data.versions) {
-            assert('_hasShrinkwrap' in data.versions[v]);
+            const pkg = data.versions[v];
+            assert('_hasShrinkwrap' in pkg);
+            assert(pkg.publish_time && typeof pkg.publish_time === 'number');
+            assert(pkg._publish_on_cnpm === undefined);
           }
         });
     });

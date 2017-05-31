@@ -228,8 +228,8 @@ function* handleAbbreviatedMetaRequest(ctx, name, modifiedTime, tags, rows) {
     var row = rows[i];
     var pkg = row.package;
     common.setDownloadURL(pkg, ctx);
-    pkg._cnpm_publish_time = undefined;
-    pkg.publish_time = undefined;
+    pkg._publish_on_cnpm = undefined;
+    pkg.publish_time = pkg.publish_time || row.publish_time;
 
     versions[pkg.version] = pkg;
 
@@ -293,7 +293,7 @@ function* handleAbbreviatedMetaRequestWithFullMeta(ctx, name, modifiedTime, tags
       dist: row.package.dist,
       engines: row.package.engines,
       _hasShrinkwrap: row.package._hasShrinkwrap,
-      _publish_on_cnpm: row.package._publish_on_cnpm,
+      publish_time: row.package.publish_time || row.publish_time,
     };
     common.setDownloadURL(pkg, ctx);
 

@@ -326,13 +326,17 @@ exports.saveModule = function* (mod) {
 exports.listModuleAbbreviatedsByName = function* (name) {
   var rows = yield models.ModuleAbbreviated.findAll({
     where: {
-      name: name
+      name: name,
     },
     order: [ ['id', 'DESC'] ],
   });
 
   for (var row of rows) {
     row.package = JSON.parse(row.package);
+    if (row.publish_time && typeof row.publish_time === 'string') {
+      // pg bigint is string
+      row.publish_time = Number(row.publish_time);
+    }
   }
   return rows;
 };
