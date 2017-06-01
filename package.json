@@ -72,7 +72,7 @@
     "mocha": "*",
     "node-dev": "*",
     "pedding": "*",
-    "pg": "5",
+    "pg": "6.0.3",
     "pg-hstore": "2",
     "power-assert": "^1.4.2",
     "should": "8",
