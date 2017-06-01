@@ -67,7 +67,7 @@
     "contributors": "*",
     "intelli-espower-loader": "^1.0.1",
     "istanbul": "*",
-    "jshint": "*",
+    "jshint": "2.9.3",
     "mm": "*",
     "mocha": "*",
     "node-dev": "*",
