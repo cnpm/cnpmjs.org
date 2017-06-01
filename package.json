@@ -16,7 +16,7 @@
   },
   "dependencies": {
     "agentkeepalive": "^2.2.0",
-    "await-event": "^1.0.0",
+    "await-event": "^2.1.0",
     "bytes": "^2.4.0",
     "cfork": "^1.5.1",
     "changes-stream": "^1.1.0",
