@@ -40,7 +40,7 @@
     "koa-limit": "^1.0.2",
     "koa-markdown": "^2.0.1",
     "koa-maxrequests": "^1.0.0",
-    "koa-middlewares": "^2.1.0",
+    "koa-middlewares": "^6.0.0",
     "koa-mock": "^1.6.1",
     "koa-safe-jsonp": "^0.3.1",
     "markdown-it": "^3.0.6",
