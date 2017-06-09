@@ -5,6 +5,7 @@
  */
 
 var debug = require('debug')('cnpmjs.org:middleware:proxy_to_npm');
+var urllib = require('../common/urllib');
 var config = require('../config');
 
 module.exports = function (options) {
@@ -45,6 +46,10 @@ module.exports = function (options) {
 
     var url = redirectUrl + this.url;
     debug('proxy to %s', url);
-    this.redirect(url);
+    
+    this.body = yield urllib.request(url, {
+      dataType: 'json',
+      timeout: 20000
+    });
   };
 };
