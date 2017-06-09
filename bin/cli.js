@@ -50,6 +50,7 @@ program.parse(process.argv);
 function start(options) {
   stop(options);
   var dataDir = options.dataDir || path.join(process.env.HOME, '.cnpmjs.org');
+  process.env.CNPM_DATA_DIR = dataDir;
   mkdirp.sync(dataDir);
 
   var configfile = path.join(dataDir, 'config.json');

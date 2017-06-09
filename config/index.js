@@ -9,7 +9,7 @@ var os = require('os');
 var version = require('../package.json').version;
 
 var root = path.dirname(__dirname);
-var dataDir = path.join(process.env.HOME || root, '.cnpmjs.org');
+var dataDir = process.env.CNPM_DATA_DIR || path.join(process.env.HOME || root, '.cnpmjs.org');
 
 var config = {
   version: version,
