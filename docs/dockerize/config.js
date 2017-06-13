@@ -224,16 +224,12 @@ var config = {
 
   // https://github.com/cnpm/cnpmjs.org/issues/1149
   // if enable this option, must create module_abbreviated and package_readme table in database
-  enableAbbreviatedMetadata: false,
+  enableAbbreviatedMetadata: true,
 
   // global hook function: function* (envelope) {}
   // envelope format please see https://github.com/npm/registry/blob/master/docs/hooks/hooks-payload.md#payload
   globalHook: null,
 };
-
-if (process.env.NODE_ENV === 'test') {
-  config.enableAbbreviatedMetadata = true;
-}
 
 if (process.env.NODE_ENV !== 'test') {
   var customConfig;
