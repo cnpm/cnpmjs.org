@@ -103,6 +103,61 @@ $ make autod
 $ make dev
 ```
 
+### Dockerized cnpmjs.org Installation Guide
+
+Cnpmjs.org shipped with a simple but pragmatic Docker Compose configuration.With the configuration, you can set up a MySQL backed cnpmjs.org instance by executing just one command on Docker installed environment.
+
+#### Preparation
+
+* [Install Docker](https://www.docker.com/community-edition)
+* [Install Docker Compose](https://docs.docker.com/compose/install/) (Docker for Mac, Docker for Windows include Docker Compose, so most Mac and Windows users do not need to install Docker Compose separately)
+* (Optional) Speed up Docker images downloading by setting up [Docker images download accelerator](https://yq.aliyun.com/articles/29941)
+
+
+#### Dockerized cnpmjs.org control command 
+
+Make sure your current working directory is the root of this GitHub repository.
+
+##### Run dockerized cnpmjs.org
+
+```bash
+ $docker-compose up
+ ```
+ 
+This command will build a Docker image using the current code of repository. Then set up a dockerized MySQL instance with data initialized. After Docker container running, you can access your cnpmjs.org web portal at http://127.0.0.1:7002 and npm register at http://127.0.0.1:7001.
+
+#### Run cnpmjs.org in the backend
+
+```bash
+$docker-compose up -d
+```
+
+#### Rebuild cnpmjs.org Docker image
+
+```bash
+$docker-compose build
+```
+
+#### Remove current dockerized cnpmjs.org instance
+
+The current configuration set 2 named Docker Volume for your persistent data. If you haven't change the repository directory name, them will be "cnpmjsorg_cnpm-files-volume" & "cnpmjsorg_cnpm-db-volume".
+
+Be Careful, the following commands will remove them.
+
+```bash
+$docker-compose rm 
+$docker volume rm cnpmjsorg_cnpm-files-volume
+$docker volume rm cnpmjsorg_cnpm-db-volume
+```
+
+You can get more information about your data volumes using the below commands:
+
+```bash
+$docker volume ls  // list all of your Docker volume
+$docker volume inspect cnpmjsorg_cnpm-files-volume
+$docker volume inspect cnpmjsorg_cnpm-db-volume
+```
+
 ## How to contribute
 
 * Clone the project

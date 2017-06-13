@@ -1,0 +1,30 @@
+version: '3'
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: cnpmjs.org
+    depends_on:
+      - mysql-db
+    volumes:
+      - cnpm-files-volume:/var/data/cnpm_data
+    ports:
+      - "7001:7001"
+      - "7002:7002"
+
+  mysql-db:
+    image: mysql:5.6
+    restart: always
+    environment :
+      MYSQL_USER: root      
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"      
+      MYSQL_DATABASE: cnpmjs_test
+      MYSQL_ROOT_HOST: "%"
+    volumes:
+      - ./docs/db.sql:/docker-entrypoint-initdb.d/cnpm-init.sql           
+      - cnpm-db-volume:/var/lib/mysql 
+
+volumes:
+  cnpm-files-volume:
+  cnpm-db-volume:    
