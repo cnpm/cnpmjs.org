@@ -124,7 +124,7 @@ Make sure your current working directory is the root of this GitHub repository.
  $docker-compose up
  ```
  
-This command will build a Docker image using the current code of repository. Then set up a dockerized MySQL instance with data initialized. After Docker container running, you can access your cnpmjs.org web portal at http://127.0.0.1:7002 and npm register at http://127.0.0.1:7002.
+This command will build a Docker image using the current code of repository. Then set up a dockerized MySQL instance with data initialized. After Docker container running, you can access your cnpmjs.org web portal at http://127.0.0.1:7002 and npm register at http://127.0.0.1:7001.
 
 #### Run cnpmjs.org in the backend
 
