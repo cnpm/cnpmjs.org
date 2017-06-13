@@ -12,12 +12,6 @@ services:
     ports:
       - "7001:7001"
       - "7002:7002"
-    deploy:
-      mode: replicated
-      replicas: 2
-    labels:
-      aliyun.routing.port_7001: cnpm-registry
-      aliyun.routing.port_7002: cnpm-web
 
   mysql-db:
     image: mysql:5.6
