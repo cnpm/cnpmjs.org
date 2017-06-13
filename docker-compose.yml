@@ -5,6 +5,10 @@ services:
       context: .
       dockerfile: Dockerfile
     image: cnpmjs.org
+    depends_on:
+      - mysql-db
+    volumes:
+      - /var/data/cnpm_data
     ports:
       - "7001:7001"
       - "7002:7002"
@@ -14,3 +18,18 @@ services:
     labels:
       aliyun.routing.port_7001: cnpm-registry
       aliyun.routing.port_7002: cnpm-web
+
+  mysql-db:
+    image: mysql:5.6
+    restart: always
+    environment :
+      MYSQL_USER: root      
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"      
+      MYSQL_DATABASE: cnpmjs_test
+      MYSQL_ROOT_HOST: "%"
+    volumes:
+      - ./docs/db.sql:/docker-entrypoint-initdb.d/cnpm-init.sql           
+      - /var/lib/mysql 
+
+
+    
