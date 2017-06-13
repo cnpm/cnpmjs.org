@@ -27,7 +27,7 @@ var config = {
 
   registryPort: 7001,
   webPort: 7002,
-  bindingHost: '0.0.0.0', // only binding on 127.0.0.1 for local access
+  bindingHost: '0.0.0.0', // binding on 0.0.0.0 for outside of container access
 
   // debug mode
   // if in debug mode, some middleware like limit wont load
@@ -106,7 +106,7 @@ var config = {
     // - currently supported: 'mysql', 'sqlite', 'postgres', 'mariadb'
     dialect: 'mysql',
 
-    // custom host; default: 127.0.0.1
+    // the Docker container network hostname defined at docker-compose.yml
     host: 'mysql-db',
 
     // custom port; default: 3306

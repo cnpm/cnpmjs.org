@@ -132,16 +132,30 @@ This command will build a Docker image using the current code of repository. The
 $docker-compose up -d
 ```
 
-#### Clear current cnpmjs.org instance data (remove MySQL DB & uploaded npm packages)
-
-```bash
-$docker-compose rm -v
-```
-
 #### Rebuild cnpmjs.org Docker image
 
 ```bash
 $docker-compose build
+```
+
+#### Remove current dockerized cnpmjs.org instance
+
+The current configuration set 2 named Docker Volume for your persistent data. If you haven't change the repository directory name, them will be "cnpmjsorg_cnpm-files-volume" & "cnpmjsorg_cnpm-db-volume".
+
+Be Careful, the following commands will remove them.
+
+```bash
+$docker-compose rm 
+$docker volume rm cnpmjsorg_cnpm-files-volume
+$docker volume rm cnpmjsorg_cnpm-db-volume
+```
+
+You can get more information about your data volumes using the below commands:
+
+```bash
+$docker volume ls  // list all of your Docker volume
+$docker volume inspect cnpmjsorg_cnpm-files-volume
+$docker volume inspect cnpmjsorg_cnpm-db-volume
 ```
 
 ## How to contribute

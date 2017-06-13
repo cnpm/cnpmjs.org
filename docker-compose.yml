@@ -8,7 +8,7 @@ services:
     depends_on:
       - mysql-db
     volumes:
-      - /var/data/cnpm_data
+      - cnpm-files-volume:/var/data/cnpm_data
     ports:
       - "7001:7001"
       - "7002:7002"
@@ -23,7 +23,8 @@ services:
       MYSQL_ROOT_HOST: "%"
     volumes:
       - ./docs/db.sql:/docker-entrypoint-initdb.d/cnpm-init.sql           
-      - /var/lib/mysql 
+      - cnpm-db-volume:/var/lib/mysql 
 
-
-    
+volumes:
+  cnpm-files-volume:
+  cnpm-db-volume:    
