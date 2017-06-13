@@ -1,5 +1,5 @@
 FROM node:6.11
-MAINTAINER lvyi <lvscar  {aT} gmail.com>
+MAINTAINER Bono Lv <lvscar  {aT} gmail.com>
 
 # Working enviroment
 ENV \
