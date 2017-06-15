@@ -39,10 +39,11 @@ describe('test/services/package.test.js', function () {
       size: 100,
     };
     mod.package.dist = dist;
-    yield* Package.saveModule(mod);
+    yield Package.saveModule(mod);
+    yield Package.saveModuleAbbreviated(mod);
     // add tag
-    yield* Package.addModuleTag(name, tag || 'latest', version);
-    return yield* Package.getModule(mod.name, mod.version);
+    yield Package.addModuleTag(name, tag || 'latest', version);
+    return yield Package.getModule(mod.name, mod.version);
   }
 
   describe('addModuleTag()', function () {
@@ -217,22 +218,28 @@ describe('test/services/package.test.js', function () {
 
   describe('removeModulesByNameAndVersions()', function () {
     it('should remove some versions', function* () {
-      yield* createModule('test-removeModulesByNameAndVersions-module-1', '0.0.0');
-      yield* createModule('test-removeModulesByNameAndVersions-module-1', '1.0.0');
-      yield* createModule('test-removeModulesByNameAndVersions-module-1', '1.0.1', null, 'beta');
-      yield* createModule('test-removeModulesByNameAndVersions-module-1', '2.0.0');
+      yield createModule('test-removeModulesByNameAndVersions-module-1', '0.0.0');
+      yield createModule('test-removeModulesByNameAndVersions-module-1', '1.0.0');
+      yield createModule('test-removeModulesByNameAndVersions-module-1', '1.0.1', null, 'beta');
+      yield createModule('test-removeModulesByNameAndVersions-module-1', '2.0.0');
 
-      var mods = yield* Package.listModulesByName('test-removeModulesByNameAndVersions-module-1');
+      var mods = yield Package.listModulesByName('test-removeModulesByNameAndVersions-module-1');
       mods.should.length(4);
+      var rows = yield Package.listModuleAbbreviatedsByName('test-removeModulesByNameAndVersions-module-1');
+      rows.should.length(4);
 
-      yield* Package.removeModulesByNameAndVersions('test-removeModulesByNameAndVersions-module-1', ['1.0.0']);
-      mods = yield* Package.listModulesByName('test-removeModulesByNameAndVersions-module-1');
+      yield Package.removeModulesByNameAndVersions('test-removeModulesByNameAndVersions-module-1', ['1.0.0']);
+      mods = yield Package.listModulesByName('test-removeModulesByNameAndVersions-module-1');
       mods.should.length(3);
+      rows = yield Package.listModuleAbbreviatedsByName('test-removeModulesByNameAndVersions-module-1');
+      rows.should.length(3);
 
-      yield* Package.removeModulesByNameAndVersions('test-removeModulesByNameAndVersions-module-1',
+      yield Package.removeModulesByNameAndVersions('test-removeModulesByNameAndVersions-module-1',
         ['0.0.0', '1.0.0', '1.0.1', '2.0.0']);
-      mods = yield* Package.listModulesByName('test-removeModulesByNameAndVersions-module-1');
+      mods = yield Package.listModulesByName('test-removeModulesByNameAndVersions-module-1');
       mods.should.length(0);
+      rows = yield Package.listModuleAbbreviatedsByName('test-removeModulesByNameAndVersions-module-1');
+      rows.should.length(0);
     });
   });
 

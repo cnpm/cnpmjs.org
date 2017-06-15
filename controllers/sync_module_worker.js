@@ -559,7 +559,7 @@ SyncModuleWorker.prototype._sync = function* (name, pkg) {
   }
 
   // get package AbbreviatedMetadata
-  var abbreviatedMetadatas = {};
+  var remoteAbbreviatedMetadatas = {};
   if (config.enableAbbreviatedMetadata) {
     var packageUrl = '/' + name.replace('/', '%2f');
     var result = yield npmSerivce.request(packageUrl, {
@@ -582,7 +582,7 @@ SyncModuleWorker.prototype._sync = function* (name, pkg) {
         for (var version in versions) {
           const item = versions[version];
           if (item && typeof item._hasShrinkwrap === 'boolean') {
-            abbreviatedMetadatas[version] = { _hasShrinkwrap: item._hasShrinkwrap };
+            remoteAbbreviatedMetadatas[version] = { _hasShrinkwrap: item._hasShrinkwrap };
           }
         }
       }
@@ -697,7 +697,7 @@ SyncModuleWorker.prototype._sync = function* (name, pkg) {
       version.maintainers = pkg.maintainers;
     }
 
-    var abbreviatedMetadata = abbreviatedMetadatas[version.version];
+    var abbreviatedMetadata = remoteAbbreviatedMetadatas[version.version];
 
     if (exists.package && exists.package.dist.shasum === version.dist.shasum) {
       var existsModuleAbbreviated = existsModuleAbbreviatedsMap[exists.package.version];
@@ -799,6 +799,12 @@ SyncModuleWorker.prototype._sync = function* (name, pkg) {
     var v = localVersionNames[i];
     if (!remoteVersionNameMap[v]) {
       deletedVersionNames.push(v);
+    }
+  }
+  // delete local abbreviatedMetadata data too
+  for (var item of existsModuleAbbreviateds) {
+    if (!remoteVersionNameMap[item.version] && deletedVersionNames.indexOf(item.version) === -1) {
+      deletedVersionNames.push(item.version);
     }
   }
 

@@ -516,6 +516,14 @@ exports.removeModulesByNameAndVersions = function* (name, versions) {
       version: versions,
     }
   });
+  if (config.enableAbbreviatedMetadata) {
+    yield models.ModuleAbbreviated.destroy({
+      where: {
+        name: name,
+        version: versions,
+      },
+    });
+  }
 };
 
 // tags
