@@ -1,4 +1,10 @@
 
+3.0.0-alpha.8 / 2017-06-15
+==================
+
+  * fix: should remove unpublished version on ModuleAbbreviated too (#1192)
+  * docs: Dockerized cnpmjs.org configuration with installation guide (#1191)
+
 3.0.0-alpha.7 / 2017-06-01
 ==================
 
