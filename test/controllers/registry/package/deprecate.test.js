@@ -1,19 +1,6 @@
-/**!
- * cnpmjs.org - test/controllers/registry/package/deprecate.test.js
- *
- * Copyright(c) cnpmjs.org and other contributors.
- * MIT Licensed
- *
- * Authors:
- *  fengmk2 <fengmk2@gmail.com> (http://fengmk2.github.com)
- */
-
 'use strict';
 
-/**
- * Module dependencies.
- */
-
+var assert = require('assert');
 var should = require('should');
 var request = require('supertest');
 var mm = require('mm');
@@ -105,56 +92,61 @@ describe('controllers/registry/package/deprecate.test.js', function () {
       });
     });
 
-    it('should deprecate version@<1.0.0', function (done) {
-      request(app.listen())
-      .put('/' + pkgname)
-      .set('authorization', utils.adminAuth)
-      .send({
-        name: pkgname,
-        versions: {
-          '1.0.0': {
-            version: '1.0.0'
-          },
-          '0.0.1': {
-            deprecated: 'mock test deprecated message 0.0.1'
-          },
-          '0.0.2': {
-            deprecated: 'mock test deprecated message 0.0.2'
+    it('should deprecate version@<1.0.0', function* () {
+      yield request(app.listen())
+        .put('/' + pkgname)
+        .set('authorization', utils.adminAuth)
+        .send({
+          name: pkgname,
+          versions: {
+            '1.0.0': {
+              version: '1.0.0'
+            },
+            '0.0.1': {
+              deprecated: 'mock test deprecated message 0.0.1'
+            },
+            '0.0.2': {
+              deprecated: 'mock test deprecated message 0.0.2'
+            }
           }
-        }
-      })
-      .expect({
-        ok: true
-      })
-      .expect(201, function (err) {
-        should.not.exist(err);
-        done = pedding(3, done);
+        })
+        .expect({
+          ok: true
+        })
+        .expect(201);
 
-        request(app.listen())
+      yield request(app.listen())
         .get('/' + pkgname + '/0.0.1')
-        .expect(200, function (err, res) {
-          should.not.exist(err);
+        .expect(200)
+        .expect(res => {
           res.body.deprecated.should.equal('mock test deprecated message 0.0.1');
-          done();
         });
 
-        request(app.listen())
+      yield request(app.listen())
         .get('/' + pkgname + '/0.0.2')
-        .expect(200, function (err, res) {
-          should.not.exist(err);
+        .expect(200)
+        .expect(res => {
           res.body.deprecated.should.equal('mock test deprecated message 0.0.2');
-          done();
         });
 
-        // not change 1.0.0
-        request(app.listen())
+      // not change 1.0.0
+      yield request(app.listen())
         .get('/' + pkgname + '/1.0.0')
-        .expect(200, function (err, res) {
-          should.not.exist(err);
-          res.body.deprecated.should.equal('');
-          done();
+        .expect(200)
+        .expect(res => {
+          assert(!res.body.deprecated);
         });
-      });
+
+      // show deprecated info on abbreviatedMeta request
+      yield request(app.listen())
+        .get('/' + pkgname)
+        .set('accept', 'application/vnd.npm.install-v1+json')
+        .expect(200)
+        .expect(res => {
+          assert(res.body.versions['0.0.2'].deprecated === 'mock test deprecated message 0.0.2');
+          assert(res.body.versions['0.0.1'].deprecated === 'mock test deprecated message 0.0.1');
+          assert(!res.body.versions['1.0.0'].deprecated);
+        });
     });
 
     it('should 404 deprecate not exists version', function (done) {

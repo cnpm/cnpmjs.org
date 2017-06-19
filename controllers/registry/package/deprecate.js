@@ -1,18 +1,4 @@
-/**!
- * cnpmjs.org - controllers/registry/package/deprecate.js
- *
- * Copyright(c) fengmk2 and other contributors.
- * MIT Licensed
- *
- * Authors:
- *   fengmk2 <fengmk2@gmail.com> (http://fengmk2.github.com)
- */
-
 'use strict';
-
-/**
- * Module dependencies.
- */
 
 var packageService = require('../../../services/package');
 
@@ -51,10 +37,10 @@ function* deprecateVersions() {
   }
   yield updateTasks;
   // update last modified
-  yield* packageService.updateModuleLastModified(name);
+  yield packageService.updateModuleLastModified(name);
 
   this.status = 201;
   this.body = {
-    ok: true
+    ok: true,
   };
 }
