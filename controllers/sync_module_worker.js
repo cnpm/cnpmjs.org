@@ -21,6 +21,7 @@ var common = require('../lib/common');
 var npmSerivce = require('../services/npm');
 var packageService = require('../services/package');
 var logService = require('../services/module_log');
+var hook = require('../services/hook');
 var User = require('../models').User;
 var os = require('os');
 
@@ -105,7 +106,7 @@ SyncModuleWorker.prototype._saveLog = function () {
   var logstr = that._log;
   that._log = '';
   co(function* () {
-    yield* logService.append(that._logId, logstr);
+    yield logService.append(that._logId, logstr);
   }).then(function () {
     that._loging = false;
     if (that._log) {
@@ -589,6 +590,8 @@ SyncModuleWorker.prototype._sync = function* (name, pkg) {
     }
   }
 
+  // any properties changed versions
+  var changedVersions = {};
   var missingVersions = [];
   var missingTags = [];
   var missingDescriptions = [];
@@ -734,6 +737,7 @@ SyncModuleWorker.prototype._sync = function* (name, pkg) {
             id: exists.id,
             description: version.description
           });
+          changedVersions[v] = 1;
         }
 
         if (config.enableAbbreviatedMetadata) {
@@ -751,6 +755,7 @@ SyncModuleWorker.prototype._sync = function* (name, pkg) {
               id: exists.id,
               readme: version.readme,
             });
+            changedVersions[v] = 1;
           }
         }
 
@@ -760,6 +765,7 @@ SyncModuleWorker.prototype._sync = function* (name, pkg) {
             id: exists.id,
             deprecated: version.deprecated,
           });
+          changedVersions[v] = 1;
         }
         if (exists.package.deprecated && !version.deprecated) {
           // remove deprecated info
@@ -767,6 +773,7 @@ SyncModuleWorker.prototype._sync = function* (name, pkg) {
             id: exists.id,
             deprecated: undefined,
           });
+          changedVersions[v] = 1;
         }
         // find missing abbreviatedMetadata
         if (abbreviatedMetadata) {
@@ -791,6 +798,7 @@ SyncModuleWorker.prototype._sync = function* (name, pkg) {
       Object.assign(version, abbreviatedMetadata);
     }
     missingVersions.push(version);
+    changedVersions[v] = 1;
   }
 
   // find out deleted versions
@@ -1147,6 +1155,21 @@ SyncModuleWorker.prototype._sync = function* (name, pkg) {
   yield syncModuleAbbreviateds();
   yield syncAbbreviatedMetadatas();
   yield syncDeprecatedsOnExistsModuleAbbreviated();
+
+  changedVersions = Object.keys(changedVersions);
+  // hooks
+  const envelope = {
+    event: 'package:sync',
+    name: name,
+    type: 'package',
+    version: null,
+    hookOwner: null,
+    payload: {
+      changedVersions,
+    },
+    change: null,
+  };
+  hook.trigger(envelope);
 
   return syncedVersionNames;
 };

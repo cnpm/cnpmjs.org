@@ -27,7 +27,7 @@ function* getFirstSyncPackages(lastSyncModule) {
 
 module.exports = function* sync() {
   var syncTime = Date.now();
-  var info = yield* totalService.getTotalInfo();
+  var info = yield totalService.getTotalInfo();
   if (!info) {
     throw new Error('can not found total info');
   }
@@ -36,7 +36,7 @@ module.exports = function* sync() {
   logger.syncInfo('Last sync time %s', new Date(info.last_sync_time));
   if (!info.last_sync_time) {
     logger.syncInfo('First time sync all packages from official registry');
-    packages = yield* getFirstSyncPackages(info.last_sync_module);
+    packages = yield getFirstSyncPackages(info.last_sync_module);
   } else {
     var result = yield npmService.fetchUpdatesSince(info.last_sync_time);
     syncTime = result.lastModified;
