@@ -56,6 +56,11 @@ describe('test/controllers/sync_module_worker.test.js', () => {
   it('should sync public scoped package', function* () {
     mm(config, 'registryHost', '');
     mm(config, 'sourceNpmRegistry', 'https://registry.npmjs.org');
+    let envelope;
+    mm(config, 'globalHook', function* (e) {
+      envelope = e;
+    });
+
     var worker = new SyncModuleWorker({
       name: '@sindresorhus/df',
       username: 'fengmk2',
@@ -64,6 +69,10 @@ describe('test/controllers/sync_module_worker.test.js', () => {
     worker.start();
     var end = thunkify.event(worker, 'end');
     yield end();
+    assert(envelope);
+    assert(envelope.event === 'package:sync');
+    assert(envelope.name === '@sindresorhus/df');
+    assert(envelope.payload.changedVersions.length > 0);
 
     // sync again
     var worker = new SyncModuleWorker({
@@ -73,6 +82,10 @@ describe('test/controllers/sync_module_worker.test.js', () => {
     worker.start();
     var end = thunkify.event(worker, 'end');
     yield end();
+    assert(envelope);
+    assert(envelope.event === 'package:sync');
+    assert(envelope.name === '@sindresorhus/df');
+    assert(envelope.payload.changedVersions.length === 0);
 
     var tgzUrl;
     function checkResult() {
@@ -129,7 +142,7 @@ describe('test/controllers/sync_module_worker.test.js', () => {
 
   it('should sync upstream first', function* () {
     mm(config, 'sourceNpmRegistryIsCNpm', true);
-    var log = yield* logService.create({
+    var log = yield logService.create({
       name: 'mk2testmodule',
       username: 'fengmk2',
     });
@@ -172,12 +185,12 @@ describe('test/controllers/sync_module_worker.test.js', () => {
   });
 
   it('should sync unpublished module by name', function* () {
-    var result = yield* SyncModuleWorker.sync('tnpm', 'fengmk2');
+    var result = yield SyncModuleWorker.sync('tnpm', 'fengmk2');
     result.should.be.Number;
   });
 
   it('should sync not exists module', function* () {
-    var result = yield* SyncModuleWorker.sync('tnpm-not-exists', 'fengmk2');
+    var result = yield SyncModuleWorker.sync('tnpm-not-exists', 'fengmk2');
     result.should.be.Number;
   });
 
@@ -199,7 +212,7 @@ describe('test/controllers/sync_module_worker.test.js', () => {
   it('should sync missing description, readme', function* () {
     var listModulesByName = packageService.listModulesByName;
     mm(packageService, 'listModulesByName', function* (name) {
-      var mods = yield* listModulesByName.call(packageService, name);
+      var mods = yield listModulesByName.call(packageService, name);
       mods.forEach(function (mod) {
         mod.description = null;
         mod.package.readme = '';
@@ -207,13 +220,23 @@ describe('test/controllers/sync_module_worker.test.js', () => {
       return mods;
     });
 
+    let envelope;
+    mm(config, 'globalHook', function* (e) {
+      envelope = e;
+      // console.log(envelope);
+    });
     var worker = new SyncModuleWorker({
-      name: 'byte',
+      name: 'pedding',
       username: 'fengmk2',
+      noDep: true,
     });
     worker.start();
     var end = thunkify.event(worker, 'end');
     yield end();
+    assert(envelope);
+    assert(envelope.name === 'pedding');
+    assert(envelope.event === 'package:sync');
+    assert(envelope.payload.changedVersions.length > 0);
   });
 
   it('should delete not exists   version', function* () {
@@ -324,6 +347,7 @@ describe('test/controllers/sync_module_worker.test.js', () => {
       const worker = new SyncModuleWorker({
         name: 'ms',
         username: 'fengmk2',
+        noDep: true,
       });
       worker.start();
       const end = thunkify.event(worker, 'end');
@@ -343,6 +367,7 @@ describe('test/controllers/sync_module_worker.test.js', () => {
       var worker = new SyncModuleWorker({
         name: 'ms',
         username: 'fengmk2',
+        noDep: true,
       });
       worker.start();
       const end = thunkify.event(worker, 'end');
