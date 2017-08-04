@@ -40,7 +40,7 @@ module.exports = function* save(next) {
 
   // check maintainers
   var result = yield* packageService.authMaintainer(name, username);
-  if (!result.isMaintainer) {
+  if (!result.isMaintainer && !this.user.isAdmin) {
     this.status = 403;
     this.body = {
       error: 'forbidden user',
