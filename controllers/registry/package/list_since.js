@@ -3,6 +3,7 @@
 var packageService = require('../../../services/package');
 
 var A_WEEK_MS = 3600000 * 24 * 7;
+var TWA_DAYS_MS = 3600000 * 24 * 2;
 
 // GET /-/all/since?stale=update_after&startkey={key}
 // List packages names since startkey
@@ -30,9 +31,9 @@ module.exports = function* listSince() {
 
   var updated = Date.now();
   if (updated - startkey > A_WEEK_MS) {
-    startkey = updated - A_WEEK_MS;
-    console.warn('[%s] list modules since time out of range: query: %j, ip: %s',
-      Date(), query, this.ip);
+    startkey = updated - TWA_DAYS_MS;
+    console.warn('[%s] list modules since time out of range: query: %j, ip: %s, limit to %s',
+      Date(), query, this.ip, startkey);
   }
 
   var names = yield packageService.listPublicModuleNamesSince(startkey);
