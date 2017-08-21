@@ -5,6 +5,10 @@ var app = module.exports = koa();
 var http = require('http');
 var middlewares = require('koa-middlewares');
 var bodyParser = require('koa-bodyparser');
+var rt = require('koa-rt');
+var rewrite = require('koa-rewrite');
+var conditional = require('koa-conditional-get');
+var etag = require('koa-etag');
 var routes = require('../routes/registry');
 var logger = require('../common/logger');
 var config = require('../config');
@@ -19,8 +23,8 @@ var maxrequests = require('koa-maxrequests');
 app.use(maxrequests());
 app.use(block());
 middlewares.jsonp(app);
-app.use(middlewares.rt({ headerName: 'X-ReadTime' }));
-app.use(middlewares.rewrite('/favicon.ico', '/favicon.png'));
+app.use(rt({ headerName: 'X-ReadTime' }));
+app.use(rewrite('/favicon.ico', '/favicon.png'));
 app.use(staticCache);
 
 app.keys = ['todokey', config.sessionSecret];
@@ -36,8 +40,8 @@ app.use(notFound);
 if (config.enableCompress) {
   app.use(middlewares.compress({ threshold: 150 }));
 }
-app.use(middlewares.conditional());
-app.use(middlewares.etag());
+app.use(conditional());
+app.use(etag());
 
 /**
  * Routes
