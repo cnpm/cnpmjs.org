@@ -96,7 +96,7 @@ contributors:
 
 autod:
 	@node_modules/.bin/autod -w \
-		--prefix "~" \
+		--prefix "^" \
 		--exclude public,view,docs,backup,coverage \
 		--dep mysql \
 		--keep should,supertest,chunkstream,mm,pedding
