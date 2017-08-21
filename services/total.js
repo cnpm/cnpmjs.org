@@ -1,16 +1,4 @@
-/**
- * Copyright(c) cnpm and other contributors.
- * MIT Licensed
- *
- * Authors:
- *   fengmk2 <fengmk2@gmail.com> (http://fengmk2.com)
- */
-
 'use strict';
-
-/**
- * Module dependencies.
- */
 
 var config = require('../config');
 var models = require('../models');
@@ -102,22 +90,22 @@ exports.getTotalInfo = function* () {
 
 exports.plusDeleteModule = function* () {
   var sql = 'UPDATE total SET module_delete=module_delete+1 WHERE name=\'total\'';
-  return yield* models.query(sql);
+  return yield models.query(sql);
 };
 
 exports.setLastSyncTime = function* (time) {
   var sql = 'UPDATE total SET last_sync_time=? WHERE name=\'total\'';
-  return yield* models.query(sql, [Number(time)]);
+  return yield models.query(sql, [Number(time)]);
 };
 
 exports.setLastExistSyncTime = function* (time) {
   var sql = 'UPDATE total SET last_exist_sync_time=? WHERE name=\'total\'';
-  return yield* models.query(sql, [Number(time)]);
+  return yield models.query(sql, [Number(time)]);
 };
 
 exports.updateSyncStatus = function* (status) {
   var sql = 'UPDATE total SET sync_status=? WHERE name=\'total\'';
-  return yield* models.query(sql, [status]);
+  return yield models.query(sql, [status]);
 };
 
 exports.updateSyncNum = function* (params) {
@@ -133,5 +121,5 @@ exports.updateSyncNum = function* (params) {
     sync_status=?, need_sync_num=?, success_sync_num=?, \
     fail_sync_num=?, left_sync_num=?, last_sync_module=? \
     WHERE name=\'total\'';
-  return yield* models.query(sql, args);
+  return yield models.query(sql, args);
 };

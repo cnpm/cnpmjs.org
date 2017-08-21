@@ -9,7 +9,7 @@ var SyncModuleWorker = require('../controllers/sync_module_worker');
 var logger = require('../common/logger');
 
 module.exports = function* syncPopular() {
-  var packages = yield* npmService.getPopular(config.topPopular);
+  var packages = yield npmService.getPopular(config.topPopular);
   packages = packages.map(function (r) {
     return r[0];
   });

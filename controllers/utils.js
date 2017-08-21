@@ -1,18 +1,4 @@
-/**!
- * cnpmjs.org - controllers/utils.js
- *
- * Copyright(c) fengmk2 and other contributors.
- * MIT Licensed
- *
- * Authors:
- *   fengmk2 <fengmk2@gmail.com> (http://fengmk2.github.com)
- */
-
 'use strict';
-
-/**
- * Module dependencies.
- */
 
 var debug = require('debug')('cnpmjs.org:controllers:utils');
 var path = require('path');
@@ -70,7 +56,7 @@ exports.getDownloadTotal = function* (name) {
     args.unshift(name);
   }
 
-  var rows = yield* downloadTotalService[method].apply(downloadTotalService, args);
+  var rows = yield downloadTotalService[method].apply(downloadTotalService, args);
   var download = {
     today: 0,
     thisweek: 0,

@@ -1,18 +1,4 @@
-/**!
- * cnpmjs.org - middleware/editable.js
- *
- * Copyright(c) fengmk2 and other contributors.
- * MIT Licensed
- *
- * Authors:
- *   fengmk2 <fengmk2@gmail.com> (http://fengmk2.github.com)
- */
-
 'use strict';
-
-/**
- * Module dependencies.
- */
 
 var packageService = require('../services/package');
 
@@ -22,11 +8,11 @@ module.exports = function* editable(next) {
   var moduleName = this.params.name || this.params[0];
   if (username && moduleName) {
     if (this.user.isAdmin) {
-      return yield* next;
+      return yield next;
     }
-    var isMaintainer = yield* packageService.isMaintainer(moduleName, username);
+    var isMaintainer = yield packageService.isMaintainer(moduleName, username);
     if (isMaintainer) {
-      return yield* next;
+      return yield next;
     }
   }
 

@@ -84,11 +84,11 @@ describe('test/controllers/registry/package/save.test.js', function () {
     });
 
     it('should save dependents', function* () {
-      var names = yield* packageService.listDependents('bytetest-1');
+      var names = yield packageService.listDependents('bytetest-1');
       names.should.length(2);
       names.should.eql(['testmodule-new-1', 'testmodule-new-2']);
 
-      names = yield* packageService.listDependents('testmodule-new-1');
+      names = yield packageService.listDependents('testmodule-new-1');
       names.should.length(0);
     });
 

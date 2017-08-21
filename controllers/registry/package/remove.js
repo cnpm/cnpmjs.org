@@ -1,18 +1,4 @@
-/**!
- * cnpmjs.org - controllers/registry/package/remove.js
- *
- * Copyright(c) fengmk2 and other contributors.
- * MIT Licensed
- *
- * Authors:
- *   fengmk2 <fengmk2@gmail.com> (http://fengmk2.github.com)
- */
-
 'use strict';
-
-/**
- * Module dependencies.
- */
 
 var debug = require('debug')('cnpmjs.org:controllers:registry:package:remove');
 var urlparse = require('url').parse;
@@ -28,11 +14,11 @@ module.exports = function* remove(next) {
   var rev = this.params.rev || this.params[1];
   debug('remove all the module with name: %s, id: %s', name, rev);
 
-  var mods = yield* packageService.listModulesByName(name);
+  var mods = yield packageService.listModulesByName(name);
   debug('removeAll module %s: %d', name, mods.length);
   var mod = mods[0];
   if (!mod) {
-    return yield* next;
+    return yield next;
   }
 
   yield [
@@ -61,7 +47,7 @@ module.exports = function* remove(next) {
   }
 
   // remove the maintainers
-  yield* packageService.removeAllMaintainers(name);
+  yield packageService.removeAllMaintainers(name);
 
   this.body = { ok: true };
 };

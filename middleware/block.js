@@ -1,18 +1,4 @@
-/**!
- * cnpmjs.org - middleware/block.js
- *
- * Copyright(c) fengmk2 and other contributors.
- * MIT Licensed
- *
- * Authors:
- *   fengmk2 <fengmk2@gmail.com> (http://fengmk2.github.com)
- */
-
 'use strict';
-
-/**
- * Module dependencies.
- */
 
 module.exports = function () {
   return function* block(next) {
@@ -23,6 +9,6 @@ module.exports = function () {
         message: 'forbidden Ruby user-agent, ip: ' + this.ip
       };
     }
-    yield* next;
+    yield next;
   };
 };

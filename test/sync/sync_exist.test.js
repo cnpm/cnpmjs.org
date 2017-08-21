@@ -46,11 +46,11 @@ describe('test/sync/sync_exist.test.js', function () {
         byte: {},
       });
       mm.data(totalService, 'getTotalInfo', {last_exist_sync_time: Date.now()});
-      var data = yield* sync();
+      var data = yield sync();
       data.successes[0].should.equal('byte');
 
       mm.data(npmService, 'getAllSince', []);
-      var data = yield* sync();
+      var data = yield sync();
       data.successes.should.eql([]);
     });
 
@@ -61,11 +61,11 @@ describe('test/sync/sync_exist.test.js', function () {
         }
       ]);
       mm.data(totalService, 'getTotalInfo', {last_exist_sync_time: Date.now()});
-      var data = yield* sync();
+      var data = yield sync();
       data.successes[0].should.equal('byte');
 
       mm.data(npmService, 'getAllSince', []);
-      var data = yield* sync();
+      var data = yield sync();
       data.successes.should.eql([]);
     });
   });

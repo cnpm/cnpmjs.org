@@ -1,23 +1,9 @@
-/**!
- * cnpmjs.org - middleware/web_not_found.js
- *
- * Copyright(c) cnpmjs.org and other contributors.
- * MIT Licensed
- *
- * Authors:
- *  dead_horse <dead_horse@qq.com> (http://deadhorse.me)
- */
-
 'use strict';
-
-/**
- * Module dependencies.
- */
 
 var debug = require('debug')('cnpmjs.org:middleware:web_not_found');
 
 module.exports = function* notFound(next) {
-  yield* next;
+  yield next;
 
   if (this.status && this.status !== 404) {
     return;
@@ -46,7 +32,7 @@ module.exports = function* notFound(next) {
   }
 
   this.status = 404;
-  yield* this.render('404', {
+  yield this.render('404', {
     title: title,
     name: name
   });

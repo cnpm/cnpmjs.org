@@ -1,18 +1,4 @@
-/**!
- * cnpmjs.org - common/mail.js
- *
- * Copyright(c) cnpmjs.org and other contributors.
- * MIT Licensed
- *
- * Authors:
- *  dead_horse <dead_horse@qq.com> (http://deadhorse.me)
- */
-
 'use strict';
-
-/**
- * Module dependencies.
- */
 
 var nodemailer = require('nodemailer');
 var utility = require('utility');

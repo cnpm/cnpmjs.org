@@ -24,22 +24,22 @@ describe('test/services/download_total.test.js', function () {
         name: 'plusModuleTotal-module',
         count: 1000
       };
-      yield* DownloadTotal.plusModuleTotal(data);
+      yield DownloadTotal.plusModuleTotal(data);
 
       data = {
         date: '2014-10-22',
         name: 'plusModuleTotal-module',
         count: 2
       };
-      yield* DownloadTotal.plusModuleTotal(data);
+      yield DownloadTotal.plusModuleTotal(data);
 
-      var rows = yield* DownloadTotal.getModuleTotal(
+      var rows = yield DownloadTotal.getModuleTotal(
         'plusModuleTotal-module', '2014-10-21', '2014-10-21');
       rows.should.length(1);
       rows[0].count.should.equal(1000);
       rows[0].date.should.equal('2014-10-21');
 
-      rows = yield* DownloadTotal.getModuleTotal(
+      rows = yield DownloadTotal.getModuleTotal(
         'plusModuleTotal-module', '2014-10-21', '2014-10-22');
       rows.should.length(2);
       rows[0].count.should.equal(1000);
@@ -53,8 +53,8 @@ describe('test/services/download_total.test.js', function () {
         name: 'plusModuleTotal-module',
         count: 3
       };
-      yield* DownloadTotal.plusModuleTotal(data);
-      rows = yield* DownloadTotal.getModuleTotal(
+      yield DownloadTotal.plusModuleTotal(data);
+      rows = yield DownloadTotal.getModuleTotal(
         'plusModuleTotal-module', '2014-10-21', '2014-10-21');
       rows.should.length(1);
       rows[0].count.should.equal(1003);
@@ -65,19 +65,19 @@ describe('test/services/download_total.test.js', function () {
         name: 'plusModuleTotal-module2',
         count: 3
       };
-      yield* DownloadTotal.plusModuleTotal(data);
+      yield DownloadTotal.plusModuleTotal(data);
       data = {
         date: '2014-12-22',
         name: 'plusModuleTotal-module2',
         count: 3
       };
-      yield* DownloadTotal.plusModuleTotal(data);
+      yield DownloadTotal.plusModuleTotal(data);
       data = {
         date: '2014-12-21',
         name: 'plusModuleTotal-module2',
         count: 3
       };
-      yield* DownloadTotal.plusModuleTotal(data);
+      yield DownloadTotal.plusModuleTotal(data);
 
       rows = yield DownloadTotal.getTotal('2014-10-21', '2014-12-21');
       rows.should.length(3);
@@ -97,14 +97,14 @@ describe('test/services/download_total.test.js', function () {
         name: 'getTotalByName-module',
         count: 1000
       };
-      yield* DownloadTotal.plusModuleTotal(data);
+      yield DownloadTotal.plusModuleTotal(data);
 
       data = {
         date: '2015-10-22',
         name: 'getTotalByName-module',
         count: 2
       };
-      yield* DownloadTotal.plusModuleTotal(data);
+      yield DownloadTotal.plusModuleTotal(data);
 
       var count = yield DownloadTotal.getTotalByName('getTotalByName-module');
       count.should.equal(1002);

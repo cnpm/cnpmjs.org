@@ -1,18 +1,4 @@
-/**!
- * cnpmjs.org - services/default_user_service.js
- *
- * Copyright(c) fengmk2 and other contributors.
- * MIT Licensed
- *
- * Authors:
- *   fengmk2 <fengmk2@gmail.com> (http://fengmk2.github.com)
- */
-
 'use strict';
-
-/**
- * Module dependencies.
- */
 
 var gravatar = require('gravatar');
 // var User = require('../proxy/user');
@@ -83,7 +69,7 @@ var proto = DefaultUserService.prototype;
  * @return {User}
  */
 proto.auth = function* (login, password) {
-  var row = yield* User.auth(login, password);
+  var row = yield User.auth(login, password);
   if (!row) {
     return null;
   }
@@ -109,7 +95,7 @@ proto.get = function* (login) {
  * @return {Array<User>}
  */
 proto.list = function* (logins) {
-  var rows = yield* User.listByNames(logins);
+  var rows = yield User.listByNames(logins);
   var users = [];
   rows.forEach(function (row) {
     users.push(convertToUser(row));
@@ -131,7 +117,7 @@ proto.search = function* (query, options) {
     options.limit = 20;
   }
 
-  var rows = yield* User.search(query, options);
+  var rows = yield User.search(query, options);
   var users = [];
   rows.forEach(function (row) {
     users.push(convertToUser(row));
