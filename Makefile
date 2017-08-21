@@ -96,6 +96,7 @@ contributors:
 
 autod:
 	@node_modules/.bin/autod -w \
+		--registry https://r.cnpmjs.org \
 		--prefix "^" \
 		--exclude public,view,docs,backup,coverage \
 		--dep mysql \

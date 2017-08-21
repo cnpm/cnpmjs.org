@@ -5,6 +5,10 @@ var notFound = require('../middleware/web_not_found');
 var staticCache = require('../middleware/static');
 var middlewares = require('koa-middlewares');
 var bodyParser = require('koa-bodyparser');
+var rt = require('koa-rt');
+var rewrite = require('koa-rewrite');
+var conditional = require('koa-conditional-get');
+var etag = require('koa-etag');
 var markdownMiddleware = require('koa-markdown');
 var block = require('../middleware/block');
 var logger = require('../common/logger');
@@ -28,8 +32,8 @@ var rootdir = path.dirname(__dirname);
 
 app.use(maxrequests());
 app.use(block());
-app.use(middlewares.rt({headerName: 'X-ReadTime'}));
-app.use(middlewares.rewrite('/favicon.ico', '/favicon.png'));
+app.use(rt({ headerName: 'X-ReadTime' }));
+app.use(rewrite('/favicon.ico', '/favicon.png'));
 app.use(staticCache);
 
 if (config.pagemock) {
@@ -52,8 +56,8 @@ if (config.enableCompress) {
   app.use(middlewares.compress({threshold: 150}));
 }
 
-app.use(middlewares.conditional());
-app.use(middlewares.etag());
+app.use(conditional());
+app.use(etag());
 
 var viewDir = path.join(rootdir, 'view', 'web');
 var docDir = path.join(rootdir, 'docs', 'web');
