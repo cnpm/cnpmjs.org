@@ -1,18 +1,4 @@
-/**!
- * cnpmjs.org - test/controllers/registry/package/remove.test.js
- *
- * Copyright(c) cnpmjs.org and other contributors.
- * MIT Licensed
- *
- * Authors:
- *  fengmk2 <fengmk2@gmail.com> (http://fengmk2.com)
- */
-
 'use strict';
-
-/**
- * Module dependencies.
- */
 
 var should = require('should');
 var request = require('supertest');
@@ -92,7 +78,7 @@ describe('test/controllers/registry/package/remove.test.js', function () {
     it('should mock key not exists', function (done) {
       var listModulesByName = packageService.listModulesByName;
       mm(packageService, 'listModulesByName', function* (name) {
-        var mods = yield* listModulesByName.call(packageService, name);
+        var mods = yield listModulesByName.call(packageService, name);
         mods.forEach(function (mod) {
           delete mod.package.dist.key;
         });

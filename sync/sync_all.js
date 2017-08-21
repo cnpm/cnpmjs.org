@@ -14,7 +14,7 @@ var logger = require('../common/logger');
  * @param {String} lastSyncModule
  */
 function* getFirstSyncPackages(lastSyncModule) {
-  var pkgs = yield* npmService.getShort();
+  var pkgs = yield npmService.getShort();
   if (!lastSyncModule) {
     return pkgs;
   }

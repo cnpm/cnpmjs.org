@@ -1,18 +1,4 @@
-/**!
- * cnpmjs.org - models/_module_maintainer_class_methods.js
- *
- * Copyright(c) fengmk2 and other contributors.
- * MIT Licensed
- *
- * Authors:
- *   fengmk2 <fengmk2@gmail.com> (http://fengmk2.github.com)
- */
-
 'use strict';
-
-/**
- * Module dependencies.
- */
 
 /**
  * list all module names by user
@@ -134,7 +120,7 @@ exports.updateMaintainers = function* (name, users) {
       remove: []
     };
   }
-  var exists = yield* this.listMaintainers(name);
+  var exists = yield this.listMaintainers(name);
 
   var addUsers = users.filter(function (username) {
     // add user which in `users` but do not in `exists`
@@ -156,4 +142,3 @@ exports.updateMaintainers = function* (name, users) {
     remove: removeUsers
   };
 };
-

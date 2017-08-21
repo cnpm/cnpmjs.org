@@ -1,19 +1,4 @@
-/**!
- * cnpmjs.org - controllers/registry/user/update.js
- *
- * Copyright(c) fengmk2 and other contributors.
- * MIT Licensed
- *
- * Authors:
- *   dead_horse <dead_horse@qq.com> (http://deadhorse.me)
- *   fengmk2 <fengmk2@gmail.com> (http://fengmk2.github.com)
- */
-
 'use strict';
-
-/**
- * Module dependencies.
- */
 
 var debug = require('debug')('cnpmjs.org:controllers:registry:user:update');
 var ensurePasswordSalt = require('./common').ensurePasswordSalt;
@@ -40,7 +25,7 @@ module.exports = function* updateUser(next) {
   var name = this.params.name;
   var rev = this.params.rev;
   if (!name || !rev) {
-    return yield* next;
+    return yield next;
   }
   debug('update: %s, rev: %s, user.name: %s', name, rev, this.user.name);
 
@@ -78,7 +63,7 @@ module.exports = function* updateUser(next) {
     return;
   }
 
-  var result = yield* userService.update(user);
+  var result = yield userService.update(user);
   if (!result) {
     this.status = 409;
     this.body = {

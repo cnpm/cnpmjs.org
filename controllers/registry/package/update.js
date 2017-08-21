@@ -1,18 +1,4 @@
-/**!
- * cnpmjs.org - controllers/registry/package/update.js
- *
- * Copyright(c) fengmk2 and other contributors.
- * MIT Licensed
- *
- * Authors:
- *   fengmk2 <fengmk2@gmail.com> (http://fengmk2.github.com)
- */
-
 'use strict';
-
-/**
- * Module dependencies.
- */
 
 var debug = require('debug')('cnpmjs.org:controllers:registry:package:update');
 var packageService = require('../../../services/package');
@@ -45,11 +31,11 @@ function* updateVersions(next) {
   var versions = this.request.body.versions;
 
   // step1: list all the versions
-  var mods = yield* packageService.listModulesByName(name);
+  var mods = yield packageService.listModulesByName(name);
   debug('removeWithVersions module %s, left versions %j, %s mods',
     name, Object.keys(versions), mods && mods.length);
   if (!mods || !mods.length) {
-    return yield* next;
+    return yield next;
   }
 
   // step3: calculate which versions need to remove and
@@ -78,7 +64,7 @@ function* updateVersions(next) {
 
   // step 4: remove all the versions which need to remove
   // let removeTar do remove versions from module table
-  var tags = yield* packageService.listModuleTags(name);
+  var tags = yield packageService.listModuleTags(name);
 
   var removeTags = [];
   var latestRemoved = false;
@@ -95,17 +81,17 @@ function* updateVersions(next) {
   debug('remove tags: %j', removeTags);
   if (removeTags.length) {
     // step 5: remove all the tags
-    yield* packageService.removeModuleTagsByIds(removeTags);
+    yield packageService.removeModuleTagsByIds(removeTags);
     if (latestRemoved && remainVersions[0]) {
       debug('latest tags removed, generate a new latest tag with new version: %s',
         remainVersions[0]);
       // step 6: insert new latest tag
-      yield* packageService.addModuleTag(name, 'latest', remainVersions[0]);
+      yield packageService.addModuleTag(name, 'latest', remainVersions[0]);
     }
   }
 
   // step 7: update last modified, make sure etag change
-  yield* packageService.updateModuleLastModified(name);
+  yield packageService.updateModuleLastModified(name);
 
   this.status = 201;
   this.body = { ok: true };
@@ -131,7 +117,7 @@ function* updateMaintainers() {
 
   if (config.customUserService) {
     // ensure new authors are vaild
-    var maintainers = yield* packageService.listMaintainerNamesOnly(name);
+    var maintainers = yield packageService.listMaintainerNamesOnly(name);
     var map = {};
     var newNames = [];
     for (var i = 0; i < maintainers.length; i++) {
@@ -144,7 +130,7 @@ function* updateMaintainers() {
       }
     }
     if (newNames.length > 0) {
-      var users = yield* userService.list(newNames);
+      var users = yield userService.list(newNames);
       var map = {};
       for (var i = 0; i < users.length; i++) {
         var user = users[i];
@@ -168,7 +154,7 @@ function* updateMaintainers() {
     }
   }
 
-  var r = yield* packageService.updatePrivateModuleMaintainers(name, usernames);
+  var r = yield packageService.updatePrivateModuleMaintainers(name, usernames);
   debug('result: %j', r);
 
   this.status = 201;

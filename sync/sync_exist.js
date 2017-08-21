@@ -78,7 +78,7 @@ module.exports = function* sync() {
   debug('All packages sync done, successes %d, fails %d',
     worker.successes.length, worker.fails.length);
 
-  yield* totalService.setLastExistSyncTime(syncTime);
+  yield totalService.setLastExistSyncTime(syncTime);
   return {
     successes: worker.successes,
     fails: worker.fails

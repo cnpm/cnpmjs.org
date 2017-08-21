@@ -24,7 +24,7 @@ exports.index = function* () {
 exports.save = function* () {
   var name = this.params.name || this.params[0];
   yield packageService.removeModuleTags(name);
-  yield* exports.update.call(this);
+  yield exports.update.call(this);
 };
 
 // POST /-/package/:pkg/dist-tags -- Add/modify dist-tags from provided object body (merge)

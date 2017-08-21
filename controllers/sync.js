@@ -1,18 +1,4 @@
-/**!
- * cnpmjs.org - controllers/sync.js
- *
- * Copyright(c) cnpmjs.org and other contributors.
- * MIT Licensed
- *
- * Authors:
- *  dead_horse <dead_horse@qq.com> (http://deadhorse.me)
- */
-
 'use strict';
-
-/**
- * Module dependencies.
- */
 
 var debug = require('debug')('cnpmjs.org:controllers:sync');
 var Log = require('../services/module_log');
@@ -49,7 +35,7 @@ exports.sync = function* () {
     syncUpstreamFirst: config.sourceNpmRegistryIsCNpm,
   };
 
-  var logId = yield* SyncModuleWorker.sync(name, username, options);
+  var logId = yield SyncModuleWorker.sync(name, username, options);
   debug('sync %s got log id %j', name, logId);
 
   this.status = 201;
@@ -67,9 +53,9 @@ exports.getSyncLog = function* (next) {
     this.status = 404;
     return;
   }
-  var row = yield* Log.get(logId);
+  var row = yield Log.get(logId);
   if (!row) {
-    return yield* next;
+    return yield next;
   }
 
   var log = row.log.trim();

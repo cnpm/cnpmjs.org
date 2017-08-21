@@ -145,20 +145,20 @@ exports.listModules = function* (names) {
 };
 
 exports.listModulesByUser = function* (username) {
-  var names = yield* exports.listModuleNamesByUser(username);
-  return yield* exports.listModules(names);
+  var names = yield exports.listModuleNamesByUser(username);
+  return yield exports.listModules(names);
 };
 
 exports.listModuleNamesByUser = function* (username) {
   var sql = 'SELECT distinct(name) AS name FROM module WHERE author=?;';
-  var rows = yield* models.query(sql, [username]);
+  var rows = yield models.query(sql, [username]);
   var map = {};
   var names = rows.map(function (r) {
     return r.name;
   });
 
   // find from npm module maintainer table
-  var moduleNames = yield* NpmModuleMaintainer.listModuleNamesByUser(username);
+  var moduleNames = yield NpmModuleMaintainer.listModuleNamesByUser(username);
   moduleNames.forEach(function (name) {
     if (!map[name]) {
       names.push(name);
@@ -166,7 +166,7 @@ exports.listModuleNamesByUser = function* (username) {
   });
 
   // find from private module maintainer table
-  moduleNames = yield* PrivateModuleMaintainer.listModuleNamesByUser(username);
+  moduleNames = yield PrivateModuleMaintainer.listModuleNamesByUser(username);
   moduleNames.forEach(function (name) {
     if (!map[name]) {
       names.push(name);
@@ -176,14 +176,14 @@ exports.listModuleNamesByUser = function* (username) {
 };
 
 exports.listPublicModulesByUser = function* (username) {
-  var names = yield* exports.listPublicModuleNamesByUser(username);
-  return yield* exports.listModules(names);
+  var names = yield exports.listPublicModuleNamesByUser(username);
+  return yield exports.listModules(names);
 };
 
 // return user all public package names
 exports.listPublicModuleNamesByUser = function* (username) {
   var sql = 'SELECT distinct(name) AS name FROM module WHERE author=?;';
-  var rows = yield* models.query(sql, [username]);
+  var rows = yield models.query(sql, [username]);
   var map = {};
   var names = rows.map(function (r) {
     return r.name;
@@ -615,26 +615,26 @@ exports.listDependents = function* (dependency) {
 // maintainers
 
 exports.listPublicModuleMaintainers = function* (name) {
-  return yield* NpmModuleMaintainer.listMaintainers(name);
+  return yield NpmModuleMaintainer.listMaintainers(name);
 };
 
 exports.addPublicModuleMaintainer = function* (name, user) {
-  return yield* NpmModuleMaintainer.addMaintainer(name, user);
+  return yield NpmModuleMaintainer.addMaintainer(name, user);
 };
 
 exports.removePublicModuleMaintainer = function* (name, user) {
-  return yield* NpmModuleMaintainer.removeMaintainers(name, user);
+  return yield NpmModuleMaintainer.removeMaintainers(name, user);
 };
 
 // only can add to cnpm maintainer table
 exports.addPrivateModuleMaintainers = function* (name, usernames) {
-  return yield* PrivateModuleMaintainer.addMaintainers(name, usernames);
+  return yield PrivateModuleMaintainer.addMaintainers(name, usernames);
 };
 
 exports.updatePrivateModuleMaintainers = function* (name, usernames) {
-  var result = yield* PrivateModuleMaintainer.updateMaintainers(name, usernames);
+  var result = yield PrivateModuleMaintainer.updateMaintainers(name, usernames);
   if (result.add.length > 0 || result.remove.length > 0) {
-    yield* exports.updateModuleLastModified(name);
+    yield exports.updateModuleLastModified(name);
   }
   return result;
 };
@@ -644,12 +644,12 @@ function* getMaintainerModel(name) {
 }
 
 exports.listMaintainers = function* (name) {
-  var mod = yield* getMaintainerModel(name);
-  var usernames = yield* mod.listMaintainers(name);
+  var mod = yield getMaintainerModel(name);
+  var usernames = yield mod.listMaintainers(name);
   if (usernames.length === 0) {
     return usernames;
   }
-  var users = yield* User.listByNames(usernames);
+  var users = yield User.listByNames(usernames);
   return users.map(function (user) {
     return {
       name: user.name,
@@ -659,8 +659,8 @@ exports.listMaintainers = function* (name) {
 };
 
 exports.listMaintainerNamesOnly = function* (name) {
-  var mod = yield* getMaintainerModel(name);
-  return yield* mod.listMaintainers(name);
+  var mod = yield getMaintainerModel(name);
+  return yield mod.listMaintainers(name);
 };
 
 exports.removeAllMaintainers = function* (name) {
@@ -671,7 +671,7 @@ exports.removeAllMaintainers = function* (name) {
 };
 
 exports.authMaintainer = function* (packageName, username) {
-  var mod = yield* getMaintainerModel(packageName);
+  var mod = yield getMaintainerModel(packageName);
   var rs = yield [
     mod.listMaintainers(packageName),
     exports.getLatestModule(packageName)
@@ -707,7 +707,7 @@ exports.authMaintainer = function* (packageName, username) {
 };
 
 exports.isMaintainer = function* (name, username) {
-  var result = yield* exports.authMaintainer(name, username);
+  var result = yield exports.authMaintainer(name, username);
   return result.isMaintainer;
 };
 
@@ -754,13 +754,13 @@ exports.search = function* (word, options) {
 
   var sql = 'SELECT module_id FROM tag WHERE LOWER(name) LIKE LOWER(?) AND tag=\'latest\' \
     ORDER BY name LIMIT ?;';
-  var rows = yield* models.query(sql, [word + '%', limit ]);
+  var rows = yield models.query(sql, [word + '%', limit ]);
   for (var i = 0; i < rows.length; i++) {
     ids[rows[i].module_id] = 1;
   }
 
   if (rows.length < 20) {
-    rows = yield* models.query(sql, [ '%' + word + '%', limit ]);
+    rows = yield models.query(sql, [ '%' + word + '%', limit ]);
     for (var i = 0; i < rows.length; i++) {
       ids[rows[i].module_id] = 1;
     }
@@ -847,9 +847,9 @@ exports.listUserStarModuleNames = function* (user) {
 
 // unpublish info
 exports.saveUnpublishedModule = function* (name, pkg) {
-  return yield* ModuleUnpublished.save(name, pkg);
+  return yield ModuleUnpublished.save(name, pkg);
 };
 
 exports.getUnpublishedModule = function* (name) {
-  return yield* ModuleUnpublished.findByName(name);
+  return yield ModuleUnpublished.findByName(name);
 };

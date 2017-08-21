@@ -242,7 +242,7 @@ describe('test/controllers/sync_module_worker.test.js', () => {
   it('should delete not exists   version', function* () {
     var listModulesByName = packageService.listModulesByName;
     mm(packageService, 'listModulesByName', function* (name) {
-      var mods = yield* listModulesByName.call(packageService, name);
+      var mods = yield listModulesByName.call(packageService, name);
       if (mods[0]) {
         mods[0].version = '100.0.0';
       }

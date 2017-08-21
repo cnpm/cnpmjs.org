@@ -1,18 +1,4 @@
-/**!
- * cnpmjs.org - models/user.js
- *
- * Copyright(c) fengmk2 and other contributors.
- * MIT Licensed
- *
- * Authors:
- *   fengmk2 <fengmk2@gmail.com> (http://fengmk2.github.com)
- */
-
 'use strict';
-
-/**
- * Module dependencies.
- */
 
 var utility = require('utility');
 var utils = require('./utils');
@@ -104,7 +90,7 @@ module.exports = function (sequelize, DataTypes) {
 
       // read
       auth: function* (name, password) {
-        var user = yield* this.findByName(name);
+        var user = yield this.findByName(name);
         if (user) {
           var sha = this.createPasswordSha(password, user.salt);
           if (user.password_sha !== sha) {
@@ -141,7 +127,7 @@ module.exports = function (sequelize, DataTypes) {
 
       // write
       saveNpmUser: function* (data) {
-        var user = yield* this.findByName(data.name);
+        var user = yield this.findByName(data.name);
         if (!user) {
           user = this.build({
             isNpmUser: true,
@@ -162,7 +148,7 @@ module.exports = function (sequelize, DataTypes) {
       },
       saveCustomUser: function* (data) {
         var name = data.user.login;
-        var user = yield* this.findByName(name);
+        var user = yield this.findByName(name);
         if (!user) {
           user = this.build({
             isNpmUser: false,
@@ -230,7 +216,7 @@ module.exports = function (sequelize, DataTypes) {
           roles = '[]';
         }
 
-        var row = yield* this.findByName(user.name);
+        var row = yield this.findByName(user.name);
         if (!row) {
           return null;
         }

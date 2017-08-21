@@ -105,7 +105,7 @@ describe('controllers/registry/package/remove_version.test.js', function () {
     it('should auto add cdn key', function (done) {
       var getModule = packageService.getModule;
       mm(packageService, 'getModule', function* (name, version) {
-        var mod = yield* getModule.call(packageService, name, version);
+        var mod = yield getModule.call(packageService, name, version);
         delete mod.package.dist.key;
         return mod;
       });

@@ -1,18 +1,4 @@
-/**!
- * cnpmjs.org - controllers/web/badge.js
- *
- * Copyright(c) fengmk2 and other contributors.
- * MIT Licensed
- *
- * Authors:
- *   fengmk2 <fengmk2@gmail.com> (http://fengmk2.com)
- */
-
 'use strict';
-
-/**
- * Module dependencies.
- */
 
 var utility = require('utility');
 var util = require('util');
@@ -25,7 +11,7 @@ exports.version = function* () {
   var version = 'invalid';
   var name = this.params[0];
   var tag = this.query.tag || 'latest';
-  var info = yield* packageService.getModuleByTag(name, tag);
+  var info = yield packageService.getModuleByTag(name, tag);
   if (info) {
     version = info.version;
     if (/^0\.0\./.test(version)) {

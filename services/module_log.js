@@ -1,18 +1,4 @@
-/**!
- * cnpmjs.org - services/module_log.js
- *
- * Copyright(c) fengmk2 and other contributors.
- * MIT Licensed
- *
- * Authors:
- *   fengmk2 <fengmk2@gmail.com> (http://fengmk2.github.com)
- */
-
 'use strict';
-
-/**
- * Module dependencies.
- */
 
 var models = require('../models');
 var ModuleLog = models.ModuleLog;
@@ -33,7 +19,7 @@ exports.append = function* (id, log) {
     return null;
   }
 
-  var row = yield* exports.get(id);
+  var row = yield exports.get(id);
   if (!row) {
     return null;
   }

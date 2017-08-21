@@ -36,12 +36,12 @@ describe('models/module_unpublished.test.js', function () {
           "0.0.0"
         ]
       };
-      var row = yield* ModuleUnpublished.save('tfs', pkg);
+      var row = yield ModuleUnpublished.save('tfs', pkg);
       row.id.should.above(0);
       row.package.should.eql(pkg);
 
       // save again should work
-      var row2 = yield* ModuleUnpublished.save('tfs', pkg);
+      var row2 = yield ModuleUnpublished.save('tfs', pkg);
       row2.id.should.equal(row.id);
       row2.package.should.eql(pkg);
     });
@@ -66,17 +66,17 @@ describe('models/module_unpublished.test.js', function () {
           "0.0.0"
         ]
       };
-      yield* ModuleUnpublished.save('findByName-unpublished-info', pkg);
+      yield ModuleUnpublished.save('findByName-unpublished-info', pkg);
     });
 
     it('should return unpublished info', function* () {
-      var row = yield* ModuleUnpublished.findByName('findByName-unpublished-info');
+      var row = yield ModuleUnpublished.findByName('findByName-unpublished-info');
       row.id.should.above(0);
       row.package.description.should.equal('findByName-unpublished-info');
     });
 
     it('should return null when name not exists', function* () {
-      var row = yield* ModuleUnpublished.findByName('not-exists');
+      var row = yield ModuleUnpublished.findByName('not-exists');
       (row === null).should.equal(true);
     });
   });

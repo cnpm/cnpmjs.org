@@ -47,7 +47,7 @@ module.exports = function* download(next) {
 
   if (!row || !row.package || !row.package.dist) {
     if (!url) {
-      return yield* next;
+      return yield next;
     }
     this.status = 302;
     this.set('Location', url);
@@ -105,7 +105,7 @@ defer.setInterval(function* () {
     var name = item[0];
     var count = item[1];
     try {
-      yield* downloadTotalService.plusModuleTotal({ name: name, date: date, count: count });
+      yield downloadTotalService.plusModuleTotal({ name: name, date: date, count: count });
     } catch (err) {
       if (err.name !== 'SequelizeUniqueConstraintError') {
         err.message += '; name: ' + name + ', count: ' + count + ', date: ' + date;

@@ -39,7 +39,7 @@ module.exports = function* save(next) {
   }
 
   // check maintainers
-  var result = yield* packageService.authMaintainer(name, username);
+  var result = yield packageService.authMaintainer(name, username);
   if (!result.isMaintainer) {
     this.status = 403;
     this.body = {
@@ -60,7 +60,7 @@ module.exports = function* save(next) {
       }
     }
     if (hasDeprecated) {
-      return yield* deprecateVersions.call(this, next);
+      return yield deprecateVersions.call(this, next);
     }
 
     this.status = 400;
@@ -149,7 +149,7 @@ module.exports = function* save(next) {
 
   if (!distTags.latest) {
     // need to check if latest tag exists or not
-    var latest = yield* packageService.getModuleByTag(name, 'latest');
+    var latest = yield packageService.getModuleByTag(name, 'latest');
     if (!latest) {
       // auto add latest
       tags.push(['latest', tags[0][1]]);

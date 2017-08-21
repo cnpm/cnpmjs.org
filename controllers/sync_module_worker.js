@@ -1063,7 +1063,7 @@ SyncModuleWorker.prototype._sync = function* (name, pkg) {
     if (names.length === 0) {
       return;
     }
-    var rows = yield* User.listByNames(names);
+    var rows = yield User.listByNames(names);
     var map = {};
     rows.forEach(function (r) {
       map[r.name] = r;
@@ -1250,7 +1250,7 @@ SyncModuleWorker.prototype._syncOneVersion = function *(versionIndex, sourcePack
     // https://github.com/cnpm/cnpmjs.org/issues/325
     // if (statusCode === 404) {
     //   shasum = sourcePackage.dist.shasum;
-    //   return yield *afterUpload({
+    //   return yield afterUpload({
     //     url: downurl
     //   });
     // }

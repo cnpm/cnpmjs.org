@@ -1,18 +1,4 @@
-/**!
- * cnpmjs.org - controllers/registry/package/remove_version.js
- *
- * Copyright(c) fengmk2 and other contributors.
- * MIT Licensed
- *
- * Authors:
- *   fengmk2 <fengmk2@gmail.com> (http://fengmk2.github.com)
- */
-
 'use strict';
-
-/**
- * Module dependencies.
- */
 
 var debug = require('debug')('cnpmjs.org:controllers:registry:package:remove_version');
 var packageService = require('../../../services/package');
@@ -33,13 +19,13 @@ module.exports = function* removeOneVersion(next) {
     version = version.substring(0, version.lastIndexOf('.tgz'));
   }
   if (!version) {
-    return yield* next;
+    return yield next;
   }
 
   debug('remove tarball with filename: %s, version: %s, revert to => rev id: %s', filename, version, id);
 
   if (isNaN(id)) {
-    return yield* next;
+    return yield next;
   }
 
   var rs = yield [
@@ -49,7 +35,7 @@ module.exports = function* removeOneVersion(next) {
   var revertTo = rs[0];
   var mod = rs[1]; // module need to delete
   if (!mod || mod.name !== name) {
-    return yield* next;
+    return yield next;
   }
 
   var key = mod.package && mod.package.dist && mod.package.dist.key;
@@ -68,7 +54,7 @@ module.exports = function* removeOneVersion(next) {
     logger.error(err);
   }
   // remove version from table
-  yield* packageService.removeModulesByNameAndVersions(name, [version]);
+  yield packageService.removeModulesByNameAndVersions(name, [version]);
   debug('removed %s@%s', name, version);
   this.body = { ok: true };
 };

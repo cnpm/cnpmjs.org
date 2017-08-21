@@ -42,7 +42,7 @@ exports.request = request;
 
 exports.getUser = function* (name) {
   var url = '/-/user/org.couchdb.user:' + name;
-  var r = yield* request(url);
+  var r = yield request(url);
   var data = r.data;
   if (data && !data.name) {
     // 404
@@ -138,14 +138,14 @@ exports.fetchAllPackagesSince = function* (timestamp) {
 };
 
 exports.getAllSince = function* (startkey, timeout) {
-  var r = yield* request('/-/all/since?stale=update_after&startkey=' + startkey, {
+  var r = yield request('/-/all/since?stale=update_after&startkey=' + startkey, {
     timeout: timeout || 300000
   });
   return r.data;
 };
 
 exports.getAllToday = function* (timeout) {
-  var r = yield* request('/-/all/static/today.json', {
+  var r = yield request('/-/all/static/today.json', {
     timeout: timeout || 300000
   });
   // data is array: see https://registry.npmjs.org/-/all/static/today.json
@@ -153,7 +153,7 @@ exports.getAllToday = function* (timeout) {
 };
 
 exports.getShort = function* (timeout) {
-  var r = yield* request('/-/short', {
+  var r = yield request('/-/short', {
     timeout: timeout || 300000,
     // registry.npmjs.org/-/short is 404 now therefore have a fallback
     registry: config.sourceNpmRegistryIsCNpm ? config.sourceNpmRegistry : 'http://r.cnpmjs.org',
@@ -162,7 +162,7 @@ exports.getShort = function* (timeout) {
 };
 
 exports.getPopular = function* (top, timeout) {
-  var r = yield* request('/-/_view/dependedUpon?group_level=1', {
+  var r = yield request('/-/_view/dependedUpon?group_level=1', {
     registry: config.officialNpmRegistry,
     timeout: timeout || 120000
   });

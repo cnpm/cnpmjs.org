@@ -1,19 +1,4 @@
-/**!
- * cnpmjs.org - controllers/registry/user/add.js
- *
- * Copyright(c) fengmk2 and other contributors.
- * MIT Licensed
- *
- * Authors:
- *   dead_horse <dead_horse@qq.com> (http://deadhorse.me)
- *   fengmk2 <fengmk2@gmail.com> (http://fengmk2.github.com)
- */
-
 'use strict';
-
-/**
- * Module dependencies.
- */
 
 var ensurePasswordSalt = require('./common').ensurePasswordSalt;
 var userService = require('../../../services/user');
@@ -77,7 +62,7 @@ module.exports = function* addUser() {
 
   var loginedUser;
   try {
-    loginedUser = yield* userService.authAndSave(body.name, body.password);
+    loginedUser = yield userService.authAndSave(body.name, body.password);
   } catch (err) {
     this.status = err.status || 500;
     this.body = {
@@ -106,7 +91,7 @@ module.exports = function* addUser() {
     return;
   }
 
-  var existUser = yield* userService.get(name);
+  var existUser = yield userService.get(name);
   if (existUser) {
     this.status = 409;
     this.body = {
@@ -117,7 +102,7 @@ module.exports = function* addUser() {
   }
 
   // add new user
-  var result = yield* userService.add(user);
+  var result = yield userService.add(user);
   this.etag = '"' + result.rev + '"';
   this.status = 201;
   this.body = {
