@@ -48,7 +48,7 @@ app.proxy = true;
 app.use(proxyToNpm({
   isWeb: true
 }));
-app.use(bodyParser({ jsonLimit: config.jsonLimit }));
+app.use(bodyParser({ jsonLimit: config.jsonLimit, strict: false }));
 app.use(auth());
 app.use(notFound);
 
