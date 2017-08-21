@@ -345,7 +345,7 @@ describe('test/controllers/sync_module_worker.test.js', () => {
     before(function* () {
       mm(config, 'syncModel', 'all');
       const worker = new SyncModuleWorker({
-        name: 'ms',
+        name: 'pedding',
         username: 'fengmk2',
         noDep: true,
       });
@@ -365,7 +365,7 @@ describe('test/controllers/sync_module_worker.test.js', () => {
       });
 
       var worker = new SyncModuleWorker({
-        name: 'ms',
+        name: 'pedding',
         username: 'fengmk2',
         noDep: true,
       });
@@ -374,7 +374,7 @@ describe('test/controllers/sync_module_worker.test.js', () => {
       yield end();
       mm.restore();
       // check deprecated
-      const mods = yield packageService.listModulesByName('ms');
+      const mods = yield packageService.listModulesByName('pedding');
       for (const mod of mods) {
         should.ok(mod.package.deprecated === undefined);
       }
