@@ -4,6 +4,7 @@ var koa = require('koa');
 var app = module.exports = koa();
 var http = require('http');
 var middlewares = require('koa-middlewares');
+var bodyParser = require('koa-bodyparser');
 var routes = require('../routes/registry');
 var logger = require('../common/logger');
 var config = require('../config');
@@ -24,7 +25,7 @@ app.use(staticCache);
 
 app.keys = ['todokey', config.sessionSecret];
 app.proxy = true;
-app.use(middlewares.bodyParser({ jsonLimit: config.jsonLimit }));
+app.use(bodyParser({ jsonLimit: config.jsonLimit }));
 app.use(cors({
   allowMethods: 'GET,HEAD',
 }));

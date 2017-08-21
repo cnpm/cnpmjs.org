@@ -4,6 +4,7 @@ var opensearch = require('../middleware/opensearch');
 var notFound = require('../middleware/web_not_found');
 var staticCache = require('../middleware/static');
 var middlewares = require('koa-middlewares');
+var bodyParser = require('koa-bodyparser');
 var markdownMiddleware = require('koa-markdown');
 var block = require('../middleware/block');
 var logger = require('../common/logger');
@@ -43,7 +44,7 @@ app.proxy = true;
 app.use(proxyToNpm({
   isWeb: true
 }));
-app.use(middlewares.bodyParser());
+app.use(bodyParser({ jsonLimit: config.jsonLimit }));
 app.use(auth());
 app.use(notFound);
 
