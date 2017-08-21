@@ -29,7 +29,7 @@ app.use(staticCache);
 
 app.keys = ['todokey', config.sessionSecret];
 app.proxy = true;
-app.use(bodyParser({ jsonLimit: config.jsonLimit }));
+app.use(bodyParser({ jsonLimit: config.jsonLimit, strict: false }));
 app.use(cors({
   allowMethods: 'GET,HEAD',
 }));
