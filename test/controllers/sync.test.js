@@ -107,6 +107,7 @@ describe('test/controllers/sync.test.js', () => {
 
     it('should sync sync_upstream=true success', function (done) {
       mm(config, 'syncModel', 'all');
+      mm(config, 'sourceNpmRegistryIsCNpm', true);
       mm(npmService, 'get', function* () {
         return mockPackage;
       });
