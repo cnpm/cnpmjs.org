@@ -23,7 +23,7 @@
       return getSyncLog(logid);
     }
     $.ajax({
-      url: resourceURL,
+      url: resourceURL + '?sync_upstream=true',
       type: 'PUT',
       dataType: 'json',
       success: handleSyncSucess,

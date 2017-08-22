@@ -18,7 +18,11 @@ exports.sync = function* () {
   }
   var publish = this.query.publish === 'true';
   var noDep = this.query.nodeps === 'true';
-  debug('sync %s with query: %j', name, this.query);
+  var syncUpstreamFirst = this.query.sync_upstream === 'true';
+  if (!config.sourceNpmRegistryIsCNpm) {
+    syncUpstreamFirst = false;
+  }
+  debug('sync %s with query: %j, syncUpstreamFirst: %s', name, this.query, syncUpstreamFirst);
   if (type === 'package' && publish && !this.user.isAdmin) {
     this.status = 403;
     this.body = {
@@ -32,7 +36,7 @@ exports.sync = function* () {
     type: type,
     publish: publish,
     noDep: noDep,
-    syncUpstreamFirst: config.sourceNpmRegistryIsCNpm,
+    syncUpstreamFirst: syncUpstreamFirst,
   };
 
   var logId = yield SyncModuleWorker.sync(name, username, options);

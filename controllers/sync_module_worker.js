@@ -122,8 +122,8 @@ SyncModuleWorker.prototype._saveLog = function () {
 };
 
 SyncModuleWorker.prototype.start = function () {
-  this.log('user: %s, sync %s worker start, %d concurrency, nodeps: %s, publish: %s',
-    this.username, this.names[0], this.concurrency, this.noDep, this._publish);
+  this.log('user: %s, sync %s worker start, %d concurrency, nodeps: %s, publish: %s, syncUpstreamFirst: %s',
+    this.username, this.names[0], this.concurrency, this.noDep, this._publish, this.syncUpstreamFirst);
   var that = this;
   co(function* () {
     // sync upstream
@@ -198,9 +198,9 @@ SyncModuleWorker.prototype.syncUpstream = function* (name) {
   if (this.type === 'user') {
     syncname = this.type + ':' + syncname;
   }
-  var url = config.sourceNpmRegistry + '/' + syncname + '/sync';
+  var url = config.sourceNpmRegistry + '/' + syncname + '/sync?sync_upstream=true';
   if (this.noDep) {
-    url += '?nodeps=true';
+    url += '&nodeps=true';
   }
   var r = yield urllib.request(url, {
     method: 'put',

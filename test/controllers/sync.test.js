@@ -1,19 +1,4 @@
-/**!
- * cnpmjs.org - test/controllers/sync.test.js
- *
- * Copyright(c) cnpmjs.org and other contributors.
- * MIT Licensed
- *
- * Authors:
- *  fengmk2 <fengmk2@gmail.com> (http://fengmk2.github.com)
- *  dead_horse <dead_horse@qq.com> (http://deadhorse.me)
- */
-
 'use strict';
-
-/**
- * Module dependencies.
- */
 
 var request = require('supertest');
 var should = require('should');
@@ -25,8 +10,9 @@ var npmService = require('../../services/npm');
 var registryApp = require('../../servers/registry');
 var webApp = require('../../servers/web');
 var utils = require('../utils');
+var config = require('../../config');
 
-describe('controllers/sync.test.js', function () {
+describe('test/controllers/sync.test.js', () => {
   afterEach(mm.restore);
 
   var fixtures = path.join((path.dirname(__dirname)), 'fixtures');
@@ -35,6 +21,7 @@ describe('controllers/sync.test.js', function () {
   describe('sync source npm package', function () {
     var logIdRegistry;
     var logIdWeb;
+    var logIdRegistry2;
 
     it('should sync as publish success', function (done) {
       request(registryApp.listen())
@@ -75,7 +62,7 @@ describe('controllers/sync.test.js', function () {
         return mockPackage;
       });
       request(webApp.listen())
-      .put('/sync/pedding')
+      .put('/sync/pedding?sync_upstream=true')
       .end(function (err, res) {
         should.not.exist(err);
         res.body.should.have.keys('ok', 'logId');
@@ -116,6 +103,44 @@ describe('controllers/sync.test.js', function () {
         res.body.should.have.keys('ok', 'log');
         done();
       });
+    });
+
+    it('should sync sync_upstream=true success', function (done) {
+      mm(config, 'syncModel', 'all');
+      mm(npmService, 'get', function* () {
+        return mockPackage;
+      });
+      request(registryApp.listen())
+      .put('/pedding/sync?sync_upstream=true')
+      .set('authorization', utils.adminAuth)
+      .end(function (err, res) {
+        should.not.exist(err);
+        res.body.should.have.keys('ok', 'logId');
+        logIdRegistry2 = res.body.logId;
+        done();
+      });
+    });
+
+    it('should get sync_upstream=true log', function (done) {
+      done = pedding(2, done);
+      setTimeout(() => {
+        request(registryApp.listen())
+        .get('/pedding/sync/log/' + logIdRegistry2)
+        .expect(200, function (err, res) {
+          should.not.exist(err);
+          res.body.should.have.keys('ok', 'log');
+          res.body.log.should.containEql(', syncUpstreamFirst: true');
+          done();
+        });
+
+        request(webApp.listen())
+        .get('/sync/pedding/log/' + logIdRegistry2 + '?offset=1')
+        .expect(200, function (err, res) {
+          should.not.exist(err);
+          res.body.should.have.keys('ok', 'log');
+          done();
+        });
+      }, 3000);
     });
 
     it('should 404 when log id not exists', function (done) {
