@@ -40,7 +40,7 @@ module.exports = function* sync() {
 };
 
 function syncPackage(change) {
-  const url = `${config.handleSyncRegistry}/${change.id}/sync`;
+  const url = `${config.handleSyncRegistry}/${change.id}/sync?sync_upstream=true`;
   urllib.request(url, {
     method: 'PUT',
     dataType: 'json',
