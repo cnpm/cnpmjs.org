@@ -40,8 +40,8 @@ module.exports = function* sync() {
 };
 
 function syncPackage(change) {
-  const url = `${config.handleSyncRegistry}/${change.id}/sync?sync_upstream=true`;
-  urllib.request(url, {
+  const url = `${config.handleSyncRegistry}/${change.id}/sync`;
+  urllib.request(`${url}?sync_upstream=true`, {
     method: 'PUT',
     dataType: 'json',
     timeout: 10000,
