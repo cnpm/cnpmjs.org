@@ -48,52 +48,59 @@ program.parse(process.argv);
 
 
 function start(options) {
-  stop(options);
-  var dataDir = options.dataDir || path.join(process.env.HOME, '.cnpmjs.org');
-  mkdirp.sync(dataDir);
+  stop(options)
+    // wait for "stop" method to remove the pid file
+    .then(function () {
+      var dataDir = options.dataDir || path.join(process.env.HOME, '.cnpmjs.org');
+      mkdirp.sync(dataDir);
 
-  var configfile = path.join(dataDir, 'config.json');
-  var config = {};
-  if (fs.existsSync(configfile)) {
-    try {
-      config = require(configfile);
-    } catch (err) {
-      console.warn('load old %s error: %s', configfile, err);
-    }
-  }
-  // config.enableCluster = !!options.cluster;
-  if (options.admins) {
-    config.admins = {};
-    for (var i = 0; i < options.admins.length; i++) {
-      config.admins[options.admins[i]] = options.admins[i] + '@localhost.com';
-    }
-  }
-  if (options.scopes) {
-    config.scopes = options.scopes.map(function (name) {
-      if (name[0] !== '@') {
-        name = '@' + name;
+      var configfile = path.join(dataDir, 'config.json');
+      var config = {};
+      if (fs.existsSync(configfile)) {
+        try {
+          config = require(configfile);
+        } catch (err) {
+          console.warn('load old %s error: %s', configfile, err);
+        }
       }
-      return name;
+      // config.enableCluster = !!options.cluster;
+      if (options.admins) {
+        config.admins = {};
+        for (var i = 0; i < options.admins.length; i++) {
+          config.admins[options.admins[i]] = options.admins[i] + '@localhost.com';
+        }
+      }
+      if (options.scopes) {
+        config.scopes = options.scopes.map(function (name) {
+          if (name[0] !== '@') {
+            name = '@' + name;
+          }
+          return name;
+        });
+      }
+
+      var configJSON = JSON.stringify(config, null, 2);
+      fs.writeFileSync(configfile, configJSON);
+
+      debug('save config %s to %s', configJSON, configfile);
+
+      // if sqlite db file not exists, init first
+      initDatabase(function() {
+        require('../dispatch');
+      });
+
+      fs.writeFileSync(path.join(dataDir, 'pid'), process.pid + '');
     });
-  }
-
-  var configJSON = JSON.stringify(config, null, 2);
-  fs.writeFileSync(configfile, configJSON);
-
-  debug('save config %s to %s', configJSON, configfile);
-
-  // if sqlite db file not exists, init first
-  initDatabase(function() {
-    require('../dispatch');
-  });
-
-  fs.writeFileSync(path.join(dataDir, 'pid'), process.pid + '');
 }
 
 function stop(options) {
   var dataDir = options.dataDir || path.join(process.env.HOME, '.cnpmjs.org');
   var pidfile = path.join(dataDir, 'pid');
-  if (fs.existsSync(pidfile)) {
+  return new Promise(function (resolve) {
+    if (!fs.existsSync(pidfile)) {
+      resolve();
+      return;
+    }
     var pid = Number(fs.readFileSync(pidfile, 'utf8'));
     treekill(pid, function (err) {
       if (err) {
@@ -102,8 +109,9 @@ function stop(options) {
       }
       console.log('cnpmjs.org server:%d stop', pid);
       fs.unlinkSync(pidfile);
+      resolve();
     });
-  }
+  });
 }
 
 function initDatabase(callback) {
