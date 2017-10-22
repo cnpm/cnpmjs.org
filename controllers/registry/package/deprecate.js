@@ -21,7 +21,7 @@ function* deprecateVersions() {
   for (var i = 0; i < rs.length; i++) {
     var row = rs[i];
     if (!row) {
-      // some version not exists
+      // some version does not exist
       this.status = 400;
       this.body = {
         error: 'version_error',

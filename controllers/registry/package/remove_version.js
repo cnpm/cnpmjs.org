@@ -46,7 +46,7 @@ module.exports = function* removeOneVersion(next) {
   if (revertTo && revertTo.package) {
     debug('removing key: %s from nfs, revert to %s@%s', key, revertTo.name, revertTo.package.version);
   } else {
-    debug('removing key: %s from nfs, no revert mod', key);
+    debug('removing key: %s from nfs, no module to revert', key);
   }
   try {
     yield nfs.remove(key);

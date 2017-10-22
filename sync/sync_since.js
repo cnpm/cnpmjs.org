@@ -13,7 +13,7 @@ function* sync(sinceTimestamp) {
 
   packages = packages || [];
   if (!packages.length) {
-    console.log('no packages need be sync');
+    console.log('no packages need be synced');
     process.exit(0);
   }
   // var news = [];
@@ -24,7 +24,7 @@ function* sync(sinceTimestamp) {
   //   }
   // }
   // packages = news;
-  console.log('lastModified: %s, lastModified package: %s, total %d packages to sync: %j',
+  console.log('lastModified: %s, lastModified package: %s, total %d packages to be synced: %j',
     new Date(result.lastModified), result.lastModifiedName, packages.length, packages);
 
   var worker = new SyncModuleWorker({

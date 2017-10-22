@@ -44,7 +44,7 @@ module.exports = function* save(next) {
     this.status = 403;
     this.body = {
       error: 'forbidden user',
-      reason: username + ' not authorized to modify ' + name +
+      reason: username + ' is not authorized to modify ' + name +
         ', please contact maintainers: ' + result.maintainers.join(', ')
     };
     return;
@@ -97,7 +97,7 @@ module.exports = function* save(next) {
     this.status = 403;
     this.body = {
       error: 'maintainers error',
-      reason: username + ' does not in maintainer list'
+      reason: username + ' is not in maintainer list'
     };
     return;
   }
@@ -142,13 +142,13 @@ module.exports = function* save(next) {
     this.body = {
       error: 'size_wrong',
       reason: 'Attachment size ' + attachment.length
-        + ' not match download size ' + tarballBuffer.length,
+        + ' does not match downloading size ' + tarballBuffer.length,
     };
     return;
   }
 
   if (!distTags.latest) {
-    // need to check if latest tag exists or not
+    // check if latest tag exists or not
     var latest = yield packageService.getModuleByTag(name, 'latest');
     if (!latest) {
       // auto add latest
@@ -173,7 +173,7 @@ module.exports = function* save(next) {
     size: attachment.length
   };
 
-  // if nfs upload return a key, record it
+  // if nfs uploading returns a key, record it
   if (uploadResult.url) {
     dist.tarball = uploadResult.url;
   } else if (uploadResult.key) {
@@ -202,7 +202,7 @@ module.exports = function* save(next) {
     });
   }
 
-  // ensure maintainers exists
+  // ensure maintainers existed
   var maintainerNames = maintainers.map(function (item) {
     return item.name;
   });

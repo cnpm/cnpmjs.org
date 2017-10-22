@@ -33,8 +33,8 @@ module.exports = function () {
     try {
       row = yield UserService.auth(username, password);
     } catch (err) {
-      // do not response error here
-      // many request do not need login
+      // do not respond error here
+      // most requests do not need login
       this.user.error = err;
     }
 

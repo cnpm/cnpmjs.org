@@ -17,7 +17,7 @@ co(function * () {
   var newPasswordSha = utility.sha1(newPassword + salt);
   user.password_sha = newPasswordSha;
   user = yield user.save();
-  console.log(`change user password successful!! user new password_sha: ${user.password_sha}`);
+  console.log(`changing user password succeeded!! user new password_sha: ${user.password_sha}`);
   process.exit(0);
 }).catch(function (e) {
   console.log(e);

@@ -31,7 +31,7 @@ module.exports = function* sync() {
   var existPackages = r[0];
   var info = r[1];
   if (!info) {
-    throw new Error('can not found total info');
+    throw new Error('can not find total info');
   }
 
   var allPackages;
@@ -48,7 +48,7 @@ module.exports = function* sync() {
     }
     allPackages = pkgs;
   } else {
-    debug('sync new module from last exist sync time: %s', info.last_exist_sync_time);
+    debug('sync new module from last existed sync time: %s', info.last_exist_sync_time);
     var result = yield npmService.fetchUpdatesSince(info.last_exist_sync_time);
     allPackages = result.names;
     syncTime = result.lastModified;
@@ -56,13 +56,13 @@ module.exports = function* sync() {
 
   var packages = intersection(existPackages, allPackages);
   if (!packages.length) {
-    debug('no packages need be sync');
+    debug('no packages need to be synced');
     return {
       successes: [],
       fails: []
     };
   }
-  debug('Total %d packages to sync, top 10: %j', packages.length, packages.slice(0, 10));
+  debug('Total %d packages to be synced, top 10: %j', packages.length, packages.slice(0, 10));
 
   var worker = new SyncModuleWorker({
     username: 'admin',

@@ -4,7 +4,7 @@ const packageService = require('../../../services/package');
 const config = require('../../../config');
 
 // GET /-/short
-// List public all packages names only
+// List all public packages names only
 module.exports = function* () {
   if (this.query.private_only) {
     const tasks = [];

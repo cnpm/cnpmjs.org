@@ -60,7 +60,7 @@ function start(options) {
         try {
           config = require(configfile);
         } catch (err) {
-          console.warn('load old %s error: %s', configfile, err);
+          console.warn('loading old %s error: %s', configfile, err);
         }
       }
       // config.enableCluster = !!options.cluster;
@@ -82,7 +82,7 @@ function start(options) {
       var configJSON = JSON.stringify(config, null, 2);
       fs.writeFileSync(configfile, configJSON);
 
-      debug('save config %s to %s', configJSON, configfile);
+      debug('saved config %s to %s', configJSON, configfile);
 
       // if sqlite db file not exists, init first
       initDatabase(function() {
@@ -107,7 +107,7 @@ function stop(options) {
         console.log(err);
         throw err;
       }
-      console.log('cnpmjs.org server:%d stop', pid);
+      console.log('cnpmjs.org server:%d stopped', pid);
       fs.unlinkSync(pidfile);
       resolve();
     });
@@ -121,17 +121,17 @@ function initDatabase(callback) {
     .then(function () {
       models.Total.init(function (err) {
         if (err) {
-          console.error('[models/init_script.js] sequelize init fail');
+          console.error('[models/init_script.js] sequelize initialization failed');
           console.error(err);
           throw err;
         } else {
-          console.log('[models/init_script.js] `sqlite` sequelize sync and init success');
+          console.log('[models/init_script.js] `sqlite` sequelize synchronization and initialization succeeded');
           callback();
         }
       });
     })
     .catch(function (err) {
-      console.error('[models/init_script.js] sequelize sync fail');
+      console.error('[models/init_script.js] sequelize synchronization failed');
       console.error(err);
       throw err;
     });

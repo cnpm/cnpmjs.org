@@ -38,7 +38,7 @@ start()
       nohup $NODEJS $NODE_DISPATH_PATH > $STDOUT_LOG  2>&1 &
       sleep 2
       get_pid
-      echo "Start nodejs success. PID=$PID"
+      echo "Nodejs started. PID=$PID"
    else
       echo "$PROJECT_NAME is already running, PID=$PID"
    fi

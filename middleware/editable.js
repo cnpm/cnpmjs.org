@@ -2,7 +2,7 @@
 
 var packageService = require('../services/package');
 
-// admin or module's maintainer can modified the module
+// only admin or module's maintainer can modified the module
 module.exports = function* editable(next) {
   var username = this.user && this.user.name;
   var moduleName = this.params.name || this.params[0];

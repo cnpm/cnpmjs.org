@@ -834,7 +834,7 @@ SyncModuleWorker.prototype._sync = function* (name, pkg) {
   }
 
   if (missingVersions.length === 0) {
-    that.log('  [%s] all versions are exists', name);
+    that.log('  [%s] all versions existed', name);
   } else {
     missingVersions.sort(function (a, b) {
       return a.publish_time - b.publish_time;

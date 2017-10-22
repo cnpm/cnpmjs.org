@@ -23,7 +23,7 @@ exports.list = function* () {
     this.status = 400;
     this.body = {
       error: 'bad_request',
-      reason: 'reach max user names limit, must <= 20 user names'
+      reason: 'user name length can not longer than 20'
     };
     return;
   }

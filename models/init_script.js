@@ -28,18 +28,18 @@ models.sequelize.sync({
   .then(function () {
     models.Total.init(function (err) {
       if (err) {
-        console.error('[models/init_script.js] sequelize init fail');
+        console.error('[models/init_script.js] sequelize initialization failed');
         console.error(err);
         throw err;
       } else {
-        console.log('[models/init_script.js] `%s` sequelize sync and init success',
+        console.log('[models/init_script.js] `%s` sequelize synchronization and initialization succeeded',
           config.database.dialect);
         process.exit(0);
       }
     });
   })
   .catch(function (err) {
-    console.error('[models/init_script.js] sequelize sync fail');
+    console.error('[models/init_script.js] sequelize synchronization failed');
     console.error(err);
     process.exit(1);
   });

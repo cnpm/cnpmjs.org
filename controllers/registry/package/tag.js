@@ -17,7 +17,7 @@ module.exports = function* tag() {
   if (!version) {
     this.status = 400;
     this.body = {
-      error: 'version_missed',
+      error: 'version missing',
       reason: 'version not found'
     };
     return;

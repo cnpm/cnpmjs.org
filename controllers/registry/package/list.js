@@ -22,7 +22,7 @@ module.exports = function* list() {
   debug('show %s, last modified: %s, tags: %j', name, modifiedTime, tags);
   if (modifiedTime) {
     // find out the latest modfied time
-    // because update tags only modfied tag, wont change module gmt_modified
+    // because updating tags only modfied tag, wont change module gmt_modified
     for (var i = 0; i < tags.length; i++) {
       var tag = tags[i];
       if (tag.gmt_modified > modifiedTime) {
@@ -33,7 +33,7 @@ module.exports = function* list() {
     // must set status first
     this.status = 200;
     if (this.fresh) {
-      debug('%s not change at %s, 304 return', name, modifiedTime);
+      debug('%s has not changed at %s, return 304', name, modifiedTime);
       this.status = 304;
       return;
     }
@@ -48,7 +48,7 @@ module.exports = function* list() {
     }
     var fullRows = yield packageService.listModulesByName(name);
     if (fullRows.length > 0) {
-      // no abbreviated meta rows, use the full meta convert to abbreviated meta
+      // no abbreviated meta rows, convert to abbreviated meta using the full meta
       yield handleAbbreviatedMetaRequestWithFullMeta(this, name, modifiedTime, tags, fullRows);
       return;
     }
@@ -63,7 +63,7 @@ module.exports = function* list() {
   var starUsers = r[1];
   var maintainers = r[2];
 
-  debug('show %s got %d rows, %d tags, %d star users, maintainers: %j',
+  debug('show %s: got %d rows, %d tags, %d star users, maintainers: %j',
     name, rows.length, tags.length, starUsers.length, maintainers);
 
   var starUserMap = {};
@@ -94,8 +94,8 @@ module.exports = function* list() {
     }
   }
 
-  // if module not exist in this registry,
-  // sync the module backend and return package info from official registry
+  // if the module does not exist in this registry,
+  // sync the module background and redirect to official registry
   if (rows.length === 0) {
     if (!this.allowSync) {
       this.status = 404;
@@ -130,7 +130,7 @@ module.exports = function* list() {
   for (var i = 0; i < rows.length; i++) {
     var row = rows[i];
     var pkg = row.package;
-    // pkg is string ... ignore it
+    // if pkg is string ... ignore it
     if (typeof pkg === 'string') {
       continue;
     }
@@ -175,7 +175,7 @@ module.exports = function* list() {
   var pkg = latestMod.package;
 
   if (tags.length === 0) {
-    // some sync error reason, will cause tags missing
+    // some sync error reason will cause tags missing
     // set latest tag at least
     distTags.latest = pkg.version;
   }
@@ -208,12 +208,12 @@ module.exports = function* list() {
   info.bugs = pkg.bugs;
   info.license = pkg.license;
 
-  debug('show module %s: %s, latest: %s', name, rev, latestMod.version);
+  debug('show module: %s: %s, latest: %s', name, rev, latestMod.version);
   this.jsonp = info;
 };
 
 function* handleAbbreviatedMetaRequest(ctx, name, modifiedTime, tags, rows) {
-  debug('show %s got %d rows, %d tags, modifiedTime: %s', name, rows.length, tags.length, modifiedTime);
+  debug('show %s: got %d rows, %d tags, modifiedTime: %s', name, rows.length, tags.length, modifiedTime);
   var latestMod = null;
   // set tags
   var distTags = {};
@@ -243,7 +243,7 @@ function* handleAbbreviatedMetaRequest(ctx, name, modifiedTime, tags, rows) {
   }
 
   if (tags.length === 0) {
-    // some sync error reason, will cause tags missing
+    // some sync error reason will cause tags missing
     // set latest tag at least
     distTags.latest = latestMod.package.version;
   }
@@ -260,7 +260,7 @@ function* handleAbbreviatedMetaRequest(ctx, name, modifiedTime, tags, rows) {
 }
 
 function* handleAbbreviatedMetaRequestWithFullMeta(ctx, name, modifiedTime, tags, rows) {
-  debug('show %s got %d rows, %d tags',
+  debug('show %s: got %d rows, %d tags',
     name, rows.length, tags.length);
   var latestMod = null;
   // set tags
@@ -274,7 +274,7 @@ function* handleAbbreviatedMetaRequestWithFullMeta(ctx, name, modifiedTime, tags
   var versions = {};
   for (var i = 0; i < rows.length; i++) {
     var row = rows[i];
-    // pkg is string ... ignore it
+    // if pkg is string ... ignore it
     if (typeof row.package === 'string') {
       continue;
     }

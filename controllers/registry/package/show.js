@@ -56,11 +56,11 @@ module.exports = function* show() {
     return;
   }
 
-  // if not fond, sync from source registry
+  // if not found, sync from source registry
   if (!this.allowSync) {
     this.status = 404;
     this.jsonp = {
-      error: 'not exist',
+      error: 'not found',
       reason: 'version not found: ' + version
     };
     return;
@@ -68,7 +68,7 @@ module.exports = function* show() {
 
   // start sync
   var logId = yield SyncModuleWorker.sync(name, 'sync-by-install');
-  debug('start sync %s, get log id %s', name, logId);
+  debug('start syncing %s, got log id %s', name, logId);
 
   this.redirect(config.officialNpmRegistry + this.url);
 };

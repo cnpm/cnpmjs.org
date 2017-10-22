@@ -157,13 +157,13 @@ function sendMailToAdmin(err, result, syncTime) {
     }
     subject = 'Sync Error';
     type = 'error';
-    html = util.format('Sync packages from official registry failed.\n' +
+    html = util.format('Syncing packages from official registry failed.\n' +
       'Start sync time is %s.\nError message is %s: %s\n%s.', syncTime, err.name, err.message, err.stack);
   } else if (result.fails && result.fails.length) {
-    subject = 'Sync Finished But Some Packages Failed';
+    subject = 'Synchronization Finished But Some Packages Failed';
     type = 'warn';
-    html = util.format('Sync packages from official registry finished, but some packages sync failed.\n' +
-      'Start sync time is %s.\n %d packges sync failed: %j ...\n %d packages sync successes :%j ...',
+    html = util.format('Syncing packages from official registry finished, but some packages sync failed.\n' +
+      'Starting time of synchronization is %s.\n %d packges syncing failed: %j ...\n %d packages sync successes :%j ...',
       syncTime, result.fails.length, result.fails.slice(0, 10),
       result.successes.length, result.successes.slice(0, 10));
     // skip email notice when fails items small then 3

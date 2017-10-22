@@ -111,7 +111,7 @@ exports.removeAllMaintainers = function* (name) {
 
 exports.updateMaintainers = function* (name, users) {
   // maintainers should be [username1, username2, ...] format
-  // find out the exists maintainers
+  // find out the existed maintainers
   // then remove all the users not present and add all the left
 
   if (users.length === 0) {

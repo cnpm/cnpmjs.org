@@ -33,7 +33,7 @@ if (config.mysqlServers && config.database.dialect === 'sqlite') {
   // mysqlMaxConnections: 4,
   // mysqlQueryTimeout: 5000,
 
-  console.warn('[WARNNING] your config.js was too old, please @see https://github.com/cnpm/cnpmjs.org/wiki/Migrating-from-1.x-to-2.x');
+  console.warn('[WARNNING] your config.js was outdated. please @see https://github.com/cnpm/cnpmjs.org/wiki/Migrating-from-1.x-to-2.x');
   var server = config.mysqlServers[0];
   config.database = {
     db: config.mysqlDatabase,
@@ -53,7 +53,7 @@ if (config.mysqlServers && config.database.dialect === 'sqlite') {
 
 var database = config.database;
 
-// sync database before app start, defaul is false
+// sync database before app starting. default is false
 database.syncFirst = false;
 
 // add longtext for mysql

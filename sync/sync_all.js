@@ -45,7 +45,7 @@ module.exports = function* sync() {
 
   packages = packages || [];
   if (!packages.length) {
-    logger.syncInfo('no packages need be sync');
+    logger.syncInfo('no packages need to be synced');
     return;
   }
   logger.syncInfo('Total %d packages to sync: %j', packages.length, packages);
