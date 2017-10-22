@@ -81,9 +81,9 @@ function start(options) {
 
       var configJSON = JSON.stringify(config, null, 2);
       fs.writeFileSync(configfile, configJSON);
-
+    
       debug('saved config %s to %s', configJSON, configfile);
-
+    
       // if sqlite db file not exists, init first
       initDatabase(function() {
         require('../dispatch');
