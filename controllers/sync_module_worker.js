@@ -1342,6 +1342,7 @@ SyncModuleWorker.prototype._syncOneVersion = function *(versionIndex, sourcePack
     } else if (sourcePackage._npmUser && sourcePackage._npmUser.name) {
       // try to use _npmUser instead
       author = sourcePackage._npmUser.name;
+      sourcePackage.maintainers = [ sourcePackage._npmUser ];
     }
 
     var mod = {
