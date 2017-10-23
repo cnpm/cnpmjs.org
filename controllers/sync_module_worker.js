@@ -1337,8 +1337,12 @@ SyncModuleWorker.prototype._syncOneVersion = function *(versionIndex, sourcePack
     //make sure sync module have the correct author info
     //only if can not get maintainers, use the username
     var author = username;
-    if (Array.isArray(sourcePackage.maintainers)) {
+    if (Array.isArray(sourcePackage.maintainers) && sourcePackage.maintainers.length > 0) {
       author = sourcePackage.maintainers[0].name || username;
+    } else if (sourcePackage._npmUser && sourcePackage._npmUser.name) {
+      // try to use _npmUser instead
+      author = sourcePackage._npmUser.name;
+      sourcePackage.maintainers = [ sourcePackage._npmUser ];
     }
 
     var mod = {
