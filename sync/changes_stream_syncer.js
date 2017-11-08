@@ -13,6 +13,7 @@ const lastSeqFile = path.join(config.dataDir, '.cnpmjs.org.last_seq.txt');
 let _STREAM_ID = 0;
 
 module.exports = function* sync() {
+  const pedding = [];
   const since = yield getLastSequence();
   const streamId = _STREAM_ID++;
   let changesCount = 0;
@@ -26,12 +27,24 @@ module.exports = function* sync() {
   changes.on('data', change => {
     changesCount++;
     logger.syncInfo('stream#%d get change#%d: %j', streamId, changesCount, change);
-    syncPackage(change);
+    pedding.push(change);
+    // syncPackage(change);
   });
+
+  const timer = setInterval(function() {
+    for (var i = 0; i < 100; i++) {
+      var change = pedding.shift();
+      if (!change) {
+        break;
+      }
+      syncPackage(change);
+    }
+  }, 5000);
 
   try {
     yield changes.await('error');
   } catch (err) {
+    clearInterval(timer);
     // make sure changes steam is destroy
     changes.destroy();
     err.message += `, stream#${streamId}, changesCount#${changesCount}`;
@@ -50,7 +63,6 @@ function syncPackage(change) {
       logger.syncInfo('%s:%s PUT %s error: %s, retry after 5s',
         change.seq, change.id, url, err);
       logger.syncError(err);
-      syncPackage(change);
       setTimeout(() => syncPackage(change), 5000);
     } else {
       saveLastSequence(change.seq);
