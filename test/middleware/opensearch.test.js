@@ -1,21 +1,9 @@
-/**!
- * cnpmjs.org - test/middleware/opensearch.test.js
- *
- * Copyright(c) cnpmjs.org and other contributors.
- * MIT Licensed
- *
- * Authors:
- *  dead_horse <dead_horse@qq.com> (http://deadhorse.me)
- */
-
 'use strict';
 
-/**
- * Module dependencies.
- */
-
 var request = require('supertest');
+var mm = require('mm');
 var app = require('../../servers/web');
+var config = require('../../config');
 
 describe('middleware/opensearch.test.js', function () {
   before(function (done) {
@@ -24,13 +12,22 @@ describe('middleware/opensearch.test.js', function () {
   after(function (done) {
     app.close(done);
   });
+  afterEach(mm.restore);
 
   describe('GET /opensearch.xml', function () {
     it('should get 200', function (done) {
       request(app)
       .get('/opensearch.xml')
       .set('host', 'localhost')
-      .expect(/http:\/\/localhost/, done);
+      .expect(/http:\/\/localhost\//, done);
+    });
+
+    it('should return custom opensearch host', function (done) {
+      mm(config.opensearch, 'host', 'foo.com');
+      request(app)
+      .get('/opensearch.xml')
+      .set('host', 'localhost:6002')
+      .expect(/http:\/\/foo\.com\/browse\/keyword\//, done);
     });
   });
 });
