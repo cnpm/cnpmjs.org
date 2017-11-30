@@ -7,7 +7,6 @@ var config = require('../config');
 var npmService = require('../services/npm');
 var packageService = require('../services/package');
 var totalService = require('../services/total');
-var Status = require('./status');
 var SyncModuleWorker = require('../controllers/sync_module_worker');
 
 function intersection(arrOne, arrTwo) {
