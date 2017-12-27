@@ -17,6 +17,9 @@
 var should = require('should');
 var sleep = require('co-sleep');
 var Package = require('../../services/package');
+var models = require('../../models');
+var thunkify = require('thunkify-wrap');
+var SyncModuleWorker = require('../../controllers/sync_module_worker');
 var utils = require('../utils');
 
 describe('test/services/package.test.js', function () {
@@ -581,6 +584,31 @@ describe('test/services/package.test.js', function () {
       users.should.eql([]);
       names = yield Package.listUserStarModuleNames('addStar-user');
       names.should.eql([]);
+    });
+  });
+
+  describe('updateModuleAbbreviatedPackage()', function () {
+    it('should return null if module abbreviated is not exists', function* () {
+      var mod = yield Package.updateModuleAbbreviatedPackage({
+        name: 'not-exists-module-name',
+        version: 'not-exists-module-version'
+      });
+      should.not.exist(mod);
+    });
+
+    it('should return updated module abbreviated instance', function* () {
+      var row = yield createModule('test-updateModuleAbbreviatedPackage-module-name', '1.0.0');
+      var item = {
+        id: row.package._id,
+        name: row.name,
+        version: row.version,
+        _hasShrinkwrap: true
+      };
+
+      var mod = yield Package.updateModuleAbbreviatedPackage(item);
+      Package.parseRow(mod);
+      (mod.package._hasShrinkwrap === item._hasShrinkwrap).should.be.true();
+      console.log('assert done');
     });
   });
 });

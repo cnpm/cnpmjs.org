@@ -328,6 +328,42 @@ describe('test/controllers/sync_module_worker.test.js', () => {
     yield end();
   });
 
+  it('should sync missing module deprecated property', function* () {
+    var testModuleName = 'native-or-bluebird';
+    var worker = new SyncModuleWorker({
+      name: testModuleName,
+      username: 'fengmk2',
+    });
+    worker.start();
+    var end = thunkify.event(worker, 'end');
+    yield end();
+
+    const rows = yield packageService.listModulesByName(testModuleName);
+    console.log('get %d rows', rows.length);
+    rows.forEach(row => {
+      assert(row.package.deprecated);
+      assert(row.package._hasShrinkwrap === false);
+    });
+
+    // mock module deprecated property missing
+    mm(packageService, 'listModulesByName', function* () {
+      rows.forEach((row, index) => {
+        if (index % 2 === 0) {
+          row.package.deprecated = undefined;
+        }
+      });
+      return rows;
+    });
+
+    worker = new SyncModuleWorker({
+      name: testModuleName,
+      username: 'fengmk2',
+    });
+    worker.start();
+    var end = thunkify.event(worker, 'end');
+    yield end();
+  });
+
   describe('syncUpstream()', function () {
     it('should sync upstream work', function* () {
       var worker = new SyncModuleWorker({
