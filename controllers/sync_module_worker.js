@@ -482,6 +482,10 @@ SyncModuleWorker.prototype._unpublished = function* (name, unpublishedInfo) {
     this.log('  [%s] publish on local cnpm registry, don\'t sync', name);
     return [];
   }
+  if (!config.syncDeletedVersions) {
+    this.log('  [%s] `config.syncDeletedVersions=false`, don\'t sync unpublished info', name);
+    return [];
+  }
 
   var r = yield packageService.saveUnpublishedModule(name, unpublishedInfo);
   this.log('    [%s] save unpublished info: %j to row#%s',
@@ -879,16 +883,21 @@ SyncModuleWorker.prototype._sync = function* (name, pkg) {
     }
   }
 
-  if (deletedVersionNames.length === 0) {
-    that.log('  [%s] no versions need to deleted', name);
-  } else {
-    that.log('  [%s] %d versions: %j need to deleted',
-      name, deletedVersionNames.length, deletedVersionNames);
-    try {
-      yield packageService.removeModulesByNameAndVersions(name, deletedVersionNames);
-    } catch (err) {
-      that.log('    [%s] delete error, %s: %s', name, err.name, err.message);
+  if (config.syncDeletedVersions) {
+    if (deletedVersionNames.length === 0) {
+      that.log('  [%s] no versions need to deleted', name);
+    } else {
+      that.log('  [%s] %d versions: %j need to deleted',
+        name, deletedVersionNames.length, deletedVersionNames);
+      try {
+        yield packageService.removeModulesByNameAndVersions(name, deletedVersionNames);
+      } catch (err) {
+        that.log('    [%s] delete error, %s: %s', name, err.name, err.message);
+      }
     }
+  } else {
+    that.log('  [%s] %d versions: %j need to deleted, but we won\'t delete them because `config.syncDeletedVersions=false`',
+      name, deletedVersionNames.length, deletedVersionNames);
   }
 
   // sync missing descriptions

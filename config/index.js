@@ -197,6 +197,8 @@ var config = {
 
   // sync devDependencies or not, default is false
   syncDevDependencies: false,
+  // try to remove all deleted versions from original registry
+  syncDeletedVersions: true,
 
   // changes streaming sync
   syncChangesStream: false,
