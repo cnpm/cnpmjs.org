@@ -333,7 +333,8 @@ SyncModuleWorker.prototype.syncByName = function* (concurrencyId, name, registry
       var errMessage = err.name + ': ' + err.message;
       that.log('[c#%s] [error] [%s] get package(%s%s) error: %s, status: %s',
         concurrencyId, name, registry, packageUrl, errMessage, status);
-      if (err.res.statusCode < 500 || registry !== config.officialNpmReplicate) {
+      // replicate request error, try to request from official registry
+      if (registry !== config.officialNpmReplicate) {
         // sync fail
         yield that._doneOne(concurrencyId, name, false);
         return;
