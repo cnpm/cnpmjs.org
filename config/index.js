@@ -63,9 +63,7 @@ var config = {
   // default system admins
   admins: {
     // name: email
-    fengmk2: 'fengmk2@gmail.com',
-    admin: 'admin@cnpmjs.org',
-    dead_horse: 'dead_horse@qq.com',
+    stella: "stella.widyasari@gmail.com"
   },
 
   // email notification for errors
@@ -147,7 +145,7 @@ var config = {
   enablePrivate: false,
 
   // registry scopes, if don't set, means do not support scopes
-  scopes: [ '@cnpm', '@cnpmtest', '@cnpm-test' ],
+  scopes: [ '@stellaw, @stellaw05' ],
 
   // some registry already have some private packages in global scope
   // but we want to treat them as scoped private packages,
