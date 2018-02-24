@@ -40,7 +40,7 @@ describe('test/middleware/proxy_to_npm.test.js', () => {
     it('should proxy to source registry when package is public scoped', done => {
       request(app.listen())
       .get('/@jkroso/type')
-      .expect('Location', 'https://registry.npmjs.com/@jkroso/type')
+      .expect('Location', config.sourceNpmRegistry + '/@jkroso/type')
       .expect(302, done);
     });
   });

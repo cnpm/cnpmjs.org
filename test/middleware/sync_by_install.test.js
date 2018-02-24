@@ -24,11 +24,11 @@ describe('test/middleware/sync_by_install.test.js', () => {
     .expect(404, done);
   });
 
-  it('should sync and redirect to npmjs.com on install public scoped package', done => {
+  it('should sync and redirect to source registry on install public scoped package', done => {
     request(app.listen())
     .get('/@jkroso/type')
     .set('User-Agent', 'node/v4.4.4')
-    .expect('Location', 'https://registry.npmjs.com/@jkroso/type')
+    .expect('Location', config.sourceNpmRegistry + '/@jkroso/type')
     .expect(302, done);
   });
 });

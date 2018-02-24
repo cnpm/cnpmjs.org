@@ -46,7 +46,7 @@ describe('test/controllers/registry/module/scope_package.test.js', function () {
     mm(config, 'scopes', []);
     request(app)
     .get('/@invalid/test')
-    .expect('Location', 'https://registry.npmjs.com/@invalid/test')
+    .expect('Location', config.sourceNpmRegistry + '/@invalid/test')
     .expect(302, done);
   });
 
