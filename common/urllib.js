@@ -30,26 +30,30 @@ if (config.httpProxy) {
     httpAgent = tunnel.httpOverHttp({
       proxy: {
         host: urlinfo.hostname,
-        port: urlinfo.port
+        port: urlinfo.port,
+        proxyAuth: urlinfo.auth
       }
     });
     httpsAgent = tunnel.httpsOverHttp({
       proxy: {
         host: urlinfo.hostname,
-        port: urlinfo.port
+        port: urlinfo.port,
+        proxyAuth: urlinfo.auth
       }
     });
   } else if (urlinfo.protocol === 'https:') {
     httpAgent = tunnel.httpOverHttps({
       proxy: {
         host: urlinfo.hostname,
-        port: urlinfo.port
+        port: urlinfo.port,
+        proxyAuth: urlinfo.auth
       }
     });
     httpsAgent = tunnel.httpsOverHttps({
       proxy: {
         host: urlinfo.hostname,
-        port: urlinfo.port
+        port: urlinfo.port,
+        proxyAuth: urlinfo.auth
       }
     });
   } else {
