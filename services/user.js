@@ -8,6 +8,10 @@ if (!config.userService) {
   config.userService = new DefaultUserService();
   config.customUserService = false;
 } else {
+  if(typeof(config.userService) === 'string') {
+    var CustomUserService = require(config.userService);
+    config.userService = new CustomUserService();
+  }
   config.customUserService = true;
 }
 config.scopes = config.scopes || [];
