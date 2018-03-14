@@ -40,18 +40,8 @@ var config = require('../../../config');
 module.exports = function* addUser() {
   var name = this.params.name;
   var body = this.request.body || {};
-  var user = {
-    name: body.name,
-    // salt: body.salt,
-    // password_sha: body.password_sha,
-    email: body.email,
-    ip: this.ip || '0.0.0.0',
-    // roles: body.roles || [],
-  };
 
-  ensurePasswordSalt(user, body);
-
-  if (!body.password || !user.name || !user.salt || !user.password_sha || !user.email) {
+  if (!body.password || !body.name) {
     this.status = 422;
     this.body = {
       error: 'paramError',
@@ -87,6 +77,26 @@ module.exports = function* addUser() {
     this.body = {
       error: 'unauthorized',
       reason: 'Login fail, please check your login name and password'
+    };
+    return;
+  }
+
+  var user = {
+    name: body.name,
+    // salt: body.salt,
+    // password_sha: body.password_sha,
+    email: body.email,
+    ip: this.ip || '0.0.0.0',
+    // roles: body.roles || [],
+  };
+
+  ensurePasswordSalt(user, body);
+
+  if (!user.salt || !user.password_sha || !user.email) {
+    this.status = 422;
+    this.body = {
+      error: 'paramError',
+      reason: 'params missing, name, email or password missing.'
     };
     return;
   }
