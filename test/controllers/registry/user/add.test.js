@@ -68,6 +68,35 @@ describe('controllers/registry/user/add.test.js', function () {
       })
       .expect(201, done);
     });
+
+    it('should 422 add user without email', function (done) {
+      mm(userService, 'get', function* () {
+        return null;
+      });
+      mm(userService, 'add', function* () {
+        return {rev: '1-123'};
+      });
+      request(app)
+      .put('/-/user/org.couchdb.user:name')
+      .send({
+        name: 'name',
+        password: 'password'
+      })
+      .expect(422, done);
+    });
+
+    it('should login without email ok', function (done) {
+      mm(userService, 'authAndSave', function* () {
+        return {login: 'name'};
+      });
+      request(app)
+      .put('/-/user/org.couchdb.user:name')
+      .send({
+        name: 'name',
+        password: 'password'
+      })
+      .expect(201, done);
+    });
   });
 
   describe('config.customUserSerivce = true', function () {

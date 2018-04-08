@@ -66,8 +66,9 @@ module.exports = function* sync() {
 
   logger.syncInfo('All packages sync done, successes %d, fails %d, updates %d',
       worker.successes.length, worker.fails.length, worker.updates.length);
-  //only when all succss, set last sync time
-  if (!worker.fails.length) {
+  // only when all succss, set last sync time
+  // or successes > 1000
+  if (!worker.fails.length || worker.successes.length > 1000) {
     yield totalService.setLastSyncTime(syncTime);
   }
   return {
