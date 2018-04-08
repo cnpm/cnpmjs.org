@@ -552,6 +552,7 @@ SyncModuleWorker.prototype._sync = function* (name, pkg) {
   }
 
   hasModules = moduleRows.length > 0;
+  // localPackage
   var map = {};
   var localVersionNames = [];
   for (var i = 0; i < moduleRows.length; i++) {
@@ -884,10 +885,10 @@ SyncModuleWorker.prototype._sync = function* (name, pkg) {
     }
   }
 
-  if (config.syncDeletedVersions) {
-    if (deletedVersionNames.length === 0) {
-      that.log('  [%s] no versions need to deleted', name);
-    } else {
+  if (deletedVersionNames.length === 0) {
+    that.log('  [%s] no versions need to deleted', name);
+  } else {
+    if (config.syncDeletedVersions) {
       that.log('  [%s] %d versions: %j need to deleted',
         name, deletedVersionNames.length, deletedVersionNames);
       try {
@@ -895,10 +896,33 @@ SyncModuleWorker.prototype._sync = function* (name, pkg) {
       } catch (err) {
         that.log('    [%s] delete error, %s: %s', name, err.name, err.message);
       }
+    } else {
+      // find deleted in 24 hours versions
+      var oneDay = 3600000 * 24;
+      var now = Date.now();
+      var deletedIn24HoursVersions = [];
+      var oldVersions = [];
+      for (var i = 0; i < deletedVersionNames.length; i++) {
+        var v = deletedVersionNames[i];
+        var exists = map[v];
+        if (exists && now - exists.publish_time < oneDay) {
+          deletedIn24HoursVersions.push(v);
+        } else {
+          oldVersions.push(v);
+        }
+      }
+      if (deletedIn24HoursVersions.length > 0) {
+        that.log('  [%s] %d versions: %j need to deleted, they are deleted in 24 hours',
+          name, deletedIn24HoursVersions.length, deletedIn24HoursVersions);
+        try {
+          yield packageService.removeModulesByNameAndVersions(name, deletedIn24HoursVersions);
+        } catch (err) {
+          that.log('    [%s] delete error, %s: %s', name, err.name, err.message);
+        }
+      }
+      that.log('  [%s] %d versions: %j no need to delete, because `config.syncDeletedVersions=false`',
+        name, oldVersions.length, oldVersions);
     }
-  } else {
-    that.log('  [%s] %d versions: %j need to deleted, but we won\'t delete them because `config.syncDeletedVersions=false`',
-      name, deletedVersionNames.length, deletedVersionNames);
   }
 
   // sync missing descriptions
