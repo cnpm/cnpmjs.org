@@ -9,13 +9,18 @@ const startTime = '' + Date.now();
 let cache = null;
 
 module.exports = function* showTotal() {
-  if (cache && Date.now() - cache.cache_time < 10000) {
-    // cache 10 seconds
+  if (cache && Date.now() - cache.cache_time < 120000) {
+    // cache 120 seconds
     this.body = cache;
     return;
   }
 
-  const r = yield [Total.get(), getDownloadTotal()];
+  if (cache) {
+    // set cache_time fisrt, avoid query in next time
+    cache.cache_time = Date.now();
+  }
+
+  const r = yield [ Total.get(), getDownloadTotal() ];
   const total = r[0];
   const download = r[1];
 
@@ -28,7 +33,7 @@ module.exports = function* showTotal() {
   total.sync_model = config.syncModel;
 
   cache = total;
-  total.cache_time = Date.now();
+  cache.cache_time = Date.now();
 
   this.body = total;
 };
