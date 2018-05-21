@@ -61,10 +61,10 @@ app.on('error', function (err, ctx) {
   logger.error(err);
 });
 
-app = http.createServer(app.callback());
+const server = http.createServer(app.callback());
 
 if (!module.parent) {
-  app.listen(config.registryPort);
+  server.listen(config.registryPort);
 }
 
-module.exports = app;
+module.exports = server;

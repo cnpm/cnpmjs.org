@@ -1,16 +1,4 @@
-/**!
- * Copyright(c) cnpm and other contributors.
- * MIT Licensed
- *
- * Authors:
- *   fengmk2 <fengmk2@gmail.com> (http://fengmk2.com)
- */
-
 'use strict';
-
-/**
- * Module dependencies.
- */
 
 var request = require('supertest');
 var mm = require('mm');
@@ -71,6 +59,18 @@ describe('test/controllers/registry/package/download.test.js', function () {
         request(app)
         .get('/@cnpmtest/download-test-module/-/@cnpmtest/download-test-module-1.0.0.tgz')
         .expect('Location', 'http://foo.test.com/@cnpmtest/download-test-module/-/@cnpmtest/download-test-module-1.0.0.tgz')
+        .expect(302, done);
+      });
+
+      it('should download from foo-us1 bucket', function(done) {
+        mm(config.nfs, 'url', function(key, options) {
+          return 'http://' + options.bucket + '.oss.com' + key;
+        });
+        mm(config, 'downloadRedirectToNFS', true);
+
+        request(app)
+        .get('/@cnpmtest/download-test-module/-/@cnpmtest/download-test-module-1.0.0.tgz?bucket=foo-us1')
+        .expect('Location', 'http://foo-us1.oss.com/@cnpmtest/download-test-module/-/@cnpmtest/download-test-module-1.0.0.tgz')
         .expect(302, done);
       });
     });
