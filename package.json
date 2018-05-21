@@ -94,6 +94,9 @@
   "bugs": {
     "url": "https://github.com/cnpm/cnpmjs.org/issues"
   },
+  "publishConfig": {
+    "tag": "latest-3"
+  },
   "keywords": [
     "cnpmjs.org",
     "npm",
