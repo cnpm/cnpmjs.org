@@ -296,13 +296,15 @@ SyncModuleWorker.prototype.next = function* (concurrencyId) {
   // try to sync from official replicate when source npm registry is not cnpmjs.org
   const registry = config.sourceNpmRegistryIsCNpm ? config.sourceNpmRegistry : config.officialNpmReplicate;
 
-  let versions = yield this.syncByName(concurrencyId, name, registry);
-  if (versions && versions.length === 0 && registry === config.officialNpmReplicate) {
-    // need to sync sourceNpmRegistry also
-    // make sure package data be update event replicate down.
-    // https://github.com/npm/registry/issues/129
-    versions = yield this.syncByName(concurrencyId, name, config.officialNpmRegistry);
-  }
+  yield this.syncByName(concurrencyId, name, registry);
+  // no need to resync again, syncByName had retry from officialNpmRegistry when officialNpmReplicate request error
+  // let versions = yield this.syncByName(concurrencyId, name, registry);
+  // if (versions && versions.length === 0 && registry === config.officialNpmReplicate) {
+  //   // need to sync sourceNpmRegistry also
+  //   // make sure package data be update event replicate down.
+  //   // https://github.com/npm/registry/issues/129
+  //   versions = yield this.syncByName(concurrencyId, name, config.officialNpmRegistry);
+  // }
 };
 
 SyncModuleWorker.prototype.syncByName = function* (concurrencyId, name, registry) {
@@ -340,7 +342,7 @@ SyncModuleWorker.prototype.syncByName = function* (concurrencyId, name, registry
         return;
       }
 
-      // retry from officialNpmRegistry
+      // retry from officialNpmRegistry when officialNpmReplicate fail
       this.log('[c#%d] [%s] retry from %s', concurrencyId, name, config.officialNpmRegistry);
       try {
         var result = yield npmSerivce.request(packageUrl, { registry: config.officialNpmRegistry });
