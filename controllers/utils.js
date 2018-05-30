@@ -21,9 +21,11 @@ exports.downloadAsReadStream = function* (key) {
 
   var tmpPath = path.join(config.uploadDir,
     utility.randomString() + key.replace(/\//g, '-'));
+  var tarball;
   function cleanup() {
     debug('cleanup %s', tmpPath);
     rimraf(tmpPath, utility.noop);
+    if (tarball) tarball.destroy();
   }
   debug('downloadAsReadStream() %s to %s', key, tmpPath);
   try {
@@ -33,7 +35,7 @@ exports.downloadAsReadStream = function* (key) {
     cleanup();
     throw err;
   }
-  var tarball = fs.createReadStream(tmpPath);
+  tarball = fs.createReadStream(tmpPath);
   tarball.once('error', cleanup);
   tarball.once('end', cleanup);
   return tarball;
