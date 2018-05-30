@@ -6,6 +6,7 @@ var fs = require('fs');
 var utility = require('utility');
 var ms = require('humanize-ms');
 var moment = require('moment');
+var rimraf = require('rimraf');
 var downloadTotalService = require('../services/download_total');
 var nfs = require('../common/nfs');
 var config = require('../config');
@@ -22,7 +23,7 @@ exports.downloadAsReadStream = function* (key) {
     utility.randomString() + key.replace(/\//g, '-'));
   function cleanup() {
     debug('cleanup %s', tmpPath);
-    fs.unlink(tmpPath, utility.noop);
+    rimraf(tmpPath, utility.noop);
   }
   debug('downloadAsReadStream() %s to %s', key, tmpPath);
   try {
