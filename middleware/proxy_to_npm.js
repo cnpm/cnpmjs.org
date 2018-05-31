@@ -43,6 +43,12 @@ module.exports = function (options) {
       return yield next;
     }
 
+    // check private package
+    var packageName = pathname.replace(/.*package\/([^\/]+).*/, '$1');
+    if (config.privatePackages.indexOf(packageName) > -1) {
+      return yield next;
+    }
+
     var url = redirectUrl + this.url;
     debug('proxy to %s', url);
     this.redirect(url);
