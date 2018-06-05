@@ -25,7 +25,9 @@ exports.downloadAsReadStream = function* (key) {
   function cleanup() {
     debug('cleanup %s', tmpPath);
     rimraf(tmpPath, utility.noop);
-    if (tarball) tarball.destroy();
+    if (tarball) {
+      tarball.destroy();
+    }
   }
   debug('downloadAsReadStream() %s to %s', key, tmpPath);
   try {
