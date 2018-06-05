@@ -6,6 +6,7 @@ var fs = require('fs');
 var utility = require('utility');
 var ms = require('humanize-ms');
 var moment = require('moment');
+var rimraf = require('rimraf');
 var downloadTotalService = require('../services/download_total');
 var nfs = require('../common/nfs');
 var config = require('../config');
@@ -20,9 +21,13 @@ exports.downloadAsReadStream = function* (key) {
 
   var tmpPath = path.join(config.uploadDir,
     utility.randomString() + key.replace(/\//g, '-'));
+  var tarball;
   function cleanup() {
     debug('cleanup %s', tmpPath);
-    fs.unlink(tmpPath, utility.noop);
+    rimraf(tmpPath, utility.noop);
+    if (tarball) {
+      tarball.destroy();
+    }
   }
   debug('downloadAsReadStream() %s to %s', key, tmpPath);
   try {
@@ -32,7 +37,7 @@ exports.downloadAsReadStream = function* (key) {
     cleanup();
     throw err;
   }
-  var tarball = fs.createReadStream(tmpPath);
+  tarball = fs.createReadStream(tmpPath);
   tarball.once('error', cleanup);
   tarball.once('end', cleanup);
   return tarball;
