@@ -73,6 +73,38 @@ describe('test/controllers/registry/package/download.test.js', function () {
         .expect('Location', 'http://foo-us1.oss.com/@cnpmtest/download-test-module/-/@cnpmtest/download-test-module-1.0.0.tgz')
         .expect(302, done);
       });
+
+      it('should download from multi urls', function(done) {
+        mm(config.nfs, 'urls', function(key, options) {
+          return [
+            'http://' + options.bucket + '.oss.com' + key,
+            'http://default.oss.com' + key,
+            'http://backup.oss.com' + key,
+          ];
+        });
+        mm(config, 'downloadRedirectToNFS', true);
+
+        request(app)
+        .get('/@cnpmtest/download-test-module/-/@cnpmtest/download-test-module-1.0.0.tgz?bucket=foo-us1')
+        .expect('Location', 'http://foo-us1.oss.com/@cnpmtest/download-test-module/-/@cnpmtest/download-test-module-1.0.0.tgz?other_urls=http%3A%2F%2Fdefault.oss.com%2F%40cnpmtest%2Fdownload-test-module%2F-%2F%40cnpmtest%2Fdownload-test-module-1.0.0.tgz%2Chttp%3A%2F%2Fbackup.oss.com%2F%40cnpmtest%2Fdownload-test-module%2F-%2F%40cnpmtest%2Fdownload-test-module-1.0.0.tgz')
+        .expect(302, done);
+      });
+
+      it('should download from multi urls dont modifiy raw query', function(done) {
+        mm(config.nfs, 'urls', function(key, options) {
+          return [
+            'http://' + options.bucket + '.oss.com' + key + '?foo=bar',
+            'http://default.oss.com' + key,
+            'http://backup.oss.com' + key,
+          ];
+        });
+        mm(config, 'downloadRedirectToNFS', true);
+
+        request(app)
+        .get('/@cnpmtest/download-test-module/-/@cnpmtest/download-test-module-1.0.0.tgz?bucket=foo-us1')
+        .expect('Location', 'http://foo-us1.oss.com/@cnpmtest/download-test-module/-/@cnpmtest/download-test-module-1.0.0.tgz?foo=bar&other_urls=http%3A%2F%2Fdefault.oss.com%2F%40cnpmtest%2Fdownload-test-module%2F-%2F%40cnpmtest%2Fdownload-test-module-1.0.0.tgz%2Chttp%3A%2F%2Fbackup.oss.com%2F%40cnpmtest%2Fdownload-test-module%2F-%2F%40cnpmtest%2Fdownload-test-module-1.0.0.tgz')
+        .expect(302, done);
+      });
     });
   });
 });
