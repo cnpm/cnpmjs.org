@@ -75,7 +75,7 @@ describe('test/controllers/registry/package/download.test.js', function () {
       });
 
       it('should download from multi urls', function(done) {
-        mm(config.nfs, 'url', function(key, options) {
+        mm(config.nfs, 'urls', function(key, options) {
           return [
             'http://' + options.bucket + '.oss.com' + key,
             'http://default.oss.com' + key,

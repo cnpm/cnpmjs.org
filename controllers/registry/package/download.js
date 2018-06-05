@@ -23,10 +23,17 @@ module.exports = function* download(next) {
   // can not get dist
   var url = null;
 
-  if (typeof nfs.url === 'function') {
-    var query = this.query || {};
-    // allow download from specific store bucket
-    var options = query.bucket ? { bucket: query.bucket } : null;
+  var query = this.query || {};
+  // allow download from specific store bucket
+  var options = query.bucket ? { bucket: query.bucket } : null;
+
+  if (typeof nfs.urls === 'function') {
+    if (is.generatorFunction(nfs.urls)) {
+      url = yield nfs.urls(common.getCDNKey(name, filename), options);
+    } else {
+      url = nfs.urls(common.getCDNKey(name, filename), options);
+    }
+  } else if (typeof nfs.url === 'function') {
     if (is.generatorFunction(nfs.url)) {
       url = yield nfs.url(common.getCDNKey(name, filename), options);
     } else {
