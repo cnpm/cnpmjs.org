@@ -27,31 +27,12 @@ module.exports = function* download(next) {
   // allow download from specific store bucket
   var options = query.bucket ? { bucket: query.bucket } : null;
 
-  if (typeof nfs.urls === 'function') {
-    if (is.generatorFunction(nfs.urls)) {
-      url = yield nfs.urls(common.getCDNKey(name, filename), options);
-    } else {
-      url = nfs.urls(common.getCDNKey(name, filename), options);
-    }
-  } else if (typeof nfs.url === 'function') {
+  if (typeof nfs.url === 'function') {
     if (is.generatorFunction(nfs.url)) {
       url = yield nfs.url(common.getCDNKey(name, filename), options);
     } else {
       url = nfs.url(common.getCDNKey(name, filename), options);
     }
-  }
-
-  if (url && Array.isArray(url)) {
-    var newUrl = url[0];
-    if (url.length > 1) {
-      var otherUrls = url.slice(1).join(',');
-      if (newUrl.indexOf('?') === -1) {
-        newUrl += '?other_urls=' + encodeURIComponent(otherUrls);
-      } else {
-        newUrl += '&other_urls=' + encodeURIComponent(otherUrls);
-      }
-    }
-    url = newUrl;
   }
 
   debug('download %s %s %s %s', name, filename, version, url);
