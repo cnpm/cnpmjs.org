@@ -34,6 +34,19 @@ module.exports = function* download(next) {
     }
   }
 
+  if (url && Array.isArray(url)) {
+    var newUrl = url[0];
+    if (url.length > 1) {
+      var otherUrls = url.slice(1).join(',');
+      if (newUrl.indexOf('?') === -1) {
+        newUrl += '?other_urls=' + encodeURIComponent(otherUrls);
+      } else {
+        newUrl += '&other_urls=' + encodeURIComponent(otherUrls);
+      }
+    }
+    url = newUrl;
+  }
+
   debug('download %s %s %s %s', name, filename, version, url);
 
   if (!row || !row.package || !row.package.dist) {
