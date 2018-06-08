@@ -359,10 +359,14 @@ SyncModuleWorker.prototype.syncByName = function* (concurrencyId, name, registry
     }
   }
 
-  if (status === 404 && pkg && pkg.reason === 'deleted' && registry === config.officialNpmReplicate) {
+  if (status === 404 && pkg && pkg.reason && registry === config.officialNpmReplicate) {
     // unpublished package on replicate.npmjs.com
     // 404 { error: 'not_found', reason: 'deleted' }
     // try to read from registry.npmjs.com and get the whole unpublished info
+
+    // https://replicate.npmjs.com/registry-url
+    // {"error":"not_found","reason":"no_db_file"}
+    // try to read from registry.npmjs.com and get no_db_file
     try {
       var result = yield npmSerivce.request(packageUrl, { registry: config.sourceNpmRegistry });
       pkg = result.data;
