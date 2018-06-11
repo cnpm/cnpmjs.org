@@ -329,6 +329,29 @@ SyncModuleWorker.prototype.syncByName = function* (concurrencyId, name, registry
     var result = yield npmSerivce.request(packageUrl, { registry: registry });
     pkg = result.data;
     status = result.status;
+    // read from officialNpmRegistry and use the latest modified package info
+    if (registry === config.officialNpmReplicate) {
+      try {
+        const officialResult = yield npmSerivce.request(packageUrl, { registry: config.officialNpmRegistry });
+        const officialPkg = officialResult.data;
+        const officialStatus = officialResult.status;
+        this.log('[c#%d] [%s] official registry(%j, %j), replicate(%j, %j)',
+          concurrencyId, name,
+          officialPkg['dist-tags'], officialPkg.time && officialPkg.time.modified,
+          pkg['dist-tags'], pkg.time && pkg.time.modified);
+        if (officialPkg.time) {
+          if (!pkg.time || officialPkg.time.modified > pkg.time.modified) {
+            pkg = officialPkg;
+            status = officialStatus;
+            this.log('[c#%d] [%s] use official registry\' data instead of replicate, modified: %j => %j',
+              concurrencyId, name, config.officialNpmRegistry, officialPkg.time.modified, pkg.time && pkg.time.modified);
+          }
+        }
+      } catch (err) {
+        that.log('[c#%s] [error] [%s] get package(%s%s) error: %s',
+          concurrencyId, name, config.officialNpmReplicate, packageUrl, err);
+      }
+    }
   } catch (err) {
     // if 404
     if (!err.res || err.res.statusCode !== 404) {
