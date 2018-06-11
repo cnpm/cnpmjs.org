@@ -315,6 +315,7 @@ SyncModuleWorker.prototype.syncByName = function* (concurrencyId, name, registry
     return;
   }
 
+  let realRegistry = registry;
   // get from npm
   const packageUrl = '/' + name.replace('/', '%2f');
   try {
@@ -333,10 +334,11 @@ SyncModuleWorker.prototype.syncByName = function* (concurrencyId, name, registry
           pkg['dist-tags'], pkg.time && pkg.time.modified);
         if (officialPkg.time) {
           if (!pkg.time || officialPkg.time.modified > pkg.time.modified) {
+            this.log('[c#%d] [%s] use official registry\'s data instead of replicate, modified: %j < %j',
+              concurrencyId, name, pkg.time && pkg.time.modified, officialPkg.time.modified);
             pkg = officialPkg;
             status = officialStatus;
-            this.log('[c#%d] [%s] use official registry\' data instead of replicate, modified: %j => %j',
-              concurrencyId, name, config.officialNpmRegistry, officialPkg.time.modified, pkg.time && pkg.time.modified);
+            realRegistry = config.officialNpmRegistry;
           }
         }
       } catch (err) {
@@ -363,6 +365,7 @@ SyncModuleWorker.prototype.syncByName = function* (concurrencyId, name, registry
         var result = yield npmSerivce.request(packageUrl, { registry: config.officialNpmRegistry });
         pkg = result.data;
         status = result.status;
+        realRegistry = config.officialNpmRegistry;
       } catch (err) {
         var errMessage = err.name + ': ' + err.message;
         that.log('[c#%s] [error] [%s] get package(%s%s) error: %s, status: %s',
@@ -386,6 +389,7 @@ SyncModuleWorker.prototype.syncByName = function* (concurrencyId, name, registry
       var result = yield npmSerivce.request(packageUrl, { registry: config.sourceNpmRegistry });
       pkg = result.data;
       status = result.status;
+      realRegistry = config.sourceNpmRegistry;
     } catch (err) {
       // if 404
       if (!err.res || err.res.statusCode !== 404) {
@@ -416,14 +420,14 @@ SyncModuleWorker.prototype.syncByName = function* (concurrencyId, name, registry
 
   if (!pkg) {
     that.log('[c#%s] [error] [%s] get package(%s%s) error: package not exists, status: %s',
-      concurrencyId, name, registry, packageUrl, status);
+      concurrencyId, name, realRegistry, packageUrl, status);
     yield that._doneOne(concurrencyId, name, true);
     // return empty versions, try again on officialNpmRegistry
     return [];
   }
 
   that.log('[c#%d] [%s] package(%s%s) status: %s, dist-tags: %j, time.modified: %s, unpublished: %j, start...',
-    concurrencyId, name, registry, packageUrl, status,
+    concurrencyId, name, realRegistry, packageUrl, status,
     pkg['dist-tags'], pkg.time && pkg.time.modified,
     unpublishedInfo);
 
