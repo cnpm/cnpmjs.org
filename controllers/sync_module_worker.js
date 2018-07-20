@@ -901,12 +901,23 @@ SyncModuleWorker.prototype._sync = function* (name, pkg) {
     if (!syncModule.dist.tarball) {
       continue;
     }
-    try {
-      yield that._syncOneVersion(index, syncModule);
-      syncedVersionNames.push(syncModule.version);
-    } catch (err) {
-      that.log('    [%s:%d] sync error, version: %s, %s: %s',
-        syncModule.name, index, syncModule.version, err.name, err.stack);
+    // retry 3 times
+    var tries = 3;
+    while (true) {
+      try {
+        yield that._syncOneVersion(index, syncModule);
+        syncedVersionNames.push(syncModule.version);
+        break;
+      } catch (err) {
+        that.log('    [%s:%d] tries: %d, sync error, version: %s, %s: %s',
+          syncModule.name, index, tries, syncModule.version, err.name, err.stack);
+        if (tries-- > 0) {
+          that.log('    [%s:%d] retry after 15s');
+          yield sleep(15000);
+        } else {
+          break;
+        }
+      }
     }
   }
 
@@ -1336,6 +1347,7 @@ SyncModuleWorker.prototype._syncOneVersion = function *(versionIndex, sourcePack
       var err = new Error('Download ' + downurl + ' fail, status: ' + statusCode);
       err.name = 'DownloadTarballError';
       err.data = sourcePackage;
+      err.status = statusCode;
       logger.syncInfo('[sync_module_worker] %s', err.message);
       throw err;
     }
