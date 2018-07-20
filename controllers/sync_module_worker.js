@@ -297,14 +297,6 @@ SyncModuleWorker.prototype.next = function* (concurrencyId) {
   const registry = config.sourceNpmRegistryIsCNpm ? config.sourceNpmRegistry : config.officialNpmReplicate;
 
   yield this.syncByName(concurrencyId, name, registry);
-  // no need to resync again, syncByName had retry from officialNpmRegistry when officialNpmReplicate request error
-  // let versions = yield this.syncByName(concurrencyId, name, registry);
-  // if (versions && versions.length === 0 && registry === config.officialNpmReplicate) {
-  //   // need to sync sourceNpmRegistry also
-  //   // make sure package data be update event replicate down.
-  //   // https://github.com/npm/registry/issues/129
-  //   versions = yield this.syncByName(concurrencyId, name, config.officialNpmRegistry);
-  // }
 };
 
 SyncModuleWorker.prototype.syncByName = function* (concurrencyId, name, registry) {
@@ -323,12 +315,37 @@ SyncModuleWorker.prototype.syncByName = function* (concurrencyId, name, registry
     return;
   }
 
+  let realRegistry = registry;
   // get from npm
   const packageUrl = '/' + name.replace('/', '%2f');
   try {
     var result = yield npmSerivce.request(packageUrl, { registry: registry });
     pkg = result.data;
     status = result.status;
+    // read from officialNpmRegistry and use the latest modified package info
+    if (registry === config.officialNpmReplicate) {
+      try {
+        const officialResult = yield npmSerivce.request(packageUrl, { registry: config.officialNpmRegistry });
+        const officialPkg = officialResult.data;
+        const officialStatus = officialResult.status;
+        this.log('[c#%d] [%s] official registry(%j, %j), replicate(%j, %j)',
+          concurrencyId, name,
+          officialPkg['dist-tags'], officialPkg.time && officialPkg.time.modified,
+          pkg['dist-tags'], pkg.time && pkg.time.modified);
+        if (officialPkg.time) {
+          if (!pkg.time || officialPkg.time.modified > pkg.time.modified) {
+            this.log('[c#%d] [%s] use official registry\'s data instead of replicate, modified: %j < %j',
+              concurrencyId, name, pkg.time && pkg.time.modified, officialPkg.time.modified);
+            pkg = officialPkg;
+            status = officialStatus;
+            realRegistry = config.officialNpmRegistry;
+          }
+        }
+      } catch (err) {
+        that.log('[c#%s] [error] [%s] get package(%s%s) error: %s',
+          concurrencyId, name, config.officialNpmReplicate, packageUrl, err);
+      }
+    }
   } catch (err) {
     // if 404
     if (!err.res || err.res.statusCode !== 404) {
@@ -348,6 +365,7 @@ SyncModuleWorker.prototype.syncByName = function* (concurrencyId, name, registry
         var result = yield npmSerivce.request(packageUrl, { registry: config.officialNpmRegistry });
         pkg = result.data;
         status = result.status;
+        realRegistry = config.officialNpmRegistry;
       } catch (err) {
         var errMessage = err.name + ': ' + err.message;
         that.log('[c#%s] [error] [%s] get package(%s%s) error: %s, status: %s',
@@ -371,6 +389,7 @@ SyncModuleWorker.prototype.syncByName = function* (concurrencyId, name, registry
       var result = yield npmSerivce.request(packageUrl, { registry: config.sourceNpmRegistry });
       pkg = result.data;
       status = result.status;
+      realRegistry = config.sourceNpmRegistry;
     } catch (err) {
       // if 404
       if (!err.res || err.res.statusCode !== 404) {
@@ -401,14 +420,14 @@ SyncModuleWorker.prototype.syncByName = function* (concurrencyId, name, registry
 
   if (!pkg) {
     that.log('[c#%s] [error] [%s] get package(%s%s) error: package not exists, status: %s',
-      concurrencyId, name, registry, packageUrl, status);
+      concurrencyId, name, realRegistry, packageUrl, status);
     yield that._doneOne(concurrencyId, name, true);
     // return empty versions, try again on officialNpmRegistry
     return [];
   }
 
   that.log('[c#%d] [%s] package(%s%s) status: %s, dist-tags: %j, time.modified: %s, unpublished: %j, start...',
-    concurrencyId, name, registry, packageUrl, status,
+    concurrencyId, name, realRegistry, packageUrl, status,
     pkg['dist-tags'], pkg.time && pkg.time.modified,
     unpublishedInfo);
 
