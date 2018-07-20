@@ -914,8 +914,8 @@ SyncModuleWorker.prototype._sync = function* (name, pkg) {
           syncModule.name, index, tries, delay, syncModule.version, err.name, err.stack);
         var maxDelay = 3600000;
         if (tries-- > 0 && delay < maxDelay) {
-          that.log('    [%s:%d] retry after 15s', syncModule.name, index);
-          yield sleep(15000);
+          that.log('    [%s:%d] retry after 30s', syncModule.name, index);
+          yield sleep(30000);
         } else {
           break;
         }
