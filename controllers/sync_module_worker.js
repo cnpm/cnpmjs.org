@@ -910,7 +910,7 @@ SyncModuleWorker.prototype._sync = function* (name, pkg) {
         break;
       } catch (err) {
         var delay = Date.now() - syncModule.publish_time;
-        that.log('    [%s:%d] tries: %d,, delay: %s ms, sync error, version: %s, %s: %s',
+        that.log('    [%s:%d] tries: %d, delay: %s ms, sync error, version: %s, %s: %s',
           syncModule.name, index, tries, delay, syncModule.version, err.name, err.stack);
         var maxDelay = 3600000;
         if (tries-- > 0 && delay < maxDelay) {
