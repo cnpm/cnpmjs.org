@@ -912,7 +912,7 @@ SyncModuleWorker.prototype._sync = function* (name, pkg) {
         that.log('    [%s:%d] tries: %d, sync error, version: %s, %s: %s',
           syncModule.name, index, tries, syncModule.version, err.name, err.stack);
         if (tries-- > 0) {
-          that.log('    [%s:%d] retry after 15s');
+          that.log('    [%s:%d] retry after 15s', syncModule.name, index);
           yield sleep(15000);
         } else {
           break;
