@@ -909,9 +909,11 @@ SyncModuleWorker.prototype._sync = function* (name, pkg) {
         syncedVersionNames.push(syncModule.version);
         break;
       } catch (err) {
-        that.log('    [%s:%d] tries: %d, sync error, version: %s, %s: %s',
-          syncModule.name, index, tries, syncModule.version, err.name, err.stack);
-        if (tries-- > 0) {
+        var delay = Date.now() - syncModule.publish_time;
+        that.log('    [%s:%d] tries: %d,, delay: %s ms, sync error, version: %s, %s: %s',
+          syncModule.name, index, tries, delay, syncModule.version, err.name, err.stack);
+        var maxDelay = 3600000;
+        if (tries-- > 0 && delay < maxDelay) {
           that.log('    [%s:%d] retry after 15s', syncModule.name, index);
           yield sleep(15000);
         } else {
