@@ -37,7 +37,7 @@ describe('controllers/registry/user/update.test.js', function () {
     it('should put 401 when name not expect', function (done) {
       request(app)
       .put('/-/user/org.couchdb.user:name/-rev/:1-123')
-      .set('authorization', 'basic ' + new Buffer('cnpmjstest10:cnpmjstest10').toString('base64'))
+      .set('authorization', 'basic ' + Buffer.from('cnpmjstest10:cnpmjstest10').toString('base64'))
       .expect(401, done);
     });
 
@@ -52,14 +52,14 @@ describe('controllers/registry/user/update.test.js', function () {
         password: 'cnpmjstest101',
         email: 'cnpmjstest101@cnpmjs.org'
       })
-      .set('authorization', 'basic ' + new Buffer('cnpmjstest101:cnpmjstest101').toString('base64'))
+      .set('authorization', 'basic ' + Buffer.from('cnpmjstest101:cnpmjstest101').toString('base64'))
       .expect(500, done);
     });
 
     it('should 201 when req.body.rev error', function (done) {
       request(app)
       .put('/-/user/org.couchdb.user:cnpmjstest101/-rev/:1-123')
-      .set('authorization', 'basic ' + new Buffer('cnpmjstest101:cnpmjstest101').toString('base64'))
+      .set('authorization', 'basic ' + Buffer.from('cnpmjstest101:cnpmjstest101').toString('base64'))
       .send({
         name: 'cnpmjstest101',
         password: 'cnpmjstest101',
@@ -75,7 +75,7 @@ describe('controllers/registry/user/update.test.js', function () {
       });
       request(app)
       .put('/-/user/org.couchdb.user:cnpmjstest101/-rev/:1-123')
-      .set('authorization', 'basic ' + new Buffer('cnpmjstest101:cnpmjstest101').toString('base64'))
+      .set('authorization', 'basic ' + Buffer.from('cnpmjstest101:cnpmjstest101').toString('base64'))
       .send({
         name: 'cnpmjstest101',
         password: 'cnpmjstest101',
@@ -92,7 +92,7 @@ describe('controllers/registry/user/update.test.js', function () {
     it('should 422 when req.body empty', function (done) {
       request(app)
       .put('/-/user/org.couchdb.user:cnpmjstest10/-rev/:1-123')
-      .set('authorization', 'basic ' + new Buffer('cnpmjstest10:cnpmjstest10').toString('base64'))
+      .set('authorization', 'basic ' + Buffer.from('cnpmjstest10:cnpmjstest10').toString('base64'))
       .send({})
       .expect({
         error: 'paramError',
@@ -107,7 +107,7 @@ describe('controllers/registry/user/update.test.js', function () {
       });
       request(app)
       .put('/-/user/org.couchdb.user:cnpmjstest10/-rev/:1-123')
-      .set('authorization', 'basic ' + new Buffer('cnpmjstest10:cnpmjstest10').toString('base64'))
+      .set('authorization', 'basic ' + Buffer.from('cnpmjstest10:cnpmjstest10').toString('base64'))
       .send({
         name: 'cnpmjstest10',
         password: 'cnpmjstest10',

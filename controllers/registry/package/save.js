@@ -135,7 +135,7 @@ module.exports = function* save(next) {
 
   // upload attachment
   var tarballBuffer;
-  tarballBuffer = new Buffer(attachment.data, 'base64');
+  tarballBuffer = Buffer.from(attachment.data, 'base64');
 
   if (tarballBuffer.length !== attachment.length) {
     this.status = 403;

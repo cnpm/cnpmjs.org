@@ -43,7 +43,7 @@ describe('services/module_log.test.js', function () {
       var log = yield ModuleLog.create({name: 'module_log-append', username: 'fengmk2'});
       var logid = log.id;
 
-      var biglog = new Buffer(1024 * 1024).fill(71).toString();
+      var biglog = Buffer.from(1024 * 1024).fill(71).toString();
       log = yield ModuleLog.append(logid, biglog);
       log.log.substring(0, 4).should.equal('...\n');
       log.log.length.should.equal(1024 * 1024 / 2 + 4);
