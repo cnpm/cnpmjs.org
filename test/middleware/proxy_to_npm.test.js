@@ -7,7 +7,7 @@ var web = require('../../servers/web');
 var registry = require('../../servers/registry');
 var config = require('../../config');
 
-describe.only('test/middleware/proxy_to_npm.test.js', () => {
+describe('test/middleware/proxy_to_npm.test.js', () => {
   beforeEach(() => {
     mm(config, 'syncModel', 'none');
   });
