@@ -6,6 +6,7 @@ var mm = require('mm');
 var thunkify = require('thunkify-wrap');
 var request = require('supertest');
 var urllib = require('urllib');
+var urlparse = require('url').parse;
 var config = require('../../config');
 var SyncModuleWorker = require('../../controllers/sync_module_worker');
 var logService = require('../../services/module_log');
@@ -26,7 +27,7 @@ describe('test/controllers/sync_module_worker.test.js', () => {
   before(function (done) {
     mm(config, 'privatePackages', ['google']);
     var pkg = utils.getPackage('google', '0.0.1', utils.admin);
-    request(app.listen())
+    request(app)
     .put('/' + pkg.name)
     .set('authorization', utils.adminAuth)
     .send(pkg)
@@ -54,8 +55,9 @@ describe('test/controllers/sync_module_worker.test.js', () => {
   });
 
   it('should sync public scoped package', function* () {
+    mm(config, 'syncMode', 'all');
     mm(config, 'registryHost', '');
-    mm(config, 'sourceNpmRegistry', 'https://registry.npmjs.org');
+    // mm(config, 'sourceNpmRegistry', 'https://registry.npmjs.org');
     let envelope;
     mm(config, 'globalHook', function* (e) {
       envelope = e;
@@ -90,7 +92,7 @@ describe('test/controllers/sync_module_worker.test.js', () => {
     var tgzUrl;
     function checkResult() {
       return function (done) {
-        request(app.listen())
+        request(app)
         .get('/@sindresorhus/df')
         .expect(function (res) {
           var latest = res.body.versions[res.body['dist-tags']['latest']];
@@ -102,9 +104,10 @@ describe('test/controllers/sync_module_worker.test.js', () => {
 
     yield checkResult();
 
-    var r = yield urllib.request(tgzUrl);
-    // console.log(r.status, r.headers);
+    const p = urlparse(tgzUrl);
+    var r = yield request(app).get(p.path);
     r.status.should.equal(200);
+    r.headers['content-type'].should.equal('application/octet-stream');
   });
 
   it('should start a sync worker and dont sync deps', function* () {

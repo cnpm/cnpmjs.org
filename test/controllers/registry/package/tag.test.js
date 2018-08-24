@@ -1,30 +1,16 @@
-/**!
- * cnpmjs.org - test/controllers/registry/package/tag.test.js
- *
- * Copyright(c) cnpmjs.org and other contributors.
- * MIT Licensed
- *
- * Authors:
- *  fengmk2 <fengmk2@gmail.com> (http://fengmk2.github.com)
- */
-
 'use strict';
-
-/**
- * Module dependencies.
- */
 
 var request = require('supertest');
 var mm = require('mm');
 var app = require('../../../../servers/registry');
 var utils = require('../../../utils');
 
-describe('controllers/registry/package/tag.test.js', function () {
+describe('test/controllers/registry/package/tag.test.js', function () {
   afterEach(mm.restore);
 
   before(function (done) {
     var pkg = utils.getPackage('@cnpmtest/testmodule-tag-1', '1.0.0', utils.admin);
-    request(app.listen())
+    request(app)
     .put('/' + pkg.name)
     .set('authorization', utils.adminAuth)
     .send(pkg)

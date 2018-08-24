@@ -15,7 +15,7 @@ describe('test/controllers/web/package/search_range.test.js', function () {
       mocha: '~1.0.0',
       'testmodule-web-show': '0.0.1'
     };
-    request(registry.listen())
+    request(registry)
     .put('/' + pkg.name)
     .set('authorization', utils.adminAuth)
     .send(pkg)

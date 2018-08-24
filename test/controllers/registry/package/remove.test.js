@@ -14,7 +14,7 @@ describe('test/controllers/registry/package/remove.test.js', function () {
 
   before(function (done) {
     var pkg = utils.getPackage('@cnpmtest/testmodule-remove-1', '1.0.0', utils.otherUser);
-    request(app.listen())
+    request(app)
     .put('/' + pkg.name)
     .set('authorization', utils.otherUserAuth)
     .send(pkg)
@@ -68,7 +68,7 @@ describe('test/controllers/registry/package/remove.test.js', function () {
   describe('mock error', function () {
     beforeEach(function (done) {
       var pkg = utils.getPackage('@cnpmtest/testmodule-remove-mock-1', '2.0.0', utils.admin);
-      request(app.listen())
+      request(app)
       .put('/' + pkg.name)
       .set('authorization', utils.adminAuth)
       .send(pkg)

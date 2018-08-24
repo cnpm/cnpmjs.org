@@ -1,19 +1,4 @@
-/*!
- * cnpmjs.org - test/controllers/web/package/search.test.js
- *
- * Copyright(c) cnpmjs.org and other contributors.
- * MIT Licensed
- *
- * Authors:
- *  dead_horse <dead_horse@qq.com> (http://deadhorse.me)
- *  fengmk2 <m@fengmk2.com> (http://fengmk2.com)
- */
-
 'use strict';
-
-/**
- * Module dependencies.
- */
 
 var request = require('supertest');
 var mm = require('mm');
@@ -21,8 +6,7 @@ var app = require('../../../../servers/web');
 var registry = require('../../../../servers/registry');
 var utils = require('../../../utils');
 
-describe('controllers/web/package/search.test.js', function () {
-
+describe('test/controllers/web/package/search.test.js', function () {
   var app_reg;
 
   before(function (done) {
@@ -34,7 +18,7 @@ describe('controllers/web/package/search.test.js', function () {
     };
 
     app_reg = registry.listen();
-    
+
     request(app_reg)
     .put('/' + pkg.name)
     .set('authorization', utils.adminAuth)

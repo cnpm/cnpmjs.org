@@ -24,7 +24,7 @@ describe('test/middleware/sync_by_install.test.js', () => {
     request(app)
     .get('/@jkroso/type')
     .set('User-Agent', 'node/v4.4.4')
-    .expect('Location', 'https://registry.npm.taobao.org/@jkroso/type')
+    .expect('Location', /\/@jkroso\/type$/)
     .expect(302, done);
   });
 });

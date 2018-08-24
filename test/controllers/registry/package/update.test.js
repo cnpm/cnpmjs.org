@@ -1,18 +1,4 @@
-/**!
- * cnpmjs.org - test/controllers/registry/package/update.test.js
- *
- * Copyright(c) cnpmjs.org and other contributors.
- * MIT Licensed
- *
- * Authors:
- *  fengmk2 <fengmk2@gmail.com> (http://fengmk2.github.com)
- */
-
 'use strict';
-
-/**
- * Module dependencies.
- */
 
 var should = require('should');
 var request = require('supertest');
@@ -22,19 +8,19 @@ var app = require('../../../../servers/registry');
 var utils = require('../../../utils');
 var config = require('../../../../config');
 
-describe('controllers/registry/package/update.test.js', function () {
+describe('test/controllers/registry/package/update.test.js', function () {
   afterEach(mm.restore);
 
   before(function (done) {
     var pkg = utils.getPackage('@cnpmtest/testmodule-update-1', '1.0.0', utils.otherUser);
-    request(app.listen())
+    request(app)
     .put('/' + pkg.name)
     .set('authorization', utils.otherUserAuth)
     .send(pkg)
     .expect(201, function (err) {
       should.not.exist(err);
       var pkg = utils.getPackage('@cnpmtest/testmodule-update-1', '2.0.0', utils.otherUser);
-      request(app.listen())
+      request(app)
       .put('/' + pkg.name)
       .set('authorization', utils.otherUserAuth)
       .send(pkg)

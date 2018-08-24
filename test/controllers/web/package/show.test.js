@@ -16,7 +16,7 @@ describe('test/controllers/web/package/show.test.js', () => {
       mocha: '~1.0.0',
       'testmodule-web-show': '0.0.1'
     };
-    request(registry.listen())
+    request(registry)
     .put('/' + pkg.name)
     .set('authorization', utils.adminAuth)
     .send(pkg)
@@ -27,7 +27,7 @@ describe('test/controllers/web/package/show.test.js', () => {
 
   describe('GET /package/:name', function () {
     it('should get 200', function (done) {
-      request(app.listen())
+      request(app)
       .get('/package/@cnpmtest/testmodule-web-show')
       .expect(200)
       .expect('content-type', 'text/html; charset=utf-8')
@@ -43,7 +43,7 @@ describe('test/controllers/web/package/show.test.js', () => {
     });
 
     it('should get scoped package', function (done) {
-      request(app.listen())
+      request(app)
       .get('/package/@cnpmtest/testmodule-web-show')
       .expect(200)
       .expect('content-type', 'text/html; charset=utf-8')
@@ -118,7 +118,7 @@ describe('test/controllers/web/package/show.test.js', () => {
     before(function (done) {
       var pkg = utils.getPackage('@cnpmtest/xss-test-ut', '0.0.1', utils.admin,
         null, '[xss link](javascript:alert(2)) \n\nfoo<script>alert(1)</script>/xss\'"&#');
-      request(registry.listen())
+      request(registry)
       .put('/' + pkg.name)
       .set('authorization', utils.adminAuth)
       .send(pkg)
@@ -126,7 +126,7 @@ describe('test/controllers/web/package/show.test.js', () => {
     });
 
     it('should filter xss content', function (done) {
-      request(app.listen())
+      request(app)
       .get('/package/@cnpmtest/xss-test-ut')
       .expect(200, function (err, res) {
         should.not.exist(err);
@@ -163,7 +163,7 @@ describe('test/controllers/web/package/show.test.js', () => {
         type: 'git',
         url: 'git://github.com/cnpm/cnpmjs.org.git'
       }
-      request(registry.listen())
+      request(registry)
       .put('/' + pkg.name)
       .set('authorization', utils.adminAuth)
       .send(pkg)
@@ -171,7 +171,7 @@ describe('test/controllers/web/package/show.test.js', () => {
     });
 
     it('should get 200', function (done) {
-      request(app.listen())
+      request(app)
       .get('/package/@cnpmtest/testmodule-repo-git')
       .expect(200)
       .expect('content-type', 'text/html; charset=utf-8')
@@ -195,7 +195,7 @@ describe('test/controllers/web/package/show.test.js', () => {
         type: 'git',
         url: 'git@github.com:cnpm/cnpmjs.org.git'
       }
-      request(registry.listen())
+      request(registry)
       .put('/' + pkg.name)
       .set('authorization', utils.adminAuth)
       .send(pkg)
@@ -203,7 +203,7 @@ describe('test/controllers/web/package/show.test.js', () => {
     });
 
     it('should get 200', function (done) {
-      request(app.listen())
+      request(app)
       .get('/package/@cnpmtest/testmodule-repo-ssh')
       .expect(200)
       .expect('content-type', 'text/html; charset=utf-8')
@@ -227,7 +227,7 @@ describe('test/controllers/web/package/show.test.js', () => {
         type: 'git',
         url: 'ssh://git@github.com/cnpm/cnpmjs.org.git'
       }
-      request(registry.listen())
+      request(registry)
       .put('/' + pkg.name)
       .set('authorization', utils.adminAuth)
       .send(pkg)
@@ -235,7 +235,7 @@ describe('test/controllers/web/package/show.test.js', () => {
     });
 
     it('should get 200', function (done) {
-      request(app.listen())
+      request(app)
       .get('/package/@cnpmtest/testmodule-repo-raw-ssh')
       .expect(200)
       .expect('content-type', 'text/html; charset=utf-8')
@@ -259,7 +259,7 @@ describe('test/controllers/web/package/show.test.js', () => {
         type: 'git',
         url: 'https://github.com/cnpm/cnpmjs.org.git'
       }
-      request(registry.listen())
+      request(registry)
       .put('/' + pkg.name)
       .set('authorization', utils.adminAuth)
       .send(pkg)
@@ -267,7 +267,7 @@ describe('test/controllers/web/package/show.test.js', () => {
     });
 
     it('should get 200', function (done) {
-      request(app.listen())
+      request(app)
       .get('/package/@cnpmtest/testmodule-repo-https')
       .expect(200)
       .expect('content-type', 'text/html; charset=utf-8')
@@ -291,7 +291,7 @@ describe('test/controllers/web/package/show.test.js', () => {
         type: 'git',
         url: 'https://github.com/cnpm/cnpmjs.org'
       }
-      request(registry.listen())
+      request(registry)
       .put('/' + pkg.name)
       .set('authorization', utils.adminAuth)
       .send(pkg)
@@ -299,7 +299,7 @@ describe('test/controllers/web/package/show.test.js', () => {
     });
 
     it('should get 200', function (done) {
-      request(app.listen())
+      request(app)
       .get('/package/@cnpmtest/testmodule-repo-short-https')
       .expect(200)
       .expect('content-type', 'text/html; charset=utf-8')
@@ -323,7 +323,7 @@ describe('test/controllers/web/package/show.test.js', () => {
         type: 'git',
         url: 'http://github.com/cnpm/cnpmjs.org.git'
       }
-      request(registry.listen())
+      request(registry)
       .put('/' + pkg.name)
       .set('authorization', utils.adminAuth)
       .send(pkg)
@@ -331,7 +331,7 @@ describe('test/controllers/web/package/show.test.js', () => {
     });
 
     it('should get 200', function (done) {
-      request(app.listen())
+      request(app)
       .get('/package/@cnpmtest/testmodule-repo-short-http')
       .expect(200)
       .expect('content-type', 'text/html; charset=utf-8')
