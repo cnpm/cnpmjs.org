@@ -5,13 +5,7 @@ var mm = require('mm');
 var app = require('../../servers/web');
 var config = require('../../config');
 
-describe('middleware/opensearch.test.js', function () {
-  before(function (done) {
-    app.listen(0, done);
-  });
-  after(function (done) {
-    app.close(done);
-  });
+describe('test/middleware/opensearch.test.js', function () {
   afterEach(mm.restore);
 
   describe('GET /opensearch.xml', function () {

@@ -1,31 +1,11 @@
-/**!
- * cnpmjs.org - test/middleware/static.test.js
- *
- * Copyright(c) cnpmjs.org and other contributors.
- * MIT Licensed
- *
- * Authors:
- *  fengmk2 <fengmk2@gmail.com> (http://fengmk2.github.com)
- */
-
 'use strict';
-
-/**
- * Module dependencies.
- */
 
 var should = require('should');
 var request = require('supertest');
 var registry = require('../../servers/registry');
 var web = require('../../servers/registry');
 
-describe('middleware/static.test.js', function () {
-  before(function (done) {
-    registry = registry.listen(0, function () {
-      web = web.listen(0, done);
-    });
-  });
-
+describe('test/middleware/static.test.js', function () {
   describe('registry', function () {
     it('should /favicon.ico rewrite to /favicon.png', function (done) {
       request(registry)

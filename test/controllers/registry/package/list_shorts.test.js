@@ -17,14 +17,14 @@ describe('test/controllers/registry/package/list_shorts.test.js', () => {
     pkg.versions['1.0.0'].dependencies = {
       '@cnpmtest/testmodule-list-shorts2': '~1.0.0',
     };
-    request(app.listen())
+    request(app)
     .put('/' + pkg.name)
     .set('authorization', utils.adminAuth)
     .send(pkg)
     .expect(201, done);
 
     const pkg2 = utils.getPackage('@cnpmtest/testmodule-list-shorts2', '1.0.0', utils.admin);
-    request(app.listen())
+    request(app)
     .put('/' + pkg2.name)
     .set('authorization', utils.adminAuth)
     .send(pkg2)
@@ -32,12 +32,12 @@ describe('test/controllers/registry/package/list_shorts.test.js', () => {
   });
 
   before(done => {
-    mm(config, 'syncModel', 'all');
     utils.sync('pedding', done);
   });
 
   describe('GET /-/short', () => {
     it('should get 200', done => {
+      mm(config, 'syncModel', 'all');
       request(app)
       .get('/-/short')
       .expect(200, (err, res) => {
@@ -50,6 +50,7 @@ describe('test/controllers/registry/package/list_shorts.test.js', () => {
     });
 
     it('should list private packages only', done => {
+      mm(config, 'syncModel', 'all');
       request(app)
       .get('/-/short?private_only=true')
       .expect(200, (err, res) => {
