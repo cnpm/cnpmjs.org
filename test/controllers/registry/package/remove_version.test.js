@@ -1,18 +1,4 @@
-/**!
- * cnpmjs.org - test/controllers/registry/package/remove_version.test.js
- *
- * Copyright(c) cnpmjs.org and other contributors.
- * MIT Licensed
- *
- * Authors:
- *  fengmk2 <fengmk2@gmail.com> (http://fengmk2.github.com)
- */
-
 'use strict';
-
-/**
- * Module dependencies.
- */
 
 var should = require('should');
 var request = require('supertest');
@@ -22,13 +8,13 @@ var utils = require('../../../utils');
 var packageService = require('../../../../services/package');
 var nfs = require('../../../../common/nfs');
 
-describe('controllers/registry/package/remove_version.test.js', function () {
+describe('test/controllers/registry/package/remove_version.test.js', function () {
   afterEach(mm.restore);
 
   var lastRev;
   before(function (done) {
     var pkg = utils.getPackage('@cnpmtest/testmodule-remove_version-1', '0.0.1', utils.otherUser);
-    request(app.listen())
+    request(app)
     .put('/' + pkg.name)
     .set('authorization', utils.otherUserAuth)
     .send(pkg)
@@ -95,7 +81,7 @@ describe('controllers/registry/package/remove_version.test.js', function () {
   describe('mock error', function () {
     before(function (done) {
       var pkg = utils.getPackage('@cnpmtest/testmodule-remove_version-1', '0.0.2', utils.otherUser);
-      request(app.listen())
+      request(app)
       .put('/' + pkg.name)
       .set('authorization', utils.otherUserAuth)
       .send(pkg)
