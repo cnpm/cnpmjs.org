@@ -10,7 +10,7 @@ var npm = require('../../services/npm');
 
 var fixtures = path.join(path.dirname(__dirname), 'fixtures');
 
-describe('services/npm.test.js', () => {
+describe('test/services/npm.test.js', () => {
   afterEach(mm.restore);
 
   it('should return a module info from source npm', function* () {
@@ -36,6 +36,7 @@ describe('services/npm.test.js', () => {
   it('should return ServerError when http 500 response', function* () {
     var content = fs.createReadStream(path.join(fixtures, '500.txt'));
     mm.http.request(/\//, content, { statusCode: 500 });
+    mm.https.request(/\//, content, { statusCode: 500 });
     // http://registry.npmjs.org/octopie
     try {
       yield npm.get('octopie');
@@ -73,7 +74,7 @@ describe('services/npm.test.js', () => {
 
   describe('getPopular()', () => {
     it('should return popular modules', function* () {
-      mm.http.request(/\//, JSON.stringify({
+      const dataString = JSON.stringify({
         rows: [
           { key: ['foo0'], value: 1 },
           { key: ['foo1'], value: 1 },
@@ -92,7 +93,9 @@ describe('services/npm.test.js', () => {
           { key: ['foo14'], value: 1 },
           { key: ['foo15'], value: 1 },
         ]
-      }));
+      });
+      mm.http.request(/\//, dataString);
+      mm.https.request(/\//, dataString);
       var rows = yield npm.getPopular(10);
       rows.should.length(2);
       rows[0][0].should.equal('underscore');

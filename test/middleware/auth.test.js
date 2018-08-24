@@ -1,19 +1,4 @@
-/**!
- * cnpmjs.org - test/middleware/auth.test.js
- *
- * Copyright(c) cnpmjs.org and other contributors.
- * MIT Licensed
- *
- * Authors:
- *  dead_horse <dead_horse@qq.com> (http://deadhorse.me)
- *  fengmk2 <fengmk2@gmail.com> (http://fengmk2.com)
- */
-
 'use strict';
-
-/**
- * Module dependencies.
- */
 
 var request = require('supertest');
 var app = require('../../servers/registry');
@@ -21,14 +6,7 @@ var mm = require('mm');
 var config = require('../../config');
 var userService = require('../../services/user');
 
-describe('middleware/auth.test.js', function () {
-  before(function (done) {
-    app.listen(0, done);
-  });
-  after(function (done) {
-    app.close(done);
-  });
-
+describe('test/middleware/auth.test.js', function () {
   afterEach(mm.restore);
 
   describe('auth()', function () {
@@ -41,7 +19,7 @@ describe('middleware/auth.test.js', function () {
     it('should pass with authorization and check ok', function (done) {
       request(app)
       .get('/-/user/org.couchdb.user:cnpmjstest10')
-      .set('authorization', 'basic ' + new Buffer('cnpmjstest10:cnpmjstest10').toString('base64'))
+      .set('authorization', 'basic ' + Buffer.from('cnpmjstest10:cnpmjstest10').toString('base64'))
       .expect(200, done);
     });
 
@@ -49,14 +27,14 @@ describe('middleware/auth.test.js', function () {
       // npm install no need to check auth
       request(app)
       .get('/-/user/org.couchdb.user:cnpmjstest10')
-      .set('authorization', 'basic ' + new Buffer('cnpmjstest10:cnpmjstest').toString('base64'))
+      .set('authorization', 'basic ' + Buffer.from('cnpmjstest10:cnpmjstest').toString('base64'))
       .expect(200, done);
     });
 
     it('should pass with authorization (password contains ":") and check ok', function (done) {
       request(app)
       .get('/-/user/org.couchdb.user:cnpmjstest104')
-      .set('authorization', 'basic ' + new Buffer('cnpmjstest104:cnpmjs:test104').toString('base64'))
+      .set('authorization', 'basic ' + Buffer.from('cnpmjstest104:cnpmjs:test104').toString('base64'))
       .expect(200, done);
     });
 
@@ -75,7 +53,7 @@ describe('middleware/auth.test.js', function () {
 
         request(app)
         .put('/-/user/org.couchdb.user:cnpmjstest10/-rev/1')
-        .set('authorization', 'basic ' + new Buffer('cnpmjstest10:cnpmjstest10').toString('base64'))
+        .set('authorization', 'basic ' + Buffer.from('cnpmjstest10:cnpmjstest10').toString('base64'))
         .expect({
           error: 'UserSeriveAuthError',
           reason: 'mock user service auth error, please visit http://ooxx.net/user to sigup first'

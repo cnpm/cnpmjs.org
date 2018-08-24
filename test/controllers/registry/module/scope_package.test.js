@@ -1,9 +1,5 @@
 'use strict';
 
-/**
- * Module dependencies.
- */
-
 var should = require('should');
 var request = require('supertest');
 var mm = require('mm');
@@ -15,24 +11,22 @@ describe('test/controllers/registry/module/scope_package.test.js', function () {
   var pkgname = '@cnpm/test-scope-package';
   var pkgURL = '/@' + encodeURIComponent(pkgname.substring(1));
   before(function (done) {
-    app = app.listen(0, function () {
-      // add scope package
-      var pkg = utils.getPackage(pkgname, '0.0.1', utils.admin);
+    // add scope package
+    var pkg = utils.getPackage(pkgname, '0.0.1', utils.admin);
 
+    request(app)
+    .put(pkgURL)
+    .set('authorization', utils.adminAuth)
+    .send(pkg)
+    .expect(201, function (err) {
+      should.not.exist(err);
+      pkg = utils.getPackage(pkgname, '0.0.2', utils.admin);
+      // publish 0.0.2
       request(app)
       .put(pkgURL)
       .set('authorization', utils.adminAuth)
       .send(pkg)
-      .expect(201, function (err) {
-        should.not.exist(err);
-        pkg = utils.getPackage(pkgname, '0.0.2', utils.admin);
-        // publish 0.0.2
-        request(app.listen())
-        .put(pkgURL)
-        .set('authorization', utils.adminAuth)
-        .send(pkg)
-        .expect(201, done);
-      });
+      .expect(201, done);
     });
   });
 
@@ -73,7 +67,7 @@ describe('test/controllers/registry/module/scope_package.test.js', function () {
   });
 
   it('should get scope package info: /@scope/name', function (done) {
-    request(app.listen())
+    request(app)
     .get('/' + pkgname)
     .expect(200, function (err, res) {
       should.not.exist(err);

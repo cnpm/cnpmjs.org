@@ -1,18 +1,4 @@
-/**!
- * cnpmjs.org - test/controllers/registry/module/maintainer.test.js
- *
- * Copyright(c) fengmk2 and other contributors.
- * MIT Licensed
- *
- * Authors:
- *   fengmk2 <fengmk2@gmail.com> (http://fengmk2.github.com)
- */
-
 'use strict';
-
-/**
- * Module dependencies.
- */
 
 var request = require('supertest');
 var mm = require('mm');
@@ -20,20 +6,18 @@ var config = require('../../../../config');
 var app = require('../../../../servers/registry');
 var utils = require('../../../utils');
 
-describe('controllers/registry/module/maintainer.test.js', function () {
+describe('test/controllers/registry/module/maintainer.test.js', function () {
   var pkgname = '@cnpm/test-package-maintainer';
   var pkgURL = '/@' + encodeURIComponent(pkgname.substring(1));
   before(function (done) {
-    app = app.listen(0, function () {
-      // add scope package
-      var pkg = utils.getPackage(pkgname, '0.0.1', utils.admin);
+    // add scope package
+    var pkg = utils.getPackage(pkgname, '0.0.1', utils.admin);
 
-      request(app)
-      .put(pkgURL)
-      .set('authorization', utils.adminAuth)
-      .send(pkg)
-      .expect(201, done);
-    });
+    request(app)
+    .put(pkgURL)
+    .set('authorization', utils.adminAuth)
+    .send(pkg)
+    .expect(201, done);
   });
 
   beforeEach(function () {

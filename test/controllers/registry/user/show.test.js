@@ -1,18 +1,4 @@
-/**!
- * cnpmjs.org - test/controllers/registry/user/show.test.js
- *
- * Copyright(c) cnpmjs.org and other contributors.
- * MIT Licensed
- *
- * Authors:
- *  fengmk2 <fengmk2@gmail.com> (http://fengmk2.github.com)
- */
-
 'use strict';
-
-/**
- * Module dependencies.
- */
 
 var should = require('should');
 var request = require('supertest');
@@ -22,7 +8,7 @@ var config = require('../../../../config');
 var userService = require('../../../../services/user');
 var utils = require('../../../utils');
 
-describe('controllers/registry/user/show.test.js, GET /-/user/org.couchdb.user:name', function () {
+describe('test/controllers/registry/user/show.test.js, GET /-/user/org.couchdb.user:name', function () {
   afterEach(mm.restore);
 
   before(function (done) {
@@ -34,7 +20,7 @@ describe('controllers/registry/user/show.test.js, GET /-/user/org.couchdb.user:n
   });
 
   it('should return user info', function (done) {
-    request(app.listen())
+    request(app)
     .get('/-/user/org.couchdb.user:cnpmjstest101')
     .expect(200, function (err, res) {
       should.not.exist(err);
@@ -46,7 +32,7 @@ describe('controllers/registry/user/show.test.js, GET /-/user/org.couchdb.user:n
   });
 
   it('should return npm user info', function (done) {
-    request(app.listen())
+    request(app)
     .get('/-/user/org.couchdb.user:fengmk2')
     .expect(200, function (err, res) {
       should.not.exist(err);
@@ -61,7 +47,7 @@ describe('controllers/registry/user/show.test.js, GET /-/user/org.couchdb.user:n
   });
 
   it('should return 404 when not eixst', function (done) {
-    request(app.listen())
+    request(app)
     .get('/-/user/org.couchdb.user:cnpmjstest_notexist')
     .expect(404, done);
   });
@@ -72,7 +58,7 @@ describe('controllers/registry/user/show.test.js, GET /-/user/org.couchdb.user:n
     });
 
     it('should show npm user', function (done) {
-      request(app.listen())
+      request(app)
       .get('/-/user/org.couchdb.user:fengmk2')
       .expect(200, function (err, res) {
         should.not.exist(err);

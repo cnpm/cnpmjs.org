@@ -1,18 +1,4 @@
-/**!
- * cnpmjs.org - test/controllers/registry/package/dist_tag.test.js
- *
- * Copyright(c) fengmk2 and other contributors.
- * MIT Licensed
- *
- * Authors:
- *   fengmk2 <fengmk2@gmail.com> (http://fengmk2.github.com)
- */
-
 'use strict';
-
-/**
- * Module dependencies.
- */
 
 var request = require('supertest');
 var mm = require('mm');
@@ -22,7 +8,7 @@ var config = require('../../../../config');
 var app = require('../../../../servers/registry');
 var utils = require('../../../utils');
 
-describe('controllers/registry/package/dist_tag.test.js', function () {
+describe('test/controllers/registry/package/dist_tag.test.js', function () {
   afterEach(mm.restore);
 
   describe('index()', function () {
@@ -31,13 +17,13 @@ describe('controllers/registry/package/dist_tag.test.js', function () {
       utils.sync('byte', done);
 
       var pkg2 = utils.getPackage('@cnpmtest/dist_tag_test_module_index', '1.0.1', utils.otherUser);
-      request(app.listen())
+      request(app)
       .put('/' + pkg2.name)
       .set('authorization', utils.otherUserAuth)
       .send(pkg2)
       .expect(201, function (err) {
         should.not.exist(err);
-        request(app.listen())
+        request(app)
         .put('/-/package/' + pkg2.name + '/dist-tags/next')
         .set('authorization', utils.otherUserAuth)
         .set('content-type', 'application/json')
@@ -48,7 +34,7 @@ describe('controllers/registry/package/dist_tag.test.js', function () {
 
     it('should get normal pakcage tags', function (done) {
       mm(config, 'syncModel', 'all');
-      request(app.listen())
+      request(app)
       .get('/-/package/byte/dist-tags')
       .expect(200, function (err, res) {
         should.not.exist(err);
@@ -58,7 +44,7 @@ describe('controllers/registry/package/dist_tag.test.js', function () {
     });
 
     it('should get scoped pakcage tags', function (done) {
-      request(app.listen())
+      request(app)
       .get('/-/package/@cnpmtest/dist_tag_test_module_index/dist-tags')
       .expect(200)
       .expect({
@@ -68,7 +54,7 @@ describe('controllers/registry/package/dist_tag.test.js', function () {
     });
 
     it('should 404 when package not exists', function (done) {
-      request(app.listen())
+      request(app)
       .get('/-/package/@cnpmtest/not-exists/dist-tags')
       .expect(404)
       .expect({
@@ -81,13 +67,13 @@ describe('controllers/registry/package/dist_tag.test.js', function () {
   describe('set()', function () {
     before(function (done) {
       var pkg2 = utils.getPackage('@cnpmtest/dist_tag_test_module_set', '1.0.1', utils.otherUser);
-      request(app.listen())
+      request(app)
       .put('/' + pkg2.name)
       .set('authorization', utils.otherUserAuth)
       .send(pkg2)
       .expect(201, function (err) {
         should.not.exist(err);
-        request(app.listen())
+        request(app)
         .put('/-/package/' + pkg2.name + '/dist-tags/next')
         .set('authorization', utils.otherUserAuth)
         .set('content-type', 'application/json')
@@ -97,7 +83,7 @@ describe('controllers/registry/package/dist_tag.test.js', function () {
     });
 
     it('should 400 when set not exists version', function (done) {
-      request(app.listen())
+      request(app)
       .put('/-/package/@cnpmtest/dist_tag_test_module_set/dist-tags/next')
       .set('authorization', utils.otherUserAuth)
       .set('content-type', 'application/json')
@@ -110,7 +96,7 @@ describe('controllers/registry/package/dist_tag.test.js', function () {
     });
 
     it('should 201 set exists tag', function (done) {
-      request(app.listen())
+      request(app)
       .put('/-/package/@cnpmtest/dist_tag_test_module_set/dist-tags/exists')
       .set('authorization', utils.otherUserAuth)
       .set('content-type', 'application/json')
@@ -120,7 +106,7 @@ describe('controllers/registry/package/dist_tag.test.js', function () {
       })
       .expect(201, function (err) {
         should.not.exist(err);
-        request(app.listen())
+        request(app)
         .put('/-/package/@cnpmtest/dist_tag_test_module_set/dist-tags/exists')
         .set('authorization', utils.otherUserAuth)
         .set('content-type', 'application/json')
@@ -136,13 +122,13 @@ describe('controllers/registry/package/dist_tag.test.js', function () {
   describe('destroy()', function () {
     before(function (done) {
       var pkg2 = utils.getPackage('@cnpmtest/dist_tag_test_module_destroy', '1.0.1', utils.otherUser);
-      request(app.listen())
+      request(app)
       .put('/' + pkg2.name)
       .set('authorization', utils.otherUserAuth)
       .send(pkg2)
       .expect(201, function (err) {
         should.not.exist(err);
-        request(app.listen())
+        request(app)
         .put('/-/package/' + pkg2.name + '/dist-tags/next')
         .set('authorization', utils.otherUserAuth)
         .set('content-type', 'application/json')
@@ -152,7 +138,7 @@ describe('controllers/registry/package/dist_tag.test.js', function () {
     });
 
     it('should destroy exists scoped tag', function (done) {
-      request(app.listen())
+      request(app)
       .delete('/-/package/@cnpmtest/dist_tag_test_module_destroy/dist-tags/next')
       .set('authorization', utils.otherUserAuth)
       .set('content-type', 'application/json')
@@ -161,7 +147,7 @@ describe('controllers/registry/package/dist_tag.test.js', function () {
       })
       .expect(200, function (err) {
         should.not.exist(err);
-        request(app.listen())
+        request(app)
         .get('/-/package/@cnpmtest/dist_tag_test_module_destroy/dist-tags')
         .expect(200)
         .expect({
@@ -171,7 +157,7 @@ describe('controllers/registry/package/dist_tag.test.js', function () {
     });
 
     it('should not destroy latest tag', function(done) {
-      request(app.listen())
+      request(app)
       .delete('/-/package/@cnpmtest/dist_tag_test_module_destroy/dist-tags/latest')
       .set('authorization', utils.otherUserAuth)
       .set('content-type', 'application/json')
@@ -183,7 +169,7 @@ describe('controllers/registry/package/dist_tag.test.js', function () {
     });
 
     it('should 404 destroy not exists tag', function (done) {
-      request(app.listen())
+      request(app)
       .delete('/-/package/@cnpmtest/dist_tag_test_module_destroy/dist-tags/not-exists')
       .set('authorization', utils.otherUserAuth)
       .set('content-type', 'application/json')
@@ -197,13 +183,13 @@ describe('controllers/registry/package/dist_tag.test.js', function () {
   describe('save()', function () {
     before(function (done) {
       var pkg2 = utils.getPackage('@cnpmtest/dist_tag_test_module_save', '1.0.1', utils.otherUser);
-      request(app.listen())
+      request(app)
       .put('/' + pkg2.name)
       .set('authorization', utils.otherUserAuth)
       .send(pkg2)
       .expect(201, function (err) {
         should.not.exist(err);
-        request(app.listen())
+        request(app)
         .put('/-/package/' + pkg2.name + '/dist-tags/next')
         .set('authorization', utils.otherUserAuth)
         .set('content-type', 'application/json')
@@ -213,7 +199,7 @@ describe('controllers/registry/package/dist_tag.test.js', function () {
     });
 
     it('should overwrite exists tags', function (done) {
-      request(app.listen())
+      request(app)
       .put('/-/package/@cnpmtest/dist_tag_test_module_save/dist-tags')
       .set('authorization', utils.otherUserAuth)
       .send({
@@ -225,7 +211,7 @@ describe('controllers/registry/package/dist_tag.test.js', function () {
       })
       .expect(201, function (err) {
         should.not.exist(err);
-        request(app.listen())
+        request(app)
         .get('/-/package/@cnpmtest/dist_tag_test_module_save/dist-tags')
         .expect(200)
         .expect({
@@ -236,7 +222,7 @@ describe('controllers/registry/package/dist_tag.test.js', function () {
     });
 
     it('should overwrite exists scoped tags', function (done) {
-      request(app.listen())
+      request(app)
       .put('/-/package/@cnpmtest/dist_tag_test_module_save/dist-tags')
       .set('authorization', utils.otherUserAuth)
       .send({
@@ -248,7 +234,7 @@ describe('controllers/registry/package/dist_tag.test.js', function () {
       })
       .expect(201, function (err) {
         should.not.exist(err);
-        request(app.listen())
+        request(app)
         .get('/-/package/@cnpmtest/dist_tag_test_module_save/dist-tags')
         .expect(200)
         .expect({
@@ -262,13 +248,13 @@ describe('controllers/registry/package/dist_tag.test.js', function () {
   describe('update()', function () {
     before(function (done) {
       var pkg2 = utils.getPackage('@cnpmtest/dist_tag_test_module_update', '1.0.1', utils.otherUser);
-      request(app.listen())
+      request(app)
       .put('/' + pkg2.name)
       .set('authorization', utils.otherUserAuth)
       .send(pkg2)
       .expect(201, function (err) {
         should.not.exist(err);
-        request(app.listen())
+        request(app)
         .put('/-/package/' + pkg2.name + '/dist-tags/next')
         .set('authorization', utils.otherUserAuth)
         .set('content-type', 'application/json')
@@ -278,7 +264,7 @@ describe('controllers/registry/package/dist_tag.test.js', function () {
     });
 
     it('should merge exists tags', function (done) {
-      request(app.listen())
+      request(app)
       .post('/-/package/@cnpmtest/dist_tag_test_module_update/dist-tags')
       .set('authorization', utils.otherUserAuth)
       .send({
@@ -290,7 +276,7 @@ describe('controllers/registry/package/dist_tag.test.js', function () {
       })
       .expect(201, function (err) {
         should.not.exist(err);
-        request(app.listen())
+        request(app)
         .get('/-/package/@cnpmtest/dist_tag_test_module_update/dist-tags')
         .expect(200)
         .expect({
@@ -302,7 +288,7 @@ describe('controllers/registry/package/dist_tag.test.js', function () {
     });
 
     it('should merge exists scoped tags', function (done) {
-      request(app.listen())
+      request(app)
       .post('/-/package/@cnpmtest/dist_tag_test_module_update/dist-tags')
       .set('authorization', utils.otherUserAuth)
       .send({
@@ -314,7 +300,7 @@ describe('controllers/registry/package/dist_tag.test.js', function () {
       })
       .expect(201, function (err) {
         should.not.exist(err);
-        request(app.listen())
+        request(app)
         .get('/-/package/@cnpmtest/dist_tag_test_module_update/dist-tags')
         .expect(200)
         .expect({

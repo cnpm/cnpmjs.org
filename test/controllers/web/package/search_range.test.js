@@ -1,18 +1,4 @@
-/*!
- * cnpmjs.org - test/controllers/web/package/search_range.test.js
- *
- * Copyright(c) cnpmjs.org and other contributors.
- * MIT Licensed
- *
- * Authors:
- *  dead_horse <dead_horse@qq.com> (http://deadhorse.me)
- */
-
 'use strict';
-
-/**
- * Module dependencies.
- */
 
 var should = require('should');
 var request = require('supertest');
@@ -21,7 +7,7 @@ var app = require('../../../../servers/web');
 var registry = require('../../../../servers/registry');
 var utils = require('../../../utils');
 
-describe('controllers/web/package/search_range.test.js', function () {
+describe('test/controllers/web/package/search_range.test.js', function () {
   before(function (done) {
     var pkg = utils.getPackage('@cnpmtest/testmodule-web-search_range', '0.0.1', utils.admin);
     pkg.versions['0.0.1'].dependencies = {
@@ -29,7 +15,7 @@ describe('controllers/web/package/search_range.test.js', function () {
       mocha: '~1.0.0',
       'testmodule-web-show': '0.0.1'
     };
-    request(registry.listen())
+    request(registry)
     .put('/' + pkg.name)
     .set('authorization', utils.adminAuth)
     .send(pkg)

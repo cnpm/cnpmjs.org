@@ -26,7 +26,7 @@ describe('test/controllers/registry/package/save.test.js', function () {
         'bytetest-1': '~0.0.1',
         mocha: '~1.0.0'
       };
-      request(app.listen())
+      request(app)
       .put('/' + pkg.name)
       .set('authorization', utils.adminAuth)
       .send(pkg)
@@ -37,7 +37,7 @@ describe('test/controllers/registry/package/save.test.js', function () {
           'bytetest-1': '~0.0.1',
           mocha: '~1.0.0'
         };
-        request(app.listen())
+        request(app)
         .put('/' + pkg.name)
         .set('authorization', utils.adminAuth)
         .send(pkg)
@@ -46,7 +46,7 @@ describe('test/controllers/registry/package/save.test.js', function () {
     });
 
     it('should publish new version package and save dependencies', function (done) {
-      request(app.listen())
+      request(app)
       .get('/testmodule-new-1')
       .expect(200, function (err, res) {
         should.not.exist(err);
@@ -76,7 +76,7 @@ describe('test/controllers/registry/package/save.test.js', function () {
         'bytetest-1': '~0.0.1',
         mocha: '~1.0.0'
       };
-      request(app.listen())
+      request(app)
       .put('/' + pkg.name)
       .set('authorization', utils.adminAuth)
       .send(pkg)
@@ -97,14 +97,14 @@ describe('test/controllers/registry/package/save.test.js', function () {
       var tags = pkg['dist-tags'];
       tags.v2 = tags.latest;
       delete tags.latest;
-      request(app.listen())
+      request(app)
       .put('/' + pkg.name)
       .set('authorization', utils.adminAuth)
       .send(pkg)
       .expect(201, function (err) {
         should.not.exist(err);
 
-        request(app.listen())
+        request(app)
         .get('/' + pkg.name)
         .expect(200, function (err, res) {
           should.not.exist(err);
@@ -123,14 +123,14 @@ describe('test/controllers/registry/package/save.test.js', function () {
       var tags = pkg['dist-tags'];
       tags.v2 = tags.latest;
       delete tags.latest;
-      request(app.listen())
+      request(app)
       .put('/' + pkg.name)
       .set('authorization', utils.adminAuth)
       .send(pkg)
       .expect(201, function (err) {
         should.not.exist(err);
 
-        request(app.listen())
+        request(app)
         .get('/' + pkg.name)
         .expect(200, function (err, res) {
           should.not.exist(err);
@@ -147,7 +147,7 @@ describe('test/controllers/registry/package/save.test.js', function () {
     it('should 400 when versions missing', function (done) {
       var pkg = utils.getPackage('testmodule-new-1', '0.0.1', utils.admin);
       delete pkg.versions;
-      request(app.listen())
+      request(app)
       .put('/' + pkg.name)
       .set('authorization', utils.adminAuth)
       .send(pkg)
@@ -161,7 +161,7 @@ describe('test/controllers/registry/package/save.test.js', function () {
     it('should 400 when maintainers missing', function (done) {
       var pkg = utils.getPackage('testmodule-new-1', '0.0.1', utils.admin);
       delete pkg.versions['0.0.1'].maintainers;
-      request(app.listen())
+      request(app)
       .put('/' + pkg.name)
       .set('authorization', utils.adminAuth)
       .send(pkg)
@@ -175,7 +175,7 @@ describe('test/controllers/registry/package/save.test.js', function () {
     it('should 400 when dist-tags missing', function (done) {
       var pkg = utils.getPackage('testmodule-new-1', '0.0.1', utils.admin);
       delete pkg['dist-tags'];
-      request(app.listen())
+      request(app)
       .put('/' + pkg.name)
       .set('authorization', utils.adminAuth)
       .send(pkg)
@@ -189,7 +189,7 @@ describe('test/controllers/registry/package/save.test.js', function () {
     it('should 403 when maintainers dont contain current user', function (done) {
       var pkg = utils.getPackage('testmodule-new-1', '0.0.1', utils.admin);
       pkg.versions['0.0.1'].maintainers[0].name += '-testuser';
-      request(app.listen())
+      request(app)
       .put('/' + pkg.name)
       .set('authorization', utils.adminAuth)
       .send(pkg)
@@ -203,7 +203,7 @@ describe('test/controllers/registry/package/save.test.js', function () {
     it('should 400 when attachments missing', function (done) {
       var pkg = utils.getPackage('testmodule-new-1', '0.0.1', utils.admin);
       delete pkg._attachments;
-      request(app.listen())
+      request(app)
       .put('/' + pkg.name)
       .set('authorization', utils.adminAuth)
       .send(pkg)
@@ -217,7 +217,7 @@ describe('test/controllers/registry/package/save.test.js', function () {
     it('should 403 when attachments length wrong', function (done) {
       var pkg = utils.getPackage('testmodule-new-1', '0.0.3', utils.admin);
       pkg._attachments[Object.keys(pkg._attachments)[0]].length += 10;
-      request(app.listen())
+      request(app)
       .put('/' + pkg.name)
       .set('authorization', utils.adminAuth)
       .send(pkg)
@@ -230,7 +230,7 @@ describe('test/controllers/registry/package/save.test.js', function () {
 
     it('should 403 when user is not maintainer', function (done) {
       var pkg = utils.getPackage('testmodule-new-1', '0.0.2', utils.otherAdmin2);
-      request(app.listen())
+      request(app)
       .put('/' + pkg.name)
       .set('authorization', utils.otherAdmin2Auth)
       .send(pkg)
@@ -243,7 +243,7 @@ describe('test/controllers/registry/package/save.test.js', function () {
 
     it('should 403 when version exists', function (done) {
       var pkg = utils.getPackage('testmodule-new-1', '0.0.1', utils.admin);
-      request(app.listen())
+      request(app)
       .put('/' + pkg.name)
       .set('authorization', utils.adminAuth)
       .send(pkg)
@@ -262,7 +262,7 @@ describe('test/controllers/registry/package/save.test.js', function () {
         bytetest2: '~0.0.1',
         mocha: '~1.0.0'
       };
-      request(app.listen())
+      request(app)
       .put('/' + pkg.name)
       .set('authorization', utils.adminAuth)
       .send(pkg)
@@ -273,7 +273,7 @@ describe('test/controllers/registry/package/save.test.js', function () {
           bytetest2: '~0.0.1',
           mocha: '~1.0.0'
         };
-        request(app.listen())
+        request(app)
         .put('/' + pkg.name)
         .set('authorization', utils.adminAuth)
         .send(pkg)
@@ -282,7 +282,7 @@ describe('test/controllers/registry/package/save.test.js', function () {
     });
 
     it('should publish new version package and save dependencies', function (done) {
-      request(app.listen())
+      request(app)
       .get('/@cnpmtest/testmodule-new-1')
       .expect(200, function (err, res) {
         should.not.exist(err);

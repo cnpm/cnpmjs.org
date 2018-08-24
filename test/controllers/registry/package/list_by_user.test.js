@@ -1,16 +1,4 @@
-/**!
- * Copyright(c) cnpmjs.org and other contributors.
- * MIT Licensed
- *
- * Authors:
- *  fengmk2 <fengmk2@gmail.com> (http://fengmk2.com)
- */
-
 'use strict';
-
-/**
- * Module dependencies.
- */
 
 var request = require('supertest');
 var mm = require('mm');
@@ -20,7 +8,7 @@ var utils = require('../../../utils');
 
 describe('test/controllers/registry/package/list_by_user.test.js', function () {
   var user = 'cnpmjstest_list_by_user';
-  var userauth = 'Basic ' + new Buffer(user + ':' + user).toString('base64');
+  var userauth = 'Basic ' + Buffer.from(user + ':' + user).toString('base64');
 
   afterEach(mm.restore);
 
@@ -49,6 +37,7 @@ describe('test/controllers/registry/package/list_by_user.test.js', function () {
       .get(url)
       .expect(function(res) {
         var data = res.body;
+        should.exists(data.user);
         data.user.name.should.equal(user);
         var map = {};
         data.packages.forEach(function(pkg) {

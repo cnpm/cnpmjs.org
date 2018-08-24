@@ -1,9 +1,5 @@
 'use strict';
 
-/**
- * Module dependencies.
- */
-
 var request = require('supertest');
 var app = require('../../servers/registry');
 var mm = require('mm');
@@ -14,7 +10,7 @@ describe('test/middleware/sync_by_install.test.js', () => {
   afterEach(mm.restore);
 
   it('should ignore sync on install private scoped package', done => {
-    request(app.listen())
+    request(app)
     .get('/@cnpmtest/foo')
     .set('User-Agent', 'node/v4.4.4')
     .expect({
@@ -25,10 +21,10 @@ describe('test/middleware/sync_by_install.test.js', () => {
   });
 
   it('should sync and redirect to npmjs.com on install public scoped package', done => {
-    request(app.listen())
+    request(app)
     .get('/@jkroso/type')
     .set('User-Agent', 'node/v4.4.4')
-    .expect('Location', 'https://registry.npmjs.com/@jkroso/type')
+    .expect('Location', /\/@jkroso\/type$/)
     .expect(302, done);
   });
 });

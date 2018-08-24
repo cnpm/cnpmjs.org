@@ -20,7 +20,7 @@ module.exports = function () {
       return yield unauthorized.call(this, next);
     }
 
-    authorization = new Buffer(authorization, 'base64').toString();
+    authorization = Buffer.from(authorization, 'base64').toString();
     var pos = authorization.indexOf(':');
     if (pos === -1) {
        return yield unauthorized.call(this, next);

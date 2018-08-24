@@ -8,12 +8,12 @@ var pedding = require('pedding');
 var app = require('../../../../servers/registry');
 var utils = require('../../../utils');
 
-describe('controllers/registry/package/deprecate.test.js', function () {
+describe('test/controllers/registry/package/deprecate.test.js', function () {
   var pkgname = '@cnpmtest/testmodule-deprecate';
   before(function (done) {
     var pkg = utils.getPackage(pkgname, '0.0.1', utils.admin);
 
-    request(app.listen())
+    request(app)
     .put('/' + pkgname)
     .set('authorization', utils.adminAuth)
     .send(pkg)
@@ -21,14 +21,14 @@ describe('controllers/registry/package/deprecate.test.js', function () {
       should.not.exist(err);
       pkg = utils.getPackage(pkgname, '0.0.2', utils.admin);
       // publish 0.0.2
-      request(app.listen())
+      request(app)
       .put('/' + pkgname)
       .set('authorization', utils.adminAuth)
       .send(pkg)
       .expect(201, function (err) {
         should.not.exist(err);
         pkg = utils.getPackage(pkgname, '1.0.0', utils.admin);
-        request(app.listen())
+        request(app)
         .put('/' + pkgname)
         .set('authorization', utils.adminAuth)
         .send(pkg)
@@ -41,7 +41,7 @@ describe('controllers/registry/package/deprecate.test.js', function () {
 
   describe('PUT /:name', function () {
     it('should deprecate version@1.0.0', function (done) {
-      request(app.listen())
+      request(app)
       .put('/' + pkgname)
       .set('authorization', utils.adminAuth)
       .send({
@@ -57,14 +57,14 @@ describe('controllers/registry/package/deprecate.test.js', function () {
       })
       .expect(201, function (err) {
         should.not.exist(err);
-        request(app.listen())
+        request(app)
         .get('/' + pkgname + '/1.0.0')
         .expect(200, function (err, res) {
           should.not.exist(err);
           res.body.deprecated.should.equal('mock test deprecated message 1.0.0');
 
           // undeprecated
-          request(app.listen())
+          request(app)
           .put('/' + pkgname)
           .set('authorization', utils.adminAuth)
           .send({
@@ -80,7 +80,7 @@ describe('controllers/registry/package/deprecate.test.js', function () {
           })
           .expect(201, function (err) {
             should.not.exist(err);
-            request(app.listen())
+            request(app)
             .get('/' + pkgname + '/1.0.0')
             .expect(200, function (err, res) {
               should.not.exist(err);
@@ -93,7 +93,7 @@ describe('controllers/registry/package/deprecate.test.js', function () {
     });
 
     it('should deprecate version@<1.0.0', function* () {
-      yield request(app.listen())
+      yield request(app)
         .put('/' + pkgname)
         .set('authorization', utils.adminAuth)
         .send({
@@ -115,14 +115,14 @@ describe('controllers/registry/package/deprecate.test.js', function () {
         })
         .expect(201);
 
-      yield request(app.listen())
+      yield request(app)
         .get('/' + pkgname + '/0.0.1')
         .expect(200)
         .expect(res => {
           res.body.deprecated.should.equal('mock test deprecated message 0.0.1');
         });
 
-      yield request(app.listen())
+      yield request(app)
         .get('/' + pkgname + '/0.0.2')
         .expect(200)
         .expect(res => {
@@ -130,7 +130,7 @@ describe('controllers/registry/package/deprecate.test.js', function () {
         });
 
       // not change 1.0.0
-      yield request(app.listen())
+      yield request(app)
         .get('/' + pkgname + '/1.0.0')
         .expect(200)
         .expect(res => {
@@ -138,7 +138,7 @@ describe('controllers/registry/package/deprecate.test.js', function () {
         });
 
       // show deprecated info on abbreviatedMeta request
-      yield request(app.listen())
+      yield request(app)
         .get('/' + pkgname)
         .set('accept', 'application/vnd.npm.install-v1+json')
         .expect(200)
@@ -150,7 +150,7 @@ describe('controllers/registry/package/deprecate.test.js', function () {
     });
 
     it('should 404 deprecate not exists version', function (done) {
-      request(app.listen())
+      request(app)
       .put('/' + pkgname)
       .set('authorization', utils.adminAuth)
       .send({
@@ -172,7 +172,7 @@ describe('controllers/registry/package/deprecate.test.js', function () {
     });
 
     it('should 403 can not modified when use is not maintainer', function (done) {
-      request(app.listen())
+      request(app)
       .put('/' + pkgname)
       .set('authorization', utils.otherUserAuth)
       .send({

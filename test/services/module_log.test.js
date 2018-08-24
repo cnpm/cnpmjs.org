@@ -1,22 +1,8 @@
-/**!
- * cnpmjs.org - test/services/module_log.test.js
- *
- * Copyright(c) cnpmjs.org and other contributors.
- * MIT Licensed
- *
- * Authors:
- *  fengmk2 <fengmk2@gmail.com> (http://fengmk2.github.com)
- */
-
 'use strict';
-
-/**
- * Module dependencies.
- */
 
 var ModuleLog = require('../../services/module_log');
 
-describe('services/module_log.test.js', function () {
+describe('test/services/module_log.test.js', function () {
   describe('create(), append()', function () {
     it('should create a log row', function* () {
       var log = yield ModuleLog.create({name: 'utility', username: 'fengmk2'});
@@ -43,7 +29,7 @@ describe('services/module_log.test.js', function () {
       var log = yield ModuleLog.create({name: 'module_log-append', username: 'fengmk2'});
       var logid = log.id;
 
-      var biglog = new Buffer(1024 * 1024).fill(71).toString();
+      var biglog = Buffer.alloc(1024 * 1024).fill(71).toString();
       log = yield ModuleLog.append(logid, biglog);
       log.log.substring(0, 4).should.equal('...\n');
       log.log.length.should.equal(1024 * 1024 / 2 + 4);
