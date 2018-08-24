@@ -8,7 +8,6 @@ var utils = require('../../../utils');
 
 describe('test/controllers/web/package/search.test.js', function () {
   var app_reg;
-
   before(function (done) {
     var pkg = utils.getPackage('@cnpmtest/testmodule-web-search', '0.0.1', utils.admin);
     pkg.versions['0.0.1'].dependencies = {
@@ -17,9 +16,9 @@ describe('test/controllers/web/package/search.test.js', function () {
       'testmodule-web-show': '0.0.1'
     };
 
-    app_reg = registry.listen();
+    app_reg = registry;
 
-    request(app_reg)
+    request(registry)
     .put('/' + pkg.name)
     .set('authorization', utils.adminAuth)
     .send(pkg)

@@ -67,7 +67,7 @@ describe('test/controllers/registry/module/scope_package.test.js', function () {
   });
 
   it('should get scope package info: /@scope/name', function (done) {
-    request(app.listen())
+    request(app)
     .get('/' + pkgname)
     .expect(200, function (err, res) {
       should.not.exist(err);
