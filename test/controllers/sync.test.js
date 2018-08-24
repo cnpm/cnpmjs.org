@@ -24,7 +24,7 @@ describe('test/controllers/sync.test.js', () => {
     var logIdRegistry2;
 
     it('should sync as publish success', function (done) {
-      request(registryApp.listen())
+      request(registryApp)
       .del('/pedding/-rev/123')
       .set('authorization', utils.adminAuth)
       .end(function (err) {
@@ -48,7 +48,7 @@ describe('test/controllers/sync.test.js', () => {
       mm(npmService, 'get', function* () {
         return mockPackage;
       });
-      request(registryApp.listen())
+      request(registryApp)
       .put('/utility_unit_test/sync?publish=true&nodeps=true')
       .expect(403)
       .expect({
@@ -61,7 +61,7 @@ describe('test/controllers/sync.test.js', () => {
       mm(npmService, 'get', function* () {
         return mockPackage;
       });
-      request(webApp.listen())
+      request(webApp)
       .put('/sync/pedding?sync_upstream=true')
       .end(function (err, res) {
         should.not.exist(err);
@@ -75,20 +75,22 @@ describe('test/controllers/sync.test.js', () => {
       mm(npmService, 'get', function* () {
         return mockPackage;
       });
-      request(registryApp.listen())
+      request(registryApp)
       .put('/pedding/sync')
       .set('authorization', utils.adminAuth)
       .end(function (err, res) {
         should.not.exist(err);
         res.body.should.have.keys('ok', 'logId');
+        console.log(res.body, res.body.logId)
         logIdRegistry = res.body.logId;
+        should.exists(logIdRegistry);
         done();
       });
     });
 
     it('should get sync log', function (done) {
       done = pedding(2, done);
-      request(registryApp.listen())
+      request(registryApp)
       .get('/pedding/sync/log/' + logIdRegistry)
       .expect(200, function (err, res) {
         should.not.exist(err);
@@ -96,7 +98,7 @@ describe('test/controllers/sync.test.js', () => {
         done();
       });
 
-      request(webApp.listen())
+      request(webApp)
       .get('/sync/pedding/log/' + logIdWeb + '?offset=1')
       .expect(200, function (err, res) {
         should.not.exist(err);
@@ -111,7 +113,7 @@ describe('test/controllers/sync.test.js', () => {
       mm(npmService, 'get', function* () {
         return mockPackage;
       });
-      request(registryApp.listen())
+      request(registryApp)
       .put('/pedding/sync?sync_upstream=true')
       .set('authorization', utils.adminAuth)
       .end(function (err, res) {
@@ -125,7 +127,7 @@ describe('test/controllers/sync.test.js', () => {
     it('should get sync_upstream=true log', function (done) {
       done = pedding(2, done);
       setTimeout(() => {
-        request(registryApp.listen())
+        request(registryApp)
         .get('/pedding/sync/log/' + logIdRegistry2)
         .expect(200, function (err, res) {
           should.not.exist(err);
@@ -134,7 +136,7 @@ describe('test/controllers/sync.test.js', () => {
           done();
         });
 
-        request(webApp.listen())
+        request(webApp)
         .get('/sync/pedding/log/' + logIdRegistry2 + '?offset=1')
         .expect(200, function (err, res) {
           should.not.exist(err);
@@ -145,13 +147,13 @@ describe('test/controllers/sync.test.js', () => {
     });
 
     it('should 404 when log id not exists', function (done) {
-      request(webApp.listen())
+      request(webApp)
       .get('/sync/pedding/log/123123123')
       .expect(404, done);
     });
 
     it('should 404 when log id not number', function (done) {
-      request(webApp.listen())
+      request(webApp)
       .get('/sync/pedding/log/info.php')
       .expect(404, done);
     });
@@ -159,7 +161,7 @@ describe('test/controllers/sync.test.js', () => {
 
   describe('scope package', function () {
     it('should sync scope package not found', function (done) {
-      request(webApp.listen())
+      request(webApp)
       .put('/sync/@cnpm/not-exists-package')
       .expect(201, done);
     });

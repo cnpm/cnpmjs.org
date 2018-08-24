@@ -11,7 +11,7 @@ describe('test/controllers/registry/package/download_total.test.js', () => {
 
   before(() => {
     const pkg2 = utils.getPackage('@cnpmtest/download_total_test_module', '1.0.1', utils.otherUser);
-    return request(app.listen())
+    return request(app)
       .put('/' + pkg2.name)
       .set('authorization', utils.otherUserAuth)
       .send(pkg2)
@@ -19,7 +19,7 @@ describe('test/controllers/registry/package/download_total.test.js', () => {
   });
 
   it('should error when range error', () => {
-    return request(app.listen())
+    return request(app)
     .get('/downloads/range/2014-10-10:xxxx/koa')
     .expect(400)
     .expect({
@@ -46,7 +46,7 @@ describe('test/controllers/registry/package/download_total.test.js', () => {
       name: 'koa'
     }]);
 
-    return request(app.listen())
+    return request(app)
     .get('/downloads/range/2014-12-01:2014-12-03/koa')
     .expect(200)
     .expect({
@@ -78,7 +78,7 @@ describe('test/controllers/registry/package/download_total.test.js', () => {
       date: '2014-12-02',
     }]);
 
-    return request(app.listen())
+    return request(app)
     .get('/downloads/range/2014-12-01:2014-12-03')
     .expect(200)
     .expect({
@@ -115,7 +115,7 @@ describe('test/controllers/registry/package/download_total.test.js', () => {
       name: '@cnpmtest/download_total_test_module'
     }]);
 
-    return request(app.listen())
+    return request(app)
     .get('/downloads/range/2014-12-01:2014-12-03/@cnpmtest/download_total_test_module')
     .expect(200)
     .expect({

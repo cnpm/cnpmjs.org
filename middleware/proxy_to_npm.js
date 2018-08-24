@@ -8,13 +8,13 @@ module.exports = function (options) {
   var proxyUrls = [
     // /:pkg, dont contains scoped package
     // /:pkg/:versionOrTag
-    /^\/[\w\-\.]+/,
+    /^\/[\w\-\.]+(?:\/[\w\-\.]+)?$/,
     // /-/package/:pkg/dist-tags
     /^\/\-\/package\/[\w\-\.]+\/dist-tags/,
   ];
   var scopedUrls = [
     // scoped package
-    /^\/(@[\w\-\.]+)\/[\w\-\.]+/,
+    /^\/(@[\w\-\.]+)\/[\w\-\.]+(?:\/[\w\-\.]+)?$/,
     /^\/\-\/package\/(@[\w\-\.]+)\/[\w\-\.]+\/dist\-tags/,
   ];
   if (options && options.isWeb) {

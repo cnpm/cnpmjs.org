@@ -5,20 +5,21 @@ var request = require('supertest');
 var mm = require('mm');
 var app = require('../../../../servers/registry');
 var utils = require('../../../utils');
+var config = require('../../../../config');
 
 describe('test/controllers/registry/package/show.test.js', function () {
   afterEach(mm.restore);
 
   before(function(done) {
     var pkg = utils.getPackage('@cnpmtest/testmodule-show', '0.0.1', utils.admin);
-    request(app.listen())
+    request(app)
     .put('/' + pkg.name)
     .set('authorization', utils.adminAuth)
     .send(pkg)
     .expect(201, function(err) {
       should.not.exist(err);
       pkg = utils.getPackage('@cnpmtest/testmodule-show', '1.1.0', utils.admin);
-      request(app.listen())
+      request(app)
       .put('/' + pkg.name)
       .set('authorization', utils.adminAuth)
       .send(pkg)
@@ -28,7 +29,7 @@ describe('test/controllers/registry/package/show.test.js', function () {
 
   before(function(done) {
     var pkg = utils.getPackage('@cnpmtest/testmodule-only-beta', '1.0.0-beta.1', utils.admin);
-    request(app.listen())
+    request(app)
     .put('/' + pkg.name)
     .set('authorization', utils.adminAuth)
     .send(pkg)
@@ -36,7 +37,7 @@ describe('test/controllers/registry/package/show.test.js', function () {
   });
 
   it('should return one version', function (done) {
-    request(app.listen())
+    request(app)
     .get('/@cnpmtest/testmodule-show/0.0.1')
     .expect(200, function (err, res) {
       should.not.exist(err);
@@ -53,7 +54,7 @@ describe('test/controllers/registry/package/show.test.js', function () {
   });
 
   it('should return max satisfied package with semver range', function (done) {
-    request(app.listen())
+    request(app)
     .get('/@cnpmtest/testmodule-show/^1.0.0')
     .expect(200, function (err, res) {
       should.not.exist(err);
@@ -69,7 +70,7 @@ describe('test/controllers/registry/package/show.test.js', function () {
   });
 
   it('should return max satisfied package with complex semver range', function (done) {
-    request(app.listen())
+    request(app)
     .get('/@cnpmtest/testmodule-show/>1.2.0 <=2 || 0.0.1')
     .expect(200, function (err, res) {
       should.not.exist(err);
@@ -85,7 +86,7 @@ describe('test/controllers/registry/package/show.test.js', function () {
   });
 
   it('should return max satisfied package with *', function (done) {
-    request(app.listen())
+    request(app)
     .get('/@cnpmtest/testmodule-show/*')
     .expect(200, function (err, res) {
       should.not.exist(err);
@@ -101,7 +102,7 @@ describe('test/controllers/registry/package/show.test.js', function () {
   });
 
   it('should return the only beta version', function (done) {
-    request(app.listen())
+    request(app)
     .get('/@cnpmtest/testmodule-only-beta/*')
     .expect(200, function (err, res) {
       should.not.exist(err);
@@ -117,14 +118,14 @@ describe('test/controllers/registry/package/show.test.js', function () {
   });
 
   it('should support jsonp', function (done) {
-    request(app.listen())
+    request(app)
     .get('/@cnpmtest/testmodule-show/0.0.1?callback=jsonp')
     .expect(/jsonp\(\{/)
     .expect(200, done);
   });
 
   it('should return latest tag', function (done) {
-    request(app.listen())
+    request(app)
     .get('/@cnpmtest/testmodule-show/latest')
     .expect(200, function (err, res) {
       should.not.exist(err);
@@ -139,7 +140,7 @@ describe('test/controllers/registry/package/show.test.js', function () {
   });
 
   it('should return other_urls on query exists', function (done) {
-    request(app.listen())
+    request(app)
     .get('/@cnpmtest/testmodule-show/latest?bucket=us1')
     .expect(200, function (err, res) {
       should.not.exist(err);
@@ -155,13 +156,13 @@ describe('test/controllers/registry/package/show.test.js', function () {
   });
 
   it('should 404 when package not exist', function (done) {
-    request(app.listen())
+    request(app)
     .get('/@cnpmtest/testmodule-show-not-exists/latest')
     .expect(404, done);
   });
 
   it('should return scoped package one version', function (done) {
-    request(app.listen())
+    request(app)
     .get('/@cnpmtest/testmodule-show/0.0.1')
     .expect(200, function (err, res) {
       should.not.exist(err);
@@ -176,7 +177,7 @@ describe('test/controllers/registry/package/show.test.js', function () {
   });
 
   it('should dont sync scoped package not exist', function (done) {
-    request(app.listen())
+    request(app)
     .get('/@cnpmtest/testmodule-show-not-exists/latest')
     .expect(404, done);
   });
@@ -187,7 +188,8 @@ describe('test/controllers/registry/package/show.test.js', function () {
     });
 
     it('should 200 when source npm exists', function (done) {
-      request(app.listen())
+      mm(config, 'syncModel', 'all');
+      request(app)
       .get('/baidu/latest')
       .expect(200, done);
     });

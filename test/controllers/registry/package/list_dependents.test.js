@@ -1,16 +1,4 @@
-/**!
- * Copyright(c) cnpm and other contributors.
- * MIT Licensed
- *
- * Authors:
- *  fengmk2 <fengmk2@gmail.com> (http://fengmk2.com)
- */
-
 'use strict';
-
-/**
- * Module dependencies.
- */
 
 const pedding = require('pedding');
 const request = require('supertest');
@@ -18,7 +6,7 @@ const mm = require('mm');
 const app = require('../../../../servers/registry');
 const utils = require('../../../utils');
 
-describe('test/controllers/registry/package/list_dependents.test.js', function () {
+describe('test/controllers/registry/package/list_dependents.test.js', function() {
   afterEach(mm.restore);
 
   before(function (done) {
@@ -27,14 +15,14 @@ describe('test/controllers/registry/package/list_dependents.test.js', function (
     pkg.versions['1.0.0'].dependencies = {
       '@cnpmtest/testmodule-list-dependents2': '~1.0.0',
     };
-    request(app.listen())
+    request(app)
     .put('/' + pkg.name)
     .set('authorization', utils.adminAuth)
     .send(pkg)
     .expect(201, done);
 
     const pkg2 = utils.getPackage('@cnpmtest/testmodule-list-dependents2', '1.0.0', utils.admin);
-    request(app.listen())
+    request(app)
     .put('/' + pkg2.name)
     .set('authorization', utils.adminAuth)
     .send(pkg2)

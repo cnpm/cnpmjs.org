@@ -37,6 +37,7 @@ describe('test/controllers/registry/package/list_by_user.test.js', function () {
       .get(url)
       .expect(function(res) {
         var data = res.body;
+        should.exists(data.user);
         data.user.name.should.equal(user);
         var map = {};
         data.packages.forEach(function(pkg) {

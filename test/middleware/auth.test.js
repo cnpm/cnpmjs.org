@@ -6,14 +6,7 @@ var mm = require('mm');
 var config = require('../../config');
 var userService = require('../../services/user');
 
-describe('middleware/auth.test.js', function () {
-  before(function (done) {
-    app.listen(0, done);
-  });
-  after(function (done) {
-    app.close(done);
-  });
-
+describe('test/middleware/auth.test.js', function () {
   afterEach(mm.restore);
 
   describe('auth()', function () {
