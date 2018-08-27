@@ -67,7 +67,7 @@ CREATE TABLE IF NOT EXISTS `module` (
  `gmt_modified` datetime NOT NULL COMMENT 'modified time',
  `author` varchar(100) NOT NULL,
  `name` varchar(100) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL COMMENT 'module name',
- `version` varchar(30) NOT NULL COMMENT 'module version',
+ `version` varchar(50) NOT NULL COMMENT 'module version',
  `description` longtext,
  `package` longtext CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'package.json',
  `dist_shasum` varchar(100) DEFAULT NULL,
@@ -86,13 +86,14 @@ CREATE TABLE IF NOT EXISTS `module` (
 -- ALTER TABLE `module` CHANGE `description` `description` LONGTEXT CHARACTER SET utf8 COLLATE utf8_general_ci;
 -- show create table module\G
 -- ALTER TABLE  `module` CHANGE  `name`  `name` VARCHAR( 100 ) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL COMMENT  'module name';
+-- ALTER TABLE  `module` CHANGE `version` `version` varchar(50) NOT NULL COMMENT 'module version';
 
 CREATE TABLE IF NOT EXISTS `module_abbreviated` (
  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'primary key',
  `gmt_create` datetime NOT NULL COMMENT 'create time',
  `gmt_modified` datetime NOT NULL COMMENT 'modified time',
  `name` varchar(100) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL COMMENT 'module name',
- `version` varchar(30) NOT NULL COMMENT 'module version',
+ `version` varchar(50) NOT NULL COMMENT 'module version',
  `package` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci COMMENT 'the abbreviated metadata',
  `publish_time` bigint(20) unsigned,
  PRIMARY KEY (`id`),
@@ -100,6 +101,7 @@ CREATE TABLE IF NOT EXISTS `module_abbreviated` (
  KEY `gmt_modified` (`gmt_modified`),
  KEY `publish_time` (`publish_time`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='module abbreviated info';
+-- ALTER TABLE  `module_abbreviated` CHANGE `version` `version` varchar(50) NOT NULL COMMENT 'module version';
 
 CREATE TABLE IF NOT EXISTS `package_readme` (
  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'primary key',
@@ -107,11 +109,12 @@ CREATE TABLE IF NOT EXISTS `package_readme` (
  `gmt_modified` datetime NOT NULL COMMENT 'modified time',
  `name` varchar(100) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL COMMENT 'module name',
  `readme` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci COMMENT 'the latest version readme',
- `version` varchar(30) NOT NULL COMMENT 'module version',
+ `version` varchar(50) NOT NULL COMMENT 'module version',
  PRIMARY KEY (`id`),
  UNIQUE KEY `name` (`name`),
  KEY `gmt_modified` (`gmt_modified`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='package latest readme';
+-- ALTER TABLE  `package_readme` CHANGE `version` `version` varchar(50) NOT NULL COMMENT 'module version';
 
 CREATE TABLE IF NOT EXISTS `module_log` (
  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'primary key',
@@ -131,7 +134,7 @@ CREATE TABLE IF NOT EXISTS `tag` (
  `gmt_modified` datetime NOT NULL COMMENT 'modified time',
  `name` varchar(100) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL COMMENT 'module name',
  `tag` varchar(30) NOT NULL COMMENT 'tag name',
- `version` varchar(30) NOT NULL COMMENT 'module version',
+ `version` varchar(50) NOT NULL COMMENT 'module version',
  `module_id` bigint(20) unsigned NOT NULL COMMENT 'module id',
  PRIMARY KEY (`id`),
  UNIQUE KEY `name` (`name`, `tag`),
@@ -140,6 +143,7 @@ CREATE TABLE IF NOT EXISTS `tag` (
 -- ALTER TABLE  `tag` ADD  `module_id` BIGINT( 20 ) UNSIGNED NOT NULL;
 -- ALTER TABLE  `tag` CHANGE  `name`  `name` VARCHAR( 100 ) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL COMMENT  'module name';
 -- ALTER TABLE `tag` ADD KEY `gmt_modified` (`gmt_modified`);
+-- ALTER TABLE  `tag` CHANGE `version` `version` varchar(50) NOT NULL COMMENT 'module version';
 
 CREATE TABLE IF NOT EXISTS `module_unpublished` (
  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'primary key',
