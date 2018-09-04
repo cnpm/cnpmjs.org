@@ -19,20 +19,20 @@ CREATE TABLE IF NOT EXISTS `tag` (
  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'primary key',
  `gmt_create` datetime NOT NULL COMMENT 'create time',
  `gmt_modified` datetime NOT NULL COMMENT 'modified time',
- `name` varchar(100) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL COMMENT 'module name',
+ `name` varchar(214) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL COMMENT 'module name',
  `tag` varchar(30) NOT NULL COMMENT 'tag name',
  `version` varchar(30) NOT NULL COMMENT 'module version',
  `module_id` bigint(20) unsigned NOT NULL COMMENT 'module id',
  PRIMARY KEY (`id`),
- UNIQUE KEY `tag_name_tag` (`name`, `tag`),
- KEY `tag_gmt_modified` (`gmt_modified`)
+ UNIQUE KEY `uk_name` (`name`, `tag`),
+ KEY `idx_gmt_modified` (`gmt_modified`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='module tag';
  */
 
 module.exports = function (sequelize, DataTypes) {
   return sequelize.define('Tag', {
     name: {
-      type: DataTypes.STRING(100),
+      type: DataTypes.STRING(214),
       allowNull: false,
       comment: 'module name',
     },
@@ -57,10 +57,10 @@ module.exports = function (sequelize, DataTypes) {
     indexes: [
       {
         unique: true,
-        fields: ['name', 'tag']
+        fields: ['name', 'tag'],
       },
       {
-        fields: ['gmt_modified']
+        fields: ['gmt_modified'],
       }
     ],
     classMethods: {

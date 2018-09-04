@@ -16,26 +16,24 @@
 
 /*
 CREATE TABLE IF NOT EXISTS `module` (
-  `id` INTEGER NOT NULL auto_increment ,
-  `author` VARCHAR(100) NOT NULL,
-  `name` VARCHAR(100) NOT NULL,
-  `version` VARCHAR(30) NOT NULL,
-  `description` LONGTEXT,
-  `package` LONGTEXT,
-  `dist_shasum` VARCHAR(100),
-  `dist_tarball` VARCHAR(2048),
-  `dist_size` INTEGER UNSIGNED NOT NULL DEFAULT 0,
-  `publish_time` BIGINT(20) UNSIGNED,
-  `gmt_create` DATETIME NOT NULL,
-  `gmt_modified` DATETIME NOT NULL,
-  PRIMARY KEY (`id`)
-)
-COMMENT 'module info' ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_general_ci;
-
-CREATE UNIQUE INDEX `module_name_version` ON `module` (`name`, `version`);
-CREATE INDEX `module_gmt_modified` ON `module` (`gmt_modified`);
-CREATE INDEX `module_publish_time` ON `module` (`publish_time`);
-CREATE INDEX `module_author` ON `module` (`author`);
+ `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'primary key',
+ `gmt_create` datetime NOT NULL COMMENT 'create time',
+ `gmt_modified` datetime NOT NULL COMMENT 'modified time',
+ `author` varchar(100) NOT NULL COMMENT 'module author',
+ `name` varchar(214) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL COMMENT 'module name',
+ `version` varchar(30) NOT NULL COMMENT 'module version',
+ `description` longtext COMMENT 'module description',
+ `package` longtext CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'package.json',
+ `dist_shasum` varchar(100) DEFAULT NULL COMMENT 'module dist SHASUM',
+ `dist_tarball` varchar(2048) DEFAULT NULL COMMENT 'module dist tarball',
+ `dist_size` int(10) unsigned NOT NULL DEFAULT '0' COMMENT 'module dist size',
+ `publish_time` bigint(20) unsigned COMMENT 'module publish time',
+ PRIMARY KEY (`id`),
+ UNIQUE KEY `uk_name` (`name`,`version`),
+ KEY `idx_gmt_modified` (`gmt_modified`),
+ KEY `idx_publish_time` (`publish_time`),
+ KEY `idx_author` (`author`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='module info';
 */
 
 module.exports = function (sequelize, DataTypes) {
@@ -46,7 +44,7 @@ module.exports = function (sequelize, DataTypes) {
       comment: 'first maintainer name'
     },
     name: {
-      type: DataTypes.STRING(100),
+      type: DataTypes.STRING(214),
       allowNull: false,
       comment: 'module name'
     },
@@ -57,6 +55,7 @@ module.exports = function (sequelize, DataTypes) {
     },
     description: {
       type: DataTypes.LONGTEXT,
+      comment: 'module description',
     },
     package: {
       type: DataTypes.LONGTEXT,
@@ -65,19 +64,23 @@ module.exports = function (sequelize, DataTypes) {
     dist_shasum: {
       type: DataTypes.STRING(100),
       allowNull: true,
+      comment: 'module dist SHASUM',
     },
     dist_tarball: {
       type: DataTypes.STRING(2048),
       allowNull: true,
+      comment: 'module dist tarball',
     },
     dist_size: {
       type: DataTypes.INTEGER,
       allowNull: false,
       defaultValue: 0,
+      comment: 'module dist size',
     },
     publish_time: {
       type: DataTypes.BIGINT(20),
       allowNull: true,
+      comment: 'module publish time',
     }
   }, {
     tableName: 'module',
@@ -85,16 +88,16 @@ module.exports = function (sequelize, DataTypes) {
     indexes: [
       {
         unique: true,
-        fields: ['name', 'version']
+        fields: ['name', 'version'],
       },
       {
-        fields: ['gmt_modified']
+        fields: ['gmt_modified'],
       },
       {
-        fields: ['publish_time']
+        fields: ['publish_time'],
       },
       {
-        fields: ['author']
+        fields: ['author'],
       }
     ],
     classMethods: {

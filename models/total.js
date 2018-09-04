@@ -15,7 +15,7 @@
  */
 
 // CREATE TABLE IF NOT EXISTS `total` (
-//  `name` varchar(100) NOT NULL COMMENT 'total name',
+//  `name` varchar(214) NOT NULL COMMENT 'total name',
 //  `gmt_modified` datetime NOT NULL COMMENT 'modified time',
 //  `module_delete` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT 'module delete count',
 //  `last_sync_time` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT 'last timestamp sync from official registry',
@@ -35,7 +35,7 @@
 module.exports = function (sequelize, DataTypes) {
   return sequelize.define('Total', {
     name: {
-      type: DataTypes.STRING(100),
+      type: DataTypes.STRING(214),
       primaryKey: true,
       comment: 'total name'
     },

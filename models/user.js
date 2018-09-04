@@ -9,17 +9,17 @@ CREATE TABLE IF NOT EXISTS `user` (
  `gmt_create` datetime NOT NULL COMMENT 'create time',
  `gmt_modified` datetime NOT NULL COMMENT 'modified time',
  `name` varchar(100) NOT NULL COMMENT 'user name',
- `salt` varchar(100) NOT NULL,
+ `salt` varchar(100) NOT NULL COMMENT 'user salt',
  `password_sha` varchar(100) NOT NULL COMMENT 'user password hash',
  `ip` varchar(64) NOT NULL COMMENT 'user last request ip',
- `roles` varchar(200) NOT NULL DEFAULT '[]',
- `rev` varchar(40) NOT NULL,
- `email` varchar(400) NOT NULL,
- `json` longtext CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'json details',
+ `roles` varchar(200) NOT NULL DEFAULT '[]' COMMENT 'user roles',
+ `rev` varchar(40) NOT NULL COMMENT 'user rev',
+ `email` varchar(400) NOT NULL COMMENT 'user email',
+ `json` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci COMMENT 'json details',
  `npm_user` tinyint(1) DEFAULT '0' COMMENT 'user sync from npm or not, 1: true, other: false',
  PRIMARY KEY (`id`),
- UNIQUE KEY `user_name` (`name`),
- KEY `user_gmt_modified` (`gmt_modified`)
+ UNIQUE KEY `uk_name` (`name`),
+ KEY `idx_gmt_modified` (`gmt_modified`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='user base info';
 */
 
@@ -33,6 +33,7 @@ module.exports = function (sequelize, DataTypes) {
     salt: {
       type: DataTypes.STRING(100),
       allowNull: false,
+      comment: 'user salt',
     },
     password_sha: {
       type: DataTypes.STRING(100),
@@ -48,14 +49,17 @@ module.exports = function (sequelize, DataTypes) {
       type: DataTypes.STRING(200),
       allowNull: false,
       defaultValue: '[]',
+      comment: 'user roles',
     },
     rev: {
       type: DataTypes.STRING(40),
       allowNull: false,
+      comment: 'user rev',
     },
     email: {
       type: DataTypes.STRING(400),
       allowNull: false,
+      comment: 'user email',
     },
     json: {
       type: DataTypes.LONGTEXT,
@@ -76,10 +80,10 @@ module.exports = function (sequelize, DataTypes) {
     indexes: [
       {
         unique: true,
-        fields: ['name']
+        fields: ['name'],
       },
       {
-        fields: ['gmt_modified']
+        fields: ['gmt_modified'],
       }
     ],
     classMethods: {
