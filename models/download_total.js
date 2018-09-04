@@ -18,7 +18,7 @@
 //  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'primary key',
 //  `gmt_create` datetime NOT NULL COMMENT 'create time',
 //  `gmt_modified` datetime NOT NULL COMMENT 'modified time',
-//  `name` varchar(100) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL COMMENT 'module name',
+//  `name` varchar(214) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL COMMENT 'module name',
 //  `date` int unsigned NOT NULL COMMENT 'YYYYMM format',
 //  `d01` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT '01 download count',
 //  `d02` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT '02 download count',
@@ -52,14 +52,14 @@
 //  `d30` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT '30 download count',
 //  `d31` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT '31 download count',
 //  PRIMARY KEY (`id`),
-//  UNIQUE KEY `name_date` (`name`, `date`)
-//  KEY `date` (`date`)
+//  UNIQUE KEY `uk_name_date` (`name`, `date`),
+//  KEY `idx_date` (`date`)
 // ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='module download total info';
 
 module.exports = function (sequelize, DataTypes) {
   return sequelize.define('DownloadTotal', {
     name: {
-      type: DataTypes.STRING(100),
+      type: DataTypes.STRING(214),
       allowNull: false,
       comment: 'module name',
     },
@@ -260,10 +260,10 @@ module.exports = function (sequelize, DataTypes) {
     indexes: [
       {
         unique: true,
-        fields: ['name', 'date']
+        fields: ['name', 'date'],
       },
       {
-        fields: ['date']
+        fields: ['date'],
       }
     ],
     classMethods: {
