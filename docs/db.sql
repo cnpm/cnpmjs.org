@@ -23,11 +23,7 @@ CREATE TABLE IF NOT EXISTS `user` (
 --   CHANGE `salt` `salt` varchar(100) NOT NULL COMMENT 'user salt',
 --   CHANGE `roles` `roles` varchar(200) NOT NULL DEFAULT '[]' COMMENT 'user roles',
 --   CHANGE `rev` `rev` varchar(40) NOT NULL COMMENT 'user rev',
---   CHANGE `email` `email` varchar(400) NOT NULL COMMENT 'user email',
---   DROP KEY `name`,
---   DROP KEY `gmt_modified`,
---   ADD UNIQUE KEY `uk_name` (`name`),
---   ADD KEY `idx_gmt_modified` (`gmt_modified`);
+--   CHANGE `email` `email` varchar(400) NOT NULL COMMENT 'user email';
 
 CREATE TABLE IF NOT EXISTS `module_keyword` (
  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'primary key',
@@ -41,11 +37,7 @@ CREATE TABLE IF NOT EXISTS `module_keyword` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='module keyword';
 -- ALTER TABLE `module_keyword`
 --   CHANGE `name` `name` varchar(214) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL COMMENT 'module name',
---   CHANGE `description` `description` longtext COMMENT 'module description',
---   DROP KEY `keyword_module_name`,
---   DROP KEY `name`,
---   ADD UNIQUE KEY `uk_keyword_module_name` (`keyword`, `name`),
---   ADD KEY `idx_name` (`name`);
+--   CHANGE `description` `description` longtext COMMENT 'module description';
 
 CREATE TABLE IF NOT EXISTS `module_star` (
  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'primary key',
@@ -57,11 +49,7 @@ CREATE TABLE IF NOT EXISTS `module_star` (
  KEY `idx_name` (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='module star';
 -- ALTER TABLE `module_star`
---   CHANGE `name` `name` varchar(214) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL COMMENT 'module name',
---   DROP KEY `user_module_name`,
---   DROP KEY `name`,
---   ADD UNIQUE KEY `uk_user_module_name` (`user`, `name`),
---   ADD KEY `idx_name` (`name`);
+--   CHANGE `name` `name` varchar(214) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL COMMENT 'module name';
 
 CREATE TABLE IF NOT EXISTS `module_maintainer` (
  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'primary key',
@@ -73,11 +61,7 @@ CREATE TABLE IF NOT EXISTS `module_maintainer` (
  KEY `idx_name` (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='private module maintainers';
 -- ALTER TABLE `module_maintainer`
---   CHANGE `name` `name` varchar(214) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL COMMENT 'module name',
---   DROP KEY `user_module_name`,
---   DROP KEY `name`,
---   ADD UNIQUE KEY `uk_user_module_name` (`user`, `name`),
---   ADD KEY `idx_name` (`name`);
+--   CHANGE `name` `name` varchar(214) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL COMMENT 'module name';
 
 CREATE TABLE IF NOT EXISTS `npm_module_maintainer` (
  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'primary key',
@@ -89,11 +73,7 @@ CREATE TABLE IF NOT EXISTS `npm_module_maintainer` (
  KEY `idx_name` (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='npm original module maintainers';
 -- ALTER TABLE `npm_module_maintainer`
---   CHANGE `name` `name` varchar(214) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL COMMENT 'module name',
---   DROP KEY `user_module_name`,
---   DROP KEY `name`,
---   ADD UNIQUE KEY `uk_user_module_name` (`user`, `name`),
---   ADD KEY `idx_name` (`name`);
+--   CHANGE `name` `name` varchar(214) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL COMMENT 'module name';
 
 CREATE TABLE IF NOT EXISTS `module` (
  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'primary key',
@@ -129,15 +109,7 @@ CREATE TABLE IF NOT EXISTS `module` (
 --   CHANGE `dist_shasum` `dist_shasum` varchar(100) DEFAULT NULL COMMENT 'module dist SHASUM',
 --   CHANGE `dist_tarball` `dist_tarball` varchar(2048) DEFAULT NULL COMMENT 'module dist tarball',
 --   CHANGE `dist_size` `dist_size` int(10) unsigned NOT NULL DEFAULT '0' COMMENT 'module dist size',
---   CHANGE `publish_time` `publish_time` bigint(20) unsigned COMMENT 'module publish time',
---   DROP KEY `gmt_modified`,
---   DROP KEY `name`,
---   DROP KEY `publish_time`,
---   DROP KEY `author`,
---   ADD UNIQUE KEY `uk_name` (`name`, `version`),
---   ADD KEY `idx_gmt_modified` (`gmt_modified`),
---   ADD KEY `idx_publish_time` (`publish_time`),
---   ADD KEY `idx_author` (`author`);
+--   CHANGE `publish_time` `publish_time` bigint(20) unsigned COMMENT 'module publish time';
 
 CREATE TABLE IF NOT EXISTS `module_abbreviated` (
  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'primary key',
@@ -154,13 +126,7 @@ CREATE TABLE IF NOT EXISTS `module_abbreviated` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='module abbreviated info';
 -- ALTER TABLE `module_abbreviated`
 --   CHANGE `name` `name` varchar(214) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL COMMENT 'module name',
---   CHANGE `publish_time` `publish_time` bigint(20) unsigned COMMENT 'the publish time',
---   DROP KEY `name`,
---   DROP KEY `gmt_modified`,
---   DROP KEY `publish_time`,
---   ADD UNIQUE KEY `uk_name` (`name`, `version`),
---   ADD KEY `idx_gmt_modified` (`gmt_modified`),
---   ADD KEY `idx_publish_time` (`publish_time`);
+--   CHANGE `publish_time` `publish_time` bigint(20) unsigned COMMENT 'the publish time';
 
 CREATE TABLE IF NOT EXISTS `package_readme` (
  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'primary key',
@@ -174,11 +140,7 @@ CREATE TABLE IF NOT EXISTS `package_readme` (
  KEY `idx_gmt_modified` (`gmt_modified`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='package latest readme';
 -- ALTER TABLE `package_readme`
---   CHANGE `name` `name` varchar(214) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL COMMENT 'module name',
---   DROP KEY `name`,
---   DROP KEY `gmt_modified`,
---   ADD UNIQUE KEY `uk_name` (`name`),
---   ADD KEY `idx_gmt_modified` (`gmt_modified`);
+--   CHANGE `name` `name` varchar(214) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL COMMENT 'module name';
 
 CREATE TABLE IF NOT EXISTS `module_log` (
  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'primary key',
@@ -194,9 +156,7 @@ CREATE TABLE IF NOT EXISTS `module_log` (
 -- ALTER TABLE `module_log`
 --   CHANGE `username` `username` varchar(100) NOT NULL COMMENT 'which username',
 --   CHANGE `name` `name` varchar(214) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL COMMENT 'module name',
---   CHANGE `log` `log` longtext COMMENT 'the raw log',
---   DROP KEY `name`,
---   ADD KEY `idx_name` (`name`);
+--   CHANGE `log` `log` longtext COMMENT 'the raw log';
 
 CREATE TABLE IF NOT EXISTS `tag` (
  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'primary key',
@@ -214,11 +174,7 @@ CREATE TABLE IF NOT EXISTS `tag` (
 -- ALTER TABLE  `tag` CHANGE  `name`  `name` VARCHAR( 100 ) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL COMMENT  'module name';
 -- ALTER TABLE `tag` ADD KEY `gmt_modified` (`gmt_modified`);
 -- ALTER TABLE `tag`
---   CHANGE `name` `name` varchar(214) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL COMMENT 'module name',
---   DROP KEY `name`,
---   DROP KEY `gmt_modified`,
---   ADD UNIQUE KEY `uk_name` (`name`, `tag`),
---   ADD KEY `idx_gmt_modified` (`gmt_modified`);
+--   CHANGE `name` `name` varchar(214) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL COMMENT 'module name';
 
 CREATE TABLE IF NOT EXISTS `module_unpublished` (
  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'primary key',
@@ -231,11 +187,7 @@ CREATE TABLE IF NOT EXISTS `module_unpublished` (
  KEY `idx_gmt_modified` (`gmt_modified`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='module unpublished info';
 -- ALTER TABLE `module_unpublished`
---   CHANGE `name` `name` varchar(214) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL COMMENT 'module name',
---   DROP KEY `name`,
---   DROP KEY `gmt_modified`,
---   ADD UNIQUE KEY `uk_name` (`name`),
---   ADD KEY `idx_gmt_modified` (`gmt_modified`);
+--   CHANGE `name` `name` varchar(214) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL COMMENT 'module name';
 
 CREATE TABLE IF NOT EXISTS `total` (
  `name` varchar(214) NOT NULL COMMENT 'total name',
@@ -319,11 +271,7 @@ CREATE TABLE IF NOT EXISTS `downloads` (
   KEY `idx_date` (`date`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='module download total info';
 -- ALTER TABLE `downloads`
---   CHANGE `name` `name` varchar(214) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL COMMENT 'module name',
---   DROP KEY `name_date`,
---   DROP KEY `date`,
---   ADD UNIQUE KEY `uk_name_date` (`name`, `date`),
---   ADD KEY `idx_date` (`date`);
+--   CHANGE `name` `name` varchar(214) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL COMMENT 'module name';
 
 CREATE TABLE IF NOT EXISTS `module_deps` (
  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'primary key',
@@ -336,11 +284,7 @@ CREATE TABLE IF NOT EXISTS `module_deps` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='module deps';
 -- ALTER TABLE `module_deps`
 --   CHANGE `name` `name` varchar(214) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL COMMENT 'module name',
---   CHANGE `deps` `deps` varchar(214) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL COMMENT 'which module depend on this module',
---   DROP KEY `name_deps`,
---   DROP KEY `name`,
---   ADD UNIQUE KEY `uk_name_deps` (`name`, `deps`),
---   ADD KEY `idx_name` (`name`);
+--   CHANGE `deps` `deps` varchar(214) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL COMMENT 'which module depend on this module';
 
 CREATE TABLE IF NOT EXISTS `dist_dir` (
  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'primary key',
@@ -355,11 +299,7 @@ CREATE TABLE IF NOT EXISTS `dist_dir` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='dist dir info';
 -- ALTER TABLE `dist_dir`
 --   CHANGE `name` `name` varchar(214) NOT NULL COMMENT 'dir name',
---   CHANGE `parent` `parent` varchar(214) NOT NULL COMMENT 'parent dir' DEFAULT '/',
---   DROP KEY `name`,
---   DROP KEY `gmt_modified`,
---   ADD UNIQUE KEY `uk_name` (`parent`, `name`),
---   ADD KEY `idx_gmt_modified` (`gmt_modified`);
+--   CHANGE `parent` `parent` varchar(214) NOT NULL COMMENT 'parent dir' DEFAULT '/';
 
 CREATE TABLE IF NOT EXISTS `dist_file` (
  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'primary key',
@@ -377,8 +317,4 @@ CREATE TABLE IF NOT EXISTS `dist_file` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='dist file info';
 -- ALTER TABLE `dist_file`
 --   CHANGE `name` `name` varchar(214) NOT NULL COMMENT 'file name',
---   CHANGE `parent` `parent` varchar(214) NOT NULL COMMENT 'parent dir' DEFAULT '/',
---   DROP KEY `fullname`,
---   DROP KEY `gmt_modified`,
---   ADD UNIQUE KEY `uk_fullname` (`parent`, `name`),
---   ADD KEY `idx_gmt_modified` (`gmt_modified`);
+--   CHANGE `parent` `parent` varchar(214) NOT NULL COMMENT 'parent dir' DEFAULT '/';
