@@ -100,6 +100,7 @@ SyncModuleWorker.prototype.log = function () {
   }
 };
 
+// isEnd will be set to true when sync process success or error
 SyncModuleWorker.prototype._saveLog = function (isEnd) {
   var that = this;
   if (that._loging && !isEnd) {
