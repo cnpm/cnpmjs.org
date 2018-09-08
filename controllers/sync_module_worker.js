@@ -113,11 +113,9 @@ SyncModuleWorker.prototype._saveLog = function () {
       that._saveLog();
     }
   }).catch(function (err) {
-    logger.error(err);
     that._loging = false;
-    if (that._log) {
-      that._saveLog();
-    }
+    logger.error(err);
+    // ignore the unsave log
   });
 };
 
