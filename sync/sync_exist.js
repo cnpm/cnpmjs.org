@@ -25,7 +25,6 @@ function intersection(arrOne, arrTwo) {
 }
 
 module.exports = function* sync() {
-  return;
   var syncTime = Date.now();
 
   var r = yield [packageService.listAllPublicModuleNames(), totalService.getTotalInfo()];
