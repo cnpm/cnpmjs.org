@@ -12,7 +12,7 @@ var webApp = require('../../servers/web');
 var utils = require('../utils');
 var config = require('../../config');
 
-describe.only('test/controllers/sync.test.js', () => {
+describe('test/controllers/sync.test.js', () => {
   afterEach(mm.restore);
 
   var fixtures = path.join((path.dirname(__dirname)), 'fixtures');
