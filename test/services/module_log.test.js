@@ -29,10 +29,20 @@ describe('test/services/module_log.test.js', () => {
       var log = yield ModuleLog.create({name: 'module_log-append', username: 'fengmk2'});
       var logid = log.id;
 
-      var biglog = Buffer.alloc(50 * 1024).fill(71).toString();
+      var biglog = Buffer.alloc(50 * 1024 + 1).fill(71).toString();
       log = yield ModuleLog.append(logid, biglog);
       log.log.substring(0, 4).should.equal('...\n');
       log.log.length.should.equal(50 * 1024 + 4);
+    });
+
+    it('should slice log when size equal 50kb', function* () {
+      var log = yield ModuleLog.create({name: 'module_log-append', username: 'fengmk2'});
+      var logid = log.id;
+
+      var biglog = Buffer.alloc(50 * 1024).fill(71).toString();
+      log = yield ModuleLog.append(logid, biglog);
+      log.log.substring(0, 4).should.equal('GGGG');
+      log.log.length.should.equal(50 * 1024);
     });
   });
 });

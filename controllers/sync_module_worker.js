@@ -102,7 +102,7 @@ SyncModuleWorker.prototype.log = function () {
 
 SyncModuleWorker.prototype._saveLog = function (isEnd) {
   var that = this;
-  if (that._loging) {
+  if (that._loging && !isEnd) {
     return;
   }
   that._loging = true;
