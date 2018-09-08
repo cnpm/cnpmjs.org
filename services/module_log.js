@@ -29,7 +29,7 @@ exports.append = function* (id, log) {
   } else {
     row.log = log;
   }
-  if (row.log.length >= ONE_MB) {
+  if (row.log.length >= MAX_LEN) {
     // only keep the last 50kb log string
     row.log = '...\n' + row.log.substring(row.log.length - MAX_LEN);
   }
