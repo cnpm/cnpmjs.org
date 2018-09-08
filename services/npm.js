@@ -153,11 +153,23 @@ exports.getAllToday = function* (timeout) {
 };
 
 exports.getShort = function* (timeout) {
+  const registry = config.sourceNpmRegistryIsCNpm ? config.sourceNpmRegistry : 'https://r.cnpmjs.org';
   var r = yield request('/-/short', {
     timeout: timeout || 300000,
     // registry.npmjs.org/-/short is 404 now therefore have a fallback
-    registry: config.sourceNpmRegistryIsCNpm ? config.sourceNpmRegistry : 'http://r.cnpmjs.org',
+    registry: registry,
   });
+  if (r.status !== 200) {
+    const data = r.data;
+    if (data && data.code && data.message) {
+      // { code: 'MethodNotAllowedError', message: 'GET is not allowed' }
+      const url = registry + '/-/short';
+      const err = new Error(data.message + ', url: ' + url);
+      err.name = data.code;
+      err.url = url;
+      throw err;
+    }
+  }
   return r.data;
 };
 

@@ -94,7 +94,7 @@ describe('test/controllers/sync.test.js', () => {
       .get('/pedding/sync/log/' + logIdRegistry)
       .expect(200, function (err, res) {
         should.not.exist(err);
-        res.body.should.have.keys('ok', 'log');
+        res.body.should.have.keys('ok', 'log', 'syncDone');
         done();
       });
 
@@ -102,7 +102,7 @@ describe('test/controllers/sync.test.js', () => {
       .get('/sync/pedding/log/' + logIdWeb + '?offset=1')
       .expect(200, function (err, res) {
         should.not.exist(err);
-        res.body.should.have.keys('ok', 'log');
+        res.body.should.have.keys('ok', 'log', 'syncDone');
         done();
       });
     });
@@ -131,8 +131,8 @@ describe('test/controllers/sync.test.js', () => {
         .get('/pedding/sync/log/' + logIdRegistry2)
         .expect(200, function (err, res) {
           should.not.exist(err);
-          res.body.should.have.keys('ok', 'log');
-          res.body.log.should.containEql(', syncUpstreamFirst: true');
+          res.body.should.have.keys('ok', 'log', 'syncDone');
+          // res.body.log.should.containEql(', syncUpstreamFirst: true');
           done();
         });
 
@@ -140,7 +140,7 @@ describe('test/controllers/sync.test.js', () => {
         .get('/sync/pedding/log/' + logIdRegistry2 + '?offset=1')
         .expect(200, function (err, res) {
           should.not.exist(err);
-          res.body.should.have.keys('ok', 'log');
+          res.body.should.have.keys('ok', 'log', 'syncDone');
           done();
         });
       }, 3000);

@@ -51,41 +51,38 @@
     $notify.html('<div class="ant-alert ant-alert-error">Sync request error.</div>');
   }
 
-  var offset = 0;
-  var logs = '';
   var syncDone = false;
   var hasFail = false;
   function getSyncLog(id) {
     $.ajax({
-      url: resourceURL + '/log/' + id + '?offset=' + offset,
+      url: resourceURL + '/log/' + id,
       type: 'GET',
       dataType: 'json',
       success: function (data) {
-        if (!data.ok || !data.log) {
+        if (!data.ok) {
           return;
         }
-        offset += data.log.split('\n').length;
-        logs = logs + '\n' + data.log;
-
-        if (data.log.indexOf('[done] Sync') >= 0) {
-          syncDone = true;
-        }
-        if (data.log.indexOf('Fail: [') >= 0) {
-          var failInfo = data.log.match(/Fail: \[ (.*?) \]/);
+        syncDone = data.syncDone;
+        var log = data.log || '';
+        if (log.indexOf('Fail: [') >= 0) {
+          var failInfo = log.match(/Fail: \[ (.*?) \]/);
           if (failInfo && failInfo[1]) {
             hasFail = true;
           }
         }
         if (syncDone) {
-          logs += '\nSync ' + name + ' complete!';
+          log += '\nSync ' + name + ' complete!';
           if (hasFail) {
-            logs += ' But some packages sync failed, you can refresh to sync again.';
+            log += ' But some packages sync failed, you can refresh to sync again.';
             location.hash = '';
+            $notify.html('<div class="ant-alert ant-alert-error">Sync failed.</div>');
+          } else {
+            $notify.html('<div class="ant-alert ant-alert-success">Sync success.</div>');
           }
           clearInterval(timer);
         }
-        $log.html(logs);
+        $log.html(log);
       }
-    })
+    });
   }
 </script>

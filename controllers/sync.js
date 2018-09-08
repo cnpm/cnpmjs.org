@@ -63,8 +63,14 @@ exports.getSyncLog = function* (next) {
   }
 
   var log = row.log.trim();
+  var syncDone = row.log.indexOf('[done] Sync') >= 0;
   if (offset > 0) {
     log = log.split('\n').slice(offset).join('\n');
+    if (!log && syncDone) {
+      // append the last 1k string
+      // the cnpm client sync need the `[done] Sync {name}` string to detect when sync task finished
+      log = '... ignore long logs ...\n' + row.log.substring(row.log.length - 1024);
+    }
   }
-  this.body = {ok: true, log: log};
+  this.body = { ok: true, syncDone: syncDone, log: log };
 };

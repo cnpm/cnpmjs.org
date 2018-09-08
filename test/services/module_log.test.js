@@ -31,8 +31,8 @@ describe('test/services/module_log.test.js', () => {
 
       var biglog = Buffer.alloc(50 * 1024 + 1).fill(71).toString();
       log = yield ModuleLog.append(logid, biglog);
-      log.log.substring(0, 4).should.equal('...\n');
-      log.log.length.should.equal(50 * 1024 + 4);
+      log.log.substring(1023, 1024 + 27).should.equal('G\n... ignore long logs ...\nG');
+      log.log.length.should.equal(50 * 1024 + 26 + 1024);
     });
 
     it('should slice log when size equal 50kb', function* () {
