@@ -37,6 +37,7 @@ function SyncModuleWorker(options) {
   this._logId = options.logId;
   this._log = '';
   this._loging = false;
+  this._isEnd = false;
   if (!Array.isArray(options.name)) {
     options.name = [options.name];
   }
@@ -78,6 +79,8 @@ SyncModuleWorker.prototype.finish = function () {
     this.type,
     this.successes.length, this.fails.length,
     this.successes.join(', '), this.fails.join(', '));
+  this._saveLog();
+  this._isEnd = true;
   this.emit('end');
   // make sure all event listeners release
   this.removeAllListeners();
@@ -100,10 +103,9 @@ SyncModuleWorker.prototype.log = function () {
   }
 };
 
-// isEnd will be set to true when sync process success or error
-SyncModuleWorker.prototype._saveLog = function (isEnd) {
+SyncModuleWorker.prototype._saveLog = function () {
   var that = this;
-  if (that._loging && !isEnd) {
+  if (that._loging || this._isEnd) {
     return;
   }
   that._loging = true;
@@ -119,14 +121,14 @@ SyncModuleWorker.prototype._saveLog = function (isEnd) {
     yield logService.append(that._logId, logstr);
   }).then(function () {
     that._loging = false;
-    if (isEnd && that._log) {
+    if (that._log) {
       that._saveLog();
     }
   }).catch(function (err) {
     that._loging = false;
     logger.error(err);
     // ignore the unsave log
-    if (isEnd) {
+    if (this._isEnd) {
       logger.error('[SyncModuleWorker] skip to save %s logstr: %s', that._logId, logstr);
     }
   });
@@ -149,7 +151,8 @@ SyncModuleWorker.prototype.start = function () {
 
     if (that.type === 'user') {
       yield that.syncUser();
-      that._saveLog(true);
+      that._saveLog();
+      that._isEnd = true;
       return;
     }
 
@@ -158,10 +161,10 @@ SyncModuleWorker.prototype.start = function () {
       arr.push(that.next(i));
     }
     yield arr;
-    that._saveLog(true);
+    that._saveLog();
   }).catch(function (err) {
     logger.error(err);
-    that._saveLog(true);
+    that._saveLog();
   });
 };
 
@@ -253,17 +256,12 @@ SyncModuleWorker.prototype.syncUpstream = function* (name) {
     }
 
     var data = rs.data;
-    var syncDone = false;
-    if (data.log && data.log.indexOf('[done] Sync') >= 0) {
-      syncDone = true;
-      data.log = data.log.replace('[done] Sync', '[Upstream done] Sync');
-    }
-
     if (data.log) {
+      data.log = data.log.replace('[done] Sync', '[Upstream done] Sync');
       this.log(data.log);
     }
 
-    if (syncDone) {
+    if (data.syncDone) {
       break;
     }
 
@@ -297,15 +295,15 @@ SyncModuleWorker.prototype.syncUser = function* () {
 };
 
 SyncModuleWorker.prototype.next = function* (concurrencyId) {
+  var name = this.names.shift();
+  if (!name) {
+    return setImmediate(this.finish.bind(this));
+  }
+
   if (config.syncModel === 'none') {
     this.log('[c#%d] [%s] syncModel is none, ignore',
       concurrencyId, name);
     return this.finish();
-  }
-
-  var name = this.names.shift();
-  if (!name) {
-    return setImmediate(this.finish.bind(this));
   }
 
   // try to sync from official replicate when source npm registry is not cnpmjs.org

@@ -324,6 +324,8 @@ exports.saveModule = function* (mod) {
 };
 
 exports.listModuleAbbreviatedsByName = function* (name) {
+  if (!config.enableAbbreviatedMetadata) return [];
+
   var rows = yield models.ModuleAbbreviated.findAll({
     where: {
       name: name,

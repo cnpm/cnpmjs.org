@@ -30,8 +30,8 @@ exports.append = function* (id, log) {
     row.log = log;
   }
   if (row.log.length > MAX_LEN) {
-    // only keep the last 50kb log string
-    row.log = '...\n' + row.log.substring(row.log.length - MAX_LEN);
+    // only keep the fisrt 1kb and the last 50kb log string
+    row.log = row.log.substring(0, 1024) + '\n... ignore long logs ...\n' + row.log.substring(row.log.length - MAX_LEN);
   }
   return yield row.save(['log']);
 };
