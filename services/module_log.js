@@ -12,8 +12,8 @@ exports.create = function* (data) {
   return yield row.save();
 };
 
-var ONE_MB = 1024 * 1024;
-
+// 50kb
+var MAX_LEN = 50 * 1024;
 exports.append = function* (id, log) {
   if (!log) {
     return null;
@@ -29,8 +29,9 @@ exports.append = function* (id, log) {
   } else {
     row.log = log;
   }
-  if (row.log.length >= ONE_MB) {
-    row.log = '...\n' + row.log.substring(ONE_MB / 2);
+  if (row.log.length > MAX_LEN) {
+    // only keep the last 50kb log string
+    row.log = '...\n' + row.log.substring(row.log.length - MAX_LEN);
   }
   return yield row.save(['log']);
 };

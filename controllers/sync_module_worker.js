@@ -83,6 +83,7 @@ SyncModuleWorker.prototype.finish = function () {
   this.removeAllListeners();
 };
 
+var MAX_LEN = 10 * 1024;
 // log(format, arg1, arg2, ...)
 SyncModuleWorker.prototype.log = function () {
   var str = '[' + utility.YYYYMMDDHHmmss() + '] ' + util.format.apply(util, arguments);
@@ -93,43 +94,54 @@ SyncModuleWorker.prototype.log = function () {
       this._log += '\n';
     }
     this._log += str;
-    this._saveLog();
+    if (this._log.length >= MAX_LEN) {
+      this._saveLog();
+    }
   }
 };
 
-SyncModuleWorker.prototype._saveLog = function () {
+// isEnd will be set to true when sync process success or error
+SyncModuleWorker.prototype._saveLog = function (isEnd) {
   var that = this;
-  if (that._loging) {
+  if (that._loging && !isEnd) {
     return;
   }
   that._loging = true;
   var logstr = that._log;
   that._log = '';
+
+  if (!logstr) {
+    that._loging = false;
+    return;
+  }
+
   co(function* () {
     yield logService.append(that._logId, logstr);
   }).then(function () {
     that._loging = false;
-    if (that._log) {
+    if (isEnd && that._log) {
       that._saveLog();
     }
   }).catch(function (err) {
-    logger.error(err);
     that._loging = false;
-    if (that._log) {
-      that._saveLog();
+    logger.error(err);
+    // ignore the unsave log
+    if (isEnd) {
+      logger.error('[SyncModuleWorker] skip to save %s logstr: %s', that._logId, logstr);
     }
   });
 };
 
 SyncModuleWorker.prototype.start = function () {
-  this.log('user: %s, sync %s worker start, %d concurrency, nodeps: %s, publish: %s, syncUpstreamFirst: %s',
-    this.username, this.names[0], this.concurrency, this.noDep, this._publish, this.syncUpstreamFirst);
   var that = this;
+  that.log('user: %s, sync %s worker start, %d concurrency, nodeps: %s, publish: %s, syncUpstreamFirst: %s',
+    that.username, that.names[0], that.concurrency, that.noDep, that._publish, that.syncUpstreamFirst);
   co(function* () {
     // sync upstream
     if (that.syncUpstreamFirst) {
       try {
         yield that.syncUpstream(that.startName);
+        that._saveLog();
       } catch (err) {
         logger.error(err);
       }
@@ -137,6 +149,7 @@ SyncModuleWorker.prototype.start = function () {
 
     if (that.type === 'user') {
       yield that.syncUser();
+      that._saveLog(true);
       return;
     }
 
@@ -145,8 +158,10 @@ SyncModuleWorker.prototype.start = function () {
       arr.push(that.next(i));
     }
     yield arr;
+    that._saveLog(true);
   }).catch(function (err) {
     logger.error(err);
+    that._saveLog(true);
   });
 };
 
