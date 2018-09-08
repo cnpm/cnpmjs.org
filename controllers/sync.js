@@ -63,7 +63,7 @@ exports.getSyncLog = function* (next) {
   }
 
   var log = row.log.trim();
-  var syncDone = row.log.indexOf('[done] Sync') >= 0
+  var syncDone = row.log.indexOf('[done] Sync') >= 0;
   if (offset > 0) {
     log = log.split('\n').slice(offset).join('\n');
     if (!log && syncDone) {
