@@ -141,6 +141,7 @@ SyncModuleWorker.prototype.start = function () {
     if (that.syncUpstreamFirst) {
       try {
         yield that.syncUpstream(that.startName);
+        that._saveLog();
       } catch (err) {
         logger.error(err);
       }
@@ -148,6 +149,7 @@ SyncModuleWorker.prototype.start = function () {
 
     if (that.type === 'user') {
       yield that.syncUser();
+      that._saveLog(true);
       return;
     }
 
