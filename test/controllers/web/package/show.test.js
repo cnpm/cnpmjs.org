@@ -76,6 +76,16 @@ describe('test/controllers/web/package/show.test.js', () => {
       .expect(/Downloads/, done);
     });
 
+    it('should 200 when get by version on /:name/v/:version', function (done) {
+      request(app)
+      .get('/package/@cnpmtest/testmodule-web-show/v/0.0.1')
+      .expect(200)
+      .expect(/testmodule-web-show/)
+      .expect(/Maintainers/)
+      .expect(/Dependencies/)
+      .expect(/Downloads/, done);
+    });
+
     it('should 200 when get by tag', function (done) {
       request(app)
       .get('/package/@cnpmtest/testmodule-web-show/latest')

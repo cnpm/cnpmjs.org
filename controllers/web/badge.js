@@ -11,7 +11,13 @@ exports.version = function* () {
   var version = 'invalid';
   var name = this.params[0];
   var tag = this.query.tag || 'latest';
-  var info = yield packageService.getModuleByTag(name, tag);
+  var version = this.query.version;
+  let info;
+  if (version) {
+    info = yield packageService.getModule(name, version);
+  } else {
+    info = yield packageService.getModuleByTag(name, tag);
+  }
   if (info) {
     version = info.version;
     if (/^0\.0\./.test(version)) {
