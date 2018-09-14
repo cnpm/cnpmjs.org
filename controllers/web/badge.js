@@ -1,13 +1,11 @@
 'use strict';
 
-var utility = require('utility');
-var util = require('util');
 var config = require('../../config');
 var packageService = require('../../services/package');
 var DownloadTotal = require('../../services/download_total');
 
 exports.version = function* () {
-  var color = 'lightgrey';
+  var color = 'grey';
   var name = this.params[0];
   var tag = this.query.tag || 'latest';
   var version = this.query.version;
@@ -31,17 +29,15 @@ exports.version = function* () {
     }
   }
 
-  var subject = config.badgeSubject.replace(/\-/g, '--');
+  var subject = config.badgeSubject;
   if (this.query.subject) {
-    subject = this.query.subject.replace(/\-/g, '--');
+    subject = this.query.subject;
   }
   if (!version) {
     version = 'invalid';
   }
-  version = version.replace(/\-/g, '--');
   var style = this.query.style || 'flat-square';
-  var url = util.format(config.badgePrefixURL + '/%s-%s-%s.svg?style=%s',
-    utility.encodeURIComponent(subject), version, color, utility.encodeURIComponent(style));
+  var url = config.badgeService.url(subject, version, { color, style });
   this.redirect(url);
 };
 
@@ -49,8 +45,7 @@ exports.downloads = function* () {
   // https://dn-img-shields-io.qbox.me/badge/downloads-100k/month-brightgreen.svg?style=flat-square
   var name = this.params[0];
   var count = yield DownloadTotal.getTotalByName(name);
-  var style = this.query.style || 'flat-square';
-  var url = util.format(config.badgePrefixURL + '/downloads-%s-brightgreen.svg?style=%s',
-    count, utility.encodeURIComponent(style));
+  var style = this.query.style;
+  var url = config.badgeService.url('downloads', count, { style });
   this.redirect(url);
 };

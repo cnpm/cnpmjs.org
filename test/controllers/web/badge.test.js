@@ -22,7 +22,7 @@ describe('test/controllers/web/badge.test.js', function () {
         should.not.exists(err);
         request(app)
         .get('/badge/v/@cnpmtest/badge-test-module.svg?style=flat-square')
-        .expect('Location', config.badgePrefixURL + '/cnpm-1.0.1-blue.svg?style=flat-square')
+        .expect('Location', 'https://badgen.net/badge/cnpm/1.0.1/blue')
         .expect(302, done);
       });
     });
@@ -37,7 +37,7 @@ describe('test/controllers/web/badge.test.js', function () {
         should.not.exists(err);
         request(app)
         .get('/badge/v/@cnpmtest/badge-test-module.svg?style=flat-square&version=1.0.0')
-        .expect('Location', config.badgePrefixURL + '/cnpm-1.0.0-blue.svg?style=flat-square')
+        .expect('Location', 'https://badgen.net/badge/cnpm/1.0.0/blue')
         .expect(302, done);
       });
     });
@@ -52,7 +52,7 @@ describe('test/controllers/web/badge.test.js', function () {
         should.not.exists(err);
         request(app)
         .get('/badge/v/@cnpmtest/badge-test-module.svg?style=flat-square&tag=v2')
-        .expect('Location', config.badgePrefixURL + '/cnpm-2.0.1-blue.svg?style=flat-square')
+        .expect('Location', 'https://badgen.net/badge/cnpm/2.0.1/blue')
         .expect(302, done);
       });
     });
@@ -67,7 +67,7 @@ describe('test/controllers/web/badge.test.js', function () {
         should.not.exists(err);
         request(app)
         .get('/badge/v/@cnpmtest/badge-test-module.svg?style=flat-square&tag=v3&subject=ant-design')
-        .expect('Location', config.badgePrefixURL + '/ant--design-3.0.1-blue.svg?style=flat-square')
+        .expect('Location', 'https://badgen.net/badge/ant-design/3.0.1/blue')
         .expect(302, done);
       });
     });
@@ -82,7 +82,7 @@ describe('test/controllers/web/badge.test.js', function () {
         should.not.exists(err);
         request(app)
         .get('/badge/v/@cnpmtest/badge-test-module.svg?style=flat-square')
-        .expect('Location', config.badgePrefixURL + '/cnpm-1.0.0--beta1-blue.svg?style=flat-square')
+        .expect('Location', 'https://badgen.net/badge/cnpm/1.0.0-beta1/blue')
         .expect(302, done);
       });
     });
@@ -96,8 +96,8 @@ describe('test/controllers/web/badge.test.js', function () {
       .end(function (err) {
         should.not.exists(err);
         request(app)
-        .get('/badge/v/@cnpmtest/badge-test-module.svg?style=flat-square')
-        .expect('Location', config.badgePrefixURL + '/cnpm-0.1.0-green.svg?style=flat-square')
+        .get('/badge/v/@cnpmtest/badge-test-module.svg')
+        .expect('Location', 'https://badgen.net/badge/cnpm/0.1.0/green')
         .expect(302, done);
       });
     });
@@ -112,7 +112,7 @@ describe('test/controllers/web/badge.test.js', function () {
         should.not.exists(err);
         request(app)
         .get('/badge/v/@cnpmtest/badge-test-module.svg?style=flat-square')
-        .expect('Location', config.badgePrefixURL + '/cnpm-0.0.0-red.svg?style=flat-square')
+        .expect('Location', 'https://badgen.net/badge/cnpm/0.0.0/red')
         .expect(302, done);
       });
     });
@@ -120,7 +120,7 @@ describe('test/controllers/web/badge.test.js', function () {
     it('should show invalid when package not exists', function (done) {
       request(app)
       .get('/badge/v/@cnpmtest/badge-test-module-not-exists.svg?style=flat')
-      .expect('Location', config.badgePrefixURL + '/cnpm-invalid-lightgrey.svg?style=flat')
+      .expect('Location', 'https://badgen.net/badge/cnpm/invalid/grey')
       .expect(302, done);
     });
   });
@@ -135,8 +135,8 @@ describe('test/controllers/web/badge.test.js', function () {
       .end(function (err) {
         should.not.exists(err);
         request(app)
-        .get('/badge/d/@cnpmtest/badge-download-module.svg?style=flat-square')
-        .expect('Location', config.badgePrefixURL + '/downloads-0-brightgreen.svg?style=flat-square')
+        .get('/badge/d/@cnpmtest/badge-download-module.svg')
+        .expect('Location', 'https://badgen.net/badge/downloads/0')
         .expect(302, done);
       });
     });

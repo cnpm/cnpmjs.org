@@ -140,7 +140,7 @@ describe('test/controllers/web/package/show.test.js', () => {
       .get('/package/@cnpmtest/xss-test-ut')
       .expect(200, function (err, res) {
         should.not.exist(err);
-        res.text.should.not.containEql('<script>alert(1)</script>');
+        res.text.should.not.containEql('<script>alert(1)<\/script>');
         res.text.should.not.containEql('alert(2)"');
         done();
       });
@@ -161,7 +161,7 @@ describe('test/controllers/web/package/show.test.js', () => {
         // https://github.com/cnpm/cnpmjs.org/issues/497
         .expect(/by <a href="\/\~fengmk2">fengmk2<\/a>/)
         // snyk link
-        .expect(/<a class="badge-link" href="https:\/\/snyk\.io\/test\/npm\/pedding" target="_blank"><img title="Known Vulnerabilities" src="https:\/\/snyk\.io\/test\/npm\/pedding\/badge\.svg\?style=flat-square"><\/a>/)
+        .expect(/<a class="badge-link" href="https:\/\/snyk\.io\/test\/npm\/pedding" target="_blank"><img title="Known Vulnerabilities" src="https:\/\/snyk\.io\/test\/npm\/pedding\/badge\.svg"><\/a>/)
         .expect(/pedding/);
     });
   });
