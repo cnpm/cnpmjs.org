@@ -15,6 +15,7 @@
       <% } %>
       <div class="pack-ver">
         <img title="<%= package.version %>" src="/badge/v/<%= package.name %>.svg?version=<%= package.version %>">
+        <img src="/badge/d/<%= package.name %>.svg">
         <% if (package.engines) { %>
           <% for (var k in package.engines) {
             var engine = package.engines[k];
