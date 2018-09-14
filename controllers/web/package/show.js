@@ -66,16 +66,40 @@ module.exports = function* show(next) {
     utils.getDownloadTotal(name),
     packageService.listDependents(name),
     packageService.listStarUserNames(name),
-    packageService.listMaintainers(name)
+    packageService.listMaintainers(name),
+    packageService.listModulesByName(name),
+    packageService.listModuleTags(name),
   ];
   var download = r[0];
   var dependents = r[1];
   var users = r[2];
   var maintainers = r[3];
+  var rows = r[4];
+  var tags = r[5];
+
+  const versionsMap = {};
+  const versions = [];
+  for (const row of rows) {
+    var versionPkg = row.package;
+    // pkg is string ... ignore it
+    if (typeof versionPkg === 'string') {
+      continue;
+    }
+    versionPkg.fromNow = moment(versionPkg.publish_time || row.publish_time).fromNow();
+    versions.push(versionPkg);
+    versionsMap[versionPkg.version] = versionPkg;
+  }
+
+  for (const row of tags) {
+    row.fromNow = versionsMap[row.version] && versionsMap[row.version].fromNow;
+  }
 
   pkg.package.fromNow = moment(pkg.publish_time).fromNow();
   pkg = pkg.package;
   pkg.users = users;
+  pkg.versions = versions;
+  pkg.tags = tags;
+
   if (!pkg.readme && config.enableAbbreviatedMetadata) {
     var packageReadme = yield packageService.getPackageReadme(name);
     if (packageReadme) {
@@ -140,6 +164,7 @@ module.exports = function* show(next) {
   }
 
   pkg.registryUrl = '//' + config.registryHost + '/' + pkg.name;
+  pkg.registryPackageUrl = '//' + config.registryHost + '/' + pkg.name + '/' + pkg.version;
 
   // pkg.engines = {
   //   "python": ">= 0.11.9",
@@ -157,19 +182,17 @@ module.exports = function* show(next) {
   for (var k in pkg.engines) {
     var engine = String(pkg.engines[k] || '').trim();
     var color = 'blue';
-    if (k.indexOf('node') === 0) {
+    if (k.indexOf('node') === 0 || k.indexOf('install-') === 0) {
       color = 'yellowgreen';
-      var version = /(\d+\.\d+\.\d+)/.exec(engine);
+      var version = /(\d+\.)/.exec(engine);
       if (version) {
         version = version[0];
-        if (/^0\.11\.\d+/.test(version)) {
+        if (/^[0123]\./.test(version)) {
           color = 'red';
-        } else if (/^0\.10\./.test(version) ||
-            /^0\.12\./.test(version) ||
-            /^0\.14\./.test(version) ||
-            /^[^0]+\./.test(version)) {
-          color = 'brightgreen';
         }
+      }
+      if (engine === '*') {
+        color = 'red';
       }
     }
     pkg.engines[k] = {
@@ -180,14 +203,22 @@ module.exports = function* show(next) {
     };
   }
 
+  let packagephobiaSupport = true;
   if (pkg._publish_on_cnpm) {
     pkg.isPrivate = true;
+    packagephobiaSupport = config.packagephobiaSupportPrivatePackage;
   } else {
     pkg.isPrivate = false;
     // add security check badge
     pkg.snyk = {
       badge: `${config.snykUrl}/test/npm/${pkg.name}/badge.svg?style=flat-square`,
       url: `${config.snykUrl}/test/npm/${pkg.name}`,
+    };
+  }
+  if (packagephobiaSupport) {
+    pkg.packagephobia = {
+      badge: `${config.packagephobiaURL}/badge?p=${pkg.name}@${pkg.version}&style=flat-square`,
+      url: `${config.packagephobiaURL}/result?p=${pkg.name}@${pkg.version}`,
     };
   }
 

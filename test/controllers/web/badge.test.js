@@ -1,18 +1,4 @@
-/*!
- * cnpmjs.org - test/controllers/web/badge.test.js
- *
- * Copyright(c) cnpmjs.org and other contributors.
- * MIT Licensed
- *
- * Authors:
- *  fengmk2 <fengmk2@gmail.com> (http://fengmk2.com)
- */
-
 'use strict';
-
-/**
- * Module dependencies.
- */
 
 var should = require('should');
 var request = require('supertest');
@@ -22,7 +8,7 @@ var registry = require('../../../servers/registry');
 var utils = require('../../utils');
 var config = require('../../../config')
 
-describe('controllers/web/badge.test.js', function () {
+describe('test/controllers/web/badge.test.js', function () {
   afterEach(mm.restore);
 
   describe('GET /badge/v/:name.svg', function () {
@@ -37,6 +23,21 @@ describe('controllers/web/badge.test.js', function () {
         request(app)
         .get('/badge/v/@cnpmtest/badge-test-module.svg?style=flat-square')
         .expect('Location', config.badgePrefixURL + '/cnpm-1.0.1-blue.svg?style=flat-square')
+        .expect(302, done);
+      });
+    });
+
+    it('should show version', function (done) {
+      var pkg = utils.getPackage('@cnpmtest/badge-test-module', '1.0.0', utils.admin);
+      request(registry)
+      .put('/' + pkg.name)
+      .set('authorization', utils.adminAuth)
+      .send(pkg)
+      .end(function (err) {
+        should.not.exists(err);
+        request(app)
+        .get('/badge/v/@cnpmtest/badge-test-module.svg?style=flat-square&version=1.0.0')
+        .expect('Location', config.badgePrefixURL + '/cnpm-1.0.0-blue.svg?style=flat-square')
         .expect(302, done);
       });
     });

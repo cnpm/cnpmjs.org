@@ -14,7 +14,7 @@
         <% } %>
       <% } %>
       <div class="pack-ver">
-        <img title="<%= package.version %>" src="/badge/v/<%= package.name %>.svg?style=flat-square">
+        <img title="<%= package.version %>" src="/badge/v/<%= package.name %>.svg?version=<%= package.version %>&style=flat-square">
         <% if (package.engines) { %>
           <% for (var k in package.engines) {
             var engine = package.engines[k];
@@ -24,6 +24,10 @@
         } %>
         <% if (package.snyk) { %>
         <a class="badge-link" href="<%= package.snyk.url %>" target="_blank"><img title="Known Vulnerabilities" src="<%- package.snyk.badge %>"></a>
+        <% } %>
+
+        <% if (package.packagephobia) { %>
+        <a class="badge-link" href="<%= package.packagephobia.url %>" target="_blank"><img title="Install Size" src="<%- package.packagephobia.badge %>"></a>
         <% } %>
       </div>
       <div class="pack-repo">
@@ -56,12 +60,17 @@
         <% if (package.license || package.repository || package.bugs.url) {%> &middot; <% } %>
 
         <% if (!package.isPrivate) { %>
-        <a href="https://www.npmjs.org/package/<%= package.name %>" target="_blank">Original npm</a>
+        <a href="https://www.npmjs.org/package/<%= package.name %>/v/<%= package.version %>" target="_blank">Original npm</a>
         <% } %>
 
         <% if (package.dist.tarball) { %>
           &middot;
           <a href="<%= package.dist.tarball %>" target="_blank">Tarball</a>
+        <% } %>
+
+        <% if (package.registryPackageUrl) { %>
+          &middot;
+          <a href="<%= package.registryPackageUrl %>" target="_blank">package.json</a>
         <% } %>
       </div>
       <div class="pack-install">
@@ -85,6 +94,45 @@
   <div class="pack-readme col-17">
     <section id="readme" class="markdown-body">
       <%- package.readme || 'No README was found.' %>
+
+      <h2>Current Tags</h2>
+      <ul>
+        <% for (const item of package.tags) { %>
+        <li>
+          <a href="/package/<%- package.name %>/v/<%= item.version %>">
+            <%= item.version %>
+          </a>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          ...
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          <span><%= item.tag %></span>
+          <% if (item.fromNow) { %>(<span><%= item.fromNow %></span>)<% } %>
+        </li>
+        <% } %>
+      </ul>
+
+      <h2><%= package.versions.length %> Versions</h2>
+      <ul>
+        <% for (const item of package.versions) { %>
+        <li>
+          <a href="/package/<%- package.name %>/v/<%= item.version %>"
+            <% if (item.deprecated) { %> style="color:red" title="<%= item.deprecated %>" <% } %>
+          >
+            <%= item.version %>
+          </a>
+          <% if (item.deprecated) { %>
+          [deprecated]
+          <% } else { %>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          <% } %>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          ...
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          <span><%= item.fromNow %></span>
+        </li>
+        <% } %>
+      </ul>
     </section>
   </div>
 

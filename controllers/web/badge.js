@@ -8,10 +8,15 @@ var DownloadTotal = require('../../services/download_total');
 
 exports.version = function* () {
   var color = 'lightgrey';
-  var version = 'invalid';
   var name = this.params[0];
   var tag = this.query.tag || 'latest';
-  var info = yield packageService.getModuleByTag(name, tag);
+  var version = this.query.version;
+  let info;
+  if (version) {
+    info = yield packageService.getModule(name, version);
+  } else {
+    info = yield packageService.getModuleByTag(name, tag);
+  }
   if (info) {
     version = info.version;
     if (/^0\.0\./.test(version)) {
@@ -29,6 +34,9 @@ exports.version = function* () {
   var subject = config.badgeSubject.replace(/\-/g, '--');
   if (this.query.subject) {
     subject = this.query.subject.replace(/\-/g, '--');
+  }
+  if (!version) {
+    version = 'invalid';
   }
   version = version.replace(/\-/g, '--');
   var style = this.query.style || 'flat-square';
