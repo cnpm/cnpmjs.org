@@ -183,7 +183,7 @@ module.exports = function* show(next) {
     var engine = String(pkg.engines[k] || '').trim();
     var color = 'blue';
     if (k.indexOf('node') === 0 || k.indexOf('install-') === 0) {
-      color = 'yellowgreen';
+      color = 'green';
       var version = /(\d+\.)/.exec(engine);
       if (version) {
         version = version[0];
@@ -198,8 +198,7 @@ module.exports = function* show(next) {
     pkg.engines[k] = {
       version: engine,
       title: k + ': ' + engine,
-      badgeURL: config.badgePrefixURL + '/' + encodeURIComponent(k) +
-        '-' + encodeURIComponent(engine) + '-' + color + '.svg?style=flat-square',
+      badgeURL: config.badgeService.url(k, engine, { color }),
     };
   }
 
@@ -211,13 +210,13 @@ module.exports = function* show(next) {
     pkg.isPrivate = false;
     // add security check badge
     pkg.snyk = {
-      badge: `${config.snykUrl}/test/npm/${pkg.name}/badge.svg?style=flat-square`,
+      badge: `${config.snykUrl}/test/npm/${pkg.name}/badge.svg`,
       url: `${config.snykUrl}/test/npm/${pkg.name}`,
     };
   }
   if (packagephobiaSupport) {
     pkg.packagephobia = {
-      badge: `${config.packagephobiaURL}/badge?p=${pkg.name}@${pkg.version}&style=flat-square`,
+      badge: `${config.packagephobiaURL}/badge?p=${pkg.name}@${pkg.version}`,
       url: `${config.packagephobiaURL}/result?p=${pkg.name}@${pkg.version}`,
     };
   }

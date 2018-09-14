@@ -5,6 +5,7 @@ var copy = require('copy-to');
 var path = require('path');
 var fs = require('fs');
 var os = require('os');
+var utility = require('utility');
 
 var version = require('../package.json').version;
 
@@ -205,9 +206,22 @@ var config = {
   syncChangesStream: false,
   handleSyncRegistry: 'http://127.0.0.1:7001',
 
-  // badge subject on http://shields.io/
-  badgePrefixURL: 'https://img.shields.io/badge',
+  // default badge subject
   badgeSubject: 'cnpm',
+  // defautl use https://badgen.net/
+  badgeService: {
+    url: function(subject, status, options) {
+      options = options || {};
+      let url = `https://badgen.net/badge/${utility.encodeURIComponent(subject)}/${utility.encodeURIComponent(status)}`;
+      if (options.color) {
+        url += `/${utility.encodeURIComponent(options.color)}`;
+      }
+      if (options.icon) {
+        url += `?icon=${utility.encodeURIComponent(options.icon)}`;
+      }
+      return url;
+    },
+  },
 
   packagephobiaURL: 'https://packagephobia.now.sh',
   packagephobiaSupportPrivatePackage: false,

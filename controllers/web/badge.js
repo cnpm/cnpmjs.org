@@ -40,8 +40,7 @@ exports.version = function* () {
   }
   version = version.replace(/\-/g, '--');
   var style = this.query.style || 'flat-square';
-  var url = util.format(config.badgePrefixURL + '/%s-%s-%s.svg?style=%s',
-    utility.encodeURIComponent(subject), version, color, utility.encodeURIComponent(style));
+  var url = config.badgeService.url(subject, version, { color, style });
   this.redirect(url);
 };
 
