@@ -191,9 +191,10 @@ module.exports = function* show(next) {
           color = 'red';
         }
       }
-      if (engine === '*') color = 'red';
+      if (engine === '*') {
+        color = 'red';
+      }
     }
-    console.log(engine)
     pkg.engines[k] = {
       version: engine,
       title: k + ': ' + engine,
