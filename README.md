@@ -167,6 +167,10 @@ $docker volume inspect cnpmjsorg_cnpm-db-volume
 
 Tips: make sure your code is following the [node-style-guide](https://github.com/felixge/node-style-guide).
 
+## Top contributors
+
+[![](https://sourcerer.io/fame/gwenaelp/gwenaelp/cnpmjs.org/images/0)](https://sourcerer.io/fame/gwenaelp/gwenaelp/cnpmjs.org/links/0)[![](https://sourcerer.io/fame/gwenaelp/gwenaelp/cnpmjs.org/images/1)](https://sourcerer.io/fame/gwenaelp/gwenaelp/cnpmjs.org/links/1)[![](https://sourcerer.io/fame/gwenaelp/gwenaelp/cnpmjs.org/images/2)](https://sourcerer.io/fame/gwenaelp/gwenaelp/cnpmjs.org/links/2)[![](https://sourcerer.io/fame/gwenaelp/gwenaelp/cnpmjs.org/images/3)](https://sourcerer.io/fame/gwenaelp/gwenaelp/cnpmjs.org/links/3)[![](https://sourcerer.io/fame/gwenaelp/gwenaelp/cnpmjs.org/images/4)](https://sourcerer.io/fame/gwenaelp/gwenaelp/cnpmjs.org/links/4)[![](https://sourcerer.io/fame/gwenaelp/gwenaelp/cnpmjs.org/images/5)](https://sourcerer.io/fame/gwenaelp/gwenaelp/cnpmjs.org/links/5)[![](https://sourcerer.io/fame/gwenaelp/gwenaelp/cnpmjs.org/images/6)](https://sourcerer.io/fame/gwenaelp/gwenaelp/cnpmjs.org/links/6)[![](https://sourcerer.io/fame/gwenaelp/gwenaelp/cnpmjs.org/images/7)](https://sourcerer.io/fame/gwenaelp/gwenaelp/cnpmjs.org/links/7)
+
 ## Sponsors
 
 - [![阿里云](https://static.aliyun.com/images/www-summerwind/logo.gif)](http://click.aliyun.com/m/4288/) (2016.2 - now)
