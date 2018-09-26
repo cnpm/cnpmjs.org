@@ -121,6 +121,11 @@ var config = {
       maxIdleTime: 30000
     },
 
+    dialectOptions: {
+      // if your server run on full cpu load, please set trace to false
+      trace: true,
+    },
+
     // the storage engine for 'sqlite'
     // default store into ~/.cnpmjs.org/data.sqlite
     storage: path.join(dataDir, 'data.sqlite'),

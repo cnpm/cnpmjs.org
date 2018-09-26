@@ -1,18 +1,4 @@
-/**!
- * cnpmjs.org - common/sequelize.js
- *
- * Copyright(c) fengmk2 and other contributors.
- * MIT Licensed
- *
- * Authors:
- *   fengmk2 <fengmk2@gmail.com> (http://fengmk2.github.com)
- */
-
 'use strict';
-
-/**
- * Module dependencies.
- */
 
 var Sequelize = require('sequelize');
 var DataTypes = require('sequelize/lib/data-types');
@@ -35,6 +21,7 @@ if (config.mysqlServers && config.database.dialect === 'sqlite') {
 
   console.warn('[WARNNING] your config.js was too old, please @see https://github.com/cnpm/cnpmjs.org/wiki/Migrating-from-1.x-to-2.x');
   var server = config.mysqlServers[0];
+  var dialectOptions = config.database && config.database.dialectOptions;
   config.database = {
     db: config.mysqlDatabase,
     username: server.user,
@@ -45,10 +32,13 @@ if (config.mysqlServers && config.database.dialect === 'sqlite') {
     pool: {
       maxConnections: config.mysqlMaxConnections || 10,
       minConnections: 0,
-      maxIdleTime: 30000
+      maxIdleTime: 30000,
     },
     logging: !!process.env.SQL_DEBUG,
   };
+  if (dialectOptions) {
+    config.database.dialectOptions = dialectOptions;
+  }
 }
 
 var database = config.database;
