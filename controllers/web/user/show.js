@@ -4,6 +4,7 @@ var config = require('../../../config');
 var packageService = require('../../../services/package');
 var userService = require('../../../services/user');
 var common = require('../../../lib/common');
+var obfooscator = require('obfooscator');
 
 module.exports = function* showUser(next) {
   var name = this.params.name;
@@ -21,7 +22,7 @@ module.exports = function* showUser(next) {
 
   var data = {
     name: name,
-    email: user.email,
+    email: obfooscator(user.email),
     json: user.json || {},
     isNpmUser: user.isNpmUser,
   };
