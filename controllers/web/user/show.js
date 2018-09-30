@@ -22,7 +22,7 @@ module.exports = function* showUser(next) {
 
   var data = {
     name: name,
-    email: obfooscator(user.email),
+    email: user.email ? obfooscator(user.email): user.email,
     json: user.json || {},
     isNpmUser: user.isNpmUser,
   };
