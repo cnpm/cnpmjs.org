@@ -12,6 +12,7 @@ var utils = require('../../utils');
 var setDownloadURL = require('../../../lib/common').setDownloadURL;
 var renderMarkdown = require('../../../common/markdown').render;
 var packageService = require('../../../services/package');
+var downloadTotalService = require('../../../services/download_total');
 
 module.exports = function* show(next) {
   var params = this.params;
@@ -69,6 +70,7 @@ module.exports = function* show(next) {
     packageService.listMaintainers(name),
     packageService.listModulesByName(name),
     packageService.listModuleTags(name),
+    downloadTotalService.getTotalByName(name),
   ];
   var download = r[0];
   var dependents = r[1];
@@ -76,6 +78,7 @@ module.exports = function* show(next) {
   var maintainers = r[3];
   var rows = r[4];
   var tags = r[5];
+  var downloadTotal = r[6];
 
   const versionsMap = {};
   const versions = [];
@@ -202,10 +205,11 @@ module.exports = function* show(next) {
     };
   }
 
-  let packagephobiaSupport = true;
+  let packagephobiaSupport = downloadTotal >= 1000;
   if (pkg._publish_on_cnpm) {
     pkg.isPrivate = true;
-    packagephobiaSupport = config.packagephobiaSupportPrivatePackage;
+    // need download total >= 1000
+    packagephobiaSupport = downloadTotal >= 1000 && config.packagephobiaSupportPrivatePackage;
   } else {
     pkg.isPrivate = false;
     // add security check badge
@@ -224,6 +228,6 @@ module.exports = function* show(next) {
   yield this.render('package', {
     title: 'Package - ' + pkg.name,
     package: pkg,
-    download: download
+    download: download,
   });
 };

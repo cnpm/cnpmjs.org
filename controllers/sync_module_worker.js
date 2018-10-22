@@ -21,6 +21,7 @@ var common = require('../lib/common');
 var npmSerivce = require('../services/npm');
 var packageService = require('../services/package');
 var logService = require('../services/module_log');
+var downloadTotalService = require('../services/download_total');
 var hook = require('../services/hook');
 var User = require('../models').User;
 var os = require('os');
@@ -522,8 +523,12 @@ SyncModuleWorker.prototype._unpublished = function* (name, unpublishedInfo) {
     return [];
   }
   if (!config.syncDeletedVersions) {
-    this.log('  [%s] `config.syncDeletedVersions=false`, don\'t sync unpublished info', name);
-    return [];
+    const downloadCount = yield downloadTotalService.getTotalByName(name);
+    if (downloadCount >= 10000) {
+      this.log('  [%s] total downloads %s >= 10000 and `config.syncDeletedVersions=false`, don\'t sync unpublished info', name, downloadCount);
+      return [];
+    }
+    this.log('  [%s] total downloads %s < 10000 and `config.syncDeletedVersions=false`, still need to sync unpublished info', name, downloadCount);
   }
 
   var r = yield packageService.saveUnpublishedModule(name, unpublishedInfo);
@@ -940,7 +945,7 @@ SyncModuleWorker.prototype._sync = function* (name, pkg) {
     that.log('  [%s] no versions need to deleted', name);
   } else {
     if (config.syncDeletedVersions) {
-      that.log('  [%s] %d versions: %j need to deleted',
+      that.log('  [%s] %d versions: %j need to deleted, because config.syncDeletedVersions=true',
         name, deletedVersionNames.length, deletedVersionNames);
       try {
         yield packageService.removeModulesByNameAndVersions(name, deletedVersionNames);
@@ -948,31 +953,42 @@ SyncModuleWorker.prototype._sync = function* (name, pkg) {
         that.log('    [%s] delete error, %s: %s', name, err.name, err.message);
       }
     } else {
-      // find deleted in 24 hours versions
-      var oneDay = 3600000 * 24;
-      var now = Date.now();
-      var deletedIn24HoursVersions = [];
-      var oldVersions = [];
-      for (var i = 0; i < deletedVersionNames.length; i++) {
-        var v = deletedVersionNames[i];
-        var exists = map[v];
-        if (exists && now - exists.publish_time < oneDay) {
-          deletedIn24HoursVersions.push(v);
-        } else {
-          oldVersions.push(v);
+      const downloadCount = yield downloadTotalService.getTotalByName(name);
+      if (downloadCount >= 10000) {
+        // find deleted in 24 hours versions
+        var oneDay = 3600000 * 24;
+        var now = Date.now();
+        var deletedIn24HoursVersions = [];
+        var oldVersions = [];
+        for (var i = 0; i < deletedVersionNames.length; i++) {
+          var v = deletedVersionNames[i];
+          var exists = map[v];
+          if (exists && now - exists.publish_time < oneDay) {
+            deletedIn24HoursVersions.push(v);
+          } else {
+            oldVersions.push(v);
+          }
         }
-      }
-      if (deletedIn24HoursVersions.length > 0) {
-        that.log('  [%s] %d versions: %j need to deleted, they are deleted in 24 hours',
-          name, deletedIn24HoursVersions.length, deletedIn24HoursVersions);
+        if (deletedIn24HoursVersions.length > 0) {
+          that.log('  [%s] %d versions: %j need to deleted, because they are deleted in 24 hours',
+            name, deletedIn24HoursVersions.length, deletedIn24HoursVersions);
+          try {
+            yield packageService.removeModulesByNameAndVersions(name, deletedIn24HoursVersions);
+          } catch (err) {
+            that.log('    [%s] delete error, %s: %s', name, err.name, err.message);
+          }
+        }
+        that.log('  [%s] %d versions: %j no need to delete, because `config.syncDeletedVersions=false`',
+          name, oldVersions.length, oldVersions);
+      } else {
+        that.log('  [%s] %d versions: %j need to deleted, because downloads %s < 10000',
+          name, deletedVersionNames.length, deletedVersionNames, downloadCount);
         try {
-          yield packageService.removeModulesByNameAndVersions(name, deletedIn24HoursVersions);
+          yield packageService.removeModulesByNameAndVersions(name, deletedVersionNames);
         } catch (err) {
           that.log('    [%s] delete error, %s: %s', name, err.name, err.message);
         }
       }
-      that.log('  [%s] %d versions: %j no need to delete, because `config.syncDeletedVersions=false`',
-        name, oldVersions.length, oldVersions);
     }
   }
 
