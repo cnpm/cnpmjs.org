@@ -15,7 +15,7 @@
     "cnpmjs.org": "bin/cli.js"
   },
   "dependencies": {
-    "agentkeepalive": "^3.3.0",
+    "agentkeepalive": "^4.0.0",
     "await-event": "^2.1.0",
     "bytes": "^2.5.0",
     "cfork": "^1.6.1",
@@ -106,7 +106,7 @@
     "registry"
   ],
   "engines": {
-    "node": ">= 6.11.2"
+    "node": ">= 8.0.0"
   },
   "author": [
     "fengmk2 <fengmk2@gmail.com> (http://fengmk2.com)",
