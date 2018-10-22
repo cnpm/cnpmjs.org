@@ -74,10 +74,10 @@ as well as [New features in 2.x](https://github.com/cnpm/cnpmjs.org/wiki/New-fea
 
 ### Dependencies
 
-* [node](http://nodejs.org) >= 4.3.1
+* [node](http://nodejs.org) >= 8.0.0
 * Databases: only required one type
   * [sqlite3](https://npm.taobao.org/package/sqlite3) >= 3.0.2, we use `sqlite3` by default
-  * [MySQL](http://dev.mysql.com/downloads/) >= 0.5.0, include `mysqld` and `mysql cli`. I test on `mysql@5.6.16`.
+  * [MySQL](http://dev.mysql.com/downloads/) >= 5.6.16, include `mysqld` and `mysql cli`. I test on `mysql@5.6.16`.
   * MariaDB
   * PostgreSQL
 
@@ -114,7 +114,7 @@ Cnpmjs.org shipped with a simple but pragmatic Docker Compose configuration.With
 * (Optional) Speed up Docker images downloading by setting up [Docker images download accelerator](https://yq.aliyun.com/articles/29941)
 
 
-#### Dockerized cnpmjs.org control command 
+#### Dockerized cnpmjs.org control command
 
 Make sure your current working directory is the root of this GitHub repository.
 
@@ -123,7 +123,7 @@ Make sure your current working directory is the root of this GitHub repository.
 ```bash
  $docker-compose up
  ```
- 
+
 This command will build a Docker image using the current code of repository. Then set up a dockerized MySQL instance with data initialized. After Docker container running, you can access your cnpmjs.org web portal at http://127.0.0.1:7002 and npm register at http://127.0.0.1:7001.
 
 #### Run cnpmjs.org in the backend
@@ -145,7 +145,7 @@ The current configuration set 2 named Docker Volume for your persistent data. If
 Be Careful, the following commands will remove them.
 
 ```bash
-$docker-compose rm 
+$docker-compose rm
 $docker volume rm cnpmjsorg_cnpm-files-volume
 $docker volume rm cnpmjsorg_cnpm-db-volume
 ```
