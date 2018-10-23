@@ -4,6 +4,7 @@ var config = require('../../../config');
 var packageService = require('../../../services/package');
 var userService = require('../../../services/user');
 var common = require('../../../lib/common');
+var he = require('he');
 
 module.exports = function* showUser(next) {
   var name = this.params.name;
@@ -21,7 +22,9 @@ module.exports = function* showUser(next) {
 
   var data = {
     name: name,
-    email: user.email,
+    email: user.email ? he.encode(user.email, {
+      encodeEverything:true
+    }): user.email,
     json: user.json || {},
     isNpmUser: user.isNpmUser,
   };

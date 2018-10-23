@@ -32,6 +32,7 @@
     "giturl": "^1.0.0",
     "graceful": "^1.0.1",
     "gravatar": "^1.6.0",
+    "he": "^1.2.0",
     "humanize-ms": "^1.2.1",
     "humanize-number": "~0.0.2",
     "is-type-of": "^1.2.0",

@@ -17,6 +17,7 @@
 
 var mm = require('mm');
 var request = require('supertest');
+var assert = require('assert');
 var app = require('../../../../servers/web');
 var config = require('../../../../config');
 var userService = require('../../../../services/user');
@@ -70,5 +71,16 @@ describe('controllers/web/user/show.test.js', function () {
       .expect(/<div id="profile">/)
       .expect(/Packages by/, done);
     });
+
+    it('should obfuscate user email address', function (done) {
+      request(app)
+        .get('/~cnpmjstest10')
+        .expect(200)
+        .then(function (res) {
+          assert(res.text.includes("fengmk2@gmail.com") === false);
+          done()
+        });
+    });
+
   });
 });
