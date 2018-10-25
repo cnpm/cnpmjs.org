@@ -59,7 +59,7 @@ if (config.enableCompress) {
 app.use(conditional());
 app.use(etag());
 
-var viewDir = path.join(rootdir, 'view', 'web');
+var viewDir = config.viewDir || path.join(rootdir, 'view', 'web');
 var docDir = path.join(rootdir, 'docs', 'web');
 
 var layoutFile = path.join(viewDir, '_layout.html');
