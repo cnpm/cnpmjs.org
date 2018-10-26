@@ -47,6 +47,9 @@ var config = {
   // web page viewCache
   viewCache: false,
 
+  // view files directory
+  viewDir: path.join(root, 'view', 'web'),
+
   // config for koa-limit middleware
   // for limit download rates
   limit: {
