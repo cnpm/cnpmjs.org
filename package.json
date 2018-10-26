@@ -1,6 +1,6 @@
 {
   "name": "cnpmjs.org",
-  "version": "3.0.0-rc.6",
+  "version": "3.0.0-rc.7",
   "description": "Private npm registry and web for Enterprise, base on MySQL and Simple Store Service",
   "main": "index.js",
   "scripts": {
