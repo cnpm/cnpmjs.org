@@ -22,9 +22,7 @@ module.exports = function* showUser(next) {
 
   var data = {
     name: name,
-    email: user.email ? he.encode(user.email, {
-      encodeEverything:true
-    }): user.email,
+    email: user.email ? he.encode(user.email, { encodeEverything: true }) : user.email,
     json: user.json || {},
     isNpmUser: user.isNpmUser,
   };
