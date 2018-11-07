@@ -14,7 +14,7 @@
         <span style="color:#09f;"><%= user.name %></span>
       <% } %>
       <% if (user.email) { %>
-        <small><<a href="mailto:<%= user.email %>"><%= user.email %></a>></small>
+        <small><<a href="mailto:<%- user.email %>"><%- user.email %></a>></small>
       <% } %>
       <% if (user.json.fullname) { %>
         <small>(<%= user.json.fullname %>)</small>
