@@ -53,7 +53,7 @@ describe('test/controllers/registry/package/list.test.js', () => {
         const pkg = data.versions[v];
         assert(pkg.publish_time && typeof pkg.publish_time === 'number');
       }
-      assert(/^"\w{32}"$/.test(res.headers.etag));
+      assert(/^W\/"\w{32}"$/.test(res.headers.etag));
 
       // should 304
       request(app)
@@ -75,7 +75,7 @@ describe('test/controllers/registry/package/list.test.js', () => {
       assert(data.modified);
       assert.deepEqual(data['dist-tags'], { latest: '1.0.0' });
       assert(!data.time);
-      assert(/^"\w{32}"$/.test(res.headers.etag));
+      assert(/^W\/"\w{32}"$/.test(res.headers.etag));
 
       // should 304
       request(app)
@@ -97,7 +97,7 @@ describe('test/controllers/registry/package/list.test.js', () => {
         assert(data.modified);
         assert.deepEqual(data['dist-tags'], { latest: '1.0.0' });
         assert(!data.time);
-        assert(/^"\w{32}"$/.test(res.headers.etag));
+        assert(/^W\/"\w{32}"$/.test(res.headers.etag));
       })
       .expect(200);
   });
@@ -117,7 +117,7 @@ describe('test/controllers/registry/package/list.test.js', () => {
         foouser: true
       });
       data.versions['0.0.1'].publish_time.should.equal(data.versions['0.0.1']._cnpm_publish_time);
-      assert(/^"\w{32}"$/.test(res.headers.etag));
+      assert(/^W\/"\w{32}"$/.test(res.headers.etag));
       done();
     });
   });
@@ -127,7 +127,7 @@ describe('test/controllers/registry/package/list.test.js', () => {
     .get('/@cnpmtest/testmodule-list-1?callback=jsonp')
     .expect(/jsonp\(\{/)
     .expect(res => {
-      assert(/^"\w{32}"$/.test(res.headers.etag));
+      assert(/^W\/"\w{32}"$/.test(res.headers.etag));
     })
     .expect(200, done);
   });
@@ -265,7 +265,7 @@ describe('test/controllers/registry/package/list.test.js', () => {
             assert(pkg.publish_time && typeof pkg.publish_time === 'number');
             assert(pkg._publish_on_cnpm === undefined);
           }
-          assert(/^"\w{32}"$/.test(res.headers.etag));
+          assert(/^W\/"\w{32}"$/.test(res.headers.etag));
         });
     });
 
@@ -303,7 +303,7 @@ describe('test/controllers/registry/package/list.test.js', () => {
             assert(pkg.publish_time && typeof pkg.publish_time === 'number');
             assert(pkg._publish_on_cnpm === undefined);
           }
-          assert(/^"\w{32}"$/.test(res.headers.etag));
+          assert(/^W\/"\w{32}"$/.test(res.headers.etag));
         });
     });
 
@@ -329,7 +329,7 @@ describe('test/controllers/registry/package/list.test.js', () => {
             assert(pkg._publish_on_cnpm === undefined);
             assert(pkg.dist.tarball.includes('.tgz?bucket=foo-us1&admin=1&other_urls=http'));
           }
-          assert(/^"\w{32}"$/.test(res.headers.etag));
+          assert(/^W\/"\w{32}"$/.test(res.headers.etag));
         });
     });
   });

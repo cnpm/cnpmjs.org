@@ -7,8 +7,10 @@ var common = require('../../../lib/common');
 var SyncModuleWorker = require('../../sync_module_worker');
 var config = require('../../../config');
 
+// https://forum.nginx.org/read.php?2,240120,240120#msg-240120
+// should set weak etag avoid nginx remove it
 function etag(objs) {
-  return '"' + utility.md5(JSON.stringify(objs)) + '"';
+  return 'W/"' + utility.md5(JSON.stringify(objs)) + '"';
 }
 
 /**
