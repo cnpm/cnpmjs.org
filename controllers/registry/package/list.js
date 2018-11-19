@@ -1,10 +1,15 @@
 'use strict';
 
 var debug = require('debug')('cnpmjs.org:controllers:registry:package:list');
+var utility = require('utility');
 var packageService = require('../../../services/package');
 var common = require('../../../lib/common');
 var SyncModuleWorker = require('../../sync_module_worker');
 var config = require('../../../config');
+
+function etag(objs) {
+  return '"' + utility.md5(JSON.stringify(objs)) + '"';
+}
 
 /**
  * list all version of a module
@@ -124,6 +129,7 @@ module.exports = function* list() {
 
   // set versions and times
   var versions = {};
+  var allVersionString = '';
   var times = {};
   var attachments = {};
   var createdTime = null;
@@ -139,6 +145,7 @@ module.exports = function* list() {
     pkg.publish_time = pkg.publish_time || row.publish_time;
 
     versions[pkg.version] = pkg;
+    allVersionString += pkg.version + ',';
 
     var t = times[pkg.version] = row.publish_time ? new Date(row.publish_time) : row.gmt_modified;
     if ((!distTags.latest && !latestMod) || distTags.latest === pkg.version) {
@@ -210,6 +217,13 @@ module.exports = function* list() {
 
   debug('show module %s: %s, latest: %s', name, rev, latestMod.version);
   this.jsonp = info;
+  // use faster etag
+  this.etag = etag([
+    modifiedTime,
+    distTags,
+    pkg.maintainers,
+    allVersionString,
+  ]);
 };
 
 function* handleAbbreviatedMetaRequest(ctx, name, modifiedTime, tags, rows) {
@@ -224,6 +238,7 @@ function* handleAbbreviatedMetaRequest(ctx, name, modifiedTime, tags, rows) {
 
   // set versions and times
   var versions = {};
+  var allVersionString = '';
   for (var i = 0; i < rows.length; i++) {
     var row = rows[i];
     var pkg = row.package;
@@ -232,6 +247,7 @@ function* handleAbbreviatedMetaRequest(ctx, name, modifiedTime, tags, rows) {
     pkg.publish_time = pkg.publish_time || row.publish_time;
 
     versions[pkg.version] = pkg;
+    allVersionString += pkg.version + ',';
 
     if ((!distTags.latest && !latestMod) || distTags.latest === pkg.version) {
       latestMod = row;
@@ -257,6 +273,12 @@ function* handleAbbreviatedMetaRequest(ctx, name, modifiedTime, tags, rows) {
 
   debug('show %j', info);
   ctx.jsonp = info;
+  // use faster etag
+  ctx.etag = etag([
+    modifiedTime,
+    distTags,
+    allVersionString,
+  ]);
 }
 
 function* handleAbbreviatedMetaRequestWithFullMeta(ctx, name, modifiedTime, tags, rows) {
@@ -272,6 +294,7 @@ function* handleAbbreviatedMetaRequestWithFullMeta(ctx, name, modifiedTime, tags
 
   // set versions and times
   var versions = {};
+  var allVersionString = '';
   for (var i = 0; i < rows.length; i++) {
     var row = rows[i];
     // pkg is string ... ignore it
@@ -298,6 +321,7 @@ function* handleAbbreviatedMetaRequestWithFullMeta(ctx, name, modifiedTime, tags
     common.setDownloadURL(pkg, ctx);
 
     versions[pkg.version] = pkg;
+    allVersionString += pkg.version + ',';
 
     if ((!distTags.latest && !latestMod) || distTags.latest === pkg.version) {
       latestMod = row;
@@ -323,4 +347,10 @@ function* handleAbbreviatedMetaRequestWithFullMeta(ctx, name, modifiedTime, tags
 
   debug('show %j', info);
   ctx.jsonp = info;
+  // use faster etag
+  ctx.etag = etag([
+    modifiedTime,
+    distTags,
+    allVersionString,
+  ]);
 }
