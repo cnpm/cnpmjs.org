@@ -109,24 +109,38 @@ describe('test/controllers/web/package/show.test.js', () => {
       .expect(/Downloads/, done);
     });
 
-    it('should 200 when get by non-semver version', function (done) {
+    it('should 200 when get by non-semver version', function* () {
       request(app)
       .get('/package/@cnpmtest/testmodule-web-show/0.0.2-alpha')
       .expect(200)
       .expect(/testmodule-web-show/)
       .expect(/Maintainers/)
       .expect(/Dependencies/)
-      .expect(/Downloads/, done);
+      .expect(/Downloads/);
+      request(app)
+      .get('/package/@cnpmtest/testmodule-web-show/v/0.0.2-alpha')
+      .expect(200)
+      .expect(/testmodule-web-show/)
+      .expect(/Maintainers/)
+      .expect(/Dependencies/)
+      .expect(/Downloads/);
     });
 
-    it('should 200 when get by semver tag', function (done) {
+    it('should 200 when get by semver tag', function* () {
       request(app)
       .get('/package/@cnpmtest/testmodule-web-show/1.0.0')
       .expect(200)
       .expect(/testmodule-web-show/)
       .expect(/Maintainers/)
       .expect(/Dependencies/)
-      .expect(/Downloads/, done);
+      .expect(/Downloads/);
+      request(app)
+      .get('/package/@cnpmtest/testmodule-web-show/v/1.0.0')
+      .expect(200)
+      .expect(/testmodule-web-show/)
+      .expect(/Maintainers/)
+      .expect(/Dependencies/)
+      .expect(/Downloads/);
     });
 
     it('should 404 when get by version not exist', function (done) {
