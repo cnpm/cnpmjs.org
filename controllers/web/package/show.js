@@ -35,6 +35,14 @@ module.exports = function* show(next) {
   }
 
   var pkg = yield packageService[getPackageMethod].apply(packageService, getPackageArgs);
+  if ((!pkg || !pkg.package) && tag) {
+    // + if we can't find it by tag, it may be a non-semver version, check it then
+    // + if we can't find it by version, it may be a tag, check it then
+    getPackageMethod = version ? 'getModuleByTag' : 'getModule';
+    pkg = yield packageService[getPackageMethod](name, tag);
+  }
+
+  // if it's still not found
   if (!pkg || !pkg.package) {
     // check if unpublished
     var unpublishedInfo = yield packageService.getUnpublishedModule(name);
