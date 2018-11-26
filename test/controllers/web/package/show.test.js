@@ -9,18 +9,31 @@ var registry = require('../../../../servers/registry');
 var utils = require('../../../utils');
 
 describe('test/controllers/web/package/show.test.js', () => {
-  before(function (done) {
+  before(function* () {
     var pkg = utils.getPackage('@cnpmtest/testmodule-web-show', '0.0.1', utils.admin);
     pkg.versions['0.0.1'].dependencies = {
       bytetest: '~0.0.1',
       mocha: '~1.0.0',
       'testmodule-web-show': '0.0.1'
     };
-    request(registry)
-    .put('/' + pkg.name)
-    .set('authorization', utils.adminAuth)
-    .send(pkg)
-    .expect(201, done);
+    yield request(registry)
+      .put('/' + pkg.name)
+      .set('authorization', utils.adminAuth)
+      .send(pkg)
+      .expect(201);
+    pkg = utils.getPackage('@cnpmtest/testmodule-web-show', '0.0.2-alpha', utils.admin);
+    pkg.versions['0.0.2-alpha'].dependencies = {
+      bytetest: '~0.0.1',
+      mocha: '~1.0.0',
+      'testmodule-web-show': '0.0.1'
+    };
+    pkg['dist-tags'].latest = '0.0.1';
+    pkg['dist-tags']['1.0.0'] = '0.0.2-alpha';
+    yield request(registry)
+      .put('/' + pkg.name)
+      .set('authorization', utils.adminAuth)
+      .send(pkg)
+      .expect(201);
   });
 
   afterEach(mm.restore);
@@ -94,6 +107,40 @@ describe('test/controllers/web/package/show.test.js', () => {
       .expect(/Maintainers/)
       .expect(/Dependencies/)
       .expect(/Downloads/, done);
+    });
+
+    it('should 200 when get by non-semver version', function* () {
+      request(app)
+      .get('/package/@cnpmtest/testmodule-web-show/0.0.2-alpha')
+      .expect(200)
+      .expect(/testmodule-web-show/)
+      .expect(/Maintainers/)
+      .expect(/Dependencies/)
+      .expect(/Downloads/);
+      request(app)
+      .get('/package/@cnpmtest/testmodule-web-show/v/0.0.2-alpha')
+      .expect(200)
+      .expect(/testmodule-web-show/)
+      .expect(/Maintainers/)
+      .expect(/Dependencies/)
+      .expect(/Downloads/);
+    });
+
+    it('should 200 when get by semver tag', function* () {
+      request(app)
+      .get('/package/@cnpmtest/testmodule-web-show/1.0.0')
+      .expect(200)
+      .expect(/testmodule-web-show/)
+      .expect(/Maintainers/)
+      .expect(/Dependencies/)
+      .expect(/Downloads/);
+      request(app)
+      .get('/package/@cnpmtest/testmodule-web-show/v/1.0.0')
+      .expect(200)
+      .expect(/testmodule-web-show/)
+      .expect(/Maintainers/)
+      .expect(/Dependencies/)
+      .expect(/Downloads/);
     });
 
     it('should 404 when get by version not exist', function (done) {

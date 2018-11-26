@@ -16,8 +16,8 @@ function routes(app) {
   // scope package without version
   app.get(/\/package\/(@[\w\-\.]+\/[\w\-\.]+)$/, showPackage);
   // scope package with version
-  app.get(/\/package\/(@[\w\-\.]+\/[\w\-\.]+)\/([\w\d\.]+)$/, showPackage);
-  app.get(/\/package\/(@[\w\-\.]+\/[\w\-\.]+)\/v\/([\w\d\.]+)$/, showPackage);
+  app.get(/\/package\/(@[\w\-\.]+\/[\w\-\.]+)\/([\w\-\d\.]+)$/, showPackage);
+  app.get(/\/package\/(@[\w\-\.]+\/[\w\-\.]+)\/v\/([\w\-\d\.]+)$/, showPackage);
   app.get('/package/:name', showPackage);
   app.get('/package/:name/:version', showPackage);
   app.get('/package/:name/v/:version', showPackage);
