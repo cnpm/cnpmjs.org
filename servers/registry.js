@@ -35,11 +35,12 @@ app.use(cors({
 }));
 app.use(auth());
 app.use(proxyToNpm());
-app.use(notFound);
 
 if (config.enableCompress) {
   app.use(middlewares.compress({ threshold: 150 }));
 }
+app.use(notFound);
+
 app.use(conditional());
 app.use(etag());
 
