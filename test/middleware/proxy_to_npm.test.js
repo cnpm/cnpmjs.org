@@ -48,6 +48,13 @@ describe('test/middleware/proxy_to_npm.test.js', () => {
         .expect('Location', config.sourceNpmRegistry + '/@jkroso/type')
         .expect(302, done);
     });
+
+    it('should proxy to source registry when package is public scoped with encoded path', done => {
+      request(registry)
+        .get('/@jkroso%2Ftype')
+        .expect('Location', config.sourceNpmRegistry + '/@jkroso%2Ftype')
+        .expect(302, done);
+    });
   });
 
   describe('dist-tags', () => {
