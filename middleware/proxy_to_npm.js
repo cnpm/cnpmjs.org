@@ -40,7 +40,7 @@ module.exports = function (options) {
       return yield next;
     }
 
-    var pathname = this.path;
+    var pathname =  decodeURIComponent(this.path);
 
     var isScoped = false;
     var isPublichScoped = false;
