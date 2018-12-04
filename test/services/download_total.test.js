@@ -1,18 +1,4 @@
-/**!
- * cnpmjs.org - test/services/download_total.test.js
- *
- * Copyright(c) fengmk2 and other contributors.
- * MIT Licensed
- *
- * Authors:
- *   fengmk2 <fengmk2@gmail.com> (http://fengmk2.github.com)
- */
-
 'use strict';
-
-/**
- * Module dependencies.
- */
 
 var DownloadTotal = require('../../services/download_total');
 
@@ -25,10 +11,22 @@ describe('test/services/download_total.test.js', function () {
         count: 1000
       };
       yield DownloadTotal.plusModuleTotal(data);
+      data = {
+        date: '2014-10-21',
+        name: '__all__',
+        count: 1000
+      };
+      yield DownloadTotal.plusModuleTotal(data);
 
       data = {
         date: '2014-10-22',
         name: 'plusModuleTotal-module',
+        count: 2
+      };
+      yield DownloadTotal.plusModuleTotal(data);
+      data = {
+        date: '2014-10-22',
+        name: '__all__',
         count: 2
       };
       yield DownloadTotal.plusModuleTotal(data);
@@ -54,6 +52,12 @@ describe('test/services/download_total.test.js', function () {
         count: 3
       };
       yield DownloadTotal.plusModuleTotal(data);
+      data = {
+        date: '2014-10-21',
+        name: '__all__',
+        count: 3
+      };
+      yield DownloadTotal.plusModuleTotal(data);
       rows = yield DownloadTotal.getModuleTotal(
         'plusModuleTotal-module', '2014-10-21', '2014-10-21');
       rows.should.length(1);
@@ -67,14 +71,34 @@ describe('test/services/download_total.test.js', function () {
       };
       yield DownloadTotal.plusModuleTotal(data);
       data = {
+        date: '2014-10-22',
+        name: '__all__',
+        count: 3
+      };
+      yield DownloadTotal.plusModuleTotal(data);
+
+      data = {
         date: '2014-12-22',
         name: 'plusModuleTotal-module2',
         count: 3
       };
       yield DownloadTotal.plusModuleTotal(data);
       data = {
+        date: '2014-12-22',
+        name: '__all__',
+        count: 3
+      };
+      yield DownloadTotal.plusModuleTotal(data);
+
+      data = {
         date: '2014-12-21',
         name: 'plusModuleTotal-module2',
+        count: 3
+      };
+      yield DownloadTotal.plusModuleTotal(data);
+      data = {
+        date: '2014-12-21',
+        name: '__all__',
         count: 3
       };
       yield DownloadTotal.plusModuleTotal(data);
