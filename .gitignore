@@ -30,6 +30,3 @@ config/web_readme.md
 .tmp/
 *.sqlite
 
-.vscode
-
-package-lock.json
