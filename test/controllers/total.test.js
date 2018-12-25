@@ -12,9 +12,9 @@ describe('test/controllers/total.test.js', function () {
       .expect(200, function (err, res) {
         should.not.exist(err);
         res.body.db_name.should.equal('registry');
-        res.body.store_engine.should.be.a.String;
+        res.body.store_engine.should.be.a.String();
         res.body.node_version.should.equal(process.version);
-        res.body.cache_time.should.be.a.Number;
+        res.body.cache_time.should.be.a.Number();
         // request again should get cache total info
         request(app)
         .get('/')

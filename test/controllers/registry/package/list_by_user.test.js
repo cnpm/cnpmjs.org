@@ -43,14 +43,14 @@ describe('test/controllers/registry/package/list_by_user.test.js', function () {
         data.packages.forEach(function(pkg) {
           map[pkg.name] = pkg;
         });
-        map['@cnpmtest/list_by_user_module1'].should.be.an.Object;
+        map['@cnpmtest/list_by_user_module1'].should.be.an.Object();
         map['@cnpmtest/list_by_user_module1'].should.eql({
           name: '@cnpmtest/list_by_user_module1',
           description: '',
           version: '1.0.1',
         });
 
-        map['@cnpmtest/list_by_user_module2'].should.be.an.Object;
+        map['@cnpmtest/list_by_user_module2'].should.be.an.Object();
         map['@cnpmtest/list_by_user_module2'].should.eql({
           name: '@cnpmtest/list_by_user_module2',
           description: '',

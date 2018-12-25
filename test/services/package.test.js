@@ -100,7 +100,7 @@ describe('test/services/package.test.js', function () {
 
     it('should show private package maintainers', function* () {
       var users = yield Package.listMaintainers('@cnpmtest/enable');
-      users.should.be.an.Array;
+      users.should.be.an.Array();
     });
   });
 
@@ -193,7 +193,7 @@ describe('test/services/package.test.js', function () {
     it('should get a datetime', function* () {
       yield createModule('test-getModuleLastModified-module-0', '1.0.0');
       var t = yield Package.getModuleLastModified('test-getModuleLastModified-module-0');
-      t.should.be.a.Date;
+      t.should.be.a.Date();
     });
 
     it('should get null when module not exists', function* () {
@@ -326,7 +326,7 @@ describe('test/services/package.test.js', function () {
       };
       mod.package.dist = dist;
       var result = yield Package.saveModule(mod);
-      result.id.should.be.a.Number;
+      result.id.should.be.a.Number();
       var item = yield Package.getModuleById(result.id);
       item.dist_size.should.equal(dist.size);
       item.dist_shasum.should.equal(dist.shasum);
@@ -506,9 +506,9 @@ describe('test/services/package.test.js', function () {
       data.should.have.keys('keywordMatchs', 'searchMatchs');
       data.searchMatchs.length.should.above(0);
       data.searchMatchs.forEach(function (row) {
-        row.name.should.be.a.String;
+        row.name.should.be.a.String();
         row.name.indexOf('test').should.above(-1);
-        row.description.should.be.a.String;
+        row.description.should.be.a.String();
       });
     });
 
@@ -516,8 +516,8 @@ describe('test/services/package.test.js', function () {
       var data = yield Package.search('aa');
       data.keywordMatchs.length.should.above(0);
       data.keywordMatchs.forEach(function (row) {
-        row.name.should.be.a.String;
-        row.description.should.be.a.String;
+        row.name.should.be.a.String();
+        row.description.should.be.a.String();
       });
     });
 
@@ -567,9 +567,9 @@ describe('test/services/package.test.js', function () {
   describe('addStar(), removeStar(), listStarUserNames(), listUserStarModuleNames()', function () {
     it('should star a module and remove that star', function* () {
       var row = yield Package.addStar('addStar-module', 'addStar-user');
-      row.id.should.be.a.Number;
+      row.id.should.be.a.Number();
       row = yield Package.addStar('addStar-module', 'addStar-user');
-      row.id.should.be.a.Number;
+      row.id.should.be.a.Number();
 
       var users = yield Package.listStarUserNames('addStar-module');
       users.should.eql(['addStar-user']);

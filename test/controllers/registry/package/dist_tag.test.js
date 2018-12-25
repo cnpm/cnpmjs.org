@@ -38,7 +38,7 @@ describe('test/controllers/registry/package/dist_tag.test.js', function () {
       .get('/-/package/byte/dist-tags')
       .expect(200, function (err, res) {
         should.not.exist(err);
-        res.body.latest.should.be.a.String;
+        res.body.latest.should.be.a.String();
         done();
       });
     });

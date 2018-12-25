@@ -36,7 +36,7 @@ describe('services/total.test.js', function () {
   describe('get()', function () {
     it('should get all total info', function* () {
       var info = yield Total.get();
-      info.disk_size.should.be.a.Number;
+      info.disk_size.should.be.a.Number();
     });
   });
 

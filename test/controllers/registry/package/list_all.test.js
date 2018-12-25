@@ -21,8 +21,8 @@ describe('test/controllers/registry/package/list_all.test.js', function () {
       .get('/-/all')
       .expect(200, function (err, res) {
         should.not.exist(err);
-        res.body.should.be.an.Object;
-        res.body._updated.should.be.a.Number;
+        res.body.should.be.an.Object();
+        res.body._updated.should.be.a.Number();
         Object.keys(res.body).length.should.above(1);
         res.body.pedding.should.equal(true);
         done();
