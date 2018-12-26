@@ -20,7 +20,7 @@ var app = require('../../../servers/web');
 describe('controllers/web/show_sync.test.js', function () {
   describe('GET /sync/:name', function () {
     it('should display ok', function (done) {
-      request(app.listen())
+      request(app)
       .get('/sync/cutter')
       .expect(200)
       .expect(/Sync package/)

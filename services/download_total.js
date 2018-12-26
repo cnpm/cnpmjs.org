@@ -1,6 +1,8 @@
 'use strict';
 
 var utility = require('utility');
+var config = require('../config');
+var models = require('../models');
 var DownloadTotal = require('../models').DownloadTotal;
 
 exports.getModuleTotal = function* (name, start, end) {
@@ -41,50 +43,36 @@ exports.getTotalByName = function* (name) {
 
 exports.plusModuleTotal = function* (data) {
   var yearMonth = parseYearMonth(data.date);
-  // all module download total
   var row = yield DownloadTotal.find({
     where: {
-      name: '__all__',
-      date: yearMonth
+      name: data.name,
+      date: yearMonth,
     }
   });
   if (!row) {
     row = DownloadTotal.build({
-      name: '__all__',
+      name: data.name,
       date: yearMonth,
     });
-  }
-  var field = 'd' + data.date.substring(8, 10);
-  if (typeof row[field] === 'string') {
-    // pg bigint is string...
-    row[field] = utility.toSafeNumber(row[field]);
-  }
-  row[field] += data.count;
-  if (row.changed()) {
     yield row.save();
   }
-
-  row = yield DownloadTotal.find({
-    where: {
-      name: data.name,
-      date: yearMonth,
-    }
-  });
-  if (!row) {
-    row = DownloadTotal.build({
-      name: data.name,
-      date: yearMonth,
-    });
-  }
   var field = 'd' + data.date.substring(8, 10);
-  if (typeof row[field] === 'string') {
-    // pg bigint is string...
-    row[field] = utility.toSafeNumber(row[field]);
+  if (config.database.dialect === 'mysql') {
+    // mysql update set field = field + count
+    yield models.query(`UPDATE downloads SET ${field} = ${field} + ${data.count}, gmt_modified=? WHERE id = ?`,
+      [ new Date(), row.id ]);
+  } else {
+    // pg
+    if (typeof row[field] === 'string') {
+      // pg bigint is string...
+      row[field] = utility.toSafeNumber(row[field]);
+    }
+    row[field] += data.count;
+    if (row.changed()) {
+      return yield row.save();
+    }
   }
-  row[field] += data.count;
-  if (row.changed()) {
-    return yield row.save();
-  }
+
   return row;
 };
 

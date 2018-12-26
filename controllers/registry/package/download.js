@@ -76,19 +76,30 @@ module.exports = function* download(next) {
   this.body = yield downloadAsReadStream(dist.key);
 };
 
+var saving = false;
 defer.setInterval(function* () {
-  // save download count
-  var totals = [];
-  for (var name in _downloads) {
-    var count = _downloads[name];
-    totals.push([name, count]);
-  }
-  _downloads = {};
-
-  if (totals.length === 0) {
+  if (saving) {
     return;
   }
 
+  // save download count
+  var totals = [];
+  var allCount = 0;
+  for (var name in _downloads) {
+    var count = _downloads[name];
+    if (name !== '__all__') {
+      totals.push([name, count]);
+    }
+    allCount += count;
+  }
+  _downloads = {};
+
+  if (allCount === 0) {
+    return;
+  }
+
+  saving = true;
+  totals.push([ '__all__', allCount ]);
   debug('save download total: %j', totals);
 
   var date = utility.YYYYMMDD();
@@ -107,4 +118,5 @@ defer.setInterval(function* () {
       _downloads[name] = (_downloads[name] || 0) + count;
     }
   }
+  saving = false;
 }, 5000 + Math.ceil(Math.random() * 1000));
