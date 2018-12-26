@@ -1,3 +1,6 @@
+#
+# 目前仅供测试使用; 
+#  
 version: '3'
 services:
   web:
@@ -12,6 +15,64 @@ services:
     ports:
       - "7001:7001"
       - "7002:7002"
+    environment :
+      # default system admins
+      CNPM_ADMIN_NAME: 'admin'
+      CNPM_ADMIN_EMAIL: 'admin@cnpmjs.org'
+      # max request json body size
+      CNPM_JSON_LIMIT: '100mb'
+      # session secret
+      CNPM_SESSION_SECRET: 'cnpmjs.org session secret'
+      # database config
+      CNPM_MYSQL_DBNAME: 'cnpmjs_test'
+      CNPM_MYSQL_USER: 'root'
+      CNPM_MYSQL_PASSWORD: ''
+      CNPM_MYSQL_HOST: 'mysql-db'
+      CNPM_MYSQL_PORT: 3306
+      # registry url name
+      CNPM_REGISTRY_HOST: '127.0.0.1:7001'
+      # CNPM_SYNC_MODEL: 'none' , 'exist', 'all'
+      #   sync mode select
+      #   none: do not sync any module, proxy all public modules from sourceNpmRegistry
+      #   exist: only sync exist modules
+      #   all: sync all modules
+      CNPM_SYNC_MODEL: 'exist'
+      # CNPM_ENABLE_PRIVATE:  'true' , 'false'
+      #   enable private mode or not
+      #   private mode: only admins can publish, other users just can sync package from source npm
+      #   public mode: all users can publish
+      CNPM_ENABLE_PRIVATE: 'true'
+      # CNPM_PRIVATE_SCOPES
+      #   registry scopes, if don't set, means do not support scopes
+      CNPM_PRIVATE_SCOPES: "[ '@cnpm', '@cnpmtest', '@cnpm-test', '@myscope' ]"
+      # CNPM_PRIVATE_PACKAGES
+      #   some registry already have some private packages in global scope
+      #   but we want to treat them as scoped private packages,
+      #   so you can use this white list.
+      CNPM_PRIVATE_PACKAGES: "[]"
+
+      #   CNPM_SOURCE_NPM_REGISTRY
+      #   sync source, upstream registry
+      #   If you want to directly sync from official npm's registry
+      #   please drop them an email first
+      #   sourceNpmRegistry: 'https://registry.npm.taobao.org'
+      CNPM_SOURCE_NPM_REGISTRY: 'https://registry.npm.taobao.org'
+      CNPM_SOURCE_NPM_WEB: 'https://npm.taobao.org'
+
+      #   CNPM_SOURCE_NPM_REGISTRY_IS_CNPM
+      #   upstream registry is base on cnpm/cnpmjs.org or not
+      #   if your upstream is official npm registry, please turn it off
+      #   sourceNpmRegistryIsCNpm: true
+      CNPM_SOURCE_NPM_REGISTRY_IS_CNPM: 'true'
+
+      # OSS config
+      # CNPM_NFS_TYPE: 'OSS'
+      # CNPM_NFS_OSS_ACCESS_KEY_ID: 'AccessKey ID'
+      # CNPM_NFS_OSS_ACCESS_KEY_SECRET: 'Access Key Secret'
+      # CNPM_NFS_OSS_ENDPOINT: 'EndPoint'
+      # CNPM_NFS_OSS_BUCKET: 'Bucket Name'
+    command: [ "/var/app/cnpmjs.org/wait-for-it.sh", "mysql-db:3306", "--", "bash", "/var/app/cnpmjs.org/docs/dockerize/start.sh"]
+
 
   mysql-db:
     image: mysql:5.6
@@ -22,8 +83,7 @@ services:
       MYSQL_DATABASE: cnpmjs_test
       MYSQL_ROOT_HOST: "%"
     volumes:
-      - ./docs/db.sql:/docker-entrypoint-initdb.d/cnpm-init.sql           
-      - cnpm-db-volume:/var/lib/mysql 
+      - cnpm-db-volume:/var/lib/mysql
 
 volumes:
   cnpm-files-volume:

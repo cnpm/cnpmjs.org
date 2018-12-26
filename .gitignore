@@ -29,3 +29,5 @@ coverage/
 config/web_readme.md
 .tmp/
 *.sqlite
+
+package-lock.json

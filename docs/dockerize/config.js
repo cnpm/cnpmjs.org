@@ -5,11 +5,31 @@ var copy = require('copy-to');
 var path = require('path');
 var fs = require('fs');
 var os = require('os');
+var utility = require('utility');
 
 var version = require('../package.json').version;
 
+const AgentKeepalive = require('agentkeepalive');
+
 var root = path.dirname(__dirname);
-var dataDir = process.env.CNPM_DATA_DIR ;
+var dataDir = process.env.CNPM_DATA_DIR || path.join(process.env.HOME || root, '.cnpmjs.org');
+
+var adminName=process.env.CNPM_ADMIN_NAME || 'admin';
+var adminEmail=process.env.CNPM_ADMIN_EMAIL || 'admin@cnpmjs.org';
+var jsonLimit=process.env.CNPM_JSON_LIMIT ||'10mb';
+var sessionSecret=process.env.CNPM_SESSION_SECRET || 'cnpmjs.org test session secret';
+
+var mysqlDBname=process.env.CNPM_MYSQL_DBNAME || 'cnpmjs_test';
+var mysqlUser=process.env.CNPM_MYSQL_USER || 'root';
+var mysqlPassword=process.env.CNPM_MYSQL_PASSWORD || '';
+var mysqlHost=process.env.CNPM_MYSQL_HOST || 'mysql-db';
+var mysqlPort=process.env.CNPM_MYSQL_PORT || 3306;
+
+var privateScopes=process.env.CNPM_PRIVATE_SCOPES || "[ '@cnpm', '@cnpmtest', '@cnpm-test' ]";
+var privatePackages=process.env.CNPM_PRIVATE_PACKAGES ||"[]";
+
+
+
 
 var config = {
   version: version,
@@ -36,15 +56,18 @@ var config = {
   // page mode, enable on development env
   pagemock: process.env.NODE_ENV === 'development',
   // session secret
-  sessionSecret: 'cnpmjs.org test session secret',
+  sessionSecret: sessionSecret,
   // max request json body size
-  jsonLimit: '10mb',
+  jsonLimit: jsonLimit,
   // log dir name
   logdir: path.join(dataDir, 'logs'),
   // update file template dir
   uploadDir: path.join(dataDir, 'downloads'),
   // web page viewCache
   viewCache: false,
+
+  // view files directory
+  viewDir: path.join(root, 'view', 'web'),
 
   // config for koa-limit middleware
   // for limit download rates
@@ -63,9 +86,7 @@ var config = {
   // default system admins
   admins: {
     // name: email
-    fengmk2: 'fengmk2@gmail.com',
-    admin: 'admin@cnpmjs.org',
-    dead_horse: 'dead_horse@qq.com',
+    [adminName]: adminEmail,
   },
 
   // email notification for errors
@@ -98,19 +119,19 @@ var config = {
    */
 
   database: {
-    db: 'cnpmjs_test',
-    username: 'root',
-    password: '',
+    db: mysqlDBname,
+    username: mysqlUser,
+    password: mysqlPassword,
 
     // the sql dialect of the database
     // - currently supported: 'mysql', 'sqlite', 'postgres', 'mariadb'
     dialect: 'mysql',
 
-    // the Docker container network hostname defined at docker-compose.yml
-    host: 'mysql-db',
+    // custom host; default: 127.0.0.1
+    host: mysqlHost,
 
     // custom port; default: 3306
-    port: 3306,
+    port: mysqlPort,
 
     // use pooling in order to reduce db connection overload and to increase speed
     // currently only for mysql and postgresql (since v1.5.0)
@@ -120,22 +141,29 @@ var config = {
       maxIdleTime: 30000
     },
 
+    dialectOptions: {
+      // if your server run on full cpu load, please set trace to false
+      trace: true,
+    },
+
     // the storage engine for 'sqlite'
     // default store into ~/.cnpmjs.org/data.sqlite
-    //storage: path.join(dataDir, 'data.sqlite'),
+    // storage: path.join(dataDir, 'data.sqlite'),
 
     logging: !!process.env.SQL_DEBUG,
   },
 
+  
   // package tarball store in local filesystem by default
   nfs: require('fs-cnpm')({
     dir: path.join(dataDir, 'nfs')
   }),
+
   // if set true, will 302 redirect to `nfs.url(dist.key)`
   downloadRedirectToNFS: false,
 
   // registry url name
-  registryHost: '127.0.0.1:7001',
+  registryHost: process.env.CNPM_REGISTRY_HOST || '127.0.0.1:7001',
 
   /**
    * registry mode config
@@ -144,15 +172,15 @@ var config = {
   // enable private mode or not
   // private mode: only admins can publish, other users just can sync package from source npm
   // public mode: all users can publish
-  enablePrivate: false,
+  enablePrivate: ((process.env.CNPM_ENABLE_PRIVATE || 'false') == 'true'),
 
   // registry scopes, if don't set, means do not support scopes
-  scopes: [ '@cnpm', '@cnpmtest', '@cnpm-test' ],
+  scopes: JSON.parse(privateScopes.replace(/'/g, '"')),
 
   // some registry already have some private packages in global scope
   // but we want to treat them as scoped private packages,
   // so you can use this white list.
-  privatePackages: [],
+  privatePackages: JSON.parse(privatePackages.replace(/'/g, '"')),
 
   /**
    * sync configs
@@ -168,11 +196,12 @@ var config = {
   // sync source, upstream registry
   // If you want to directly sync from official npm's registry
   // please drop them an email first
-  sourceNpmRegistry: 'https://registry.npm.taobao.org',
+  sourceNpmRegistry: process.env.CNPM_SOURCE_NPM_REGISTRY || 'https://registry.npm.taobao.org',
+  sourceNpmWeb: process.env.CNPM_SOURCE_NPM_WEB || 'https://npm.taobao.org',
 
   // upstream registry is base on cnpm/cnpmjs.org or not
   // if your upstream is official npm registry, please turn it off
-  sourceNpmRegistryIsCNpm: true,
+  sourceNpmRegistryIsCNpm: ((process.env.CNPM_SOURCE_NPM_REGISTRY_IS_CNPM || 'true') == 'true'),
 
   // if install return 404, try to sync from source registry
   syncByInstall: true,
@@ -181,7 +210,7 @@ var config = {
   // none: do not sync any module, proxy all public modules from sourceNpmRegistry
   // exist: only sync exist modules
   // all: sync all modules
-  syncModel: 'none', // 'none', 'all', 'exist'
+  syncModel: process.env.CNPM_SYNC_MODEL || 'node', // 'none', 'all', 'exist'
 
   syncConcurrency: 1,
   // sync interval, default is 10 minutes
@@ -197,14 +226,32 @@ var config = {
 
   // sync devDependencies or not, default is false
   syncDevDependencies: false,
+  // try to remove all deleted versions from original registry
+  syncDeletedVersions: true,
 
   // changes streaming sync
   syncChangesStream: false,
   handleSyncRegistry: 'http://127.0.0.1:7001',
 
-  // badge subject on http://shields.io/
-  badgePrefixURL: 'https://img.shields.io/badge',
+  // default badge subject
   badgeSubject: 'cnpm',
+  // defautl use https://badgen.net/
+  badgeService: {
+    url: function(subject, status, options) {
+      options = options || {};
+      let url = `https://badgen.net/badge/${utility.encodeURIComponent(subject)}/${utility.encodeURIComponent(status)}`;
+      if (options.color) {
+        url += `/${utility.encodeURIComponent(options.color)}`;
+      }
+      if (options.icon) {
+        url += `?icon=${utility.encodeURIComponent(options.icon)}`;
+      }
+      return url;
+    },
+  },
+
+  packagephobiaURL: 'https://packagephobia.now.sh',
+  packagephobiaSupportPrivatePackage: false,
 
   // custom user service, @see https://github.com/cnpm/cnpmjs.org/wiki/Use-Your-Own-User-Authorization
   // when you not intend to ingegrate with your company's user system, then use null, it would
@@ -229,7 +276,34 @@ var config = {
   // global hook function: function* (envelope) {}
   // envelope format please see https://github.com/npm/registry/blob/master/docs/hooks/hooks-payload.md#payload
   globalHook: null,
+
+  opensearch: {
+    host: '',
+  },
 };
+
+
+var nfsType=process.env.CNPM_NFS_TYPE || 'LOCAL';
+if(nfsType === 'OSS') {
+  config.nfs=require('oss-cnpm').create({
+    accessKeyId: process.env.CNPM_NFS_OSS_ACCESS_KEY_ID,
+    accessKeySecret: process.env.CNPM_NFS_OSS_ACCESS_KEY_SECRET,
+    // change to your endpoint
+    endpoint: process.env.CNPM_NFS_OSS_ENDPOINT,
+    bucket: process.env.CNPM_NFS_OSS_BUCKET,
+    mode: 'private',
+    timeout: '300s',
+    agent: new AgentKeepalive({
+        keepAlive: false,
+        maxSockets: 20,
+    }),
+  });
+}
+
+
+if (process.env.NODE_ENV === 'test') {
+  config.enableAbbreviatedMetadata = true;
+}
 
 if (process.env.NODE_ENV !== 'test') {
   var customConfig;
