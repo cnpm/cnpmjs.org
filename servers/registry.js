@@ -20,6 +20,13 @@ var cors = require('kcors');
 var proxyToNpm = require('../middleware/proxy_to_npm');
 var maxrequests = require('koa-maxrequests');
 
+var proxy = require('koa-proxy');
+app.use(proxy({
+  host:  'https://registry.npmjs.org',
+  match: /^\/\-\/npm\/v1\/security\/audits/       
+}));
+
+
 app.use(maxrequests());
 app.use(block());
 middlewares.jsonp(app);
