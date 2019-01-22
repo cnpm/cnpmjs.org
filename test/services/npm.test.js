@@ -58,17 +58,17 @@ describe('test/services/npm.test.js', () => {
       pkg.time['0.0.1-alpha1'].should.equal('2012-03-02T21:46:14.725Z');
       pkg.versions['0.0.1-alpha1'].version.should.equal('0.0.1-alpha1');
       pkg.versions['0.0.1-alpha1'].dist.shasum.should.equal('cfa9394e29c3eb0fe58998f5bf5bda79aa7d3e2e');
-      pkg.versions['0.0.1-alpha1'].dist.tarball.should.equal('http://registry.npmjs.org/shelljs/-/shelljs-0.0.1alpha1.tgz');
+      pkg.versions['0.0.1-alpha1'].dist.tarball.should.equal('https://registry.npmjs.org/shelljs/-/shelljs-0.0.1alpha1.tgz');
 
       pkg.time['0.7.5'].should.equal('2016-10-27T05:50:21.479Z');
       pkg.versions['0.7.5'].version.should.equal('0.7.5');
       pkg.versions['0.7.5'].dist.shasum.should.equal('2eef7a50a21e1ccf37da00df767ec69e30ad0675');
-      pkg.versions['0.7.5'].dist.tarball.should.equal('http://registry.npmjs.org/shelljs/-/shelljs-0.7.5.tgz');
+      pkg.versions['0.7.5'].dist.tarball.should.equal('https://registry.npmjs.org/shelljs/-/shelljs-0.7.5.tgz');
 
       pkg.time['0.0.6-pre2'].should.equal('2012-05-25T18:14:25.441Z');
       pkg.versions['0.0.6-pre2'].version.should.equal('0.0.6-pre2');
       pkg.versions['0.0.6-pre2'].dist.shasum.should.equal('8c3eecaddba6f425bd5cae001f80a4d224750911');
-      pkg.versions['0.0.6-pre2'].dist.tarball.should.equal('http://registry.npmjs.org/shelljs/-/shelljs-0.0.6pre2.tgz');
+      pkg.versions['0.0.6-pre2'].dist.tarball.should.equal('https://registry.npmjs.org/shelljs/-/shelljs-0.0.6pre2.tgz');
     });
   });
 
