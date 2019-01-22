@@ -42,7 +42,7 @@ describe('test/controllers/registry/package/list_shorts.test.js', () => {
       .get('/-/short')
       .expect(200, (err, res) => {
         should.not.exist(err);
-        res.body.should.be.an.Array;
+        res.body.should.be.an.Array();
         res.body.length.should.above(0);
         res.body.indexOf('pedding').should.above(-1);
         done();
@@ -55,7 +55,7 @@ describe('test/controllers/registry/package/list_shorts.test.js', () => {
       .get('/-/short?private_only=true')
       .expect(200, (err, res) => {
         should.not.exist(err);
-        res.body.should.be.an.Array;
+        res.body.should.be.an.Array();
         res.body.length.should.above(0);
         res.body.indexOf('@cnpmtest/testmodule-list-shorts1').should.above(-1);
         done();

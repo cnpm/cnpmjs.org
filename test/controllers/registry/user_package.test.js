@@ -25,7 +25,7 @@ describe('test/controllers/registry/user_package.test.js', function () {
       .get('/-/by-user/fengmk2')
       .expect(200, function (err, res) {
         should.not.exist(err);
-        res.body.fengmk2.should.be.an.Array;
+        res.body.fengmk2.should.be.an.Array();
         res.body.fengmk2.should.containEql('pedding');
         done();
       });
@@ -47,9 +47,9 @@ describe('test/controllers/registry/user_package.test.js', function () {
       .get('/-/by-user/' + encodeURIComponent('fengmk2|dead-horse'))
       .expect(200, function (err, res) {
         should.not.exist(err);
-        res.body.fengmk2.should.be.an.Array;
+        res.body.fengmk2.should.be.an.Array();
         res.body.fengmk2.should.containEql('pedding');
-        res.body['dead-horse'].should.be.an.Array;
+        res.body['dead-horse'].should.be.an.Array();
         res.body['dead-horse'].should.containEql('pedding');
         done();
       });
@@ -58,9 +58,9 @@ describe('test/controllers/registry/user_package.test.js', function () {
       .get('/-/by-user/fengmk2|dead-horse')
       .expect(200, function (err, res) {
         should.not.exist(err);
-        res.body.fengmk2.should.be.an.Array;
+        res.body.fengmk2.should.be.an.Array();
         res.body.fengmk2.should.containEql('pedding');
-        res.body['dead-horse'].should.be.an.Array;
+        res.body['dead-horse'].should.be.an.Array();
         res.body['dead-horse'].should.containEql('pedding');
         done();
       });
@@ -73,7 +73,7 @@ describe('test/controllers/registry/user_package.test.js', function () {
       .get('/-/by-user/' + encodeURIComponent('fengmk2|user-not-exists'))
       .expect(200, function (err, res) {
         should.not.exist(err);
-        res.body.fengmk2.should.be.an.Array;
+        res.body.fengmk2.should.be.an.Array();
         res.body.fengmk2.should.containEql('pedding');
         done();
       });
@@ -82,7 +82,7 @@ describe('test/controllers/registry/user_package.test.js', function () {
       .get('/-/by-user/' + utils.otherAdmin2 + '|fengmk2|user-not-exists|')
       .expect(200, function (err, res) {
         should.not.exist(err);
-        res.body.fengmk2.should.be.an.Array;
+        res.body.fengmk2.should.be.an.Array();
         res.body.fengmk2.should.containEql('pedding');
         done();
       });

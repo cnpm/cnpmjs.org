@@ -189,12 +189,12 @@ describe('test/controllers/sync_module_worker.test.js', () => {
 
   it('should sync unpublished module by name', function* () {
     var result = yield SyncModuleWorker.sync('tnpm', 'fengmk2');
-    result.should.be.Number;
+    result.should.be.Number();
   });
 
   it('should sync not exists module', function* () {
     var result = yield SyncModuleWorker.sync('tnpm-not-exists', 'fengmk2');
-    result.should.be.Number;
+    result.should.be.Number();
   });
 
   it('should sync unpublished info', function (done) {

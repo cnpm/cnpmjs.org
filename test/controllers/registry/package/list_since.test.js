@@ -24,8 +24,8 @@ describe('test/controllers/registry/package/list_since.test.js', function () {
       .get('/-/all/since?stale=update_after&startkey=' + (Date.now() - 10000))
       .expect(200, function (err, res) {
         should.not.exist(err);
-        res.body.should.be.an.Object;
-        res.body._updated.should.be.a.Number;
+        res.body.should.be.an.Object();
+        res.body._updated.should.be.a.Number();
         Object.keys(res.body).length.should.above(1);
         res.body['@cnpmtest/testmodule-list_since'].should.equal(true);
         done();
@@ -37,8 +37,8 @@ describe('test/controllers/registry/package/list_since.test.js', function () {
       .get('/-/all/since?stale=update_after&startkey=' + (Date.now() - 1000000000))
       .expect(200, function (err, res) {
         should.not.exist(err);
-        res.body.should.be.an.Object;
-        res.body._updated.should.be.a.Number;
+        res.body.should.be.an.Object();
+        res.body._updated.should.be.a.Number();
         Object.keys(res.body).length.should.above(1);
         res.body['@cnpmtest/testmodule-list_since'].should.equal(true);
         done();

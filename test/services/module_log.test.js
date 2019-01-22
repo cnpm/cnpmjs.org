@@ -6,7 +6,7 @@ describe('test/services/module_log.test.js', () => {
   describe('create(), append()', () => {
     it('should create a log row', function* () {
       var log = yield ModuleLog.create({name: 'utility', username: 'fengmk2'});
-      log.id.should.be.a.Number;
+      log.id.should.be.a.Number();
       log.log.should.equal('');
     });
 
