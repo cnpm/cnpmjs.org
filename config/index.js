@@ -212,6 +212,9 @@ var config = {
 
   // changes streaming sync
   syncChangesStream: false,
+  syncDownloadOptions: {
+    // formatRedirectUrl: function (url, location)
+  },
   handleSyncRegistry: 'http://127.0.0.1:7001',
 
   // default badge subject

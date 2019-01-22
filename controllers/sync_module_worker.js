@@ -1305,15 +1305,18 @@ SyncModuleWorker.prototype._syncOneVersion = function *(versionIndex, sourcePack
   var filepath = common.getTarballFilepath(filename);
   var ws = fs.createWriteStream(filepath);
 
-  var options = {
+  var downloadOptions = {
     writeStream: ws,
     followRedirect: true,
     timeout: 600000, // 10 minutes download
     headers: {
-      'user-agent': USER_AGENT
+      'user-agent': USER_AGENT,
     },
     gzip: true,
   };
+  if (config.syncDownloadOptions) {
+    Object.assign(downloadOptions, config.syncDownloadOptions);
+  }
 
   var dependencies = Object.keys(sourcePackage.dependencies || {});
   var devDependencies = [];
@@ -1359,7 +1362,7 @@ SyncModuleWorker.prototype._syncOneVersion = function *(versionIndex, sourcePack
     logger.syncInfo('[sync_module_worker] downloading %j to %j', downurl, filepath);
     var r;
     try {
-      r = yield urllib.request(downurl, options);
+      r = yield urllib.request(downurl, downloadOptions);
     } catch (err) {
       logger.syncInfo('[sync_module_worker] download %j to %j error: %s', downurl, filepath, err);
       throw err;
@@ -1411,16 +1414,16 @@ SyncModuleWorker.prototype._syncOneVersion = function *(versionIndex, sourcePack
       throw err;
     }
 
-    options = {
+    var uploadOptions = {
       key: common.getCDNKey(sourcePackage.name, filename),
       size: dataSize,
       shasum: shasum
     };
     // upload to NFS
-    logger.syncInfo('[sync_module_worker] uploading %j to nfs', options);
+    logger.syncInfo('[sync_module_worker] uploading %j to nfs', uploadOptions);
     var result;
     try {
-      result = yield nfs.upload(filepath, options);
+      result = yield nfs.upload(filepath, uploadOptions);
     } catch (err) {
       logger.syncInfo('[sync_module_worker] upload %j to nfs error: %s', err);
       throw err;
