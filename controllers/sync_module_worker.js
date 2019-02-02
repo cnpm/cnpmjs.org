@@ -1460,7 +1460,7 @@ SyncModuleWorker.prototype._syncOneVersion = function *(versionIndex, sourcePack
 
     // delete _publish_on_cnpm, because other cnpm maybe sync from current cnpm
     delete mod.package._publish_on_cnpm;
-    if (that._publish) {
+    if (that._publish || config.scopes.includes(name)) {
       // sync as publish
       mod.package._publish_on_cnpm = true;
     }
