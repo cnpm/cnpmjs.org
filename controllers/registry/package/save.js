@@ -189,11 +189,11 @@ module.exports = function* save(next) {
   };
 
   mod.package.dist = dist;
-  yield addDepsRelations(mod.package);
-
   var addResult = yield packageService.saveModule(mod);
   debug('%s module: save file to %s, size: %d, sha1: %s, dist: %j, version: %s',
     addResult.id, dist.tarball, dist.size, shasum, dist, version);
+  
+  yield addDepsRelations(mod.package);
 
   if (tags.length) {
     yield tags.map(function (tag) {
