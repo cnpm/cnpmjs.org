@@ -23,7 +23,7 @@ var maxrequests = require('koa-maxrequests');
 var proxy = require('koa-proxy');
 app.use(proxy({
   host:  'https://registry.npmjs.org',
-  match: /^\/\-\/npm\/v1\/security\/audits/       
+  match: /^\/\-\/npm\/v1\/security\/audits/
 }));
 
 
@@ -50,6 +50,10 @@ app.use(notFound);
 
 app.use(conditional());
 app.use(etag());
+
+for (const middleware of config.customRegistryMiddlewares) {
+  app.use(middleware(app));
+}
 
 /**
  * Routes
