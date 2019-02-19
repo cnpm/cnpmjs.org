@@ -41,6 +41,18 @@ describe('test/controllers/registry/package/list.test.js', () => {
     });
   });
 
+  it('should use costomized registry middleware', done => {
+    request(app)
+    .get('/@cnpmtest/testmodule-list-1')
+    .expect(200, function (err, res) {
+      should.not.exist(err);
+      var data = res.body;
+      data.name.should.equal('@cnpmtest/testmodule-list-1');
+      assert(res.headers['x-custom-middleware'] === 'true');
+      done();
+    });
+  });
+
   it('should return all versions', done => {
     request(app)
     .get('/@cnpmtest/testmodule-list-1')

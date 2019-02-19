@@ -50,6 +50,8 @@ var config = {
   // view files directory
   viewDir: path.join(root, 'view', 'web'),
 
+  customRegistryMiddlewares: [],
+
   // config for koa-limit middleware
   // for limit download rates
   limit: {
@@ -268,6 +270,12 @@ var config = {
 
 if (process.env.NODE_ENV === 'test') {
   config.enableAbbreviatedMetadata = true;
+  config.customRegistryMiddlewares.push(() => {
+    return function* (next) {
+      this.set('x-custom-middleware', 'true');
+      yield next;
+    };
+  });
 }
 
 if (process.env.NODE_ENV !== 'test') {
