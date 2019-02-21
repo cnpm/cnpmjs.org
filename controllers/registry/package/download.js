@@ -13,7 +13,7 @@ var packageService = require('../../../services/package');
 var downloadTotalService = require('../../../services/download_total');
 var config = require('../../../config');
 
-var _downloads = {};
+let globalDownloads = new Map();
 
 module.exports = function* download(next) {
   var name = this.params.name || this.params[0];
@@ -43,11 +43,13 @@ module.exports = function* download(next) {
     }
     this.status = 302;
     this.set('Location', url);
-    _downloads[name] = (_downloads[name] || 0) + 1;
+    const count = (globalDownloads.get(name) || 0) + 1;
+    globalDownloads.set(name, count);
     return;
   }
 
-  _downloads[name] = (_downloads[name] || 0) + 1;
+  const count = (globalDownloads.get(name) || 0) + 1;
+  globalDownloads.set(name, count);
 
   if (config.downloadRedirectToNFS && url) {
     this.status = 302;
@@ -85,14 +87,13 @@ defer.setInterval(function* () {
   // save download count
   var totals = [];
   var allCount = 0;
-  for (var name in _downloads) {
-    var count = _downloads[name];
+  for (const [ name, count ] of globalDownloads) {
     if (name !== '__all__') {
       totals.push([name, count]);
     }
     allCount += count;
   }
-  _downloads = {};
+  globalDownloads = new Map();
 
   if (allCount === 0) {
     return;
@@ -114,8 +115,9 @@ defer.setInterval(function* () {
         err.message += '; name: ' + name + ', count: ' + count + ', date: ' + date;
         logger.error(err);
       }
-      // save back to _downloads, try again next time
-      _downloads[name] = (_downloads[name] || 0) + count;
+      // save back to globalDownloads, try again next time
+      count = (globalDownloads.get(name) || 0) + count;
+      globalDownloads.set(name, count);
     }
   }
   saving = false;
