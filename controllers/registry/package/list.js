@@ -6,6 +6,8 @@ var packageService = require('../../../services/package');
 var common = require('../../../lib/common');
 var SyncModuleWorker = require('../../sync_module_worker');
 var config = require('../../../config');
+const cache = require('../../../common/cache');
+const logger = require('../../../common/logger');
 
 // https://forum.nginx.org/read.php?2,240120,240120#msg-240120
 // should set weak etag avoid nginx remove it
@@ -18,7 +20,33 @@ function etag(objs) {
  * GET /:name
  */
 module.exports = function* list() {
-  var name = this.params.name || this.params[0];
+  const name = this.params.name || this.params[0];
+  // sync request will contain this query params
+  let noCache = this.query.cache === '0';
+  const isJSONPRequest = this.query.callback;
+  let cacheKey;
+  let needAbbreviatedMeta = false;
+  let abbreviatedMetaType = 'application/vnd.npm.install-v1+json';
+  if (config.enableAbbreviatedMetadata && this.accepts([ 'json', abbreviatedMetaType ]) === abbreviatedMetaType) {
+    needAbbreviatedMeta = true;
+    if (cache && !isJSONPRequest) {
+      cacheKey = `list-${name}-v1`;
+    }
+  }
+
+  if (cacheKey && !noCache) {
+    const values = yield cache.hmget(cacheKey, 'etag', 'body');
+    if (values && values[0] && values[1]) {
+      this.body = values[1];
+      this.type = 'json';
+      this.etag = values[0];
+      this.set('x-hit-cache', cacheKey);
+      debug('hmget %s success, etag:%j', cacheKey, values[0]);
+      return;
+    }
+    debug('hmget %s missing, %j', cacheKey, values);
+  }
+
   var rs = yield [
     packageService.getModuleLastModified(name),
     packageService.listModuleTags(name),
@@ -46,11 +74,10 @@ module.exports = function* list() {
     }
   }
 
-  var abbreviatedMetaType = 'application/vnd.npm.install-v1+json';
-  if (config.enableAbbreviatedMetadata && this.accepts([ 'json', abbreviatedMetaType ]) === abbreviatedMetaType) {
+  if (needAbbreviatedMeta) {
     var rows = yield packageService.listModuleAbbreviatedsByName(name);
     if (rows.length > 0) {
-      yield handleAbbreviatedMetaRequest(this, name, modifiedTime, tags, rows);
+      yield handleAbbreviatedMetaRequest(this, name, modifiedTime, tags, rows, cacheKey);
       return;
     }
     var fullRows = yield packageService.listModulesByName(name);
@@ -228,8 +255,9 @@ module.exports = function* list() {
   ]);
 };
 
-function* handleAbbreviatedMetaRequest(ctx, name, modifiedTime, tags, rows) {
+function* handleAbbreviatedMetaRequest(ctx, name, modifiedTime, tags, rows, cacheKey) {
   debug('show %s got %d rows, %d tags, modifiedTime: %s', name, rows.length, tags.length, modifiedTime);
+  const isJSONPRequest = ctx.query.callback;
   var latestMod = null;
   // set tags
   var distTags = {};
@@ -274,13 +302,32 @@ function* handleAbbreviatedMetaRequest(ctx, name, modifiedTime, tags, rows) {
   };
 
   debug('show %j', info);
-  ctx.jsonp = info;
   // use faster etag
-  ctx.etag = etag([
+  const resultEtag = etag([
     modifiedTime,
     distTags,
     allVersionString,
   ]);
+
+  if (isJSONPRequest) {
+    ctx.jsonp = info;
+  } else {
+    ctx.body = JSON.stringify(info);
+    ctx.type = 'json';
+    // set cache
+    if (cacheKey) {
+      // set cache async, dont block the response
+      cache.pipeline()
+        .hmset(cacheKey, 'etag', resultEtag, 'body', ctx.body)
+        // cache 120s
+        .expire(cacheKey, 120)
+        .exec()
+        .catch(err => {
+          logger.error(err);
+        });
+    }
+  }
+  ctx.etag = resultEtag;
 }
 
 function* handleAbbreviatedMetaRequestWithFullMeta(ctx, name, modifiedTime, tags, rows) {

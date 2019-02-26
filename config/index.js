@@ -266,6 +266,12 @@ var config = {
   opensearch: {
     host: '',
   },
+
+  // redis cache
+  redisCache: {
+    enable: false,
+    connectOptions: null,
+  },
 };
 
 if (process.env.NODE_ENV === 'test') {
