@@ -25,6 +25,7 @@ var downloadTotalService = require('../services/download_total');
 var hook = require('../services/hook');
 var User = require('../models').User;
 var os = require('os');
+const cache = require('../common/cache');
 
 var USER_AGENT = 'sync.cnpmjs.org/' + config.version +
   ' hostname/' + os.hostname() +
@@ -190,6 +191,14 @@ SyncModuleWorker.prototype.add = function (name) {
 };
 
 SyncModuleWorker.prototype._doneOne = function* (concurrencyId, name, success) {
+  // clean cache
+  if (cache) {
+    const cacheKey = `list-${name}-v1`;
+    cache.del(cacheKey).catch(err => {
+      logger.error(err);
+    });
+  }
+
   this.log('----------------- Synced %s %s -------------------',
     name, success ? 'success' : 'fail');
   if (success) {
@@ -629,7 +638,8 @@ SyncModuleWorker.prototype._sync = function* (name, pkg) {
   // get package AbbreviatedMetadata
   var remoteAbbreviatedMetadatas = {};
   if (config.enableAbbreviatedMetadata) {
-    var packageUrl = '/' + name.replace('/', '%2f');
+    // use ?cache=0 tell registry dont use cache result
+    var packageUrl = '/' + name.replace('/', '%2f') + '?cache=0';
     var result = yield npmSerivce.request(packageUrl, {
       dataType: 'text',
       registry: config.sourceNpmRegistry,
