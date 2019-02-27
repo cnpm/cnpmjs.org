@@ -23,6 +23,13 @@ module.exports = function* list() {
   const name = this.params.name || this.params[0];
   // sync request will contain this query params
   let noCache = this.query.cache === '0';
+  if (!noCache) {
+    const ua = this.headers['user-agent'] || '';
+    // old sync client will request with these user-agent
+    if (ua.indexOf('npm_service.cnpmjs.org/') !== -1) {
+      noCache = true;
+    }
+  }
   const isJSONPRequest = this.query.callback;
   let cacheKey;
   let needAbbreviatedMeta = false;
