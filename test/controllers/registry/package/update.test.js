@@ -36,8 +36,8 @@ describe('test/controllers/registry/package/update.test.js', function () {
       foo: 'bar'
     })
     .expect({
-      error: 'not_found',
-      reason: 'document not found'
+      error: '[not_found] document not found',
+      reason: '[not_found] document not found',
     })
     .expect(404, done);
   });
@@ -192,7 +192,10 @@ describe('test/controllers/registry/package/update.test.js', function () {
       })
       .set('authorization', utils.otherUserAuth)
       .expect(403)
-      .expect({error: 'invalid operation', reason: 'Can not remove all maintainers'})
+      .expect({
+        error: '[invalid_operation] Can not remove all maintainers',
+        reason: '[invalid_operation] Can not remove all maintainers',
+      })
       .expect('content-type', 'application/json; charset=utf-8', done);
     });
 
@@ -208,8 +211,8 @@ describe('test/controllers/registry/package/update.test.js', function () {
       .set('authorization', utils.secondUserAuth)
       .expect(403)
       .expect({
-        error: 'forbidden user',
-        reason: 'cnpmjstest102 not authorized to modify @cnpmtest/testmodule-update-1'
+        error: '[forbidden] cnpmjstest102 not authorized to modify @cnpmtest/testmodule-update-1',
+        reason: '[forbidden] cnpmjstest102 not authorized to modify @cnpmtest/testmodule-update-1',
       }, done);
     });
 
@@ -288,8 +291,8 @@ describe('test/controllers/registry/package/update.test.js', function () {
         })
         .set('authorization', utils.otherUserAuth)
         .expect({
-          error: 'invalid user name',
-          reason: 'User: `not-exists, not-exists2` not exists'
+          error: '[invalid] User: `not-exists, not-exists2` not exists',
+          reason: '[invalid] User: `not-exists, not-exists2` not exists',
         })
         .expect(403, done);
       });

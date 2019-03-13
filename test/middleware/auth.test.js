@@ -55,8 +55,8 @@ describe('test/middleware/auth.test.js', function () {
         .put('/-/user/org.couchdb.user:cnpmjstest10/-rev/1')
         .set('authorization', 'basic ' + Buffer.from('cnpmjstest10:cnpmjstest10').toString('base64'))
         .expect({
-          error: 'UserSeriveAuthError',
-          reason: 'mock user service auth error, please visit http://ooxx.net/user to sigup first'
+          error: '[UserSeriveAuthError] mock user service auth error, please visit http://ooxx.net/user to sigup first',
+          reason: '[UserSeriveAuthError] mock user service auth error, please visit http://ooxx.net/user to sigup first',
         })
         .expect(401, done);
       });
@@ -73,8 +73,8 @@ describe('test/middleware/auth.test.js', function () {
       .get('/')
       .set('Accept', 'application/json')
       .expect({
-        error: 'unauthorized',
-        reason: 'login first'
+        error: '[unauthorized] login first',
+        reason: '[unauthorized] login first',
       })
       .expect(401, done);
     });

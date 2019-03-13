@@ -23,8 +23,8 @@ describe('test/controllers/registry/package/download_total.test.js', () => {
     .get('/downloads/range/2014-10-10:xxxx/koa')
     .expect(400)
     .expect({
-      error: 'range_error',
-      reason: 'range must be YYYY-MM-DD:YYYY-MM-DD style'
+      error: '[range_error] range must be YYYY-MM-DD:YYYY-MM-DD style',
+      reason: '[range_error] range must be YYYY-MM-DD:YYYY-MM-DD style',
     });
   });
 

@@ -58,8 +58,8 @@ describe('test/controllers/registry/package/dist_tag.test.js', function () {
       .get('/-/package/@cnpmtest/not-exists/dist-tags')
       .expect(404)
       .expect({
-        error: 'not_found',
-        reason: 'document not found'
+        error: '[not_found] document not found',
+        reason: '[not_found] document not found',
       }, done);
     });
   });
@@ -89,8 +89,8 @@ describe('test/controllers/registry/package/dist_tag.test.js', function () {
       .set('content-type', 'application/json')
       .send(JSON.stringify('2.0.1'))
       .expect({
-        error: 'version_error',
-        reason: '@cnpmtest/dist_tag_test_module_set@2.0.1 not exists'
+        error: '[version_error] @cnpmtest/dist_tag_test_module_set@2.0.1 not exists',
+        reason: '[version_error] @cnpmtest/dist_tag_test_module_set@2.0.1 not exists',
       })
       .expect(400, done);
     });
@@ -162,8 +162,8 @@ describe('test/controllers/registry/package/dist_tag.test.js', function () {
       .set('authorization', utils.otherUserAuth)
       .set('content-type', 'application/json')
       .expect({
-        error: 'dist_tag_error',
-        reason: 'Can\'t not delete latest tag',
+        error: '[dist_tag_error] Can\'t not delete latest tag',
+        reason: '[dist_tag_error] Can\'t not delete latest tag',
       })
       .expect(400, done);
     });

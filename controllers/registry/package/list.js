@@ -140,9 +140,10 @@ module.exports = function* list() {
   if (rows.length === 0) {
     if (!this.allowSync) {
       this.status = 404;
+      const error = '[not_found] document not found';
       this.jsonp = {
-        error: 'not_found',
-        reason: 'document not found',
+        error,
+        reason: error,
       };
       return;
     }

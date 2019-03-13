@@ -149,8 +149,8 @@ describe('test/controllers/registry/package/list.test.js', () => {
     .get('/@cnpmtest/not-exists-package')
     .expect(404)
     .expect({
-      error: 'not_found',
-      reason: 'document not found'
+      error: '[not_found] document not found',
+      reason: '[not_found] document not found',
     }, done);
   });
 
@@ -160,8 +160,8 @@ describe('test/controllers/registry/package/list.test.js', () => {
     .get('/@cnpmtest/not-exists-package')
     .expect(404)
     .expect({
-      error: 'not_found',
-      reason: 'document not found'
+      error: '[not_found] document not found',
+      reason: '[not_found] document not found',
     }, done);
   });
 
@@ -178,8 +178,8 @@ describe('test/controllers/registry/package/list.test.js', () => {
     .get('/@cnpmtest/pedding')
     .expect(404)
     .expect({
-      error: 'not_found',
-      reason: 'document not found'
+      error: '[not_found] document not found',
+      reason: '[not_found] document not found',
     }, done);
   });
 
@@ -289,8 +289,8 @@ describe('test/controllers/registry/package/list.test.js', () => {
         .set('Accept', 'application/vnd.npm.install-v1+json')
         .expect(404)
         .expect({
-          error: 'not_found',
-          reason: 'document not found'
+          error: '[not_found] document not found',
+          reason: '[not_found] document not found',
         });
     });
 

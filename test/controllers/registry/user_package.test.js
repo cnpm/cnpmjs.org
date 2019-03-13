@@ -120,8 +120,8 @@ describe('test/controllers/registry/user_package.test.js', function () {
       .get('/-/by-user/n1|n2|n3|n4|n5|n6|n7|n8|n9|n10|n11|n12|n13|n14|n15|n16|n17|n18|n19|n20|n21')
       .expect(400)
       .expect({
-        error: 'bad_request',
-        reason: 'reach max user names limit, must <= 20 user names'
+        error: '[bad_request] reach max user names limit, must <= 20 user names',
+        reason: '[bad_request] reach max user names limit, must <= 20 user names',
       }, done);
     });
   });

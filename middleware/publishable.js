@@ -1,18 +1,4 @@
-/**!
- * cnpmjs.org - middleware/publishable.js
- *
- * Copyright(c) cnpmjs.org and other contributors.
- * MIT Licensed
- *
- * Authors:
- *  fengmk2 <fengmk2@gmail.com> (http://fengmk2.github.com)
- */
-
 'use strict';
-
-/**
- * Module dependencies.
- */
 
 var util = require('util');
 var config = require('../config');
@@ -27,9 +13,10 @@ module.exports = function *publishable(next) {
   // private mode, normal user can't publish and unpublish
   if (config.enablePrivate) {
     this.status = 403;
+    const error = '[no_perms] Private mode enable, only admin can publish this module';
     this.body = {
-      error: 'no_perms',
-      reason: 'Private mode enable, only admin can publish this module'
+      error,
+      reason: error,
     };
     return;
   }
@@ -70,9 +57,10 @@ function checkScope(name, ctx) {
   if (ctx.user.scopes.indexOf(scope) === -1) {
     debug('assert scope  %s error', name);
     ctx.status = 400;
+    const error = util.format('[invalid] scope %s not match legal scopes: %s', scope, ctx.user.scopes.join(', '));
     ctx.body = {
-      error: 'invalid scope',
-      reason: util.format('scope %s not match legal scopes: %s', scope, ctx.user.scopes.join(', '))
+      error,
+      reason: error,
     };
     return false;
   }
@@ -87,15 +75,17 @@ function checkScope(name, ctx) {
 function assertNoneScope(name, ctx) {
   ctx.status = 403;
   if (ctx.user.scopes.length === 0) {
+    const error = '[no_perms] can\'t publish non-scoped package, please set `config.scopes`';
     ctx.body = {
-      error: 'no_perms',
-      reason: 'can\'t publish non-scoped package, please set `config.scopes`'
+      error,
+      reason: error,
     };
     return;
   }
 
+  const error = '[no_perms] only allow publish with ' + ctx.user.scopes.join(', ') + ' scope(s)';
   ctx.body = {
-    error: 'no_perms',
-    reason: 'only allow publish with ' + ctx.user.scopes.join(', ') + ' scope(s)'
+    error,
+    reason: error,
   };
 }

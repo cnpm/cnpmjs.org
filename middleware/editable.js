@@ -21,8 +21,9 @@ module.exports = function* editable(next) {
   if (username) {
     message = username + ' ' + message;
   }
+  message = '[forbidden] ' + message;
   this.body = {
-    error: 'forbidden user',
-    reason: message
+    error: message,
+    reason: message,
   };
 };

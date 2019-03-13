@@ -44,8 +44,8 @@ describe('controllers/registry/module/config_private_packages.test.js', function
       .expect(403, function (err, res) {
         should.not.exist(err);
         res.body.should.eql({
-          error: 'forbidden',
-          reason: 'cannot modify pre-existing version: 0.0.1'
+          error: '[forbidden] cannot modify pre-existing version: 0.0.1',
+          reason: '[forbidden] cannot modify pre-existing version: 0.0.1',
         });
         done();
       });
@@ -58,7 +58,7 @@ describe('controllers/registry/module/config_private_packages.test.js', function
     .put('/' + pkg.name)
     .set('authorization', utils.secondUserAuth)
     .send(pkg)
-    .expect(/forbidden user/)
+    .expect(/not authorized to modify private-package/)
     .expect(403, done);
   });
 
@@ -68,7 +68,7 @@ describe('controllers/registry/module/config_private_packages.test.js', function
     .put('/' + pkg.name)
     .set('authorization', utils.adminAuth)
     .send(pkg)
-    .expect(/forbidden user/)
+    .expect(/not authorized to modify private-package/)
     .expect(403, done);
   });
 

@@ -165,8 +165,8 @@ describe('test/controllers/registry/package/deprecate.test.js', function () {
         }
       })
       .expect({
-        error: 'version_error',
-        reason: 'Some versions: ["1.0.1","1.0.0"] not found'
+        error: '[version_error] Some versions: ["1.0.1","1.0.0"] not found',
+        reason: '[version_error] Some versions: ["1.0.1","1.0.0"] not found',
       })
       .expect(400, done);
     });
@@ -190,8 +190,8 @@ describe('test/controllers/registry/package/deprecate.test.js', function () {
         }
       })
       .expect({
-        error: 'forbidden user',
-        reason: 'cnpmjstest101 not authorized to modify @cnpmtest/testmodule-deprecate, please contact maintainers: cnpmjstest10'
+        error: '[forbidden] cnpmjstest101 not authorized to modify @cnpmtest/testmodule-deprecate, please contact maintainers: cnpmjstest10',
+        reason: '[forbidden] cnpmjstest101 not authorized to modify @cnpmtest/testmodule-deprecate, please contact maintainers: cnpmjstest10',
       })
       .expect(403, done);
     });

@@ -59,9 +59,10 @@ module.exports = function* show() {
   // if not fond, sync from source registry
   if (!this.allowSync) {
     this.status = 404;
+    const error = '[not_exists] version not found: ' + version;
     this.jsonp = {
-      error: 'not exist',
-      reason: 'version not found: ' + version
+      error,
+      reason: error,
     };
     return;
   }

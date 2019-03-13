@@ -52,8 +52,8 @@ describe('test/controllers/sync.test.js', () => {
       .put('/utility_unit_test/sync?publish=true&nodeps=true')
       .expect(403)
       .expect({
-        error: 'no_perms',
-        reason: 'Only admin can publish'
+        error: '[no_perms] Only admin can publish',
+        reason: '[no_perms] Only admin can publish',
       }, done);
     });
 

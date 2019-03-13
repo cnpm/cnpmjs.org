@@ -108,8 +108,8 @@ describe('middleware/publishable.test.js', function () {
       }
     })
     .expect({
-      error: 'no_perms',
-      reason: 'Private mode enable, only admin can publish this module'
+      error: '[no_perms] Private mode enable, only admin can publish this module',
+      reason: '[no_perms] Private mode enable, only admin can publish this module',
     })
     .expect(403, done);
   });

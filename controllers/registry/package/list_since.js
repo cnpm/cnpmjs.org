@@ -12,9 +12,10 @@ module.exports = function* listSince() {
   var query = this.query;
   if (query.stale !== 'update_after') {
     this.status = 400;
+    const error = '[query_parse_error] Invalid value for `stale`.';
     this.body = {
-      error: 'query_parse_error',
-      reason: 'Invalid value for `stale`.'
+      error,
+      reason: error,
     };
     return;
   }
@@ -22,9 +23,10 @@ module.exports = function* listSince() {
   var startkey = Number(query.startkey);
   if (!startkey) {
     this.status = 400;
+    const error = '[query_parse_error] Invalid value for `startkey`.';
     this.body = {
-      error: 'query_parse_error',
-      reason: 'Invalid value for `startkey`.'
+      error,
+      reason: error,
     };
     return;
   }

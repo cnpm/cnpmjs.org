@@ -1,18 +1,4 @@
-/**!
- * cnpmjs.org - test/controllers/registry/user/update.test.js
- *
- * Copyright(c) cnpmjs.org and other contributors.
- * MIT Licensed
- *
- * Authors:
- *  fengmk2 <fengmk2@gmail.com> (http://fengmk2.github.com)
- */
-
 'use strict';
-
-/**
- * Module dependencies.
- */
 
 var request = require('supertest');
 var mm = require('mm');
@@ -83,8 +69,8 @@ describe('controllers/registry/user/update.test.js', function () {
         rev: '1-123'
       })
       .expect({
-        error: 'conflict',
-        reason: 'Document update conflict.'
+        error: '[conflict] Document update conflict',
+        reason: '[conflict] Document update conflict',
       })
       .expect(409, done);
     });
@@ -95,8 +81,8 @@ describe('controllers/registry/user/update.test.js', function () {
       .set('authorization', 'basic ' + Buffer.from('cnpmjstest10:cnpmjstest10').toString('base64'))
       .send({})
       .expect({
-        error: 'paramError',
-        reason: 'params missing, name, email or password missing.'
+        error: '[param_error] params missing, name, email or password missing',
+        reason: '[param_error] params missing, name, email or password missing',
       })
       .expect(422, done);
     });

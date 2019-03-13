@@ -23,9 +23,10 @@ function* deprecateVersions() {
     if (!row) {
       // some version not exists
       this.status = 400;
+      const error = '[version_error] Some versions: ' + JSON.stringify(Object.keys(body.versions)) + ' not found';
       this.body = {
-        error: 'version_error',
-        reason: 'Some versions: ' + JSON.stringify(Object.keys(body.versions)) + ' not found'
+        error,
+        reason: error,
       };
       return;
     }

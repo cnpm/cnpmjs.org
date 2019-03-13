@@ -99,8 +99,8 @@ describe('test/controllers/registry/user/add.test.js', function () {
         email: 'cnpmjstest10@cnpmjs.org'
       })
       .expect({
-        error: 'paramError',
-        reason: 'params missing, name, email or password missing.'
+        error: '[param_error] params missing, name, email or password missing',
+        reason: '[param_error] params missing, name, email or password missing',
       })
       .expect(422, done);
     });
@@ -144,8 +144,8 @@ describe('test/controllers/registry/user/add.test.js', function () {
         email: 'cnpmjstest10@cnpmjs.org'
       })
       .expect({
-        error: 'unauthorized',
-        reason: 'Login fail, please check your login name and password'
+        error: '[unauthorized] Login fail, please check your login name and password',
+        reason: '[unauthorized] Login fail, please check your login name and password',
       })
       .expect(401, done);
     });
@@ -166,8 +166,8 @@ describe('test/controllers/registry/user/add.test.js', function () {
         email: 'cnpmjstest10@cnpmjs.org'
       })
       .expect({
-        error: 'UserSeriveAuthError',
-        reason: 'mock user service auth error, please visit http://ooxx.net/user to sigup first'
+        error: 'mock user service auth error, please visit http://ooxx.net/user to sigup first',
+        reason: 'mock user service auth error, please visit http://ooxx.net/user to sigup first',
       })
       .expect(401, done);
     });

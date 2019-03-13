@@ -25,8 +25,8 @@ describe('test/controllers/registry/package/remove.test.js', function () {
     request(app)
     .del('/@cnpmtest/testmodule-remove-1/-rev/1')
     .expect({
-      error: 'unauthorized',
-      reason: 'Login first'
+      error: '[unauthorized] Login first',
+      reason: '[unauthorized] Login first',
     })
     .expect(401, done);
   });
@@ -36,8 +36,8 @@ describe('test/controllers/registry/package/remove.test.js', function () {
     .del('/@cnpmtest/testmodule-remove-1-not-exists/-rev/1')
     .set('authorization', utils.adminAuth)
     .expect({
-      error: 'not_found',
-      reason: 'document not found'
+      error: '[not_found] document not found',
+      reason: '[not_found] document not found',
     })
     .expect(404, done);
   });
@@ -47,8 +47,8 @@ describe('test/controllers/registry/package/remove.test.js', function () {
     .del('/@cnpmtest/testmodule-remove-1/-rev/1')
     .set('authorization', utils.otherUserAuth)
     .expect({
-      error: 'no_perms',
-      reason: 'Only administrators can unpublish module'
+      error: '[no_perms] Only administrators can unpublish module',
+      reason: '[no_perms] Only administrators can unpublish module',
     })
     .expect(403, done);
   });
