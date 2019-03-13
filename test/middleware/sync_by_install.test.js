@@ -14,8 +14,8 @@ describe('test/middleware/sync_by_install.test.js', () => {
     .get('/@cnpmtest/foo')
     .set('User-Agent', 'node/v4.4.4')
     .expect({
-      error: 'not_found',
-      reason: 'document not found',
+      error: '[not_found] document not found',
+      reason: '[not_found] document not found',
     })
     .expect(404, done);
   });

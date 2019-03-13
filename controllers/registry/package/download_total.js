@@ -12,9 +12,10 @@ module.exports = function* downloadTotal() {
       || !range[0].match(DATE_REG)
       || !range[1].match(DATE_REG)) {
     this.status = 400;
+    const error = '[range_error] range must be YYYY-MM-DD:YYYY-MM-DD style';
     this.body = {
-      error: 'range_error',
-      reason: 'range must be YYYY-MM-DD:YYYY-MM-DD style'
+      error,
+      reason: error,
     };
     return;
   }

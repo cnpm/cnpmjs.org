@@ -152,8 +152,8 @@ describe('test/controllers/registry/package/save.test.js', function () {
       .set('authorization', utils.adminAuth)
       .send(pkg)
       .expect({
-        error: 'version_error',
-        reason: 'package.versions is empty'
+        error: '[version_error] package.versions is empty',
+        reason: '[version_error] package.versions is empty',
       })
       .expect(400, done);
     });
@@ -166,8 +166,8 @@ describe('test/controllers/registry/package/save.test.js', function () {
       .set('authorization', utils.adminAuth)
       .send(pkg)
       .expect({
-        error: 'maintainers error',
-        reason: 'request body need maintainers'
+        error: '[maintainers_error] request body need maintainers',
+        reason: '[maintainers_error] request body need maintainers',
       })
       .expect(400, done);
     });
@@ -180,8 +180,8 @@ describe('test/controllers/registry/package/save.test.js', function () {
       .set('authorization', utils.adminAuth)
       .send(pkg)
       .expect({
-        error: 'invalid',
-        reason: 'dist-tags should not be empty'
+        error: '[invalid] dist-tags should not be empty',
+        reason: '[invalid] dist-tags should not be empty',
       })
       .expect(400, done);
     });
@@ -194,8 +194,8 @@ describe('test/controllers/registry/package/save.test.js', function () {
       .set('authorization', utils.adminAuth)
       .send(pkg)
       .expect({
-        error: 'maintainers error',
-        reason: utils.admin + ' does not in maintainer list'
+        error: '[maintainers_error] ' + utils.admin + ' does not in maintainer list',
+        reason: '[maintainers_error] ' + utils.admin + ' does not in maintainer list'
       })
       .expect(403, done);
     });
@@ -208,8 +208,8 @@ describe('test/controllers/registry/package/save.test.js', function () {
       .set('authorization', utils.adminAuth)
       .send(pkg)
       .expect({
-        error: 'attachment_error',
-        reason: 'package._attachments is empty'
+        error: '[attachment_error] package._attachments is empty',
+        reason: '[attachment_error] package._attachments is empty',
       })
       .expect(400, done);
     });
@@ -222,8 +222,8 @@ describe('test/controllers/registry/package/save.test.js', function () {
       .set('authorization', utils.adminAuth)
       .send(pkg)
       .expect({
-        error: 'size_wrong',
-        reason: 'Attachment size 261 not match download size 251'
+        error: '[size_wrong] Attachment size 261 not match download size 251',
+        reason: '[size_wrong] Attachment size 261 not match download size 251',
       })
       .expect(403, done);
     });
@@ -235,8 +235,8 @@ describe('test/controllers/registry/package/save.test.js', function () {
       .set('authorization', utils.otherAdmin2Auth)
       .send(pkg)
       .expect({
-        error: 'forbidden user',
-        reason: 'cnpmjstestAdmin2 not authorized to modify testmodule-new-1, please contact maintainers: cnpmjstest10'
+        error: '[forbidden] cnpmjstestAdmin2 not authorized to modify testmodule-new-1, please contact maintainers: cnpmjstest10',
+        reason: '[forbidden] cnpmjstestAdmin2 not authorized to modify testmodule-new-1, please contact maintainers: cnpmjstest10',
       })
       .expect(403, done);
     });
@@ -248,8 +248,8 @@ describe('test/controllers/registry/package/save.test.js', function () {
       .set('authorization', utils.adminAuth)
       .send(pkg)
       .expect({
-        error: 'forbidden',
-        reason: 'cannot modify pre-existing version: 0.0.1'
+        error: '[forbidden] cannot modify pre-existing version: 0.0.1',
+        reason: '[forbidden] cannot modify pre-existing version: 0.0.1',
       })
       .expect(403, done);
     });

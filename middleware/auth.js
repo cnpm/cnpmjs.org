@@ -58,9 +58,10 @@ function* unauthorized(next) {
   this.status = 401;
   this.set('WWW-Authenticate', 'Basic realm="sample"');
   if (this.accepts(['html', 'json']) === 'json') {
+    const error = '[unauthorized] login first';
     this.body = {
-      error: 'unauthorized',
-      reason: 'login first'
+      error,
+      reason: error,
     };
   } else {
     this.body = 'login first';

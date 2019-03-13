@@ -9,18 +9,20 @@ module.exports = function *login(next) {
       ? status
       : 500;
 
+    const error = `[${this.user.error.name}] ${this.user.error.message}`;
     this.body = {
-      error: this.user.error.name,
-      reason: this.user.error.message
+      error,
+      reason: error,
     };
     return;
   }
 
   if (!this.user.name) {
     this.status = 401;
+    const error = '[unauthorized] Login first';
     this.body = {
-      error: 'unauthorized',
-      reason: 'Login first'
+      error,
+      reason: error,
     };
     return;
   }

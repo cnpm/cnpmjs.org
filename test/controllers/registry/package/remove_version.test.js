@@ -30,8 +30,8 @@ describe('test/controllers/registry/package/remove_version.test.js', function ()
     .del('/@cnpmtest/testmodule-remove_version-1/download/@cnpmtest/testmodule_remove_version123.tgz/-rev/112312312321')
     .set('authorization', utils.adminAuth)
     .expect({
-      error: 'not_found',
-      reason: 'document not found'
+      error: '[not_found] document not found',
+      reason: '[not_found] document not found',
     })
     .expect(404, done);
   });
@@ -41,8 +41,8 @@ describe('test/controllers/registry/package/remove_version.test.js', function ()
     .del('/@cnpmtest/testmodule-remove_version-1/download/@cnpmtest/testmodule-remove_version-1-1.0.1.tgz/-rev/abc')
     .set('authorization', utils.adminAuth)
     .expect({
-      error: 'not_found',
-      reason: 'document not found'
+      error: '[not_found] document not found',
+      reason: '[not_found] document not found',
     })
     .expect(404, done);
   });
@@ -52,8 +52,8 @@ describe('test/controllers/registry/package/remove_version.test.js', function ()
     .del('/@cnpmtest/testmodule-remove_version-1/download/@cnpmtest/testmodule-remove_version-1-1.0.1.tgz/-rev/112312312321')
     .set('authorization', utils.adminAuth)
     .expect({
-      error: 'not_found',
-      reason: 'document not found'
+      error: '[not_found] document not found',
+      reason: '[not_found] document not found',
     })
     .expect(404, done);
   });

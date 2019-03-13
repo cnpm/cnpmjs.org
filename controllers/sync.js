@@ -25,9 +25,10 @@ exports.sync = function* () {
   debug('sync %s with query: %j, syncUpstreamFirst: %s', name, this.query, syncUpstreamFirst);
   if (type === 'package' && publish && !this.user.isAdmin) {
     this.status = 403;
+    const error = '[no_perms] Only admin can publish';
     this.body = {
-      error: 'no_perms',
-      reason: 'Only admin can publish'
+      error,
+      reason: error,
     };
     return;
   }

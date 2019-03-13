@@ -31,9 +31,10 @@ module.exports = function* save(next) {
   var version = Object.keys(pkg.versions || {})[0];
   if (!version) {
     this.status = 400;
+    const error = '[version_error] package.versions is empty';
     this.body = {
-      error: 'version_error',
-      reason: 'package.versions is empty'
+      error,
+      reason: error,
     };
     return;
   }
@@ -42,10 +43,11 @@ module.exports = function* save(next) {
   var result = yield packageService.authMaintainer(name, username);
   if (!result.isMaintainer) {
     this.status = 403;
+    const error = '[forbidden] ' +  username + ' not authorized to modify ' + name +
+      ', please contact maintainers: ' + result.maintainers.join(', ');
     this.body = {
-      error: 'forbidden user',
-      reason: username + ' not authorized to modify ' + name +
-        ', please contact maintainers: ' + result.maintainers.join(', ')
+      error,
+      reason: error,
     };
     return;
   }
@@ -64,9 +66,10 @@ module.exports = function* save(next) {
     }
 
     this.status = 400;
+    const error = '[attachment_error] package._attachments is empty';
     this.body = {
-      error: 'attachment_error',
-      reason: 'package._attachments is empty'
+      error,
+      reason: error,
     };
     return;
   }
@@ -78,9 +81,10 @@ module.exports = function* save(next) {
   // should never happened in normal request
   if (!maintainers) {
     this.status = 400;
+    const error = '[maintainers_error] request body need maintainers';
     this.body = {
-      error: 'maintainers error',
-      reason: 'request body need maintainers'
+      error,
+      reason: error,
     };
     return;
   }
@@ -95,9 +99,10 @@ module.exports = function* save(next) {
   });
   if (m.length === 0) {
     this.status = 403;
+    const error = '[maintainers_error] ' + username + ' does not in maintainer list';
     this.body = {
-      error: 'maintainers error',
-      reason: username + ' does not in maintainer list'
+      error,
+      reason: error,
     };
     return;
   }
@@ -112,9 +117,10 @@ module.exports = function* save(next) {
 
   if (tags.length === 0) {
     this.status = 400;
+    const error = '[invalid] dist-tags should not be empty';
     this.body = {
-      error: 'invalid',
-      reason: 'dist-tags should not be empty'
+      error,
+      reason: error,
     };
     return;
   }
@@ -126,9 +132,10 @@ module.exports = function* save(next) {
   var shasum;
   if (exists) {
     this.status = 403;
+    const error = '[forbidden] cannot modify pre-existing version: ' + version;
     this.body = {
-      error: 'forbidden',
-      reason: 'cannot modify pre-existing version: ' + version
+      error,
+      reason: error,
     };
     return;
   }
@@ -139,10 +146,11 @@ module.exports = function* save(next) {
 
   if (tarballBuffer.length !== attachment.length) {
     this.status = 403;
+    const error = '[size_wrong] Attachment size ' + attachment.length
+      + ' not match download size ' + tarballBuffer.length;
     this.body = {
-      error: 'size_wrong',
-      reason: 'Attachment size ' + attachment.length
-        + ' not match download size ' + tarballBuffer.length,
+      error,
+      reason: error,
     };
     return;
   }

@@ -42,8 +42,8 @@ describe('test/controllers/registry/package/tag.test.js', function () {
     .set('authorization', utils.adminAuth)
     .send('""')
     .expect({
-      error: 'version_missed',
-      reason: 'version not found'
+      error: '[version_missed] version not found',
+      reason: '[version_missed] version not found',
     })
     .expect(400, done);
   });
@@ -56,8 +56,8 @@ describe('test/controllers/registry/package/tag.test.js', function () {
     .send('"hello"')
     .expect(403)
     .expect({
-      error: 'forbidden',
-      reason: 'setting tag newtag to invalid version: hello: @cnpmtest/testmodule-tag-1/newtag'
+      error: '[forbidden] setting tag newtag to invalid version: hello: @cnpmtest/testmodule-tag-1/newtag',
+      reason: '[forbidden] setting tag newtag to invalid version: hello: @cnpmtest/testmodule-tag-1/newtag',
     }, done);
   });
 
@@ -69,8 +69,8 @@ describe('test/controllers/registry/package/tag.test.js', function () {
     .send('"5.0.0"')
     .expect(403)
     .expect({
-      error: 'forbidden',
-      reason: 'setting tag newtag to unknown version: 5.0.0: @cnpmtest/testmodule-tag-1/newtag'
+      error: '[forbidden] setting tag newtag to unknown version: 5.0.0: @cnpmtest/testmodule-tag-1/newtag',
+      reason: '[forbidden] setting tag newtag to unknown version: 5.0.0: @cnpmtest/testmodule-tag-1/newtag',
     }, done);
   });
 
@@ -93,8 +93,8 @@ describe('test/controllers/registry/package/tag.test.js', function () {
       .send('"1.0.0"')
       .expect(403)
       .expect({
-        error: 'forbidden user',
-        reason: 'cnpmjstest101 not authorized to modify @cnpmtest/update-tag-not-maintainer'
+        error: '[forbidden] cnpmjstest101 not authorized to modify @cnpmtest/update-tag-not-maintainer',
+        reason: '[forbidden] cnpmjstest101 not authorized to modify @cnpmtest/update-tag-not-maintainer',
       }, done);
     });
   });

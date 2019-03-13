@@ -49,8 +49,8 @@ describe('test/controllers/registry/package/list_since.test.js', function () {
       request(app)
       .get('/-/all/since')
       .expect({
-        error: 'query_parse_error',
-        reason: 'Invalid value for `stale`.'
+        error: '[query_parse_error] Invalid value for `stale`.',
+        reason: '[query_parse_error] Invalid value for `stale`.',
       })
       .expect(400, done);
     });
@@ -59,8 +59,8 @@ describe('test/controllers/registry/package/list_since.test.js', function () {
       request(app)
       .get('/-/all/since?stale=update_after&startkey=')
       .expect({
-        error: 'query_parse_error',
-        reason: 'Invalid value for `startkey`.'
+        error: '[query_parse_error] Invalid value for `startkey`.',
+        reason: '[query_parse_error] Invalid value for `startkey`.',
       })
       .expect(400, done);
     });
@@ -69,8 +69,8 @@ describe('test/controllers/registry/package/list_since.test.js', function () {
       request(app)
       .get('/-/all/since?stale=update_after&startkey=foo')
       .expect({
-        error: 'query_parse_error',
-        reason: 'Invalid value for `startkey`.'
+        error: '[query_parse_error] Invalid value for `startkey`.',
+        reason: '[query_parse_error] Invalid value for `startkey`.',
       })
       .expect(400, done);
     });

@@ -49,9 +49,10 @@ exports.set = function* () {
   var pkg = yield packageService.getModule(name, version);
   if (!pkg) {
     this.status = 400;
+    const error = '[version_error] ' + name + '@' + version + ' not exists';
     this.body = {
-      error: 'version_error',
-      reason: name + '@' + version + ' not exists'
+      error,
+      reason: error,
     };
     return;
   }
@@ -67,9 +68,10 @@ exports.destroy = function* () {
   var tag = this.params.tag || this.params[1];
   if (tag === 'latest') {
     this.status = 400;
+    const error = '[dist_tag_error] Can\'t not delete latest tag';
     this.body = {
-      error: 'dist_tag_error',
-      reason: 'Can\'t not delete latest tag',
+      error,
+      reason: error,
     };
     return;
   }

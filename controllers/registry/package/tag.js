@@ -16,20 +16,21 @@ module.exports = function* tag() {
 
   if (!version) {
     this.status = 400;
+    const error = '[version_missed] version not found';
     this.body = {
-      error: 'version_missed',
-      reason: 'version not found'
+      error,
+      reason: error,
     };
     return;
   }
 
   if (!semver.valid(version)) {
     this.status = 403;
-    var reason = util.format('setting tag %s to invalid version: %s: %s/%s',
+    const error = util.format('[forbidden] setting tag %s to invalid version: %s: %s/%s',
       tag, version, name, tag);
     this.body = {
-      error: 'forbidden',
-      reason: reason
+      error,
+      reason: error,
     };
     return;
   }
@@ -37,11 +38,11 @@ module.exports = function* tag() {
   var mod = yield packageService.getModule(name, version);
   if (!mod) {
     this.status = 403;
-    var reason = util.format('setting tag %s to unknown version: %s: %s/%s',
+    const error = util.format('[forbidden] setting tag %s to unknown version: %s: %s/%s',
       tag, version, name, tag);
     this.body = {
-      error: 'forbidden',
-      reason: reason
+      error,
+      reason: error,
     };
     return;
   }
@@ -50,6 +51,6 @@ module.exports = function* tag() {
   this.status = 201;
   this.body = {
     ok: true,
-    modified: row.gmt_modified
+    modified: row.gmt_modified,
   };
 };

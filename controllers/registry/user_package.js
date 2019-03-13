@@ -21,9 +21,10 @@ exports.list = function* () {
   var users = this.params.user.split('|');
   if (users.length > 20) {
     this.status = 400;
+    const error = '[bad_request] reach max user names limit, must <= 20 user names';
     this.body = {
-      error: 'bad_request',
-      reason: 'reach max user names limit, must <= 20 user names'
+      error,
+      reason: error,
     };
     return;
   }

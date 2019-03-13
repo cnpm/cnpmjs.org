@@ -54,8 +54,8 @@ describe('test/controllers/registry/module/maintainer.test.js', function () {
         ]
       })
       .expect({
-        error: 'invalid user name',
-        reason: 'User: `new-maintainer-not-exists, new-maintainer-not-exists2` not exists'
+        error: '[invalid] User: `new-maintainer-not-exists, new-maintainer-not-exists2` not exists',
+        reason: '[invalid] User: `new-maintainer-not-exists, new-maintainer-not-exists2` not exists',
       })
       .expect(403, done);
     });

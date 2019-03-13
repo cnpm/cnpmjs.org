@@ -32,9 +32,10 @@ module.exports = function* updateUser(next) {
   if (name !== this.user.name) {
     // must auth user first
     this.status = 401;
+    const error = '[unauthorized] Name is incorrect';
     this.body = {
-      error: 'unauthorized',
-      reason: 'Name is incorrect.'
+      error,
+      reason: error,
     };
     return;
   }
@@ -56,9 +57,10 @@ module.exports = function* updateUser(next) {
 
   if (!body.password || !user.name || !user.salt || !user.password_sha || !user.email) {
     this.status = 422;
+    const error = '[param_error] params missing, name, email or password missing';
     this.body = {
-      error: 'paramError',
-      reason: 'params missing, name, email or password missing.'
+      error,
+      reason: error,
     };
     return;
   }
@@ -66,9 +68,10 @@ module.exports = function* updateUser(next) {
   var result = yield userService.update(user);
   if (!result) {
     this.status = 409;
+    const error = '[conflict] Document update conflict';
     this.body = {
-      error: 'conflict',
-      reason: 'Document update conflict.'
+      error,
+      reason: error,
     };
     return;
   }

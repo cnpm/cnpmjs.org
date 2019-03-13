@@ -108,9 +108,10 @@ function* updateMaintainers() {
 
   if (usernames.length === 0) {
     this.status = 403;
+    const error = '[invalid_operation] Can not remove all maintainers';
     this.body = {
-      error: 'invalid operation',
-      reason: 'Can not remove all maintainers'
+      error,
+      reason: error,
     };
     return;
   }
@@ -145,9 +146,10 @@ function* updateMaintainers() {
       }
       if (invailds.length > 0) {
         this.status = 403;
+        const error = '[invalid] User: `' + invailds.join(', ') + '` not exists';
         this.body = {
-          error: 'invalid user name',
-          reason: 'User: `' + invailds.join(', ') + '` not exists'
+          error,
+          reason: error,
         };
         return;
       }

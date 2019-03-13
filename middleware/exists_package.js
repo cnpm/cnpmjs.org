@@ -9,8 +9,9 @@ module.exports = function* (next) {
     return yield next;
   }
   this.status = 404;
+  const error = '[not_found] document not found';
   this.body = {
-    error: 'not_found',
-    reason: 'document not found'
+    error,
+    reason: error,
   };
 };
