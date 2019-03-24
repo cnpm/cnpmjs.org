@@ -35,13 +35,13 @@ program
   .option('--admins <admins>', 'set admins', list)
   .option('--scopes <scopes>', 'set scopes', list)
   // .option('--cluster', 'enable cluster mode')
-  .option('--dataDir <dataDir>', 'cnpmjs.org data dir, default is `$HOME/.cnpmjs.org`')
+  .option('--dataDir <dataDir>', 'cnpmjs data dir, default is `$HOME/.cnpmjs`')
   .action(start);
 
 program
   .command('stop')
   .description('stop cnpmjs.org server')
-  .option('--dataDir <dataDir>', 'cnpmjs.org data dir, default is `$HOME/.cnpmjs.org`')
+  .option('--dataDir <dataDir>', 'cnpmjs data dir, default is `$HOME/.cnpmjs`')
   .action(stop);
 
 program.parse(process.argv);
@@ -51,7 +51,7 @@ function start(options) {
   stop(options)
     // wait for "stop" method to remove the pid file
     .then(function () {
-      var dataDir = options.dataDir || path.join(process.env.HOME, '.cnpmjs.org');
+      var dataDir = options.dataDir || path.join(process.env.HOME, '.cnpmjs');
       mkdirp.sync(dataDir);
 
       var configfile = path.join(dataDir, 'config.json');
@@ -94,7 +94,7 @@ function start(options) {
 }
 
 function stop(options) {
-  var dataDir = options.dataDir || path.join(process.env.HOME, '.cnpmjs.org');
+  var dataDir = options.dataDir || path.join(process.env.HOME, '.cnpmjs');
   var pidfile = path.join(dataDir, 'pid');
   return new Promise(function (resolve) {
     if (!fs.existsSync(pidfile)) {

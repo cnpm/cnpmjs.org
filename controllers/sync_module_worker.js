@@ -27,7 +27,7 @@ var User = require('../models').User;
 var os = require('os');
 const cache = require('../common/cache');
 
-var USER_AGENT = 'sync.cnpmjs.org/' + config.version +
+var USER_AGENT = 'sync.cnpmjs/' + config.version +
   ' hostname/' + os.hostname() +
   ' syncModel/' + config.syncModel +
   ' syncInterval/' + config.syncInterval +

@@ -3,7 +3,7 @@ MAINTAINER Bono Lv <lvscar  {aT} gmail.com>
 
 # Working enviroment
 ENV \
-    CNPM_DIR="/var/app/cnpmjs.org" \
+    CNPM_DIR="/var/app/cnpmjs" \
     CNPM_DATA_DIR="/var/data/cnpm_data" 
 
 RUN mkdir  -p ${CNPM_DIR}

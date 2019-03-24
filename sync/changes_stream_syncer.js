@@ -9,7 +9,7 @@ const logger = require('../common/logger');
 const config = require('../config');
 
 const db = config.officialNpmReplicate;
-const lastSeqFile = path.join(config.dataDir, '.cnpmjs.org.last_seq.txt');
+const lastSeqFile = path.join(config.dataDir, '.cnpmjs.last_seq.txt');
 let _STREAM_ID = 0;
 
 module.exports = function* sync() {

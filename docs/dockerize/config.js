@@ -121,7 +121,7 @@ var config = {
     },
 
     // the storage engine for 'sqlite'
-    // default store into ~/.cnpmjs.org/data.sqlite
+    // default store into ~/.cnpmjs/data.sqlite
     //storage: path.join(dataDir, 'data.sqlite'),
 
     logging: !!process.env.SQL_DEBUG,

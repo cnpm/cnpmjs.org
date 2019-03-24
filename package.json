@@ -1,5 +1,5 @@
 {
-  "name": "cnpmjs.org",
+  "name": "cnpmjs",
   "version": "3.0.0-rc.18",
   "description": "Private npm registry and web for Enterprise, base on MySQL and Simple Store Service",
   "main": "index.js",
@@ -12,7 +12,7 @@
     "stop": "./bin/nodejsctl stop"
   },
   "bin": {
-    "cnpmjs.org": "bin/cli.js"
+    "cnpmjs": "bin/cli.js"
   },
   "dependencies": {
     "agentkeepalive": "^4.0.0",

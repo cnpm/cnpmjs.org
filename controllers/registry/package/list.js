@@ -26,7 +26,7 @@ module.exports = function* list() {
   if (!noCache) {
     const ua = this.headers['user-agent'] || '';
     // old sync client will request with these user-agent
-    if (ua.indexOf('npm_service.cnpmjs.org/') !== -1) {
+    if (ua.indexOf('npm_service.cnpmjs/') !== -1) {
       noCache = true;
     }
   }

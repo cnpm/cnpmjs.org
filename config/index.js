@@ -10,7 +10,7 @@ var utility = require('utility');
 var version = require('../package.json').version;
 
 var root = path.dirname(__dirname);
-var dataDir = path.join(process.env.HOME || root, '.cnpmjs.org');
+var dataDir = path.join(process.env.HOME || root, '.cnpmjs');
 
 var config = {
   version: version,
@@ -132,7 +132,7 @@ var config = {
     },
 
     // the storage engine for 'sqlite'
-    // default store into ~/.cnpmjs.org/data.sqlite
+    // default store into ~/.cnpmjs/data.sqlite
     storage: path.join(dataDir, 'data.sqlite'),
 
     logging: !!process.env.SQL_DEBUG,
