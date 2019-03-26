@@ -81,7 +81,7 @@ as well as [New features in 2.x](https://github.com/cnpm/cnpmjs.org/wiki/New-fea
   * MariaDB
   * PostgreSQL
 
-### Clone codes and run test
+### Clone code and run test
 
 ```bash
 # clone from git
