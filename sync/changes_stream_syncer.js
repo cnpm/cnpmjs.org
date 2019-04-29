@@ -12,6 +12,8 @@ const db = config.officialNpmReplicate;
 const lastSeqFile = path.join(config.dataDir, '.cnpmjs.org.last_seq.txt');
 let _STREAM_ID = 0;
 
+// debug: curl -v https://replicate.npmjs.com/_changes?since=9052545
+
 module.exports = function* sync() {
   const pedding = [];
   const since = yield getLastSequence();
@@ -54,7 +56,8 @@ module.exports = function* sync() {
 
 function syncPackage(change) {
   const url = `${config.handleSyncRegistry}/${change.id}/sync`;
-  urllib.request(`${url}?sync_upstream=true`, {
+  // sync upstream and without deps
+  urllib.request(`${url}?sync_upstream=true&nodeps=true`, {
     method: 'PUT',
     dataType: 'json',
     timeout: 10000,
