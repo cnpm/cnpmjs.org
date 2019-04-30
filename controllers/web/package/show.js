@@ -151,7 +151,9 @@ module.exports = function* show(next) {
     pkg.repository = null;
   }
   if (pkg.repository && pkg.repository.url) {
-    pkg.repository.weburl = /^https?:\/\//.test(pkg.repository.url) ? pkg.repository.url : (giturl.parse(pkg.repository.url) || pkg.repository.url);
+    if (!pkg.repository.weburl) {
+      pkg.repository.weburl = /^https?:\/\//.test(pkg.repository.url) ? pkg.repository.url : (giturl.parse(pkg.repository.url) || pkg.repository.url);
+    }
   }
   if (!pkg.bugs) {
     pkg.bugs = {};
