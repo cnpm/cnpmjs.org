@@ -49,6 +49,11 @@ var config = {
   // web page viewCache
   viewCache: false,
 
+  // registry http response cache control header
+  // if you are using CDN, can set it to 'max-age=0, s-maxage=10, must-revalidate'
+  // it meaning cache 10s on CDN server and no cache on client side.
+  registryCacheControlHeader: '',
+
   // view files directory
   viewDir: path.join(root, 'view', 'web'),
 

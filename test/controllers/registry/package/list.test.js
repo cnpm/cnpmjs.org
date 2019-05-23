@@ -75,10 +75,36 @@ describe('test/controllers/registry/package/list.test.js', () => {
     });
   });
 
+  it('should return all versions with cache-control', done => {
+    mm(config, 'registryCacheControlHeader', 'max-age=0, s-maxage=10, must-revalidate');
+    request(app)
+    .get('/@cnpmtest/testmodule-list-1')
+    .expect('cache-control', 'max-age=0, s-maxage=10, must-revalidate')
+    .expect(200, function (err, res) {
+      should.not.exist(err);
+      var data = res.body;
+      data.name.should.equal('@cnpmtest/testmodule-list-1');
+      Object.keys(data.versions).should.eql(['1.0.0', '0.0.1']);
+      for (const v in data.versions) {
+        const pkg = data.versions[v];
+        assert(pkg.publish_time && typeof pkg.publish_time === 'number');
+      }
+      assert(/^W\/"\w{32}"$/.test(res.headers.etag));
+
+      // should 304
+      request(app)
+      .get('/@cnpmtest/testmodule-list-1')
+      .set('If-None-Match', res.headers.etag)
+      .expect(304, done);
+    });
+  });
+
   it('should return all versions in abbreviated meta format for private scope package', function(done) {
+    mm(config, 'registryCacheControlHeader', 'max-age=0, s-maxage=10, must-revalidate');
     request(app)
     .get('/@cnpmtest/testmodule-list-1')
     .set('Accept', 'application/vnd.npm.install-v1+json')
+    .expect('cache-control', 'max-age=0, s-maxage=10, must-revalidate')
     .expect(200, function(err, res) {
       should.not.exist(err);
       var data = res.body;
@@ -102,6 +128,24 @@ describe('test/controllers/registry/package/list.test.js', () => {
     return request(app)
       .get('/@cnpmtest/testmodule-list-1')
       .set('Accept', 'application/vnd.npm.install-v1+json; q=1.0, application/json; q=0.8, */*')
+      .expect(res => {
+        var data = res.body;
+        assert(data.name === '@cnpmtest/testmodule-list-1');
+        assert.deepEqual(Object.keys(data.versions), ['1.0.0', '0.0.1']);
+        assert(data.modified);
+        assert.deepEqual(data['dist-tags'], { latest: '1.0.0' });
+        assert(!data.time);
+        assert(/^W\/"\w{32}"$/.test(res.headers.etag));
+      })
+      .expect(200);
+  });
+
+  it('should return abbreviated meta with cache-controll', () => {
+    mm(config, 'registryCacheControlHeader', 'max-age=0, s-maxage=10, must-revalidate');
+    return request(app)
+      .get('/@cnpmtest/testmodule-list-1')
+      .set('Accept', 'application/vnd.npm.install-v1+json; q=1.0, application/json; q=0.8, */*')
+      .expect('cache-control', 'max-age=0, s-maxage=10, must-revalidate')
       .expect(res => {
         var data = res.body;
         assert(data.name === '@cnpmtest/testmodule-list-1');
@@ -264,6 +308,31 @@ describe('test/controllers/registry/package/list.test.js', () => {
       return request(app)
         .get('/pedding')
         .set('Accept', 'application/vnd.npm.install-v1+json')
+        .expect(200)
+        .expect(res => {
+          const data = res.body;
+          assert(data.name === 'pedding');
+          assert(data.modified);
+          assert(data['dist-tags'].latest);
+          assert(Object.keys(data.versions).length > 0);
+          for (const v in data.versions) {
+            const pkg = data.versions[v];
+            assert('_hasShrinkwrap' in pkg);
+            assert(pkg.publish_time && typeof pkg.publish_time === 'number');
+            assert(pkg._publish_on_cnpm === undefined);
+          }
+          assert(/^W\/"\w{32}"$/.test(res.headers.etag));
+        });
+    });
+
+    it('should return abbreviated meta with cache-control', () => {
+      mm(config, 'registryCacheControlHeader', 'max-age=0, s-maxage=10, must-revalidate');
+      mm(config, 'syncModel', 'all');
+      mm(config, 'enableAbbreviatedMetadata', true);
+      return request(app)
+        .get('/pedding')
+        .set('Accept', 'application/vnd.npm.install-v1+json')
+        .expect('cache-control', 'max-age=0, s-maxage=10, must-revalidate')
         .expect(200)
         .expect(res => {
           const data = res.body;

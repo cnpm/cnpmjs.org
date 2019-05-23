@@ -49,6 +49,9 @@ module.exports = function* list() {
       this.etag = values[0];
       this.set('x-hit-cache', cacheKey);
       debug('hmget %s success, etag:%j', cacheKey, values[0]);
+      if (config.registryCacheControlHeader) {
+        this.set('cache-control', config.registryCacheControlHeader);
+      }
       return;
     }
     debug('hmget %s missing, %j', cacheKey, values);
@@ -261,6 +264,10 @@ module.exports = function* list() {
     pkg.maintainers,
     allVersionString,
   ]);
+
+  if (config.registryCacheControlHeader) {
+    this.set('cache-control', config.registryCacheControlHeader);
+  }
 };
 
 function* handleAbbreviatedMetaRequest(ctx, name, modifiedTime, tags, rows, cacheKey) {
@@ -336,6 +343,9 @@ function* handleAbbreviatedMetaRequest(ctx, name, modifiedTime, tags, rows, cach
     }
   }
   ctx.etag = resultEtag;
+  if (config.registryCacheControlHeader) {
+    ctx.set('cache-control', config.registryCacheControlHeader);
+  }
 }
 
 function* handleAbbreviatedMetaRequestWithFullMeta(ctx, name, modifiedTime, tags, rows) {
@@ -410,4 +420,8 @@ function* handleAbbreviatedMetaRequestWithFullMeta(ctx, name, modifiedTime, tags
     distTags,
     allVersionString,
   ]);
+
+  if (config.registryCacheControlHeader) {
+    ctx.set('cache-control', config.registryCacheControlHeader);
+  }
 }
