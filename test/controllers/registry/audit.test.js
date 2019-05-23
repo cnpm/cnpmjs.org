@@ -52,10 +52,7 @@ describe('test/controllers/registry/audit.test.js', function () {
     request(app)
       .post('/-/npm/v1/security/audits')
       .send(reqBody)
-      .expect(200, function (err, res) {
-        res.body.metadata.should.Object()
-        done();
-      });
+      .expect(200, done);
   })
 
   it('should get /-/npm/v1/security/audits/quick', function (done) {
