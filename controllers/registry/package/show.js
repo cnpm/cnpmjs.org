@@ -53,6 +53,9 @@ module.exports = function* show() {
     // show tags for npminstall faster download
     mod.package['dist-tags'] = distTags;
     this.jsonp = mod.package;
+    if (config.registryCacheControlHeader) {
+      this.set('cache-control', config.registryCacheControlHeader);
+    }
     return;
   }
 

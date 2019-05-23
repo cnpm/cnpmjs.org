@@ -125,8 +125,10 @@ describe('test/controllers/registry/package/show.test.js', function () {
   });
 
   it('should return latest tag', function (done) {
+    mm(config, 'registryCacheControlHeader', 'max-age=0, s-maxage=10, must-revalidate');
     request(app)
     .get('/@cnpmtest/testmodule-show/latest')
+    .expect('cache-control', 'max-age=0, s-maxage=10, must-revalidate')
     .expect(200, function (err, res) {
       should.not.exist(err);
       var data = res.body;

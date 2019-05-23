@@ -339,8 +339,8 @@ SyncModuleWorker.prototype.syncByName = function* (concurrencyId, name, registry
   }
 
   let realRegistry = registry;
-  // get from npm
-  const packageUrl = '/' + name.replace('/', '%2f');
+  // get from npm, don't cache
+  const packageUrl = '/' + name.replace('/', '%2f') + '?sync_timestamp=' + Date.now();
   try {
     var result = yield npmSerivce.request(packageUrl, { registry: registry });
     pkg = result.data;
@@ -351,10 +351,10 @@ SyncModuleWorker.prototype.syncByName = function* (concurrencyId, name, registry
         const officialResult = yield npmSerivce.request(packageUrl, { registry: config.officialNpmRegistry });
         const officialPkg = officialResult.data;
         const officialStatus = officialResult.status;
-        this.log('[c#%d] [%s] official registry(%j, %j), replicate(%j, %j)',
+        this.log('[c#%d] [%s] official registry(%j, %j), replicate(%j, %j), packageUrl: %s',
           concurrencyId, name,
           officialPkg['dist-tags'], officialPkg.time && officialPkg.time.modified,
-          pkg['dist-tags'], pkg.time && pkg.time.modified);
+          pkg['dist-tags'], pkg.time && pkg.time.modified, packageUrl);
         if (officialPkg.time) {
           if (!pkg.time || officialPkg.time.modified > pkg.time.modified) {
             this.log('[c#%d] [%s] use official registry\'s data instead of replicate, modified: %j < %j',
@@ -639,7 +639,7 @@ SyncModuleWorker.prototype._sync = function* (name, pkg) {
   var remoteAbbreviatedMetadatas = {};
   if (config.enableAbbreviatedMetadata) {
     // use ?cache=0 tell registry dont use cache result
-    var packageUrl = '/' + name.replace('/', '%2f') + '?cache=0';
+    var packageUrl = '/' + name.replace('/', '%2f') + '?cache=0&sync_timestamp=' + Date.now();
     var result = yield npmSerivce.request(packageUrl, {
       dataType: 'text',
       registry: config.sourceNpmRegistry,
