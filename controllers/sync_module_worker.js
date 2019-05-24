@@ -1311,7 +1311,8 @@ SyncModuleWorker.prototype._syncOneVersion = function *(versionIndex, sourcePack
   var that = this;
   var username = this.username;
   var downurl = sourcePackage.dist.tarball;
-  var filename = path.basename(downurl);
+  var urlobj = urlparse(downurl);
+  var filename = path.basename(urlobj.pathname);
   var filepath = common.getTarballFilepath(filename);
   var ws = fs.createWriteStream(filepath);
 
