@@ -2,6 +2,7 @@
 
 var debug = require('debug')('cnpmjs.org:controllers:web:package:search');
 var packageService = require('../../../services/package');
+var config = require('../../../config');
 
 module.exports = function* search() {
   var params = this.params;
@@ -10,6 +11,10 @@ module.exports = function* search() {
 
   if (limit > 10000) {
     limit = 10000;
+  }
+
+  if (config.disableSearch) {
+    return this.redirect(`/package/${encodeURIComponent(word)}`);
   }
 
   debug('search %j', word);

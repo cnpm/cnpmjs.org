@@ -50,8 +50,8 @@ module.exports = function* showTotal() {
   if (cacheClient) {
     cacheClient.pipeline()
       .set(cacheKey, JSON.stringify(total))
-      // cache 120s
-      .expire(cacheKey, 120)
+      // cache 12h
+      .expire(cacheKey, 3600 * 12)
       .exec()
       .catch(err => {
         logger.error(err);
