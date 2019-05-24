@@ -4,6 +4,8 @@ const Total = require('../services/total');
 const version = require('../package.json').version;
 const config = require('../config');
 const getDownloadTotal = require('./utils').getDownloadTotal;
+const cacheClient = require('../common/cache');
+const logger = require('../common/logger');
 
 const startTime = '' + Date.now();
 let cache = null;
@@ -13,6 +15,15 @@ module.exports = function* showTotal() {
     // cache 120 seconds
     this.body = cache;
     return;
+  }
+
+  const cacheKey = 'registry_total';
+  if (cacheClient) {
+    const result = yield cacheClient.get(cacheKey);
+    if (result) {
+      this.body = JSON.parse(result);
+      return;
+    }
   }
 
   if (cache) {
@@ -36,4 +47,14 @@ module.exports = function* showTotal() {
   cache.cache_time = Date.now();
 
   this.body = total;
+  if (cacheClient) {
+    cacheClient.pipeline()
+      .set(cacheKey, JSON.stringify(total))
+      // cache 120s
+      .expire(cacheKey, 120)
+      .exec()
+      .catch(err => {
+        logger.error(err);
+      });
+  }
 };
