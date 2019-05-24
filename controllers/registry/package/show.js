@@ -56,6 +56,9 @@ module.exports = function* show() {
     if (config.registryCacheControlHeader) {
       this.set('cache-control', config.registryCacheControlHeader);
     }
+    if (config.registryVaryHeader) {
+      this.set('vary', config.registryVaryHeader);
+    }
     return;
   }
 

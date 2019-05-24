@@ -52,6 +52,9 @@ module.exports = function* list() {
       if (config.registryCacheControlHeader) {
         this.set('cache-control', config.registryCacheControlHeader);
       }
+      if (config.registryVaryHeader) {
+        this.set('vary', config.registryVaryHeader);
+      }
       return;
     }
     debug('hmget %s missing, %j', cacheKey, values);
@@ -268,6 +271,9 @@ module.exports = function* list() {
   if (config.registryCacheControlHeader) {
     this.set('cache-control', config.registryCacheControlHeader);
   }
+  if (config.registryVaryHeader) {
+    this.set('vary', config.registryVaryHeader);
+  }
 };
 
 function* handleAbbreviatedMetaRequest(ctx, name, modifiedTime, tags, rows, cacheKey) {
@@ -346,6 +352,9 @@ function* handleAbbreviatedMetaRequest(ctx, name, modifiedTime, tags, rows, cach
   if (config.registryCacheControlHeader) {
     ctx.set('cache-control', config.registryCacheControlHeader);
   }
+  if (config.registryVaryHeader) {
+    ctx.set('vary', config.registryVaryHeader);
+  }
 }
 
 function* handleAbbreviatedMetaRequestWithFullMeta(ctx, name, modifiedTime, tags, rows) {
@@ -423,5 +432,8 @@ function* handleAbbreviatedMetaRequestWithFullMeta(ctx, name, modifiedTime, tags
 
   if (config.registryCacheControlHeader) {
     ctx.set('cache-control', config.registryCacheControlHeader);
+  }
+  if (config.registryVaryHeader) {
+    ctx.set('vary', config.registryVaryHeader);
   }
 }

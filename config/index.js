@@ -53,6 +53,8 @@ var config = {
   // if you are using CDN, can set it to 'max-age=0, s-maxage=10, must-revalidate'
   // it meaning cache 10s on CDN server and no cache on client side.
   registryCacheControlHeader: '',
+  // if you are using CDN, can set it to 'Accept, Accept-Encoding'
+  registryVaryHeader: '',
   // disable package search
   disableSearch: false,
 

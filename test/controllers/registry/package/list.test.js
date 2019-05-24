@@ -77,9 +77,11 @@ describe('test/controllers/registry/package/list.test.js', () => {
 
   it('should return all versions with cache-control', done => {
     mm(config, 'registryCacheControlHeader', 'max-age=0, s-maxage=10, must-revalidate');
+    mm(config, 'registryVaryHeader', 'accept, accept-Encoding');
     request(app)
     .get('/@cnpmtest/testmodule-list-1')
     .expect('cache-control', 'max-age=0, s-maxage=10, must-revalidate')
+    .expect('vary', 'accept, accept-Encoding')
     .expect(200, function (err, res) {
       should.not.exist(err);
       var data = res.body;
