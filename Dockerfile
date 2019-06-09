@@ -1,4 +1,4 @@
-FROM node:6.11
+FROM node:12
 MAINTAINER Bono Lv <lvscar  {aT} gmail.com>
 
 # Working enviroment
@@ -14,7 +14,7 @@ COPY package.json ${CNPM_DIR}
 
 RUN npm set registry https://registry.npm.taobao.org
 
-RUN npm install
+RUN npm install --production
 
 COPY .  ${CNPM_DIR}
 COPY docs/dockerize/config.js  ${CNPM_DIR}/config/
