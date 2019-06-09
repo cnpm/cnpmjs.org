@@ -19,7 +19,6 @@ module.exports = function* download(next) {
   var name = this.params.name || this.params[0];
   var filename = this.params.filename || this.params[1];
   var version = filename.slice(name.length + 1, -4);
-  var row = yield packageService.getModule(name, version);
   // can not get dist
   var url = null;
 
@@ -36,7 +35,16 @@ module.exports = function* download(next) {
   }
 
   debug('download %s %s %s %s', name, filename, version, url);
+  // don't check database and just download tgz from nfs
+  if (config.downloadTgzDontCheckModule && url) {
+    this.status = 302;
+    this.set('Location', url);
+    const count = (globalDownloads.get(name) || 0) + 1;
+    globalDownloads.set(name, count);
+    return;
+  }
 
+  var row = yield packageService.getModule(name, version);
   if (!row || !row.package || !row.package.dist) {
     if (!url) {
       return yield next;
