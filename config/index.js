@@ -155,6 +155,8 @@ var config = {
   }),
   // if set true, will 302 redirect to `nfs.url(dist.key)`
   downloadRedirectToNFS: false,
+  // don't check database and just download tgz from nfs
+  downloadTgzDontCheckModule: false,
 
   // registry url name
   registryHost: 'r.cnpmjs.org',
