@@ -1,5 +1,11 @@
 'use strict';
 
+/**
+ * Module dependencies.
+ */
+
+var packageService = require('../services/package');
+
 var util = require('util');
 var config = require('../config');
 var debug = require('debug')('cnpmjs.org:middlewares/publishable');
@@ -29,6 +35,22 @@ module.exports = function *publishable(next) {
   // check if is private package list in config
   if (config.privatePackages && config.privatePackages.indexOf(name) !== -1) {
     return yield next;
+  }
+
+  // check the package is already exists and is maintainer
+  var result = yield packageService.authMaintainer(name, this.user.name);
+  if (result.maintainers && result.maintainers.length) {
+    if (result.isMaintainer) {
+      return yield next;
+    }
+    this.status = 403;
+    const error = '[forbidden] ' + this.user.name + ' not authorized to modify ' + name +
+        ', please contact maintainers: ' + result.maintainers.join(', ');
+    this.body = {
+      error,
+      reason: error,
+    };
+    return;
   }
 
   // scoped module

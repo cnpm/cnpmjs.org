@@ -135,6 +135,24 @@ describe('test/controllers/registry/package/update.test.js', function () {
       .expect('content-type', 'application/json; charset=utf-8', done);
     });
 
+    it('should add again new maintainers by maintainer with invalid scope', function (done) {
+      mm(config, 'scopes', [ '@xxx' ]);
+      request(app)
+      .put('/@cnpmtest/testmodule-update-1/-rev/1')
+      .send({
+        maintainers: [{
+          name: 'cnpmjstest101',
+          email: 'cnpmjstest101@cnpmjs.org'
+        }, {
+          name: 'fengmk2',
+          email: 'fengmk2@cnpmjs.org'
+        }]
+      })
+      .set('authorization', utils.otherUserAuth)
+      .expect(201)
+      .expect('content-type', 'application/json; charset=utf-8', done);
+    });
+
     it('should add new maintainers by admin', function (done) {
       request(app)
       .put('/@cnpmtest/testmodule-update-1/-rev/1')
@@ -211,8 +229,8 @@ describe('test/controllers/registry/package/update.test.js', function () {
       .set('authorization', utils.secondUserAuth)
       .expect(403)
       .expect({
-        error: '[forbidden] cnpmjstest102 not authorized to modify @cnpmtest/testmodule-update-1',
-        reason: '[forbidden] cnpmjstest102 not authorized to modify @cnpmtest/testmodule-update-1',
+        error: '[forbidden] cnpmjstest102 not authorized to modify @cnpmtest/testmodule-update-1, please contact maintainers: cnpmjstest101',
+        reason: '[forbidden] cnpmjstest102 not authorized to modify @cnpmtest/testmodule-update-1, please contact maintainers: cnpmjstest101'
       }, done);
     });
 
