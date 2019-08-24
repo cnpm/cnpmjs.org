@@ -147,6 +147,9 @@ var config = {
     storage: path.join(dataDir, 'data.sqlite'),
 
     logging: !!process.env.SQL_DEBUG,
+
+    // enable proxy npm audits request or not
+    enableNpmAuditsProxy: true,
   },
 
   // package tarball store in local filesystem by default
@@ -251,6 +254,7 @@ var config = {
 
   packagephobiaURL: 'https://packagephobia.now.sh',
   packagephobiaSupportPrivatePackage: false,
+  packagephobiaMinDownloadCount: 1000,
 
   // custom user service, @see https://github.com/cnpm/cnpmjs.org/wiki/Use-Your-Own-User-Authorization
   // when you not intend to ingegrate with your company's user system, then use null, it would

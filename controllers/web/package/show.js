@@ -215,11 +215,11 @@ module.exports = function* show(next) {
     };
   }
 
-  let packagephobiaSupport = downloadTotal >= 1000;
+  let packagephobiaSupport = downloadTotal >= config.packagephobiaMinDownloadCount;
   if (pkg._publish_on_cnpm) {
     pkg.isPrivate = true;
     // need download total >= 1000
-    packagephobiaSupport = downloadTotal >= 1000 && config.packagephobiaSupportPrivatePackage;
+    packagephobiaSupport = downloadTotal >= config.packagephobiaMinDownloadCount && config.packagephobiaSupportPrivatePackage;
   } else {
     pkg.isPrivate = false;
     // add security check badge
