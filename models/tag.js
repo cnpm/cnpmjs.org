@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS `tag` (
  `gmt_modified` datetime NOT NULL COMMENT 'modified time',
  `name` varchar(214) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL COMMENT 'module name',
  `tag` varchar(30) NOT NULL COMMENT 'tag name',
- `version` varchar(30) NOT NULL COMMENT 'module version',
+ `version` varchar(70) NOT NULL COMMENT 'module version',
  `module_id` bigint(20) unsigned NOT NULL COMMENT 'module id',
  PRIMARY KEY (`id`),
  UNIQUE KEY `uk_name` (`name`, `tag`),
@@ -42,7 +42,7 @@ module.exports = function (sequelize, DataTypes) {
       comment: 'tag name',
     },
     version: {
-      type: DataTypes.STRING(30),
+      type: DataTypes.STRING(70),
       allowNull: false,
       comment: 'module version',
     },

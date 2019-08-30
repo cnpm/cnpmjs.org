@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS `module` (
  `gmt_modified` datetime NOT NULL COMMENT 'modified time',
  `author` varchar(100) NOT NULL COMMENT 'module author',
  `name` varchar(214) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL COMMENT 'module name',
- `version` varchar(30) NOT NULL COMMENT 'module version',
+ `version` varchar(70) NOT NULL COMMENT 'module version',
  `description` longtext COMMENT 'module description',
  `package` longtext CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'package.json',
  `dist_shasum` varchar(100) DEFAULT NULL COMMENT 'module dist SHASUM',
@@ -49,7 +49,7 @@ module.exports = function (sequelize, DataTypes) {
       comment: 'module name'
     },
     version: {
-      type: DataTypes.STRING(30),
+      type: DataTypes.STRING(70),
       allowNull: false,
       comment: 'module version'
     },

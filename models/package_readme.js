@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS `package_readme` (
  `gmt_modified` datetime NOT NULL COMMENT 'modified time',
  `name` varchar(214) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL COMMENT 'module name',
  `readme` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci COMMENT 'the latest version readme',
- `version` varchar(30) NOT NULL COMMENT 'module version',
+ `version` varchar(70) NOT NULL COMMENT 'module version',
  PRIMARY KEY (`id`),
  UNIQUE KEY `uk_name` (`name`),
  KEY `idx_gmt_modified` (`gmt_modified`)
@@ -22,7 +22,7 @@ module.exports = function (sequelize, DataTypes) {
       comment: 'module name'
     },
     version: {
-      type: DataTypes.STRING(30),
+      type: DataTypes.STRING(70),
       allowNull: false,
       comment: 'module latest version'
     },

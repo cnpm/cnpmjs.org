@@ -140,6 +140,7 @@ var config = {
     dialectOptions: {
       // if your server run on full cpu load, please set trace to false
       trace: true,
+      charset: 'utf8mb4',
     },
 
     // the storage engine for 'sqlite'
