@@ -9,7 +9,9 @@
     "test-local": "make test",
     "start": "./bin/nodejsctl start && cp History.md docs/web/history.md",
     "status": "./bin/nodejsctl status",
-    "stop": "./bin/nodejsctl stop"
+    "stop": "./bin/nodejsctl stop",
+    "snyk-protect": "snyk protect",
+    "prepublish": "npm run snyk-protect"
   },
   "bin": {
     "cnpmjs.org": "bin/cli.js"
@@ -68,7 +70,8 @@
     "tunnel-agent": "^0.6.0",
     "urllib": "^2.24.0",
     "utility": "^1.12.0",
-    "xss": "^0.3.3"
+    "xss": "^0.3.3",
+    "snyk": "^1.231.0"
   },
   "devDependencies": {
     "autod": "*",
@@ -115,5 +118,6 @@
     "fengmk2 <fengmk2@gmail.com> (http://fengmk2.com)",
     "dead_horse <dead_horse@qq.com> (http://deadhorse.me)"
   ],
-  "license": "MIT"
+  "license": "MIT",
+  "snyk": true
 }
