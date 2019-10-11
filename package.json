@@ -51,7 +51,7 @@
     "koa-rewrite": "^1.1.2",
     "koa-rt": "^1.0.0",
     "koa-safe-jsonp": "^0.3.1",
-    "markdown-it": "^8.3.2",
+    "markdown-it": "^10.0.0",
     "mime": "^1.3.6",
     "mini-logger": "^1.1.3",
     "mkdirp": "^0.5.1",
