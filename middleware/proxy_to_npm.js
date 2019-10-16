@@ -8,9 +8,9 @@ module.exports = function (options) {
   var proxyUrls = [
     // /:pkg, dont contains scoped package
     // /:pkg/:versionOrTag
-    /^\/[\w\-\.]+(?:\/[\w\-\.]+)?$/,
+    /^\/([\w\-\.]+)(?:\/[\w\-\.]+)?$/,
     // /-/package/:pkg/dist-tags
-    /^\/\-\/package\/[\w\-\.]+\/dist-tags/,
+    /^\/\-\/package\/([\w\-\.]+)\/dist-tags/,
   ];
   var scopedUrls = [
     // scoped package
@@ -21,7 +21,7 @@ module.exports = function (options) {
     redirectUrl = config.sourceNpmWeb || redirectUrl.replace('//registry.', '//');
     proxyUrls = [
       // /package/:pkg
-      /^\/package\/[\w\-\.]+/,
+      /^\/package\/([\w\-\.]+)/,
     ];
     scopedUrls = [
       // scoped package
@@ -61,10 +61,14 @@ module.exports = function (options) {
       }
     }
 
+    // check private packages
     var isPublich = false;
     if (!isScoped) {
       for (var i = 0; i < proxyUrls.length; i++) {
-        isPublich = proxyUrls[i].test(pathname);
+        const m = proxyUrls[i].exec(pathname);
+        if (m && !config.privatePackages.includes(m[1])) {
+          isPublich = true;
+        }
         if (isPublich) {
           break;
         }

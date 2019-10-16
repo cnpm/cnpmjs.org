@@ -10,6 +10,7 @@ var config = require('../../config');
 describe('test/middleware/proxy_to_npm.test.js', () => {
   beforeEach(() => {
     mm(config, 'syncModel', 'none');
+    mm(config, 'privatePackages', ['private1', 'private2']);
   });
 
   afterEach(mm.restore);
@@ -27,6 +28,19 @@ describe('test/middleware/proxy_to_npm.test.js', () => {
         .get('/baidu?write=true')
         .expect('location', config.sourceNpmRegistry + '/baidu?write=true')
         .expect(302, done);
+    });
+
+    it('should not proxy to source registry when package is private', function* () {
+      var pkg = utils.getPackage('private1');
+      yield request(registry)
+        .put('/' + pkg.name)
+        .set('authorization', utils.adminAuth)
+        .send(pkg)
+        .expect(201);
+
+      yield request(registry)
+        .get('/private1')
+        .expect(200);
     });
 
     it('should not proxy to source registry when package is private scoped', function* () {
@@ -70,6 +84,19 @@ describe('test/middleware/proxy_to_npm.test.js', () => {
         .get('/-/package/@koajs/ms/dist-tags')
         .expect('Location', config.sourceNpmRegistry + '/-/package/@koajs/ms/dist-tags')
         .expect(302, done);
+    });
+
+    it('should not proxy private packages', function* () {
+      var pkg = utils.getPackage('private2');
+      yield request(registry)
+        .put('/' + pkg.name)
+        .set('authorization', utils.adminAuth)
+        .send(pkg)
+        .expect(201);
+
+      yield request(registry)
+        .get('/-/package/private2/dist-tags')
+        .expect(200);
     });
 
     it('should dont proxy private scoped package', function* () {
