@@ -101,7 +101,7 @@ function routes(app) {
 
   // list all packages of user
   app.get('/-/by-user/:user', userPackage.list);
-  app.get('/-/users/:user/packages', listPackagesByUser);
+  app.get('/-/user/:user/package', listPackagesByUser);
 
   // download times
   app.get('/downloads/range/:range/:name', downloadTotal);
