@@ -8,9 +8,9 @@ module.exports = function (options) {
   var proxyUrls = [
     // /:pkg, dont contains scoped package
     // /:pkg/:versionOrTag
-    /^\/[\w\-\.]+(?:\/[\w\-\.]+)?$/,
+    /^\/([\w\-\.]+)(?:\/[\w\-\.]+)?$/,
     // /-/package/:pkg/dist-tags
-    /^\/\-\/package\/[\w\-\.]+\/dist-tags/,
+    /^\/\-\/package\/([\w\-\.]+)\/dist-tags/,
   ];
   var scopedUrls = [
     // scoped package
@@ -21,7 +21,7 @@ module.exports = function (options) {
     redirectUrl = config.sourceNpmWeb || redirectUrl.replace('//registry.', '//');
     proxyUrls = [
       // /package/:pkg
-      /^\/package\/[\w\-\.]+/,
+      /^\/package\/([\w\-\.]+)/,
     ];
     scopedUrls = [
       // scoped package
@@ -71,7 +71,22 @@ module.exports = function (options) {
       }
     }
 
-    if (isPublich || isPublichScoped) {
+    var isPrivatePackage = false;
+    if (config.privatePackages && config.privatePackages.length > 0) {
+      for (var i = 0; i < proxyUrls.length; i++) {
+        const m = proxyUrls[i].exec(pathname);
+        if (m) {
+          if (config.privatePackages.indexOf(m[1]) !== -1) {
+            isPrivatePackage = true;
+          } else {
+            isPrivatePackage = false;
+          }
+          break;
+        }
+      }
+    }
+
+    if (!isPrivatePackage && (isPublich || isPublichScoped)) {
       var url = redirectUrl + this.url;
       debug('proxy isPublich: %s, isPublichScoped: %s, package to %s',
         isPublich, isPublichScoped, url);
