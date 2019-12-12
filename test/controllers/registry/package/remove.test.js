@@ -65,6 +65,32 @@ describe('test/controllers/registry/package/remove.test.js', function () {
     });
   });
 
+  it('should not remove nfs', function (done) {
+    let called = false;
+    mm(config, 'unpublishRemoveTarball', false);
+    mm(nfs, 'remove', function* () {
+      called = true;
+    });
+
+    var pkg = utils.getPackage('@cnpmtest/testmodule-remove-2', '3.0.0', utils.otherUser);
+    request(app)
+      .put('/' + pkg.name)
+      .set('authorization', utils.otherUserAuth)
+      .send(pkg)
+      .expect(201, function() {
+        request(app)
+          .del('/@cnpmtest/testmodule-remove-2/-rev/1')
+          .set('authorization', utils.adminAuth)
+          .expect(200, function (err) {
+            called.should.equal(false);
+            should.not.exist(err);
+            request(app)
+              .get('/@cnpmtest/testmodule-remove-2')
+              .expect(404, done);
+          });
+      });
+  });
+
   describe('mock error', function () {
     beforeEach(function (done) {
       var pkg = utils.getPackage('@cnpmtest/testmodule-remove-mock-1', '2.0.0', utils.admin);

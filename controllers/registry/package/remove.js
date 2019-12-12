@@ -6,6 +6,7 @@ var packageService = require('../../../services/package');
 var totalService = require('../../../services/total');
 var nfs = require('../../../common/nfs');
 var logger = require('../../../common/logger');
+var config = require('../../../config');
 
 // DELETE /:name/-rev/:rev
 // https://github.com/npm/npm-registry-client/blob/master/lib/unpublish.js#L25
@@ -27,23 +28,25 @@ module.exports = function* remove(next) {
     totalService.plusDeleteModule(),
   ];
 
-  var keys = [];
-  for (var i = 0; i < mods.length; i++) {
-    var row = mods[i];
-    var dist = row.package.dist;
-    var key = dist.key;
-    if (!key) {
-      key = urlparse(dist.tarball).pathname;
+  if (config.unpublishRemoveTarball) {
+    var keys = [];
+    for (var i = 0; i < mods.length; i++) {
+      var row = mods[i];
+      var dist = row.package.dist;
+      var key = dist.key;
+      if (!key) {
+        key = urlparse(dist.tarball).pathname;
+      }
+      key && keys.push(key);
     }
-    key && keys.push(key);
-  }
 
-  try {
-    yield keys.map(function (key) {
-      return nfs.remove(key);
-    });
-  } catch (err) {
-    logger.error(err);
+    try {
+      yield keys.map(function (key) {
+        return nfs.remove(key);
+      });
+    } catch (err) {
+      logger.error(err);
+    }
   }
 
   // remove the maintainers

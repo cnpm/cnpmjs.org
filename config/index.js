@@ -160,6 +160,8 @@ var config = {
   downloadRedirectToNFS: false,
   // don't check database and just download tgz from nfs
   downloadTgzDontCheckModule: false,
+  // remove original tarball when publishing
+  unpublishRemoveTarball: true,
 
   // registry url name
   registryHost: 'r.cnpmjs.org',
