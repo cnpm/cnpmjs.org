@@ -5,6 +5,7 @@ var packageService = require('../../../services/package');
 var nfs = require('../../../common/nfs');
 var logger = require('../../../common/logger');
 var getCDNKey = require('../../../lib/common').getCDNKey;
+var config = require('../../../config');
 
 // DELETE /:name/download/:filename/-rev/:rev
 // https://github.com/npm/npm-registry-client/blob/master/lib/unpublish.js#L97
@@ -38,21 +39,25 @@ module.exports = function* removeOneVersion(next) {
     return yield next;
   }
 
-  var key = mod.package && mod.package.dist && mod.package.dist.key;
-  if (!key) {
-    key = getCDNKey(mod.name, filename);
+  if (config.unpublishRemoveTarball) {
+    var key = mod.package && mod.package.dist && mod.package.dist.key;
+    if (!key) {
+      key = getCDNKey(mod.name, filename);
+    }
+
+    if (revertTo && revertTo.package) {
+      debug('removing key: %s from nfs, revert to %s@%s', key, revertTo.name, revertTo.package.version);
+    } else {
+      debug('removing key: %s from nfs, no revert mod', key);
+    }
+
+    try {
+      yield nfs.remove(key);
+    } catch (err) {
+      logger.error(err);
+    }
   }
 
-  if (revertTo && revertTo.package) {
-    debug('removing key: %s from nfs, revert to %s@%s', key, revertTo.name, revertTo.package.version);
-  } else {
-    debug('removing key: %s from nfs, no revert mod', key);
-  }
-  try {
-    yield nfs.remove(key);
-  } catch (err) {
-    logger.error(err);
-  }
   // remove version from table
   yield packageService.removeModulesByNameAndVersions(name, [version]);
   debug('removed %s@%s', name, version);

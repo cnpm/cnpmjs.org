@@ -7,6 +7,7 @@ var app = require('../../../../servers/registry');
 var utils = require('../../../utils');
 var packageService = require('../../../../services/package');
 var nfs = require('../../../../common/nfs');
+var config = require('../../../../config');
 
 describe('test/controllers/registry/package/remove_version.test.js', function () {
   afterEach(mm.restore);
@@ -76,6 +77,32 @@ describe('test/controllers/registry/package/remove_version.test.js', function ()
     .del('/@cnpmtest/testmodule-remove_version-1/download/@cnpmtest/testmodule-remove_version-1-0.0.1.tgz/-rev/' + lastRev)
     .set('authorization', utils.adminAuth)
     .expect(200, done);
+  });
+
+  it('should not remove nfs', function (done) {
+    let called = false;
+    mm(config, 'unpublishRemoveTarball', false);
+    mm(nfs, 'remove', function* () {
+      called = true;
+    });
+
+    var pkg = utils.getPackage('@cnpmtest/testmodule-remove_version-2', '3.0.0', utils.otherUser);
+    request(app)
+      .put('/' + pkg.name)
+      .set('authorization', utils.otherUserAuth)
+      .send(pkg)
+      .expect(201, function() {
+        request(app)
+          .del('/@cnpmtest/testmodule-remove_version-2/download/@cnpmtest/testmodule-remove_version-2-3.0.0.tgz/-rev/1')
+          .set('authorization', utils.adminAuth)
+          .expect(200, function (err) {
+            called.should.equal(false);
+            should.not.exist(err);
+            request(app)
+              .get('/@cnpmtest/testmodule-remove-2')
+              .expect(404, done);
+          });
+      });
   });
 
   describe('mock error', function () {
