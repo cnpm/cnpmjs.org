@@ -147,10 +147,10 @@ var config = {
     storage: path.join(dataDir, 'data.sqlite'),
 
     logging: !!process.env.SQL_DEBUG,
-
-    // enable proxy npm audits request or not
-    enableNpmAuditsProxy: true,
   },
+
+  // enable proxy npm audits request or not
+  enableNpmAuditsProxy: true,
 
   // package tarball store in local filesystem by default
   nfs: require('fs-cnpm')({
