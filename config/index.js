@@ -193,6 +193,7 @@ var config = {
   // please don't change it if not necessary
   officialNpmRegistry: 'https://registry.npmjs.com',
   officialNpmReplicate: 'https://replicate.npmjs.com',
+  cnpmRegistry: 'https://r.cnpmjs.com',
 
   // sync source, upstream registry
   // If you want to directly sync from official npm's registry
