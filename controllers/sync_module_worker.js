@@ -322,7 +322,8 @@ SyncModuleWorker.prototype.next = function* (concurrencyId) {
   yield this.syncByName(concurrencyId, name, registry);
 };
 
-SyncModuleWorker.prototype.syncByName = function* (concurrencyId, name, registry, retryCount = 0) {
+SyncModuleWorker.prototype.syncByName = function* (concurrencyId, name, registry, retryCount) {
+  retryCount = retryCount || 0;
   var that = this;
   that.syncingNames[name] = true;
   var pkg = null;
