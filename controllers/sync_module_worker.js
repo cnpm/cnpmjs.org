@@ -322,7 +322,7 @@ SyncModuleWorker.prototype.next = function* (concurrencyId) {
   yield this.syncByName(concurrencyId, name, registry);
 };
 
-SyncModuleWorker.prototype.syncByName = function* (concurrencyId, name, registry) {
+SyncModuleWorker.prototype.syncByName = function* (concurrencyId, name, registry, retryCount = 0) {
   var that = this;
   that.syncingNames[name] = true;
   var pkg = null;
@@ -373,17 +373,28 @@ SyncModuleWorker.prototype.syncByName = function* (concurrencyId, name, registry
     // if 404
     if (!err.res || err.res.statusCode !== 404) {
       var errMessage = err.name + ': ' + err.message;
-      that.log('[c#%s] [error] [%s] get package(%s%s) error: %s, status: %s',
-        concurrencyId, name, registry, packageUrl, errMessage, status);
-      // replicate request error, try to request from official registry
-      if (registry !== config.officialNpmReplicate) {
+      that.log('[c#%s] [error] [%s] get package(%s%s) error: %s, status: %s, retryCount: %s',
+        concurrencyId, name, registry, packageUrl, errMessage, status, retryCount);
+
+      // retry from cnpmRegistry again, max 3 times
+      if (registry === config.cnpmRegistry && retryCount < 3) {
+        this.log('[c#%d] [%s] retry from %s after 3s, retryCount: %s',
+          concurrencyId, name, registry, retryCount);
+        yield sleep(3000);
+        yield that.syncByName(concurrencyId, name, registry, retryCount + 1);
+        return;
+      }
+
+      // replicate/cnpmRegistry request error, try to request from official registry
+      if (registry !== config.officialNpmReplicate && registry !== config.cnpmRegistry) {
         // sync fail
         yield that._doneOne(concurrencyId, name, false);
         return;
       }
 
       // retry from officialNpmRegistry when officialNpmReplicate fail
-      this.log('[c#%d] [%s] retry from %s', concurrencyId, name, config.officialNpmRegistry);
+      this.log('[c#%d] [%s] retry from %s, retryCount: %s',
+        concurrencyId, name, config.officialNpmRegistry, retryCount);
       try {
         var result = yield npmSerivce.request(packageUrl, { registry: config.officialNpmRegistry });
         pkg = result.data;
