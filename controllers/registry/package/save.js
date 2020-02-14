@@ -228,10 +228,14 @@ module.exports = function* save(next) {
     name: mod.name,
     type: 'package',
     version: mod.version,
-    hookOwner: null,
-    payload: null,
+    hookOwner: {
+      username: username,
+    },
+    payload: mod.package,
     change: null,
   };
+  // remove readme content, reduce message body
+  envelope.payload.readme = null;
   hook.trigger(envelope);
 };
 

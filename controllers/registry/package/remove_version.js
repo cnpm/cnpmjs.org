@@ -6,6 +6,7 @@ var nfs = require('../../../common/nfs');
 var logger = require('../../../common/logger');
 var getCDNKey = require('../../../lib/common').getCDNKey;
 var config = require('../../../config');
+var hook = require('../../../services/hook');
 
 // DELETE /:name/download/:filename/-rev/:rev
 // https://github.com/npm/npm-registry-client/blob/master/lib/unpublish.js#L97
@@ -13,6 +14,7 @@ module.exports = function* removeOneVersion(next) {
   var name = this.params.name || this.params[0];
   var filename = this.params.filename || this.params[1];
   var id = Number(this.params.rev || this.params[2]);
+  var username = this.user.name;
   // cnpmjs.org-2.0.0.tgz
   var version = filename.split(name + '-')[1];
   if (version) {
@@ -62,4 +64,18 @@ module.exports = function* removeOneVersion(next) {
   yield packageService.removeModulesByNameAndVersions(name, [version]);
   debug('removed %s@%s', name, version);
   this.body = { ok: true };
+
+  // hooks
+  const envelope = {
+    event: 'package:unpublish',
+    name: name,
+    type: 'package',
+    version: version,
+    hookOwner: {
+      username: username
+    },
+    payload: null,
+    change: null,
+  };
+  hook.trigger(envelope);
 };
