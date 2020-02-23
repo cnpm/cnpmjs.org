@@ -25,7 +25,6 @@ describe('test/controllers/registry/package/list_versions.test.js', function () 
         console.log(res.body);
         const rows = res.body;
         rows.length.should.above(0);
-        rows[0].name.should.equal('pedding');
         done();
       });
     });
