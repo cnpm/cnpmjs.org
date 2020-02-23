@@ -345,6 +345,18 @@ exports.listModuleAbbreviatedsByName = function* (name) {
   return rows;
 };
 
+exports.findAllModuleAbbreviateds = function* (where, order, limit, offset) {
+  const params = {
+    where,
+    order,
+    limit,
+    offset,
+    attributes: [ 'name', 'version', 'publish_time', 'gmt_modified'  ],
+  };
+  const rows = yield models.ModuleAbbreviated.findAll(params);
+  return rows;
+};
+
 // https://github.com/npm/registry/blob/master/docs/responses/package-metadata.md#abbreviated-version-object
 exports.saveModuleAbbreviated = function* (mod) {
   var pkg = JSON.stringify({
