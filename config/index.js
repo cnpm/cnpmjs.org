@@ -83,7 +83,7 @@ var config = {
     fengmk2: 'fengmk2@gmail.com',
     admin: 'admin@cnpmjs.org',
     dead_horse: 'dead_horse@qq.com',
-    shangwenhe: 'shangwenhe@vipkid.com.cn',
+    shangwenhe: 'shangwenhe@qq.com',
   },
 
   // email notification for errors
