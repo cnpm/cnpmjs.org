@@ -83,6 +83,7 @@ var config = {
     fengmk2: 'fengmk2@gmail.com',
     admin: 'admin@cnpmjs.org',
     dead_horse: 'dead_horse@qq.com',
+    shangwenhe: 'shangwenhe@vipkid.com.cn',
   },
 
   // email notification for errors
@@ -115,13 +116,13 @@ var config = {
    */
 
   database: {
-    db: 'cnpmjs_test',
+    db: 'cnpmjs',
     username: 'root',
-    password: '',
+    password: 'UMyygyisk!1',
 
     // the sql dialect of the database
     // - currently supported: 'mysql', 'sqlite', 'postgres', 'mariadb'
-    dialect: 'sqlite',
+    dialect: 'mysql',
 
     // custom host; default: 127.0.0.1
     host: '127.0.0.1',
@@ -164,7 +165,7 @@ var config = {
   unpublishRemoveTarball: true,
 
   // registry url name
-  registryHost: 'r.cnpmjs.org',
+  registryHost: '127.0.0.1:7001',
 
   /**
    * registry mode config
@@ -176,7 +177,7 @@ var config = {
   enablePrivate: false,
 
   // registry scopes, if don't set, means do not support scopes
-  scopes: [ '@cnpm', '@cnpmtest', '@cnpm-test' ],
+  scopes: [ '@aone','@cnpm', '@cnpmtest', '@cnpm-test' ],
 
   // some registry already have some private packages in global scope
   // but we want to treat them as scoped private packages,
@@ -277,11 +278,11 @@ var config = {
 
   // https://github.com/cnpm/cnpmjs.org/issues/1149
   // if enable this option, must create module_abbreviated and package_readme table in database
-  enableAbbreviatedMetadata: false,
+  enableAbbreviatedMetadata: true,
 
   // global hook function: function* (envelope) {}
   // envelope format please see https://github.com/npm/registry/blob/master/docs/hooks/hooks-payload.md#payload
-  globalHook: null,
+  globalHook: 'http://127.0.0.1:8080/ark/v1/npm/hook/event',
 
   opensearch: {
     host: '',

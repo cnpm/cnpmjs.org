@@ -147,7 +147,7 @@ var config = {
   enablePrivate: false,
 
   // registry scopes, if don't set, means do not support scopes
-  scopes: [ '@cnpm', '@cnpmtest', '@cnpm-test' ],
+  scopes: [ '@cnpm', '@cnpmtest', '@cnpm-test', '@aone'],
 
   // some registry already have some private packages in global scope
   // but we want to treat them as scoped private packages,
@@ -228,7 +228,7 @@ var config = {
 
   // global hook function: function* (envelope) {}
   // envelope format please see https://github.com/npm/registry/blob/master/docs/hooks/hooks-payload.md#payload
-  globalHook: null,
+  globalHook: 'http://127.0.0.1:8080/remote/hook/event',
 };
 
 if (process.env.NODE_ENV !== 'test') {

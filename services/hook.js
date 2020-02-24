@@ -14,6 +14,7 @@ exports.trigger = envelope => {
   envelope.time = Date.now();
 
   co(function* () {
+    console.log(JSON.stringify(envelope))
     yield urllib.request(config.globalHook, {
       method: 'POST',
       headers: {
