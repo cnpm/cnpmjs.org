@@ -42,6 +42,10 @@ if (config.pagemock) {
   }));
 }
 
+for (const mw of config.customWebMiddlewares) {
+  app.use(mw(app));
+}
+
 app.use(opensearch);
 app.keys = ['todokey', config.sessionSecret];
 app.proxy = true;

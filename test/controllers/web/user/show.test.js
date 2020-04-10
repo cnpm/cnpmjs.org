@@ -81,6 +81,7 @@ describe('controllers/web/user/show.test.js', function () {
 
           // he.enclde('fengmk2@gmail.com') ↓
           assert(res.text.includes('&#x66;&#x65;&#x6E;&#x67;&#x6D;&#x6B;&#x32;&#x40;&#x67;&#x6D;&#x61;&#x69;&#x6C;&#x2E;&#x63;&#x6F;&#x6D;'));
+          assert(res.headers['x-custom-web-middleware'] === 'true');
           done()
         });
     });
