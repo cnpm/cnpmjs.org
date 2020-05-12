@@ -56,8 +56,9 @@ database.define = {
   timestamps: true,
   createdAt: 'gmt_create',
   updatedAt: 'gmt_modified',
-  charset: 'utf8',
-  collate: 'utf8_general_ci',
+  // 设置为utf8mb4，解决数据库模块 description 字段 emoji 表情插入失败问题
+  charset: 'utf8mb4',
+  collate: 'utf8mb4_unicode_ci',
 };
 
 var sequelize = new Sequelize(database.db, database.username, database.password, database);

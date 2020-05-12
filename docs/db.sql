@@ -30,7 +30,7 @@ CREATE TABLE IF NOT EXISTS `module_keyword` (
  `gmt_create` datetime NOT NULL COMMENT 'create time',
  `keyword` varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT 'keyword',
  `name` varchar(214) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL COMMENT 'module name',
- `description` longtext COMMENT 'module description',
+ `description` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci COMMENT 'module description',
  PRIMARY KEY (`id`),
  UNIQUE KEY `uk_keyword_module_name` (`keyword`,`name`),
  KEY `idx_name` (`name`)
@@ -82,7 +82,7 @@ CREATE TABLE IF NOT EXISTS `module` (
  `author` varchar(100) NOT NULL COMMENT 'module author',
  `name` varchar(214) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL COMMENT 'module name',
  `version` varchar(30) NOT NULL COMMENT 'module version',
- `description` longtext COMMENT 'module description',
+ `description` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci COMMENT 'module description',
  `package` longtext CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'package.json',
  `dist_shasum` varchar(100) DEFAULT NULL COMMENT 'module dist SHASUM',
  `dist_tarball` varchar(2048) DEFAULT NULL COMMENT 'module dist tarball',

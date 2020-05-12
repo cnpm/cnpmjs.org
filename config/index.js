@@ -139,6 +139,9 @@ var config = {
     },
 
     dialectOptions: {
+      // 设置为utf8mb4，解决数据库模块 description 字段 emoji 表情插入失败问题
+      charset: 'utf8mb4',
+      collate: 'utf8mb4_unicode_ci',
       // if your server run on full cpu load, please set trace to false
       trace: true,
     },
