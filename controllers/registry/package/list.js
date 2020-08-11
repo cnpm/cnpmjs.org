@@ -387,6 +387,9 @@ function* handleAbbreviatedMetaRequestWithFullMeta(ctx, name, modifiedTime, tags
       devDependencies: row.package.devDependencies,
       bundleDependencies: row.package.bundleDependencies,
       peerDependencies: row.package.peerDependencies,
+      // this fields "peerDependenciesMeta" is not listed yet in the above link as of August 2020,
+      // but already implemented by both registry.npmjs.org and registry.yarnpkg.com
+      peerDependenciesMeta: row.package.peerDependenciesMeta,
       bin: row.package.bin,
       directories: row.package.directories,
       dist: row.package.dist,
