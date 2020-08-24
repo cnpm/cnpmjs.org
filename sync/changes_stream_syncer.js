@@ -54,6 +54,24 @@ module.exports = function* sync() {
   }
 };
 
+function syncPackageCheck(change) {
+  const url = `${config.handleSyncRegistry}/${change.id}/sync`;
+  urllib.request(`${url}?sync_upstream=true&nodeps=true&sync_package_check=true`, {
+    method: 'PUT',
+    dataType: 'json',
+    timeout: 10000,
+  }, (err, data) => {
+    if (err) {
+      logger.syncInfo('[syncPackageCheck:error] %s:%s PUT %s error: %s, retry after 5s',
+        change.seq, change.id, url, err);
+      setTimeout(() => syncPackageCheck(change), 5000);
+    } else {
+      logger.syncInfo('[syncPackageCheck:success] %s:%s sync request sent, log: %s/log/%s',
+        change.seq, change.id, url, data.logId);
+    }
+  });
+}
+
 function syncPackage(change) {
   const url = `${config.handleSyncRegistry}/${change.id}/sync`;
   // sync upstream and without deps
@@ -71,6 +89,8 @@ function syncPackage(change) {
       saveLastSequence(change.seq);
       logger.syncInfo('%s:%s sync request sent, log: %s/log/%s',
         change.seq, change.id, url, data.logId);
+      // check again after 10 mins
+      setTimeout(() => syncPackageCheck(change), 60000 * 10);
     }
   });
 }
