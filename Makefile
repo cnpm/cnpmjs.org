@@ -1,6 +1,6 @@
 TESTS = $(shell ls -S `find test -type f -name "*.test.js" -print`)
 REPORTER = spec
-TIMEOUT = 60000
+TIMEOUT = 600000
 MOCHA_OPTS =
 DB = sqlite
 
