@@ -10,7 +10,7 @@ module.exports = function* createToken() {
   var perPage = typeof this.query.perPage === 'undefined' ? DEFAULT_PER_PAGE : parseInt(this.query.perPage);
   if (Number.isNaN(perPage)) {
     this.status = 400;
-    const error = 'perPage ' + this.query.perPage + ' is not a number';
+    var error = 'perPage ' + this.query.perPage + ' is not a number';
     this.body = {
       error,
       reason: error,
@@ -19,7 +19,7 @@ module.exports = function* createToken() {
   }
   if (perPage < MIN_PER_PAGE || perPage > MAX_PER_PAGE) {
     this.status = 400;
-    const error = 'perPage ' + this.query.perPage + ' is out of boundary';
+    var error = 'perPage ' + this.query.perPage + ' is out of boundary';
     this.body = {
       error,
       reason: error,
@@ -30,7 +30,7 @@ module.exports = function* createToken() {
   var page = typeof this.query.page === 'undefined' ? 0 : parseInt(this.query.page);
   if (Number.isNaN(page)) {
     this.status = 400;
-    const error = 'page ' + this.query.page + ' is not a number';
+    var error = 'page ' + this.query.page + ' is not a number';
     this.body = {
       error,
       reason: error,
@@ -39,7 +39,7 @@ module.exports = function* createToken() {
   }
   if (page < 0) {
     this.status = 400;
-    const error = 'page ' + this.query.page + ' is invalidate';
+    var error = 'page ' + this.query.page + ' is invalidate';
     this.body = {
       error,
       reason: error,

@@ -6,22 +6,10 @@ var userService = require('../../../services/user');
 var ipv4 = ipRegex.v4({ exact: true });
 
 module.exports = function* createToken() {
-  var password = this.request.body.password;
-  var user = yield userService.auth(this.user.name, password);
-  if (!user) {
-    this.status = 401;
-    const error = '[unauthorized] incorrect or missing password.';
-    this.body = {
-      error,
-      reason: error,
-    };
-    return;
-  }
-
   var readonly = this.request.body.readonly;
   if (typeof readonly !== 'undefined' && typeof readonly !== 'boolean') {
     this.status = 400;
-    const error = '[bad_request] readonly ' + readonly + ' is not boolean';
+    var error = '[bad_request] readonly ' + readonly + ' is not boolean';
     this.body = {
       error,
       reason: error,
@@ -35,13 +23,25 @@ module.exports = function* createToken() {
     });
     if (!isValidateWhiteList) {
       this.status = 400;
-      const error = '[bad_request] cide white list ' + JSON.stringify(cidrWhitelist) + ' is not boolean';
+      var error = '[bad_request] cide white list ' + JSON.stringify(cidrWhitelist) + ' is not boolean';
       this.body = {
         error,
         reason: error,
       };
       return;
     }
+  }
+
+  var password = this.request.body.password;
+  var user = yield userService.auth(this.user.name, password);
+  if (!user) {
+    this.status = 401;
+    var error = '[unauthorized] incorrect or missing password.';
+    this.body = {
+      error,
+      reason: error,
+    };
+    return;
   }
 
   var token = yield tokenService.createToken(this.user.name, {
