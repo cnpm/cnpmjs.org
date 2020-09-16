@@ -6,8 +6,6 @@ node_js:
 services:
   - mysql
   - postgresql
-addons:
-  - postgresql: '9.3'
 script: 'make test-travis-all'
 after_script:
   - 'npm i codecov && codecov'
