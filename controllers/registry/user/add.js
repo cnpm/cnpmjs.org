@@ -3,6 +3,7 @@
 var ensurePasswordSalt = require('./common').ensurePasswordSalt;
 var userService = require('../../../services/user');
 var config = require('../../../config');
+var tokenService = require('../../../services/token');
 
 // npm 1.4.4
 // add new user first
@@ -63,8 +64,13 @@ module.exports = function* addUser() {
     return;
   }
   if (loginedUser) {
+    var token = yield tokenService.createToken(body.name, {
+      readonly: !!body.readonly,
+      cidrWhitelist: body.cidr_whitelist || [],
+    });
     this.status = 201;
     this.body = {
+      token: token.token,
       ok: true,
       id: 'org.couchdb.user:' + loginedUser.login,
       rev: Date.now() + '-' + loginedUser.login
@@ -118,8 +124,15 @@ module.exports = function* addUser() {
   // add new user
   var result = yield userService.add(user);
   this.etag = '"' + result.rev + '"';
+
+  var token = yield tokenService.createToken(body.name, {
+    readonly: !!body.readonly,
+    cidrWhitelist: body.cidr_whitelist || [],
+  });
+
   this.status = 201;
   this.body = {
+    token: token.token,
     ok: true,
     id: 'org.couchdb.user:' + name,
     rev: result.rev

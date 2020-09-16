@@ -30,6 +30,10 @@ var addUser = require('../controllers/registry/user/add');
 var showUser = require('../controllers/registry/user/show');
 var updateUser = require('../controllers/registry/user/update');
 
+var createToken = require('../controllers/registry/token/create');
+var delToken = require('../controllers/registry/token/del');
+var listToken = require('../controllers/registry/token/list');
+
 var sync = require('../controllers/sync');
 var userPackage = require('../controllers/registry/user_package');
 var tags = require('../controllers/registry/package/dist_tag');
@@ -101,6 +105,11 @@ function routes(app) {
   app.put('/-/user/org.couchdb.user::name', addUser);
   app.get('/-/user/org.couchdb.user::name', showUser);
   app.put('/-/user/org.couchdb.user::name/-rev/:rev', login, updateUser);
+
+  // token api
+  app.get('/-/npm/v1/tokens', login, listToken);
+  app.post('/-/npm/v1/tokens', login, createToken);
+  app.delete('/-/npm/v1/tokens/token/:UUID', login, delToken);
 
   // list all packages of user
   app.get('/-/by-user/:user', userPackage.list);

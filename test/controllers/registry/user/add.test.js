@@ -127,7 +127,7 @@ describe('test/controllers/registry/user/add.test.js', function () {
       })
       .expect(201, function (err, res) {
         should.not.exist(err);
-        res.body.should.have.keys('ok', 'id', 'rev');
+        res.body.should.have.keys('ok', 'id', 'rev', 'token');
         res.body.id.should.equal('org.couchdb.user:cnpmjstest11111');
         res.body.rev.should.match(/\d+\-cnpmjstest11111/);
         res.body.ok.should.equal(true);

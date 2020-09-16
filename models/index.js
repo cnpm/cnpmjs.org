@@ -26,6 +26,7 @@ module.exports = {
   User: load('user'),
   Total: load('total'),
   DownloadTotal: load('download_total'),
+  Token: load('token'),
 
   query: function* (sql, args) {
     var options = { replacements: args };
