@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS `token` (
  `token` varchar(200) NOT NULL COMMENT 'token',
  `user` varchar(100) NOT NULL COMMENT 'user name',
  `readonly` tinyint(1) DEFAULT '0' COMMENT 'readonly or not, 1: true, other: false',
- `key` varchar(200) NOT NULL COMMENT 'token sha512 hash',
+ `token_key` varchar(200) NOT NULL COMMENT 'token sha512 hash',
  `cidr_whitelist` varchar(500) NOT NULL COMMENT 'ip list, ["127.0.0.1"]',
  PRIMARY KEY (`id`),
  KEY `idx_token` (`token`)
@@ -34,6 +34,7 @@ module.exports = function(sequelize, DataTypes) {
       comment: 'readonly or not, 1: true, other: false',
     },
     key: {
+      field: 'token_key',
       type: DataTypes.STRING(256),
       allowNull: false,
       comment: 'token sha512 hash',
