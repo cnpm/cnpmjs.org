@@ -1,11 +1,15 @@
 'use strict';
 
+var mm = require('mm');
 var should = require('should');
 var uuid = require('uuid');
+var sequelize = require('../../models').sequelize;
 var Token = require('../../models').Token;
 var TestUtil = require('../utils');
 
 describe('models/token.test.js', function () {
+  afterEach(mm.restore);
+
   describe('deleteByKeyOrToken', function () {
     var token1;
     var token2;
@@ -48,6 +52,12 @@ describe('models/token.test.js', function () {
           }
           should.exist(error);
           error.message.should.match(/Token ID ".+" was ambiguous/);
+
+          var token1Row = yield Token.findByToken(token1.token);
+          should.exist(token1Row);
+
+          var token2Row = yield Token.findByToken(token2.token);
+          should.exist(token2Row);
         });
       });
     });

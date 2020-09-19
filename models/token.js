@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS `token` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='token info';
  */
 
-module.exports = function(sequelize, DataTypes) {
+module.exports = function (sequelize, DataTypes) {
   return sequelize.define('Token', {
     token: {
       type: DataTypes.STRING(100),
@@ -93,23 +93,20 @@ module.exports = function(sequelize, DataTypes) {
         });
       },
       deleteByKeyOrToken: function* (userId, keyOrToken) {
-        var self = this;
-        yield sequelize.transaction(function () {
+        const self = this;
+        yield sequelize.transaction(function (t) {
           return self.destroy({
             where: {
               userId: userId,
               $or: [
-                {
-                  key: {
-                    like: keyOrToken + '%',
-                  },
-                }, {
-                  token: keyOrToken,
-                }
+                { key: { like: keyOrToken + '%' } },
+                { token: keyOrToken },
               ],
             },
-          }).then(function (affectedRows) {
-            if (affectedRows > 1) {
+            transaction: t,
+          }).then(function (deleteRows) {
+            // Key like query should not match more than 1 row
+            if (deleteRows > 1) {
               throw new Error(`Token ID "${keyOrToken}" was ambiguous`);
             }
           });
