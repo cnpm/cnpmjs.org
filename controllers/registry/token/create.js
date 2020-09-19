@@ -23,7 +23,7 @@ module.exports = function* createToken() {
     });
     if (!isValidateWhiteList) {
       this.status = 400;
-      var error = '[bad_request] cide white list ' + JSON.stringify(cidrWhitelist) + ' is not boolean';
+      var error = '[bad_request] cide white list ' + JSON.stringify(cidrWhitelist) + ' is not validate ip array';
       this.body = {
         error,
         reason: error,

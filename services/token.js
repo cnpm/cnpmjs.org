@@ -29,7 +29,7 @@ exports.validateToken = function* (token, options) {
     return null;
   }
 
-  var name = row.user;
+  var name = row.userId;
   var tokenObj = convertToken(row);
   // write operation and readonly token
   // validate fail
@@ -49,18 +49,18 @@ exports.validateToken = function* (token, options) {
 
 /**
  * create token for user
- * @param {string} user -
+ * @param {string} userId -
  * @param {object} [options] -
  * @param {object} [options.readonly] - default is false
  * @param {object} [options.cidrWhitelist] - default is []
  */
-exports.createToken = function* (user, options) {
+exports.createToken = function* (userId, options) {
   options = Object.assign({}, DEFAULT_TOKEN_OPTIONS, options);
   var token = uuid.v4();
   var key = createTokenKey(token);
   var tokenObj = {
     token: token,
-    user: user,
+    userId: userId,
     readonly: options.readonly,
     key: key,
     cidrWhitelist: options.cidrWhitelist,
@@ -71,14 +71,14 @@ exports.createToken = function* (user, options) {
 
 /**
  * list token for user
- * @param {string} user -
+ * @param {string} userId -
  * @param {object} [options] -
  * @param {object} [options.perPage] - default is 10
  * @param {object} [options.page] - default is 0
  */
-exports.listToken = function* (user, options) {
+exports.listToken = function* (userId, options) {
   options = Object.assign({}, DEFAULT_LIST_TOKEN_OPTIONS, options);
-  var rows = yield Token.listByUser(user, options.perPage * options.page, options.perPage);
+  var rows = yield Token.listByUser(userId, options.perPage * options.page, options.perPage);
   return rows.map(function(row) {
     return convertToken(row);
   });
@@ -86,11 +86,11 @@ exports.listToken = function* (user, options) {
 
 /**
  * delete token for user
- * @param {string} user -
+ * @param {string} userId -
  * @param {string} keyOrToken - the key prefix or full token
  */
-exports.deleteToken = function* (user, keyOrToken) {
-  yield Token.deleteByKeyOrToken(user, keyOrToken);
+exports.deleteToken = function* (userId, keyOrToken) {
+  yield Token.deleteByKeyOrToken(userId, keyOrToken);
 };
 
 function convertToken(row, options) {
@@ -99,16 +99,10 @@ function convertToken(row, options) {
   if (options.redacte !== false) {
     token = redacteToken(token);
   }
-  var cidrWhitelist = [];
-  try {
-    cidrWhitelist = JSON.parse(row.cidrWhitelist);
-  } catch (_) {
-    // ...
-  }
   return {
     token: token,
     key: row.key,
-    cidr_whitelist: cidrWhitelist,
+    cidr_whitelist: row.cidrWhitelist,
     created: row.gmt_create,
     updated: row.gmt_create,
     readonly: row.readonly,

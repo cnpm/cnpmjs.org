@@ -324,7 +324,7 @@ CREATE TABLE IF NOT EXISTS `token` (
  `gmt_create` datetime NOT NULL COMMENT 'create time',
  `gmt_modified` datetime NOT NULL COMMENT 'modified time',
  `token` varchar(100) NOT NULL COMMENT 'token',
- `user` varchar(100) NOT NULL COMMENT 'user name',
+ `user_id` varchar(100) NOT NULL COMMENT 'user name',
  `readonly` tinyint NOT NULL DEFAULT 0 COMMENT 'readonly or not, 1: true, other: false',
  `token_key` varchar(200) NOT NULL COMMENT 'token sha512 hash',
  `cidr_whitelist` varchar(500) NOT NULL COMMENT 'ip list, ["127.0.0.1"]',

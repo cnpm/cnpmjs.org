@@ -1,8 +1,8 @@
 'use strict';
 
 var should = require('should');
-var app = require('../../../../servers/registry');
 var request = require('supertest');
+var app = require('../../../../servers/registry');
 var tokenService = require('../../../../services/token');
 var TestUtil = require('../../../utils');
 

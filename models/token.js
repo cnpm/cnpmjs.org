@@ -6,13 +6,13 @@ CREATE TABLE IF NOT EXISTS `token` (
  `gmt_create` datetime NOT NULL COMMENT 'create time',
  `gmt_modified` datetime NOT NULL COMMENT 'modified time',
  `token` varchar(100) NOT NULL COMMENT 'token',
- `user` varchar(100) NOT NULL COMMENT 'user name',
+ `user_id` varchar(100) NOT NULL COMMENT 'user name',
  `readonly` tinyint NOT NULL DEFAULT 0 COMMENT 'readonly or not, 1: true, other: false',
  `token_key` varchar(200) NOT NULL COMMENT 'token sha512 hash',
  `cidr_whitelist` varchar(500) NOT NULL COMMENT 'ip list, ["127.0.0.1"]',
  PRIMARY KEY (`id`),
  UNIQUE KEY `uk_token` (`token`),
- KEY `idx_user` (`user`)
+ KEY `idx_user_id` (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='token info';
  */
 
@@ -23,7 +23,8 @@ module.exports = function(sequelize, DataTypes) {
       allowNull: false,
       comment: 'token',
     },
-    user: {
+    userId: {
+      field: 'user_id',
       type: DataTypes.STRING(100),
       allowNull: false,
       comment: 'user name'
@@ -45,6 +46,21 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.STRING(500),
       allowNull: false,
       comment: 'ip list, ["127.0.0.1"]',
+      get: function () {
+        try {
+          return JSON.parse(this.getDataValue('cidrWhitelist'));
+        } catch (_) {
+          return [];
+        }
+      },
+      set: function (val) {
+        try {
+          var stringifyVal = JSON.stringify(val);
+          this.setDataValue('cidrWhitelist', stringifyVal);
+        } catch (_) {
+          // ...
+        }
+      }
     },
   }, {
     tableName: 'token',
@@ -55,7 +71,7 @@ module.exports = function(sequelize, DataTypes) {
         fields: [ 'token' ],
       },
       {
-        fields: [ 'user' ],
+        fields: [ 'user_id' ],
       }
     ],
     classMethods: {
@@ -63,45 +79,40 @@ module.exports = function(sequelize, DataTypes) {
         return yield this.find({ where: { token: token } });
       },
       add: function* (tokenObj) {
-        var whiteList = [];
-        try {
-          whiteList = JSON.stringify(tokenObj.cidrWhitelist);
-        } catch (_) {
-          // ...
-        }
-        var row = this.build({
-          token: tokenObj.token,
-          user: tokenObj.user,
-          readonly: tokenObj.readonly,
-          key: tokenObj.key,
-          cidrWhitelist: whiteList,
-        });
+        var row = this.build(tokenObj);
         return yield row.save();
       },
-      listByUser: function* (user, offset, limit) {
+      listByUser: function* (userId, offset, limit) {
         return yield this.findAll({
           where: {
-            user: user,
+            userId: userId,
           },
           limit: limit,
           offset: offset,
           order: 'id asc',
         });
       },
-      deleteByKeyOrToken: function* (user, keyOrToken) {
-        return yield this.destroy({
-          where: {
-            user: user,
-            $or: [
-              {
-                key: {
-                  like: keyOrToken + '%',
-                },
-              }, {
-                token: keyOrToken,
-              }
-            ],
-          },
+      deleteByKeyOrToken: function* (userId, keyOrToken) {
+        var self = this;
+        yield sequelize.transaction(function () {
+          return self.destroy({
+            where: {
+              userId: userId,
+              $or: [
+                {
+                  key: {
+                    like: keyOrToken + '%',
+                  },
+                }, {
+                  token: keyOrToken,
+                }
+              ],
+            },
+          }).then(function (affectedRows) {
+            if (affectedRows > 1) {
+              throw new Error(`Token ID "${keyOrToken}" was ambiguous`);
+            }
+          });
         });
       },
     },
