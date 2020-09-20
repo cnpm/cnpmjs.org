@@ -2,7 +2,10 @@
 
 var debug = require('debug')('cnpmjs.org:middleware:auth');
 var UserService = require('../services/user');
+var TokenService = require('../services/token');
 var config = require('../config');
+var BASIC_PREFIX = /basic /i;
+var BEARER_PREFIX = /bearer /i;
 
 /**
  * Parse the request authorization
@@ -13,25 +16,21 @@ module.exports = function () {
   return function* auth(next) {
     this.user = {};
 
-    var authorization = (this.get('authorization') || '').split(' ')[1] || '';
-    authorization = authorization.trim();
+    var authorization = (this.get('authorization') || '').trim();
     debug('%s %s with %j', this.method, this.url, authorization);
     if (!authorization) {
       return yield unauthorized.call(this, next);
     }
 
-    authorization = Buffer.from(authorization, 'base64').toString();
-    var pos = authorization.indexOf(':');
-    if (pos === -1) {
-       return yield unauthorized.call(this, next);
-    }
-
-    var username = authorization.slice(0, pos);
-    var password = authorization.slice(pos + 1);
-
     var row;
     try {
-      row = yield UserService.auth(username, password);
+      if (BASIC_PREFIX.test(authorization)) {
+        row = yield basicAuth(authorization);
+      } else if (BEARER_PREFIX.test(authorization)) {
+        row = yield bearerAuth(authorization, this.method, this.ip);
+      } else {
+        return yield unauthorized.call(this, next);
+      }
     } catch (err) {
       // do not response error here
       // many request do not need login
@@ -50,6 +49,30 @@ module.exports = function () {
     yield next;
   };
 };
+
+function* basicAuth(authorization) {
+  authorization = authorization.split(' ')[1];
+  authorization = Buffer.from(authorization, 'base64').toString();
+
+  var pos = authorization.indexOf(':');
+  if (pos === -1) {
+    return null;
+  }
+
+  var username = authorization.slice(0, pos);
+  var password = authorization.slice(pos + 1);
+
+  return yield UserService.auth(username, password);
+}
+
+function* bearerAuth(authorization, method, ip) {
+  var token = authorization.split(' ')[1];
+  var isReadOperation = method === 'HEAD' || method === 'GET';
+  return yield TokenService.validateToken(token, {
+    isReadOperation: isReadOperation,
+    accessIp: ip,
+  });
+}
 
 function* unauthorized(next) {
   if (!config.alwaysAuth || this.method !== 'GET') {

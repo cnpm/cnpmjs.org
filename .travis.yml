@@ -3,8 +3,9 @@ language: node_js
 node_js:
   - '8'
   - '10'
-addons:
-  - postgresql: '9.3'
+services:
+  - mysql
+  - postgresql
 script: 'make test-travis-all'
 after_script:
   - 'npm i codecov && codecov'

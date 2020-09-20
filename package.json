@@ -36,6 +36,7 @@
     "humanize-ms": "^1.2.1",
     "humanize-number": "~0.0.2",
     "ioredis": "^4.6.2",
+    "ip-regex": "^4.1.0",
     "is-type-of": "^1.2.0",
     "kcors": "^1.2.1",
     "koa": "^1.2.0",
@@ -68,6 +69,7 @@
     "tunnel-agent": "^0.6.0",
     "urllib": "^2.24.0",
     "utility": "^1.12.0",
+    "uuid": "^8.3.0",
     "xss": "^0.3.3"
   },
   "devDependencies": {

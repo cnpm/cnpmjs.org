@@ -1,6 +1,6 @@
 TESTS = $(shell ls -S `find test -type f -name "*.test.js" -print`)
 REPORTER = spec
-TIMEOUT = 60000
+TIMEOUT = 600000
 MOCHA_OPTS =
 DB = sqlite
 
@@ -61,7 +61,7 @@ test-cov-mysql: init-mysql
 	@$(MAKE) test-cov DB=mysql
 
 test-travis: init-database
-	@NODE_ENV=test DB=${DB} CNPM_SOURCE_NPM=https://registry.npmjs.com CNPM_SOURCE_NPM_ISCNPM=false \
+	@NODE_ENV=test DB=${DB} \
 		node \
 		node_modules/.bin/istanbul cover \
 		node_modules/.bin/_mocha \
