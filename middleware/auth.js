@@ -8,7 +8,7 @@ var BASIC_PREFIX = /basic /i;
 var BEARER_PREFIX = /bearer /i;
 
 /**
- * Parse the request authorization
+ * Parse the request authorization222
  * get the real user
  */
 

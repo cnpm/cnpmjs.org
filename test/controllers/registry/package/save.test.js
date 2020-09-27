@@ -6,6 +6,7 @@ var request = require('supertest');
 var pedding = require('pedding');
 var mm = require('mm');
 var packageService = require('../../../../services/package');
+var tokenService = require('../../../../services/token');
 var app = require('../../../../servers/registry');
 var config = require('../../../../config');
 var utils = require('../../../utils');
@@ -144,6 +145,20 @@ describe('test/controllers/registry/package/save.test.js', function () {
       });
     });
 
+    it('should publish use token', function* () {
+      var token = yield tokenService.createToken(utils.admin);
+
+      var pkg = utils.getPackageWithToken('testmodule-new-3', '0.0.1', utils.admin);
+
+      yield request(app)
+        .put('/' + pkg.name)
+        .set('authorization', 'Bearer ' + token.token)
+        .send(pkg)
+        .expect(201);
+
+      yield tokenService.deleteToken(utils.admin, token.token);
+    });
+
     it('should 400 when versions missing', function (done) {
       var pkg = utils.getPackage('testmodule-new-1', '0.0.1', utils.admin);
       delete pkg.versions;
@@ -154,20 +169,6 @@ describe('test/controllers/registry/package/save.test.js', function () {
       .expect({
         error: '[version_error] package.versions is empty',
         reason: '[version_error] package.versions is empty',
-      })
-      .expect(400, done);
-    });
-
-    it('should 400 when maintainers missing', function (done) {
-      var pkg = utils.getPackage('testmodule-new-1', '0.0.1', utils.admin);
-      delete pkg.versions['0.0.1'].maintainers;
-      request(app)
-      .put('/' + pkg.name)
-      .set('authorization', utils.adminAuth)
-      .send(pkg)
-      .expect({
-        error: '[maintainers_error] request body need maintainers',
-        reason: '[maintainers_error] request body need maintainers',
       })
       .expect(400, done);
     });
