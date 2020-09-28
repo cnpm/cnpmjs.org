@@ -6,6 +6,7 @@ var request = require('supertest');
 var pedding = require('pedding');
 var mm = require('mm');
 var packageService = require('../../../../services/package');
+var tokenService = require('../../../../services/token');
 var app = require('../../../../servers/registry');
 var config = require('../../../../config');
 var utils = require('../../../utils');
@@ -170,6 +171,20 @@ describe('test/controllers/registry/package/save.test.js', function () {
         reason: '[maintainers_error] request body need maintainers',
       })
       .expect(400, done);
+    });
+
+    it('should publish use token', function* () {
+      var token = yield tokenService.createToken(utils.admin);
+
+      var pkg = utils.getPackageWithToken('testmodule-new-3', '0.0.1', utils.admin);
+
+      yield request(app)
+        .put('/' + pkg.name)
+        .set('authorization', 'Bearer ' + token.token)
+        .send(pkg)
+        .expect(201);
+
+      yield tokenService.deleteToken(utils.admin, token.token);
     });
 
     it('should 400 when dist-tags missing', function (done) {

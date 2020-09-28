@@ -78,15 +78,25 @@ module.exports = function* save(next) {
   var versionPackage = pkg.versions[version];
   var maintainers = versionPackage.maintainers;
 
-  // should never happened in normal request
   if (!maintainers) {
-    this.status = 400;
-    const error = '[maintainers_error] request body need maintainers';
-    this.body = {
-      error,
-      reason: error,
-    };
-    return;
+    var authorizeType = common.getAuthorizeType(this);
+    if (authorizeType === common.AuthorizeType.BEARER) {
+      // With the token mode, pub lib with no maintainers
+      // make the maintainer to be puber
+      maintainers = [{
+        name: this.user.name,
+        email: this.user.email,
+      }];
+    } else {
+      // should never happened in normal request
+      this.status = 400;
+      const error = '[maintainers_error] request body need maintainers';
+      this.body = {
+        error,
+        reason: error,
+      };
+      return;
+    }
   }
 
   // notice that admins can not publish to all modules

@@ -30,6 +30,7 @@ var thirdUser = exports.thirdUser = 'cnpmjstest103';
 exports.thirdUserAuth = 'Basic ' + Buffer.from(thirdUser + ':' + thirdUser).toString('base64');
 
 var _pkg = fs.readFileSync(path.join(fixtures, 'package_and_tgz.json'));
+var _pkg2 = fs.readFileSync(path.join(fixtures, 'package_and_tgz_by_token.json'));
 
 exports.getPackage = function (name, version, user, tag, readme) {
   // name: mk2testmodule
@@ -46,6 +47,29 @@ exports.getPackage = function (name, version, user, tag, readme) {
   pkg.versions[version] = versions[Object.keys(versions)[0]];
   pkg.maintainers[0].name = user;
   pkg.versions[version].maintainers[0].name = user;
+  pkg.versions[version].name = name;
+  pkg.versions[version].version = version;
+  pkg.versions[version]._id = name + '@' + version;
+  pkg.name = name;
+  pkg['dist-tags'] = tags;
+  if (readme) {
+    pkg.versions[version].readme = pkg.readme = readme;
+  }
+  return pkg;
+};
+
+exports.getPackageWithToken = function (name, version, user, tag, readme) {
+  // name: mk2testmodule
+  name = name || 'mk2testmodule';
+  version = version || '0.0.1';
+  tag = tag || 'latest';
+  var tags = {};
+  tags[tag] = version;
+
+  var pkg = JSON.parse(_pkg2);
+  var versions = pkg.versions;
+  pkg.versions = {};
+  pkg.versions[version] = versions[Object.keys(versions)[0]];
   pkg.versions[version].name = name;
   pkg.versions[version].version = version;
   pkg.versions[version]._id = name + '@' + version;
