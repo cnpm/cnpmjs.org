@@ -4,8 +4,7 @@ var debug = require('debug')('cnpmjs.org:middleware:auth');
 var UserService = require('../services/user');
 var TokenService = require('../services/token');
 var config = require('../config');
-var BASIC_PREFIX = /basic /i;
-var BEARER_PREFIX = /bearer /i;
+var common = require('../lib/common')
 
 /**
  * Parse the request authorization222
@@ -24,9 +23,11 @@ module.exports = function () {
 
     var row;
     try {
-      if (BASIC_PREFIX.test(authorization)) {
+      var authorizeType = common.getAuthorizeType(this);
+
+      if (authorizeType === common.AuthorizeType.BASIC) {
         row = yield basicAuth(authorization);
-      } else if (BEARER_PREFIX.test(authorization)) {
+      } else if (authorizeType === common.AuthorizeType.BEARER) {
         row = yield bearerAuth(authorization, this.method, this.ip);
       } else {
         return yield unauthorized.call(this, next);
