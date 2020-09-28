@@ -4,10 +4,10 @@ var debug = require('debug')('cnpmjs.org:middleware:auth');
 var UserService = require('../services/user');
 var TokenService = require('../services/token');
 var config = require('../config');
-var common = require('../lib/common')
+var common = require('../lib/common');
 
 /**
- * Parse the request authorization222
+ * Parse the request authorization
  * get the real user
  */
 
