@@ -6,4 +6,4 @@ module.exports = function* () {
   this.body = {
     username: this.user.name,
   };
-}
+};

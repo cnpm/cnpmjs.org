@@ -16,4 +16,4 @@ module.exports = function* () {
 
   yield login.apply(ctx, [ Promise.resolve() ]);
   response(ctx);
-}
+};
