@@ -61,7 +61,7 @@ function routes(app) {
   app.get('/-/allversions', listAllPackageVersions);
 
   app.get('/-/whoami', login, whoami);
-  app.get('/-/ping', ping);
+  app.get('/-/ping', login, ping);
 
   // module
   // scope package: params: [$name]

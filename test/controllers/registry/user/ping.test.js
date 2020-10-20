@@ -29,7 +29,7 @@ describe('test/controllers/registry/user/ping.test.js', function () {
           request(app)
             .get('/-/ping?write=true')
             .set('authorization', 'Bearer ' + token.token)
-            .expect(200, function (err, res) {
+            .expect(200, function (err) {
               should.not.exist(err);
               done();
             });
@@ -40,8 +40,9 @@ describe('test/controllers/registry/user/ping.test.js', function () {
         it('should work', function (done) {
           request(app)
             .get('/-/ping?write=true')
-            .set('authorization', 'Bearer ' + token.token)
-            .expect(401, function (err, res) {
+            .set('authorization', 'Bearer mock_token')
+            .expect(401, function (err) {
+              should.not.exist(err);
               done();
             });
         });
@@ -54,7 +55,7 @@ describe('test/controllers/registry/user/ping.test.js', function () {
           request(app)
             .get('/-/ping')
             .set('authorization', 'Bearer ' + token.token)
-            .expect(200, function (err, res) {
+            .expect(200, function (err) {
               should.not.exist(err);
               done();
             });
@@ -66,7 +67,7 @@ describe('test/controllers/registry/user/ping.test.js', function () {
           request(app)
             .get('/-/ping')
             .set('authorization', 'Bearer ' + token.token)
-            .expect(200, function (err, res) {
+            .expect(200, function (err) {
               should.not.exist(err);
               done();
             });
