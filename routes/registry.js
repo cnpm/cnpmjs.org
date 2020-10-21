@@ -29,6 +29,8 @@ var listPackagesByUser = require('../controllers/registry/package/list_by_user')
 var addUser = require('../controllers/registry/user/add');
 var showUser = require('../controllers/registry/user/show');
 var updateUser = require('../controllers/registry/user/update');
+var whoami = require('../controllers/registry/user/whoami');
+var ping = require('../controllers/registry/user/ping');
 
 var createToken = require('../controllers/registry/token/create');
 var delToken = require('../controllers/registry/token/del');
@@ -57,6 +59,9 @@ function routes(app) {
   app.get('/-/short', listShorts);
 
   app.get('/-/allversions', listAllPackageVersions);
+
+  app.get('/-/whoami', login, whoami);
+  app.get('/-/ping', login, ping);
 
   // module
   // scope package: params: [$name]

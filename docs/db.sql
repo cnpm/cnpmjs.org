@@ -330,5 +330,5 @@ CREATE TABLE IF NOT EXISTS `token` (
  `cidr_whitelist` varchar(500) NOT NULL COMMENT 'ip list, ["127.0.0.1"]',
  PRIMARY KEY (`id`),
  UNIQUE KEY `uk_token` (`token`),
- KEY `idx_user` (`user`)
+ KEY `idx_user` (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='token info';

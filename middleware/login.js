@@ -3,6 +3,11 @@
 var http = require('http');
 
 module.exports = function *login(next) {
+  if (this.path === '/-/ping' && this.query.write !== 'true') {
+    yield next;
+    return;
+  }
+
   if (this.user.error) {
     var status = this.user.error.status;
     this.status = http.STATUS_CODES[status]
