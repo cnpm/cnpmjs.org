@@ -39,19 +39,6 @@ module.exports = function* save(next) {
     return;
   }
 
-  // check maintainers
-  var result = yield packageService.authMaintainer(name, username);
-  if (!result.isMaintainer) {
-    this.status = 403;
-    const error = '[forbidden] ' +  username + ' not authorized to modify ' + name +
-      ', please contact maintainers: ' + result.maintainers.join(', ');
-    this.body = {
-      error,
-      reason: error,
-    };
-    return;
-  }
-
   if (!filename) {
     var hasDeprecated = false;
     for (var v in pkg.versions) {
