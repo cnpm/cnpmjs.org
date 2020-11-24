@@ -151,5 +151,5 @@ Release [History](/history).
 
 ## Sponsors
 
-- [![阿里云](https://static.aliyun.com/images/www-summerwind/logo.gif)](http://click.aliyun.com/m/4288/) (2016.2 - now)
+- [![阿里云](https://static.aliyun.com/images/www-summerwind/logo.gif)](http://click.aliyun.com/m/4288/) [![阿里云云效](https://img.alicdn.com/tfs/TB1aEKm3hz1gK0jSZSgXXavwpXa-212-42.png)](https://devops.aliyun.com/?channel=pd_cnpm_github) (2016.2 - now)
 - [![UCloud云计算](https://www.ucloud.cn/static/style/images/about/logo.png)](http://www.ucloud.cn?sem=sdk-CNPMJS) (2015.3 - 2016.3)
