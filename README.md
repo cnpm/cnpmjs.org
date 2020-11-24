@@ -31,6 +31,7 @@ Our goal is to provide a low cost maintenance, easy to use, and easy to scale so
 
 * Build a private npm for your own enterprise. ([alibaba](http://www.alibaba.com/) is using `cnpmjs.org` now)
 * Build a npm mirror. (we use it to build a mirror in China: [https://npm.taobao.org/](https://npm.taobao.org/))
+* Use the private npm service provided by Alibaba Cloud DevOps which build with cnpm. [https://packages.aliyun.com/](https://packages.aliyun.com/?channel=pd_cnpm_github)
 
 ## Features
 
@@ -171,7 +172,7 @@ Tips: make sure your code is following the [node-style-guide](https://github.com
 
 ## Sponsors
 
-- [![阿里云](https://static.aliyun.com/images/www-summerwind/logo.gif)](http://click.aliyun.com/m/4288/) (2016.2 - now)
+- [![阿里云](https://static.aliyun.com/images/www-summerwind/logo.gif)](http://click.aliyun.com/m/4288/) [![阿里云云效](https://img.alicdn.com/tfs/TB116yt3fb2gK0jSZK9XXaEgFXa-106-20.png)](https://devops.aliyun.com/?channel=pd_cnpm_github) (2016.2 - now)
 
 ## License
 
