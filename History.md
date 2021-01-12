@@ -1,3 +1,9 @@
+3.0.0-rc.38 / 2021-01-12
+==================
+
+**features**
+  * [[`c6040b`](http://github.com/cnpm/cnpmjs.org/commit/1c6040bc95610e23b4756baa09e8119cda2fe01e)] - performance: optimise query pkg latestModified  (#1611) (killa <<killa123@126.com>>)
+
 
 3.0.0-rc.37 / 2020-10-21
 ==================
