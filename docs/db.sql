@@ -93,6 +93,7 @@ CREATE TABLE IF NOT EXISTS `module` (
  KEY `idx_gmt_modified` (`gmt_modified`),
  KEY `idx_publish_time` (`publish_time`),
  KEY `idx_author` (`author`)
+ KEY `idx_name_gmt_modified` (`name`,`gmt_modified`),
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='module info';
 -- ALTER TABLE `module` ADD `description` longtext;
 -- ALTER TABLE `module` ADD `publish_time` bigint(20) unsigned, ADD KEY `publish_time` (`publish_time`);

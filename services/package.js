@@ -251,16 +251,12 @@ exports.listModulesByName = function* (moduleName, attributes) {
 };
 
 exports.getModuleLastModified = function* (name) {
-  var mod = yield Module.find({
+  var gmt_modified = yield Module.max('gmt_modified', {
     where: {
       name: name,
     },
-    order: [
-      ['gmt_modified', 'DESC']
-    ],
-    attributes: [ 'gmt_modified' ]
   });
-  return mod && mod.gmt_modified || null;
+  return gmt_modified;
 };
 
 // module:update
