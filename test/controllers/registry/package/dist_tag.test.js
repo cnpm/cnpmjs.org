@@ -1,5 +1,6 @@
 'use strict';
 
+var assert = require('assert');
 var request = require('supertest');
 var mm = require('mm');
 var pedding = require('pedding');
@@ -117,6 +118,26 @@ describe('test/controllers/registry/package/dist_tag.test.js', function () {
         .expect(201, done);
       });
     });
+
+    it('should fire globalHook', function (done) {
+      done = pedding(2, done);
+      mm(config, 'globalHook', function* (envelope) {
+        assert(envelope.version === '1.0.1');
+        assert(envelope.name === '@cnpmtest/dist_tag_test_module_set');
+        assert(envelope.type === 'package');
+        assert(envelope.event === 'package:dist-tag');
+        done();
+      })
+      request(app)
+        .put('/-/package/@cnpmtest/dist_tag_test_module_set/dist-tags/exists')
+        .set('authorization', utils.otherUserAuth)
+        .set('content-type', 'application/json')
+        .send(JSON.stringify('1.0.1'))
+        .expect({
+          ok: 'dist-tags updated'
+        })
+        .expect(201, done);
+    });
   });
 
   describe('destroy()', function () {
@@ -177,6 +198,24 @@ describe('test/controllers/registry/package/dist_tag.test.js', function () {
         ok: 'dist-tags updated'
       })
       .expect(200, done);
+    });
+
+    it('should fire globalHook', function (done) {
+      done = pedding(2, done);
+      mm(config, 'globalHook', function* (envelope) {
+        assert(envelope.name === '@cnpmtest/dist_tag_test_module_destroy');
+        assert(envelope.type === 'package');
+        assert(envelope.event === 'package:dist-tag:rm');
+        done();
+      })
+      request(app)
+        .delete('/-/package/@cnpmtest/dist_tag_test_module_destroy/dist-tags/next')
+        .set('authorization', utils.otherUserAuth)
+        .set('content-type', 'application/json')
+        .expect({
+          ok: 'dist-tags updated'
+        })
+        .expect(200, done);
     });
   });
 
@@ -242,6 +281,28 @@ describe('test/controllers/registry/package/dist_tag.test.js', function () {
           new: '1.0.1',
         }, done);
       });
+    });
+
+    it('should fire globalHook', function (done) {
+      done = pedding(2, done);
+      mm(config, 'globalHook', function* (envelope) {
+        assert(envelope.version === '1.0.1');
+        assert(envelope.name === '@cnpmtest/dist_tag_test_module_save');
+        assert(envelope.type === 'package');
+        assert(envelope.event === 'package:dist-tag');
+        done();
+      })
+      request(app)
+        .put('/-/package/@cnpmtest/dist_tag_test_module_save/dist-tags')
+        .set('authorization', utils.otherUserAuth)
+        .send({
+          latest: '1.0.1',
+          new: '1.0.1'
+        })
+        .expect({
+          ok: 'dist-tags updated'
+        })
+        .expect(201, done);
     });
   });
 
