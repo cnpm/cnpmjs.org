@@ -1,3 +1,9 @@
+3.0.0-rc.39 / 2021-01-14
+==================
+
+**features**
+  * [[`33dd355`](http://github.com/cnpm/cnpmjs.org/commit/33dd3554f5daf13de33f04128be6853ce120636f)] - feat: impl dist-tag hooks (#1612) (killa <<killa123@126.com>>)
+
 3.0.0-rc.38 / 2021-01-12
 ==================
 
