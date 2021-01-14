@@ -1,6 +1,7 @@
 'use strict';
 
 var packageService = require('../../../services/package');
+var hook = require('../../../services/hook');
 
 function ok() {
   return {
@@ -34,6 +35,19 @@ exports.update = function* () {
   for (var tag in tags) {
     var version = tags[tag];
     yield packageService.addModuleTag(name, tag, version);
+
+    // hooks
+    const envelope = {
+      event: 'package:dist-tag',
+      name: name,
+      tag: tag,
+      type: 'package',
+      version: version,
+      hookOwner: null,
+      payload: null,
+      change: null,
+    };
+    hook.trigger(envelope);
   }
   this.status = 201;
   this.body = ok();
@@ -60,6 +74,18 @@ exports.set = function* () {
   yield packageService.addModuleTag(name, tag, version);
   this.status = 201;
   this.body = ok();
+  // hooks
+  const envelope = {
+    event: 'package:dist-tag',
+    name: name,
+    tag: tag,
+    type: 'package',
+    version: version,
+    hookOwner: null,
+    payload: null,
+    change: null,
+  };
+  hook.trigger(envelope);
 };
 
 // DELETE /-/package/:pkg/dist-tags/:tag -- Remove tag from dist-tags
@@ -77,4 +103,15 @@ exports.destroy = function* () {
   }
   yield packageService.removeModuleTagsByNames(name, tag);
   this.body = ok();
+  // hooks
+  const envelope = {
+    event: 'package:dist-tag:rm',
+    name: name,
+    tag: tag,
+    type: 'package',
+    hookOwner: null,
+    payload: null,
+    change: null,
+  };
+  hook.trigger(envelope);
 };
