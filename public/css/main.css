@@ -14,10 +14,6 @@ body {
   margin-left: auto
 }
 
-.yunxiao {
-  width: 1170px;
-}
-
 @media (min-width: 768px) {
   .container {
     width:750px
