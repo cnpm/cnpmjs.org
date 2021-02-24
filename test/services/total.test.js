@@ -1,22 +1,13 @@
-/**!
- * cnpmjs.org - test/services/total.test.js
- *
- * Copyright(c) fengmk2 and other contributors.
- * MIT Licensed
- *
- * Authors:
- *   fengmk2 <fengmk2@gmail.com> (http://fengmk2.github.com)
- */
-
 'use strict';
 
-/**
- * Module dependencies.
- */
-
 var Total = require('../../services/total');
+var config = require('../../config');
+var utils = require('../utils');
+var mm = require('mm');
 
 describe('services/total.test.js', function () {
+  afterEach(mm.restore);
+
   describe('plusDeleteModule()', function () {
     it('should plus delete module count', function* () {
       var info = yield Total.getTotalInfo();
@@ -34,9 +25,21 @@ describe('services/total.test.js', function () {
   });
 
   describe('get()', function () {
-    it('should get all total info', function* () {
+    it('should get all total info, enableTotalCount: true', function* () {
+      yield utils.createModule('test-services-total-get-enableTotalCount-true', '1.0.0');
       var info = yield Total.get();
       info.disk_size.should.be.a.Number();
+      info.doc_count.should.above(0);
+      info.doc_version_count.should.above(0);
+    });
+
+    it('should get all total info, enableTotalCount: false', function* () {
+      mm(config, 'enableTotalCount', false);
+      yield utils.createModule('test-services-total-get-enableTotalCount-false', '1.0.0');
+      var info = yield Total.get();
+      info.disk_size.should.be.a.Number();
+      info.doc_count.should.equal(0);
+      info.doc_version_count.should.equal(0);
     });
   });
 
