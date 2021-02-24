@@ -13,18 +13,29 @@ if (config.database.dialect === 'postgres') {
 }
 
 exports.get = function* () {
+  var rs;
   // var DB_SIZE_SQL = 'SELECT TABLE_NAME AS name, data_length, index_length \
   //   FROM information_schema.tables WHERE TABLE_SCHEMA = ? \
   //   GROUP BY TABLE_NAME \
   //   ORDER BY data_length DESC \
   //   LIMIT 0, 200';
-  var rs = yield [
-    // models.query(DB_SIZE_SQL, [config.db]),
-    models.queryOne(TOTAL_MODULE_SQL),
-    models.queryOne(TOTAL_VERSION_SQL),
-    models.queryOne(TOTAL_USER_SQL),
-    exports.getTotalInfo(),
-  ];
+  if (config.enableTotalCount) {
+    rs = yield [
+      // models.query(DB_SIZE_SQL, [config.db]),
+      models.queryOne(TOTAL_MODULE_SQL),
+      models.queryOne(TOTAL_VERSION_SQL),
+      models.queryOne(TOTAL_USER_SQL),
+      exports.getTotalInfo(),
+    ];
+  } else {
+    rs = yield [
+      models.queryOne(TOTAL_USER_SQL),
+      exports.getTotalInfo(),
+    ];
+    // set total modules and versions to zero
+    rs.unshift({ count: 0 });
+    rs.unshift({ count: 0 });
+  }
 
   // var sizes = rs[0];
   var mc = rs[0];

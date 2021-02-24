@@ -151,6 +151,10 @@ var config = {
     logging: !!process.env.SQL_DEBUG,
   },
 
+  // return total modules and versions, default is true
+  // it will use `SELECT count(DISTINCT name) FROM module` SQL on Database
+  enableTotalCount: true,
+
   // enable proxy npm audits request or not
   enableNpmAuditsProxy: true,
 

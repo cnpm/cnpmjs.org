@@ -1,18 +1,4 @@
-/**!
- * cnpmjs.org - test/services/package.test.js
- *
- * Copyright(c) fengmk2 and other contributors.
- * MIT Licensed
- *
- * Authors:
- *   fengmk2 <fengmk2@gmail.com> (http://fengmk2.com)
- */
-
 'use strict';
-
-/**
- * Module dependencies.
- */
 
 var should = require('should');
 var sleep = require('co-sleep');
@@ -20,40 +6,14 @@ var Package = require('../../services/package');
 var utils = require('../utils');
 
 describe('test/services/package.test.js', function () {
-  function* createModule(name, version, user, tag) {
-    var sourcePackage = {
-      version: version,
-      name: name,
-      publish_time: Date.now(),
-    };
-    var mod = {
-      version: sourcePackage.version,
-      name: sourcePackage.name,
-      package: sourcePackage,
-      author: user || 'unittest',
-      publish_time: sourcePackage.publish_time,
-    };
-    var dist = {
-      tarball: 'http://registry.npmjs.org/' + name + '/-/' + name + '-' + version + '.tgz',
-      shasum: '9d7bc446e77963933301dd602d5731cb861135e0',
-      size: 100,
-    };
-    mod.package.dist = dist;
-    yield Package.saveModule(mod);
-    yield Package.saveModuleAbbreviated(mod);
-    // add tag
-    yield Package.addModuleTag(name, tag || 'latest', version);
-    return yield Package.getModule(mod.name, mod.version);
-  }
-
   describe('addModuleTag()', function () {
     it('should add latest tag to 1.0.0', function* () {
-      var r = yield createModule('test-addModuleTag-module-name', '1.0.0');
+      var r = yield utils.createModule('test-addModuleTag-module-name', '1.0.0');
       var tag = yield Package.addModuleTag(r.name, 'latest', r.version);
       should.exist(tag);
       tag.id.should.above(0);
 
-      r = yield createModule('test-addModuleTag-module-name', '1.1.0');
+      r = yield utils.createModule('test-addModuleTag-module-name', '1.1.0');
       var tag2 = yield Package.addModuleTag(r.name, 'latest', r.version);
       should.exist(tag2);
       tag.id.should.equal(tag2.id);
@@ -70,7 +30,7 @@ describe('test/services/package.test.js', function () {
 
   describe('getModuleByTag()', function () {
     it('should get latest module', function* () {
-      var r = yield createModule('test-getModuleByTag-module-name', '1.0.0');
+      var r = yield utils.createModule('test-getModuleByTag-module-name', '1.0.0');
       var tag = yield Package.addModuleTag(r.name, 'latest', r.version);
       should.exist(tag);
 
@@ -106,9 +66,9 @@ describe('test/services/package.test.js', function () {
 
   describe('listPublicModuleNamesByUser(), listPublicModulesByUser()', function () {
     before(function* () {
-      yield createModule('listPublicModuleNamesByUser-module0', '1.0.0', 'listPublicModuleNamesByUser-user');
-      yield createModule('listPublicModuleNamesByUser-module1', '1.0.0', 'listPublicModuleNamesByUser-user');
-      yield createModule('listPublicModuleNamesByUser-module2', '1.0.0', 'listPublicModuleNamesByUser-user');
+      yield utils.createModule('listPublicModuleNamesByUser-module0', '1.0.0', 'listPublicModuleNamesByUser-user');
+      yield utils.createModule('listPublicModuleNamesByUser-module1', '1.0.0', 'listPublicModuleNamesByUser-user');
+      yield utils.createModule('listPublicModuleNamesByUser-module2', '1.0.0', 'listPublicModuleNamesByUser-user');
     });
 
     it('should got all public module names', function* () {
@@ -143,8 +103,8 @@ describe('test/services/package.test.js', function () {
     });
 
     it('should return all version modules', function* () {
-      yield createModule('test-listModulesByName-module-1', '1.0.0');
-      yield createModule('test-listModulesByName-module-1', '2.0.0');
+      yield utils.createModule('test-listModulesByName-module-1', '1.0.0');
+      yield utils.createModule('test-listModulesByName-module-1', '2.0.0');
       var modules = yield Package.listModulesByName('test-listModulesByName-module-1');
       modules.should.length(2);
       modules.forEach(function (mod) {
@@ -161,8 +121,8 @@ describe('test/services/package.test.js', function () {
     });
 
     it('should work', function* () {
-      yield createModule('@cnpm-test/test-listPrivateModules-module-1', '1.0.0');
-      yield createModule('@cnpm-test/test-listPrivateModules-module-2', '1.0.0');
+      yield utils.createModule('@cnpm-test/test-listPrivateModules-module-1', '1.0.0');
+      yield utils.createModule('@cnpm-test/test-listPrivateModules-module-2', '1.0.0');
       var modules = yield Package.listPrivateModulesByScope('@cnpm-test');
       modules.should.length(2);
       modules[0].name.should.containEql('@cnpm-test/test-listPrivateModules-module-');
@@ -171,12 +131,12 @@ describe('test/services/package.test.js', function () {
 
   describe('listPublicModuleNamesSince(), listAllPublicModuleNames()', function () {
     it('should got those module names', function* () {
-      yield createModule('test-listPublicModuleNamesSince-module-0', '1.0.0');
+      yield utils.createModule('test-listPublicModuleNamesSince-module-0', '1.0.0');
       yield sleep(1100);
       var start = Date.now() - 1000;
-      yield createModule('test-listPublicModuleNamesSince-module-1', '1.0.0');
-      yield createModule('test-listPublicModuleNamesSince-module-1', '1.0.1', null, 'beta');
-      yield createModule('test-listPublicModuleNamesSince-module-2', '1.0.0');
+      yield utils.createModule('test-listPublicModuleNamesSince-module-1', '1.0.0');
+      yield utils.createModule('test-listPublicModuleNamesSince-module-1', '1.0.1', null, 'beta');
+      yield utils.createModule('test-listPublicModuleNamesSince-module-2', '1.0.0');
       var names = yield Package.listPublicModuleNamesSince(start);
       names.should.length(2);
       names.should.eql(['test-listPublicModuleNamesSince-module-1', 'test-listPublicModuleNamesSince-module-2']);
@@ -191,7 +151,7 @@ describe('test/services/package.test.js', function () {
 
   describe('getModuleLastModified()', function () {
     it('should get a datetime', function* () {
-      yield createModule('test-getModuleLastModified-module-0', '1.0.0');
+      yield utils.createModule('test-getModuleLastModified-module-0', '1.0.0');
       var t = yield Package.getModuleLastModified('test-getModuleLastModified-module-0');
       t.should.be.a.Date();
     });
@@ -204,9 +164,9 @@ describe('test/services/package.test.js', function () {
 
   describe('removeModulesByName()', function () {
     it('should remove all', function* () {
-      yield createModule('test-removeModulesByName-module-1', '1.0.0');
-      yield createModule('test-removeModulesByName-module-1', '1.0.1', null, 'beta');
-      yield createModule('test-removeModulesByName-module-1', '2.0.0');
+      yield utils.createModule('test-removeModulesByName-module-1', '1.0.0');
+      yield utils.createModule('test-removeModulesByName-module-1', '1.0.1', null, 'beta');
+      yield utils.createModule('test-removeModulesByName-module-1', '2.0.0');
 
       var mods = yield Package.listModulesByName('test-removeModulesByName-module-1');
       mods.should.length(3);
@@ -218,10 +178,10 @@ describe('test/services/package.test.js', function () {
 
   describe('removeModulesByNameAndVersions()', function () {
     it('should remove some versions', function* () {
-      yield createModule('test-removeModulesByNameAndVersions-module-1', '0.0.0');
-      yield createModule('test-removeModulesByNameAndVersions-module-1', '1.0.0');
-      yield createModule('test-removeModulesByNameAndVersions-module-1', '1.0.1', null, 'beta');
-      yield createModule('test-removeModulesByNameAndVersions-module-1', '2.0.0');
+      yield utils.createModule('test-removeModulesByNameAndVersions-module-1', '0.0.0');
+      yield utils.createModule('test-removeModulesByNameAndVersions-module-1', '1.0.0');
+      yield utils.createModule('test-removeModulesByNameAndVersions-module-1', '1.0.1', null, 'beta');
+      yield utils.createModule('test-removeModulesByNameAndVersions-module-1', '2.0.0');
 
       var mods = yield Package.listModulesByName('test-removeModulesByNameAndVersions-module-1');
       mods.should.length(4);
@@ -245,11 +205,11 @@ describe('test/services/package.test.js', function () {
 
   describe('removeModuleTags()', function () {
     it('should remove all tags by name', function* () {
-      var r2 = yield createModule('test-removeModuleTagsByName2-module-name', '1.0.0');
+      var r2 = yield utils.createModule('test-removeModuleTagsByName2-module-name', '1.0.0');
       var tag = yield Package.addModuleTag(r2.name, 'latest', r2.version);
       should.exist(tag);
 
-      var r = yield createModule('test-removeModuleTagsByName-module-name', '1.0.0');
+      var r = yield utils.createModule('test-removeModuleTagsByName-module-name', '1.0.0');
       var tag = yield Package.addModuleTag(r.name, 'latest', r.version);
       should.exist(tag);
       var tag = yield Package.addModuleTag(r.name, 'beta', r.version);
@@ -268,7 +228,7 @@ describe('test/services/package.test.js', function () {
 
   describe('removeModuleTagsByIds()', function () {
     it('should remove tags by ids', function* () {
-      var r = yield createModule('test-removeModuleTagsByIds-module-name', '1.0.0');
+      var r = yield utils.createModule('test-removeModuleTagsByIds-module-name', '1.0.0');
       var tag1 = yield Package.addModuleTag(r.name, 'latest', r.version);
       should.exist(tag1);
       var tag2 = yield Package.addModuleTag(r.name, 'beta', r.version);
@@ -291,7 +251,7 @@ describe('test/services/package.test.js', function () {
 
   describe('removeModuleTagsByNames()', function () {
     it('should remove some tags', function* () {
-      var r = yield createModule('test-removeModuleTagsByNames-module-name', '1.0.0');
+      var r = yield utils.createModule('test-removeModuleTagsByNames-module-name', '1.0.0');
       var tag1 = yield Package.addModuleTag(r.name, 'latest', r.version);
       should.exist(tag1);
       var tag2 = yield Package.addModuleTag(r.name, 'beta', r.version);
@@ -340,17 +300,17 @@ describe('test/services/package.test.js', function () {
 
   describe('getModuleByRange()', function() {
     it('should get undefined when not match semver range', function* () {
-      yield createModule('test-getModuleByRange-module-0', '1.0.0');
-      yield createModule('test-getModuleByRange-module-0', '1.1.0');
-      yield createModule('test-getModuleByRange-module-0', '2.0.0');
+      yield utils.createModule('test-getModuleByRange-module-0', '1.0.0');
+      yield utils.createModule('test-getModuleByRange-module-0', '1.1.0');
+      yield utils.createModule('test-getModuleByRange-module-0', '2.0.0');
       var mod = yield Package.getModuleByRange('test-getModuleByRange-module-0', '~2.1.0');
       should.not.exist(mod);
     });
 
     it('should get package with semver range', function* () {
-      yield createModule('test-getModuleByRange-module-1', '1.0.0');
-      yield createModule('test-getModuleByRange-module-1', '1.1.0');
-      yield createModule('test-getModuleByRange-module-1', '2.0.0');
+      yield utils.createModule('test-getModuleByRange-module-1', '1.0.0');
+      yield utils.createModule('test-getModuleByRange-module-1', '1.1.0');
+      yield utils.createModule('test-getModuleByRange-module-1', '2.0.0');
       var mod = yield Package.getModuleByRange('test-getModuleByRange-module-1', '1');
       mod.package.name.should.equal(mod.name);
       mod.name.should.equal('test-getModuleByRange-module-1');
@@ -358,9 +318,9 @@ describe('test/services/package.test.js', function () {
     });
 
     it('should get package with semver range when have invalid version', function* () {
-      yield createModule('test-getModuleByRange-module-2', '1.0.0');
-      yield createModule('test-getModuleByRange-module-2', '1.1.0');
-      yield createModule('test-getModuleByRange-module-2', 'next');
+      yield utils.createModule('test-getModuleByRange-module-2', '1.0.0');
+      yield utils.createModule('test-getModuleByRange-module-2', '1.1.0');
+      yield utils.createModule('test-getModuleByRange-module-2', 'next');
       var mod = yield Package.getModuleByRange('test-getModuleByRange-module-2', '1');
       mod.package.name.should.equal(mod.name);
       mod.name.should.equal('test-getModuleByRange-module-2');
@@ -412,7 +372,7 @@ describe('test/services/package.test.js', function () {
     });
 
     it('should return updated module instance', function* () {
-      var r = yield createModule('test-updateModulePackageFields-name', '1.0.0');
+      var r = yield utils.createModule('test-updateModulePackageFields-name', '1.0.0');
       should.exist(r);
       var r1 = yield Package.updateModulePackageFields(r.id, {foo: 'update for field'});
       r1.id.should.equal(r.id);
@@ -428,7 +388,7 @@ describe('test/services/package.test.js', function () {
     });
 
     it('should return updated module instance', function* () {
-      var r = yield createModule('test-updateModuleReadme-name', '1.0.0');
+      var r = yield utils.createModule('test-updateModuleReadme-name', '1.0.0');
       should.exist(r);
       var r1 = yield Package.updateModuleReadme(r.id, 'test updateModuleReadme');
       r1.id.should.equal(r.id);
@@ -444,7 +404,7 @@ describe('test/services/package.test.js', function () {
     });
 
     it('should return updated module instance', function* () {
-      var r = yield createModule('test-updateModuleDescription-name', '1.0.0');
+      var r = yield utils.createModule('test-updateModuleDescription-name', '1.0.0');
       should.exist(r);
       var r1 = yield Package.updateModuleDescription(r.id, 'test updateModuleDescription');
       r1.id.should.equal(r.id);
@@ -461,7 +421,7 @@ describe('test/services/package.test.js', function () {
     });
 
     it('should return the update module when update lastTime exists', function* () {
-      var r1 = yield createModule('test-update-module-last-modified-package-name', '1.0.0');
+      var r1 = yield utils.createModule('test-update-module-last-modified-package-name', '1.0.0');
       yield sleep(1100);
       yield Package.updateModuleLastModified(r1.name);
       var r2 = yield Package.getModule(r1.name, r1.version);
