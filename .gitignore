@@ -30,3 +30,4 @@ config/web_readme.md
 .tmp/
 *.sqlite
 
+run/

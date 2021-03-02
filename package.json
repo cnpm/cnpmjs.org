@@ -1,12 +1,13 @@
 {
   "name": "cnpmjs.org",
-  "version": "3.0.0-rc.40",
+  "version": "4.0.0",
   "description": "Private npm registry and web for Enterprise, base on MySQL and Simple Store Service",
   "main": "index.js",
   "scripts": {
-    "dev": "DEBUG=cnpm* node dispatch.js",
-    "test": "make jshint && make test",
-    "test-local": "make test",
+    "lint": "eslint app config test/app/",
+    "dev": "egg-bin dev",
+    "test": "TESTS=test/app/**/*/user.test.js egg-bin test",
+    "test-model": "TESTS=test/app/model/**/user.test.js egg-bin test",
     "start": "./bin/nodejsctl start && cp History.md docs/web/history.md",
     "status": "./bin/nodejsctl status",
     "stop": "./bin/nodejsctl stop"
@@ -15,7 +16,6 @@
     "cnpmjs.org": "bin/cli.js"
   },
   "dependencies": {
-    "agentkeepalive": "^4.0.0",
     "await-event": "^2.1.0",
     "bytes": "^2.5.0",
     "cfork": "^1.6.1",
@@ -27,6 +27,8 @@
     "commander": "^2.11.0",
     "copy-to": "^2.0.1",
     "debug": "^3.0.0",
+    "egg": "^2.29.3",
+    "egg-orm": "^1.1.1",
     "error-formater": "^1.0.3",
     "fs-cnpm": "^1.2.0",
     "giturl": "^1.0.0",
@@ -76,32 +78,21 @@
     "autod": "*",
     "chunkstream": "*",
     "contributors": "*",
-    "intelli-espower-loader": "^1.0.1",
-    "istanbul": "*",
-    "jshint": "*",
-    "mm": "*",
-    "mocha": "3",
-    "node-dev": "*",
-    "pedding": "*",
-    "pg": "5",
-    "pg-hstore": "2",
-    "power-assert": "^1.4.2",
-    "should": "8",
-    "sqlite3": "*",
-    "supertest": "2",
-    "thunk-mocha": "1"
+    "egg-bin": "^4.15.0",
+    "egg-mock": "^4.0.1",
+    "eslint": "^7.21.0",
+    "eslint-config-egg": "^9.0.0"
   },
   "homepage": "https://github.com/cnpm/cnpmjs.org",
   "repository": {
     "type": "git",
-    "url": "git://github.com/cnpm/cnpmjs.org.git",
-    "web": "https://github.com/cnpm/cnpmjs.org"
+    "url": "git://github.com/cnpm/cnpmjs.org.git"
   },
   "bugs": {
     "url": "https://github.com/cnpm/cnpmjs.org/issues"
   },
   "publishConfig": {
-    "tag": "latest-3"
+    "tag": "latest-4"
   },
   "keywords": [
     "cnpmjs.org",
@@ -113,7 +104,7 @@
   "engines": {
     "node": ">= 8.0.0"
   },
-  "author": [
+  "authors": [
     "fengmk2 <fengmk2@gmail.com> (http://fengmk2.com)",
     "dead_horse <dead_horse@qq.com> (http://deadhorse.me)"
   ],
