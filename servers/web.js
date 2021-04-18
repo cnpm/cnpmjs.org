@@ -17,6 +17,7 @@ var auth = require('../middleware/auth');
 var proxyToNpm = require('../middleware/proxy_to_npm');
 var routes = require('../routes/web');
 var config = require('../config');
+var models = require('../models');
 var jsonp = require('koa-safe-jsonp');
 var path = require('path');
 var http = require('http');
@@ -42,6 +43,8 @@ if (config.pagemock) {
   }));
 }
 
+// add app.models, let middleware can access models ref
+app.models = models;
 for (const mw of config.customWebMiddlewares) {
   app.use(mw(app));
 }

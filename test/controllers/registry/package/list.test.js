@@ -49,6 +49,7 @@ describe('test/controllers/registry/package/list.test.js', () => {
       var data = res.body;
       data.name.should.equal('@cnpmtest/testmodule-list-1');
       assert(res.headers['x-custom-middleware'] === 'true');
+      assert(res.headers['x-custom-app-models'] === 'true');
       done();
     });
   });

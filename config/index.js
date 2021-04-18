@@ -302,16 +302,18 @@ var config = {
 
 if (process.env.NODE_ENV === 'test') {
   config.enableAbbreviatedMetadata = true;
-  config.customRegistryMiddlewares.push(() => {
+  config.customRegistryMiddlewares.push((app) => {
     return function* (next) {
       this.set('x-custom-middleware', 'true');
+      this.set('x-custom-app-models', typeof app.models.query === 'function' ? 'true' : 'false');
       yield next;
     };
   });
 
-  config.customWebMiddlewares.push(() => {
+  config.customWebMiddlewares.push((app) => {
     return function* (next) {
       this.set('x-custom-web-middleware', 'true');
+      this.set('x-custom-web-app-models', typeof app.models.query === 'function' ? 'true' : 'false');
       yield next;
     };
   });
