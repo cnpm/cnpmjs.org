@@ -298,6 +298,19 @@ var config = {
     enable: false,
     connectOptions: null,
   },
+
+  // custom format full package list
+  // change `GET /:name` request response body
+  // use on `controllers/registry/list.js`
+  formatCustomFullPackageInfoAndVersions: (ctx, packageInfo) => {
+    return packageInfo;
+  },
+  // custom format one package version
+  // change `GET /:name/:version` request response body
+  // use on `controllers/registry/show.js`
+  formatCustomOnePackageVersion: (ctx, packageVersion) => {
+    return packageVersion;
+  },
 };
 
 if (process.env.NODE_ENV === 'test') {

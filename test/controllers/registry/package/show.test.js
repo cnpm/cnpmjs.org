@@ -1,5 +1,6 @@
 'use strict';
 
+var assert = require('assert');
 var should = require('should');
 var request = require('supertest');
 var mm = require('mm');
@@ -182,6 +183,20 @@ describe('test/controllers/registry/package/show.test.js', function () {
     request(app)
     .get('/@cnpmtest/testmodule-show-not-exists/latest')
     .expect(404, done);
+  });
+
+  it('should config.formatCustomOnePackageVersion work', async () => {
+    mm(config, 'formatCustomOnePackageVersion', (ctx, packageVersion) => {
+      console.log('%s %s, query: %j', ctx.method, ctx.url, ctx.query);
+      packageVersion.description = '';
+      packageVersion.readme = '';
+      return packageVersion;
+    });
+    const res = await request(app)
+      .get('/@cnpmtest/testmodule-show/0.0.1?sync_timestamp=123123');
+    assert(res.status === 200);
+    assert(res.body.description === '');
+    assert(res.body.readme === '');
   });
 
   describe('show sync package', function () {
