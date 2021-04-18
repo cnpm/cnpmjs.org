@@ -193,7 +193,7 @@ describe('test/controllers/registry/package/show.test.js', function () {
       return packageVersion;
     });
     const res = await request(app)
-      .get('/@cnpmtest/testmodule-show/0.0.1?sync_timestamp=123123');
+      .get('/@cnpmtest/testmodule-show/0.0.1?b=123123');
     assert(res.status === 200);
     assert(res.body.description === '');
     assert(res.body.readme === '');

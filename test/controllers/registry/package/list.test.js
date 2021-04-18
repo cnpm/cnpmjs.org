@@ -243,7 +243,7 @@ describe('test/controllers/registry/package/list.test.js', () => {
       return info;
     });
     const res = await request(app)
-      .get('/@cnpmtest/testmodule-list-1?sync_timestamp=123123');
+      .get('/@cnpmtest/testmodule-list-1?a=123123');
     assert(res.status === 200);
     assert(res.body.description === '');
     assert(res.body.readme === '');
