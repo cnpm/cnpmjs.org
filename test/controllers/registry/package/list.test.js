@@ -230,6 +230,29 @@ describe('test/controllers/registry/package/list.test.js', () => {
     }, done);
   });
 
+  it('should config.formatCustomFullPackageInfoAndVersions work', async () => {
+    mm(config, 'formatCustomFullPackageInfoAndVersions', (ctx, info) => {
+      console.log('%s %s, query: %j', ctx.method, ctx.url, ctx.query);
+      info.description = '';
+      info.readme = '';
+      for (const version in info.versions) {
+        const item = info.versions[version];
+        item.description = '';
+        item.readme = '';
+      }
+      return info;
+    });
+    const res = await request(app)
+      .get('/@cnpmtest/testmodule-list-1?a=123123');
+    assert(res.status === 200);
+    assert(res.body.description === '');
+    assert(res.body.readme === '');
+    const firstVersion = Object.keys(res.body.versions)[0];
+    assert(firstVersion);
+    assert(res.body.versions[firstVersion].description === '');
+    assert(res.body.versions[firstVersion].readme === '');
+  });
+
   describe.skip('unpublished', () => {
     before(done => {
       mm(config, 'syncModel', 'all');

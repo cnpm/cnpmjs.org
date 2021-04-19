@@ -258,6 +258,10 @@ module.exports = function* list() {
   info.bugs = pkg.bugs;
   info.license = pkg.license;
 
+  if (typeof config.formatCustomFullPackageInfoAndVersions === 'function') {
+    info = config.formatCustomFullPackageInfoAndVersions(this, info);
+  }
+
   debug('show module %s: %s, latest: %s', name, rev, latestMod.version);
   this.jsonp = info;
   // use faster etag
