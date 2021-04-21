@@ -8,6 +8,7 @@ var thunkify = require('thunkify-wrap');
 var EventEmitter = require('events').EventEmitter;
 var util = require('util');
 var fs = require('fs');
+var mzFs = require('mz/fs');
 var path = require('path');
 var crypto = require('crypto');
 var sleep = require('co-sleep');
@@ -164,6 +165,7 @@ SyncModuleWorker.prototype.start = function () {
     }
     yield arr;
     that._saveLog();
+    that._saveBackupFiles();
   }).catch(function (err) {
     logger.error(err);
     that._saveLog();
@@ -1521,6 +1523,120 @@ SyncModuleWorker.prototype._syncOneVersion = function *(versionIndex, sourcePack
 
     return r;
   }
+};
+
+SyncModuleWorker.prototype._saveBackupFiles = function *() {
+  if (!config.syncBackupFiles) {
+    return;
+  }
+  const pkgNames = Object.keys(this.nameMap);
+  const that = this;
+  yield pkgNames.map(function* (pkgName) {
+    yield that._saveBackupFile(pkgName);
+  });
+};
+
+SyncModuleWorker.prototype._saveBackupFile = function *(pkgName) {
+  const [ mods, tags ] = yield [
+    packageService.listModulesByName(pkgName, [ 'version' ]),
+    packageService.listModuleTags(pkgName),
+  ];
+  const that = this;
+  yield mods.map(function* (mod) {
+    yield that._savePackageJsonBackup(pkgName, mod.version);
+  });
+  yield tags.map(function* (tag) {
+    yield that._saveDistTagBackup(pkgName, tag.tag, tag.version);
+  });
+  yield this._clearDeletedDistTags(pkgName, tags.map(t => t.tag));
+};
+
+SyncModuleWorker.prototype._savePackageJsonBackup = function *(pkgName, version) {
+  const cdnKey = common.getPackageFileCDNKey(pkgName, version);
+  const filePath = common.getTarballFilepath(pkgName, version, `package-${version}.json`);
+  this.log('[%s:%s] start backup package.json', pkgName, version);
+  // If package.json exists no need to sync
+  try {
+    yield nfs.download(cdnKey, filePath);
+    fs.unlink(filePath, utility.noop);
+    this.log('[%s:%s] package.json exits skip backup', pkgName, version);
+    // Download success, no need to sync
+    return;
+  } catch (_) {
+    // ...
+  }
+  // Version is from db, so mod can not be null
+  const mod = yield packageService.showPackage(pkgName, version);
+
+  const file = JSON.stringify(mod.package);
+  yield mzFs.writeFile(filePath, file);
+
+  let shasum = crypto.createHash('sha1');
+  shasum.update(file);
+  shasum = shasum.digest('hex');
+
+  yield nfs.upload(filePath, {
+    key: cdnKey,
+    size: file.length,
+    shasum: shasum,
+  });
+  this.log('[%s:%s] package.json backup success', pkgName, version);
+};
+
+SyncModuleWorker.prototype._saveDistTagBackup = function *(pkgName, tag, version) {
+  const cdnKey = common.getDistTagCDNKey(pkgName, tag);
+  const filePath = common.getTarballFilepath(pkgName, '', `tag-${tag}.json`);
+  this.log('[%s:%s] start backup dist-tag.json', pkgName, tag);
+  let oldVersion;
+  try {
+    yield nfs.download(cdnKey, filePath);
+    oldVersion = yield mzFs.readFile(filePath, 'utf8');
+    fs.unlink(filePath, utility.noop);
+  } catch (_) {
+    // ...
+  }
+  this.log('[%s:%s] backup dist tag is %j current dist tag is %j', pkgName, tag, oldVersion, version);
+  if (oldVersion === version) {
+    this.log('[%s:%s] tag equal skip sync', pkgName, tag);
+    return;
+  }
+  this.log('[%s:%s] tag not equal start sync', pkgName, tag);
+  const file = version;
+  yield mzFs.writeFile(filePath, file);
+
+  let shasum = crypto.createHash('sha1');
+  shasum.update(file);
+  shasum = shasum.digest('hex');
+
+  yield nfs.upload(filePath, {
+    key: cdnKey,
+    size: file.length,
+    shasum: shasum,
+  });
+  this.log('[%s:%s] backup dist tag success', pkgName, tag);
+};
+
+SyncModuleWorker.prototype._clearDeletedDistTags = function *(pkgName, tagNames) {
+  const syncDir = common.getSyncDir(pkgName);
+  const backupDistTagFiless = yield nfs.list(syncDir);
+  const currentTagNames = new Set(tagNames);
+  const shouldDelTags = backupDistTagFiless.filter(tagFileName => {
+    const tagName = common.getTagNameFromFileName(tagFileName);
+    return (
+      // File is an dist-tag file
+      tagName
+      // tag is deleted
+      && !currentTagNames.has(tagName)
+    );
+  });
+  this.log('[%s] current tags %j backup tags %j should delete tags %j', pkgName, tagNames, backupDistTagFiless, shouldDelTags);
+  const that = this;
+  yield shouldDelTags.map(function* (tagFileName) {
+    const filePath = path.join(syncDir, tagFileName);
+    that.log('[%s] delete tags %s', pkgName, filePath);
+    yield nfs.remove(filePath);
+  });
+  this.log('[%s] delete tags success', pkgName);
 };
 
 SyncModuleWorker.sync = function* (name, username, options) {

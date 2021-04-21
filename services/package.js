@@ -865,3 +865,45 @@ exports.saveUnpublishedModule = function* (name, pkg) {
 exports.getUnpublishedModule = function* (name) {
   return yield ModuleUnpublished.findByName(name);
 };
+
+exports.showPackage = function* (name, tag) {
+  if (tag === '*') {
+    tag = 'latest';
+  }
+  if (tag === '*') {
+    tag = 'latest';
+  }
+  var version = semver.valid(tag);
+  var range = semver.validRange(tag);
+  var mod;
+  if (version) {
+    mod = yield exports.getModule(name, version);
+  } else if (range) {
+    mod = yield exports.getModuleByRange(name, range);
+  } else {
+    mod = yield exports.getModuleByTag(name, tag);
+  }
+
+  if (mod) {
+    common.setDownloadURL(mod.package, {});
+    mod.package._cnpm_publish_time = mod.publish_time;
+    mod.package.publish_time = mod.package.publish_time || mod.publish_time;
+    var rs = yield [
+      exports.listMaintainers(name),
+      exports.listModuleTags(name),
+    ];
+    var maintainers = rs[0];
+    if (maintainers.length > 0) {
+      mod.package.maintainers = maintainers;
+    }
+    var tags = rs[1];
+    var distTags = {};
+    for (var i = 0; i < tags.length; i++) {
+      var t = tags[i];
+      distTags[t.tag] = t.version;
+    }
+    // show tags for npminstall faster download
+    mod.package['dist-tags'] = distTags;
+    return mod;
+  }
+};

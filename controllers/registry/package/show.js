@@ -1,9 +1,7 @@
 'use strict';
 
 var debug = require('debug')('cnpmjs.org:controllers:registry:package:show');
-var semver = require('semver');
 var packageService = require('../../../services/package');
-var setDownloadURL = require('../../../lib/common').setDownloadURL;
 var SyncModuleWorker = require('../../sync_module_worker');
 var config = require('../../../config');
 
@@ -18,41 +16,9 @@ var config = require('../../../config');
 module.exports = function* show() {
   var name = this.params.name || this.params[0];
   var tag = this.params.version || this.params[1];
-  if (tag === '*') {
-    tag = 'latest';
-  }
-  var version = semver.valid(tag);
-  var range = semver.validRange(tag);
-  var mod;
-  if (version) {
-    mod = yield packageService.getModule(name, version);
-  } else if (range) {
-    mod = yield packageService.getModuleByRange(name, range);
-  } else {
-    mod = yield packageService.getModuleByTag(name, tag);
-  }
+  var mod = yield packageService.showPackage(name, tag);
 
   if (mod) {
-    setDownloadURL(mod.package, this);
-    mod.package._cnpm_publish_time = mod.publish_time;
-    mod.package.publish_time = mod.package.publish_time || mod.publish_time;
-    var rs = yield [
-      packageService.listMaintainers(name),
-      packageService.listModuleTags(name),
-    ];
-    var maintainers = rs[0];
-    if (maintainers.length > 0) {
-      mod.package.maintainers = maintainers;
-    }
-    var tags = rs[1];
-    var distTags = {};
-    for (var i = 0; i < tags.length; i++) {
-      var t = tags[i];
-      distTags[t.tag] = t.version;
-    }
-    // show tags for npminstall faster download
-    mod.package['dist-tags'] = distTags;
-
     if (typeof config.formatCustomOnePackageVersion === 'function') {
       mod.package = config.formatCustomOnePackageVersion(this, mod.package);
     }
@@ -70,7 +36,7 @@ module.exports = function* show() {
   // if not fond, sync from source registry
   if (!this.allowSync) {
     this.status = 404;
-    const error = '[not_exists] version not found: ' + version;
+    const error = '[not_exists] version not found: ' + tag;
     this.jsonp = {
       error,
       reason: error,

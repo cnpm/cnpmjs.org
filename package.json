@@ -28,7 +28,7 @@
     "copy-to": "^2.0.1",
     "debug": "^3.0.0",
     "error-formater": "^1.0.3",
-    "fs-cnpm": "^1.2.0",
+    "fs-cnpm": "^2.1.0",
     "giturl": "^1.0.0",
     "graceful": "^1.0.1",
     "gravatar": "^1.6.0",

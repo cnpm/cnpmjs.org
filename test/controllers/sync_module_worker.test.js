@@ -7,7 +7,9 @@ var thunkify = require('thunkify-wrap');
 var request = require('supertest');
 var urllib = require('urllib');
 var urlparse = require('url').parse;
+var fs = require('mz/fs');
 var config = require('../../config');
+var common = require('../../lib/common');
 var SyncModuleWorker = require('../../controllers/sync_module_worker');
 var logService = require('../../services/module_log');
 var packageService = require('../../services/package');
@@ -452,6 +454,138 @@ describe('test/controllers/sync_module_worker.test.js', () => {
         yield end();
         var user = yield User.findByName('notexistsuserscnpmtest');
         should.not.exists(user);
+      });
+    });
+  });
+
+  describe('save backup files', function () {
+    beforeEach(() => {
+      mm(config, 'syncBackupFiles', true);
+    });
+
+    describe('package not exists', () => {
+      const mockPackageJson = {
+        name: 'tnpm',
+        version: '1.0.0',
+        description: 'foo',
+      };
+
+      beforeEach(() => {
+        mm(packageService, 'listModulesByName', function* () {
+          return [
+            { name: 'tnpm', version: '1.0.0' },
+          ];
+        });
+        mm(packageService, 'showPackage', function* () {
+          return { package: mockPackageJson };
+        });
+      });
+
+      it('should upload new file', function* () {
+        var worker = new SyncModuleWorker({
+          name: 'tnpm',
+          username: 'fengmk2',
+        });
+        yield worker._saveBackupFiles();
+
+        const cdnKey = common.getPackageFileCDNKey('tnpm', '1.0.0');
+        const filePath = '/tmp/tnpm-1.0.0.json';
+        yield config.nfs.download(cdnKey, filePath);
+        const fileContent = yield fs.readFile(filePath, 'utf8');
+        const packageJson = JSON.parse(fileContent);
+        assert.deepStrictEqual(packageJson, mockPackageJson);
+      });
+    });
+
+    describe('new dist tag', () => {
+      beforeEach(() => {
+        mm(packageService, 'listModulesByName', function* () {
+          return [];
+        });
+        mm(packageService, 'listModuleTags', function* () {
+          return [
+            { tag: 'latest', version: '1.0.0' },
+          ];
+        });
+      });
+
+      it('should create dist-tag file', function* () {
+        var worker = new SyncModuleWorker({
+          name: 'tnpm',
+          username: 'fengmk2',
+        });
+        yield worker._saveBackupFiles();
+
+        const cdnKey = common.getDistTagCDNKey('tnpm', 'latest');
+        const filePath = '/tmp/tnpm-dist-tag.json';
+        yield config.nfs.download(cdnKey, filePath);
+        const fileContent = yield fs.readFile(filePath, 'utf8');
+        assert(fileContent === '1.0.0');
+      });
+    });
+
+    describe('remove dist tag', () => {
+      beforeEach(function* () {
+        mm(packageService, 'listModulesByName', function* () {
+          return [];
+        });
+        mm(packageService, 'listModuleTags', function* () {
+          return [];
+        });
+        const cdnKey = common.getDistTagCDNKey('tnpm', 'latest');
+        const filePath = '/tmp/tnpm-dist-tag.json';
+        yield fs.writeFile(filePath, '1.0.0');
+        yield config.nfs.upload(filePath, {
+          key: cdnKey,
+        });
+      });
+
+      it('should delete', function* () {
+        var worker = new SyncModuleWorker({
+          name: 'tnpm',
+          username: 'fengmk2',
+        });
+        yield worker._saveBackupFiles();
+
+        const cdnKey = common.getDistTagCDNKey('tnpm', 'latest');
+        try {
+          yield config.nfs.download(cdnKey, filePath);
+        } catch (e) {
+          console.log('e: ', e);
+        }
+      });
+    });
+
+    describe('update dist tag', () => {
+      beforeEach(function* () {
+        mm(packageService, 'listModulesByName', function* () {
+          return [];
+        });
+        mm(packageService, 'listModuleTags', function* () {
+          return [
+            { tag: 'latest', version: '1.0.1' },
+          ];
+        });
+        const cdnKey = common.getDistTagCDNKey('tnpm', 'latest');
+        const filePath = '/tmp/tnpm-dist-tag.json';
+        yield fs.writeFile(filePath, '1.0.0');
+        yield config.nfs.upload(filePath, {
+          key: cdnKey,
+        });
+      });
+
+      it('should update dist-tag file', function* () {
+        var worker = new SyncModuleWorker({
+          name: 'tnpm',
+          username: 'fengmk2',
+        });
+        yield worker._saveBackupFiles();
+
+        const cdnKey = common.getDistTagCDNKey('tnpm', 'latest');
+        const filePath = '/tmp/tnpm-dist-tag.json';
+        yield config.nfs.download(cdnKey, filePath);
+        const fileContent = yield fs.readFile(filePath, 'utf8');
+        assert(fileContent === '1.0.1');
       });
     });
   });
