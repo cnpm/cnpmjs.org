@@ -19,6 +19,7 @@ exports.sync = function* () {
   var publish = this.query.publish === 'true';
   var noDep = this.query.nodeps === 'true';
   var syncUpstreamFirst = this.query.sync_upstream === 'true';
+  var syncFromBackupFile = this.query.sync_from_backup === 'true';
   if (!config.sourceNpmRegistryIsCNpm) {
     syncUpstreamFirst = false;
   }
@@ -38,6 +39,7 @@ exports.sync = function* () {
     publish: publish,
     noDep: noDep,
     syncUpstreamFirst: syncUpstreamFirst,
+    syncFromBackupFile: syncFromBackupFile,
   };
 
   var logId = yield SyncModuleWorker.sync(name, username, options);

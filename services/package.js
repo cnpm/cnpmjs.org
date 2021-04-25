@@ -3,6 +3,7 @@
 var semver = require('semver');
 var models = require('../models');
 var common = require('./common');
+var libCommon = require('../lib/common');
 var config = require('../config');
 var Tag = models.Tag;
 var User = models.User;
@@ -866,7 +867,7 @@ exports.getUnpublishedModule = function* (name) {
   return yield ModuleUnpublished.findByName(name);
 };
 
-exports.showPackage = function* (name, tag) {
+exports.showPackage = function* (name, tag, ctx) {
   if (tag === '*') {
     tag = 'latest';
   }
@@ -885,7 +886,7 @@ exports.showPackage = function* (name, tag) {
   }
 
   if (mod) {
-    common.setDownloadURL(mod.package, {});
+    libCommon.setDownloadURL(mod.package, ctx || {});
     mod.package._cnpm_publish_time = mod.publish_time;
     mod.package.publish_time = mod.package.publish_time || mod.publish_time;
     var rs = yield [

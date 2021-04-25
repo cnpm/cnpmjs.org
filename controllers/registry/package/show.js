@@ -16,7 +16,7 @@ var config = require('../../../config');
 module.exports = function* show() {
   var name = this.params.name || this.params[0];
   var tag = this.params.version || this.params[1];
-  var mod = yield packageService.showPackage(name, tag);
+  var mod = yield packageService.showPackage(name, tag, this);
 
   if (mod) {
     if (typeof config.formatCustomOnePackageVersion === 'function') {

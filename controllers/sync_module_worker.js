@@ -53,6 +53,7 @@ function SyncModuleWorker(options) {
   this.concurrency = options.concurrency || 1;
   this._publish = options.publish === true; // _publish_on_cnpm
   this.syncUpstreamFirst = options.syncUpstreamFirst;
+  this.syncFromBackupFile = options.syncFromBackupFile;
 
   this.syncingNames = {};
   this.nameMap = {};
@@ -324,7 +325,149 @@ SyncModuleWorker.prototype.next = function* (concurrencyId) {
   yield this.syncByName(concurrencyId, name, registry);
 };
 
+// TODO unimplement unpublish
+SyncModuleWorker.prototype._syncByNameFromBackupFile = function* (concurrencyId, name, retryCount) {
+  this.syncingNames[name] = true;
+
+  this.log('----------------- Syncing %s -------------------', name);
+
+  // ignore private scoped package
+  if (common.isPrivateScopedPackage(name)) {
+    this.log('[c#%d] [%s] ignore sync private scoped %j package',
+      concurrencyId, name, config.scopes);
+    yield this._doneOne(concurrencyId, name, true);
+    return;
+  }
+
+  let packageJsons;
+  let tags;
+  try {
+    const packageDir = common.getSyncPackageDir(name);
+    const packageDirFiles = yield nfs.list(packageDir);
+    const packageJsonFileNames = packageDirFiles.filter(fileName => common.isBackupPkgFile(fileName));
+
+    const distTagDir = common.getSyncTagDir(name);
+    const distTagDirFiles = yield nfs.list(distTagDir);
+    const distTagFileNames = distTagDirFiles.filter(fileName => common.isBackupTagFile(fileName));
+
+    packageJsons = yield packageJsonFileNames.map(function* (packageJsonFileName) {
+      const version = common.getVersionFromFileName(packageJsonFileName);
+      return yield readPackage(name, version);
+    });
+
+    packageJsons = packageJsons.sort((a, b) => {
+      return a.publish_time - b.publish_time;
+    });
+
+    tags = yield distTagFileNames.map(function* (tagFileName) {
+      const tag = common.getTagNameFromFileName(tagFileName);
+      const version = yield readDistTag(name, tag);
+      return {
+        tag,
+        version,
+      };
+    });
+  } catch (err) {
+    if (retryCount < 3) {
+      this.log('[c#%d] [%s] retry from oss after 3s, err: %s, retryCount: %s',
+        concurrencyId, name, err.stack, retryCount);
+      yield sleep(3000);
+      yield this._syncByNameFromBackupFile(concurrencyId, name, retryCount + 1);
+      return;
+    }
+    this.log('[c#%s] [error] [%s] sync error: %s', concurrencyId, name, err.stack);
+    yield this._doneOne(concurrencyId, name, false);
+    return;
+  }
+
+  const firstPkg = packageJsons[0];
+  const lastPkg = packageJsons[packageJsons.length - 1];
+
+  const times = packageJsons.reduce((times, packageJson) => {
+    times[packageJson.version] = new Date(packageJson.publish_time);
+    return times;
+  }, {
+    modified: new Date(lastPkg.publish_time),
+    created: new Date(firstPkg.publish_time),
+  });
+  const distTags = tags.reduce((distTags, tag) => {
+    distTags[tag.tag] = tag.version;
+    return distTags;
+  }, {});
+  const versions = packageJsons.reduce((versions, packageJson) => {
+    versions[packageJson.version] = packageJson;
+    return versions;
+  }, {});
+
+  const pkg = {
+    name,
+    'dist-tags': distTags,
+    versions: versions,
+    time: times,
+
+    description: lastPkg.description,
+    maintainers: lastPkg.maintainers,
+    author: lastPkg.author,
+    repository: lastPkg.repository,
+    readme: lastPkg.readme,
+    readmeFilename: lastPkg.readmeFilename,
+    homepage: lastPkg.homepage,
+    bugs: lastPkg.bugs,
+    license: lastPkg.license,
+  };
+
+  let syncVersions;
+  try {
+    syncVersions = yield this._sync(name, pkg);
+  } catch (err) {
+    this.log('[c#%s] [error] [%s] sync error: %s', concurrencyId, name, err.stack);
+    yield this._doneOne(concurrencyId, name, false);
+    return;
+  }
+
+  // has new version
+  if (syncVersions.length > 0) {
+    this.updates.push(name);
+  }
+
+  this.log('[c#%d] [%s] synced success, %d versions: %s',
+    concurrencyId, name, syncVersions.length, syncVersions.join(', '));
+  yield this._doneOne(concurrencyId, name, true);
+
+  return syncVersions;
+
+  function* readPackage(name, version) {
+    const filePath = common.getTarballFilepath(name, version, `package-${version}.json`);
+    const packageJsonKey = common.getPackageFileCDNKey(name, version);
+    try {
+      yield nfs.download(packageJsonKey, filePath);
+      const packageJSONFile = yield mzFs.readFile(filePath, 'utf8');
+      const packageJSON = JSON.parse(packageJSONFile);
+      return packageJSON;
+    } finally {
+      fs.unlink(filePath, utility.noop);
+    }
+  }
+
+  function* readDistTag(name, tag) {
+    const filePath = common.getTarballFilepath(name, '', `tag-${tag}.json`);
+    const packageJsonKey = common.getDistTagCDNKey(name, tag);
+    try {
+      yield nfs.download(packageJsonKey, filePath);
+      const version = yield mzFs.readFile(filePath, 'utf8');
+      return version;
+    } finally {
+      fs.unlink(filePath, utility.noop);
+    }
+  }
+};
+
 SyncModuleWorker.prototype.syncByName = function* (concurrencyId, name, registry, retryCount) {
+  if (this.syncFromBackupFile) {
+    yield this._syncByNameFromBackupFile(concurrencyId, name, retryCount);
+    return;
+  }
+
   retryCount = retryCount || 0;
   var that = this;
   that.syncingNames[name] = true;
@@ -1617,7 +1760,7 @@ SyncModuleWorker.prototype._saveDistTagBackup = function *(pkgName, tag, version
 };
 
 SyncModuleWorker.prototype._clearDeletedDistTags = function *(pkgName, tagNames) {
-  const syncDir = common.getSyncDir(pkgName);
+  const syncDir = common.getSyncTagDir(pkgName);
   const backupDistTagFiless = yield nfs.list(syncDir);
   const currentTagNames = new Set(tagNames);
   const shouldDelTags = backupDistTagFiless.filter(tagFileName => {
@@ -1650,6 +1793,7 @@ SyncModuleWorker.sync = function* (name, username, options) {
     noDep: options.noDep,
     publish: options.publish,
     syncUpstreamFirst: options.syncUpstreamFirst,
+    syncFromBackupFile: options.syncFromBackupFile,
   });
   worker.start();
   return result.id;

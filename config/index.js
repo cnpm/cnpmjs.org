@@ -30,7 +30,7 @@ var config = {
   webPort: 7002,
   bindingHost: '127.0.0.1', // only binding on 127.0.0.1 for local access
   // default is ctx.protocol
-  protocol: '',
+  protocol: 'http',
 
   // debug mode
   // if in debug mode, some middleware like limit wont load

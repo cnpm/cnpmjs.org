@@ -481,6 +481,10 @@ describe('test/controllers/sync_module_worker.test.js', () => {
         });
       });
 
+      afterEach(function* () {
+        yield config.nfs.remove(common.getPackageFileCDNKey('tnpm', '1.0.0'));
+      });
+
       it('should upload new file', function* () {
         var worker = new SyncModuleWorker({
           name: 'tnpm',
@@ -507,6 +511,10 @@ describe('test/controllers/sync_module_worker.test.js', () => {
             { tag: 'latest', version: '1.0.0' },
           ];
         });
+      });
+
+      afterEach(function* () {
+        yield config.nfs.remove(common.getDistTagCDNKey('tnpm', 'latest'));
       });
 
       it('should create dist-tag file', function* () {
@@ -574,6 +582,10 @@ describe('test/controllers/sync_module_worker.test.js', () => {
         });
       });
 
+      afterEach(function* () {
+        yield config.nfs.remove(common.getDistTagCDNKey('tnpm', 'latest'));
+      });
+
       it('should update dist-tag file', function* () {
         var worker = new SyncModuleWorker({
           name: 'tnpm',
@@ -586,6 +598,144 @@ describe('test/controllers/sync_module_worker.test.js', () => {
         yield config.nfs.download(cdnKey, filePath);
         const fileContent = yield fs.readFile(filePath, 'utf8');
         assert(fileContent === '1.0.1');
+      });
+    });
+  });
+
+  describe('sync from backup files', function () {
+    const publishTime100 = Date.now() - 1000 * 60;
+    const publishTime101 = Date.now();
+
+    afterEach(function* () {
+      yield config.nfs.remove(common.getDistTagCDNKey('tnpm', 'latest'));
+      yield config.nfs.remove(common.getDistTagCDNKey('tnpm', 'beta'));
+      yield config.nfs.remove(common.getPackageFileCDNKey('tnpm', '1.0.1'));
+      yield config.nfs.remove(common.getPackageFileCDNKey('tnpm', '1.0.0'));
+    });
+
+    beforeEach(function* () {
+      mm(config, 'syncBackupFiles', true);
+
+      const packageFileCDNKey100 = common.getPackageFileCDNKey('tnpm', '1.0.0');
+      const packageFilePath = '/tmp/tnpm-package.json';
+      yield fs.writeFile(packageFilePath, JSON.stringify({
+        name: 'tnpm',
+        version: '1.0.0',
+        publish_time: publishTime100,
+        description: 'mock desc',
+        maintainers: [],
+        author: {},
+        repository: {},
+        readme: 'mock readme',
+        readmeFilename: 'README.md',
+        homepage: 'mock home page',
+        bugs: {},
+        license: 'MIT',
+      }));
+      yield config.nfs.upload(packageFilePath, {
+        key: packageFileCDNKey100,
+      });
+
+      const packageFileCDNKey101 = common.getPackageFileCDNKey('tnpm', '1.0.1');
+      yield fs.writeFile(packageFilePath, JSON.stringify({
+        name: 'tnpm',
+        version: '1.0.1',
+        publish_time: publishTime101,
+        description: 'mock desc 101',
+        maintainers: [],
+        author: {},
+        repository: {},
+        readme: 'mock readme 101',
+        readmeFilename: 'README.md',
+        homepage: 'mock home page 101',
+        bugs: {},
+        license: 'MIT',
+      }));
+      yield config.nfs.upload(packageFilePath, {
+        key: packageFileCDNKey101,
+      });
+
+      const distTagCDNKey = common.getDistTagCDNKey('tnpm', 'latest');
+      const distTagFilePath = '/tmp/tnpm-dist-tag.json';
+      yield fs.writeFile(distTagFilePath, '1.0.0');
+      yield config.nfs.upload(distTagFilePath, {
+        key: distTagCDNKey,
+      });
+
+      const distTagCDNKeyBeta = common.getDistTagCDNKey('tnpm', 'beta');
+      yield fs.writeFile(distTagFilePath, '1.0.1');
+      yield config.nfs.upload(distTagFilePath, {
+        key: distTagCDNKeyBeta,
+      });
+    });
+
+    it('should create pkg', function (done) {
+      var worker = new SyncModuleWorker({
+        name: 'tnpm',
+        username: 'fengmk2',
+        syncFromBackupFile: true,
+      });
+      var syncPkg;
+      mm(worker, '_sync', function* (name, pkg) {
+        syncPkg = pkg;
+        return [ '1.0.0' ];
+      })
+      worker.start();
+      worker.on('end', function () {
+        assert.deepStrictEqual(worker.successes, [
+          'tnpm',
+        ]);
+
+        assert.deepStrictEqual(syncPkg, {
+          name: 'tnpm',
+          'dist-tags': { beta: '1.0.1', latest: '1.0.0' },
+          versions: {
+            '1.0.0': {
+              name: 'tnpm',
+              version: '1.0.0',
+              publish_time: publishTime100,
+              description: 'mock desc',
+              maintainers: [],
+              author: {},
+              repository: {},
+              readme: 'mock readme',
+              readmeFilename: 'README.md',
+              homepage: 'mock home page',
+              bugs: {},
+              license: 'MIT'
+            },
+            '1.0.1': {
+              name: 'tnpm',
+              version: '1.0.1',
+              publish_time: publishTime101,
+              description: 'mock desc 101',
+              maintainers: [],
+              author: {},
+              repository: {},
+              readme: 'mock readme 101',
+              readmeFilename: 'README.md',
+              homepage: 'mock home page 101',
+              bugs: {},
+              license: 'MIT'
+            }
+          },
+          time: {
+            modified: new Date(publishTime101),
+            created: new Date(publishTime100),
+            '1.0.0': new Date(publishTime100),
+            '1.0.1': new Date(publishTime101),
+          },
+          description: 'mock desc 101',
+          maintainers: [],
+          author: {},
+          repository: {},
+          readme: 'mock readme 101',
+          readmeFilename: 'README.md',
+          homepage: 'mock home page 101',
+          bugs: {},
+          license: 'MIT'
+        });
+        done();
       });
     });
   });
