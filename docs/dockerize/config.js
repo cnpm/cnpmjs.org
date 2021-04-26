@@ -229,6 +229,7 @@ var config = {
   // global hook function: function* (envelope) {}
   // envelope format please see https://github.com/npm/registry/blob/master/docs/hooks/hooks-payload.md#payload
   globalHook: null,
+  accelerateHostMap: {},
 };
 
 if (process.env.NODE_ENV !== 'test') {
