@@ -327,6 +327,7 @@ SyncModuleWorker.prototype.next = function* (concurrencyId) {
 
 // TODO unimplement unpublish
 SyncModuleWorker.prototype._syncByNameFromBackupFile = function* (concurrencyId, name, retryCount) {
+  const that = this;
   this.syncingNames[name] = true;
 
   this.log('----------------- Syncing %s -------------------', name);
@@ -335,6 +336,15 @@ SyncModuleWorker.prototype._syncByNameFromBackupFile = function* (concurrencyId,
   if (common.isPrivateScopedPackage(name)) {
     this.log('[c#%d] [%s] ignore sync private scoped %j package',
       concurrencyId, name, config.scopes);
+    yield this._doneOne(concurrencyId, name, true);
+    return;
+  }
+
+  // validate if unpublish
+  const unpublished = yield validateUnpublish(name);
+  if (unpublished) {
+    this.log('[c#%d] [%s] package is unpublished skip sync',
+      concurrencyId, name);
     yield this._doneOne(concurrencyId, name, true);
     return;
   }
@@ -435,6 +445,25 @@ SyncModuleWorker.prototype._syncByNameFromBackupFile = function* (concurrencyId,
   yield this._doneOne(concurrencyId, name, true);
 
   return syncVersions;
+
+  function* validateUnpublish(name) {
+    const filePath = common.getTarballFilepath(name, '', `unpublish-package.json`);
+    const cdnKey = common.getUnpublishFileKey(name);
+    let unpublishInfo;
+    try {
+      yield nfs.download(cdnKey, filePath);
+      const packageJSONFile = yield mzFs.readFile(filePath, 'utf8');
+      unpublishInfo = JSON.parse(packageJSONFile);
+    } catch (_) {
+      // ...
+      return false;
+    } finally {
+      fs.unlink(filePath, utility.noop);
+    }
+    that.log('[c#%s] get unpublish info', concurrencyId, name);
+    yield that._unpublished(name, unpublishInfo);
+    return true;
+  }
 
   function* readPackage(name, version) {
     const filePath = common.getTarballFilepath(name, version, `package-${version}.json`);
@@ -700,36 +729,39 @@ SyncModuleWorker.prototype._unpublished = function* (name, unpublishedInfo) {
   var r = yield packageService.saveUnpublishedModule(name, unpublishedInfo);
   this.log('    [%s] save unpublished info: %j to row#%s',
     name, unpublishedInfo, r.id);
-  if (mods.length === 0) {
-    return;
-  }
-  yield [
-    packageService.removeModulesByName(name),
-    packageService.removeModuleTags(name),
-  ];
-  var keys = [];
-  for (var i = 0; i < mods.length; i++) {
-    var row = mods[i];
-    var dist = row.package.dist;
-    var key = dist.key;
-    if (!key) {
-      key = urlparse(dist.tarball).pathname;
+  if (mods.length) {
+    yield [
+      packageService.removeModulesByName(name),
+      packageService.removeModuleTags(name),
+    ];
+    var keys = [];
+    for (var i = 0; i < mods.length; i++) {
+      var row = mods[i];
+      var dist = row.package.dist;
+      var key = dist.key;
+      if (!key) {
+        key = urlparse(dist.tarball).pathname;
+      }
+      key && keys.push(key);
     }
-    key && keys.push(key);
+
+    if (keys.length > 0) {
+      try {
+        yield keys.map(function (key) {
+          return nfs.remove(key);
+        });
+      } catch (err) {
+        // ignore error here
+        this.log('    [%s] delete nfs files: %j error: %s: %s',
+          name, keys, err.name, err.message);
+      }
+    }
+    this.log('    [%s] delete nfs files: %j success', name, keys);
   }
 
-  if (keys.length > 0) {
-    try {
-      yield keys.map(function (key) {
-        return nfs.remove(key);
-      });
-    } catch (err) {
-      // ignore error here
-      this.log('    [%s] delete nfs files: %j error: %s: %s',
-        name, keys, err.name, err.message);
-    }
+  if (config.syncBackupFiles) {
+    yield this._saveUnpublishFile(name, unpublishedInfo);
   }
-  this.log('    [%s] delete nfs files: %j success', name, keys);
 };
 
 SyncModuleWorker.prototype._sync = function* (name, pkg) {
@@ -1692,6 +1724,25 @@ SyncModuleWorker.prototype._saveBackupFile = function *(pkgName) {
     yield that._saveDistTagBackup(pkgName, tag.tag, tag.version);
   });
   yield this._clearDeletedDistTags(pkgName, tags.map(t => t.tag));
+};
+
+SyncModuleWorker.prototype._saveUnpublishFile = function* (pkgName, pkg) {
+  const cdnKey = common.getUnpublishFileKey(pkgName);
+  const filePath = common.getTarballFilepath(pkgName, '', 'unpublish-package.json');
+  this.log('[%s] start save unpublish-package.json', pkgName);
+  const file = JSON.stringify(pkg);
+  yield mzFs.writeFile(filePath, file);
+
+  let shasum = crypto.createHash('sha1');
+  shasum.update(file);
+  shasum = shasum.digest('hex');
+
+  yield nfs.upload(filePath, {
+    key: cdnKey,
+    size: file.length,
+    shasum: shasum,
+  });
+  this.log('[%s:%s] save unpublish package.json backup success', pkgName);
 };
 
 SyncModuleWorker.prototype._savePackageJsonBackup = function *(pkgName, version) {

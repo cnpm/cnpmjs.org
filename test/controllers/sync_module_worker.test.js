@@ -1,6 +1,7 @@
 'use strict';
 
 var assert = require('assert');
+var awaitEvent = require('await-event');
 var should = require('should');
 var mm = require('mm');
 var thunkify = require('thunkify-wrap');
@@ -600,6 +601,24 @@ describe('test/controllers/sync_module_worker.test.js', () => {
         assert(fileContent === '1.0.1');
       });
     });
+
+    describe('package unpublished', () => {
+      it('should sync unpublished info', function* () {
+        var worker = new SyncModuleWorker({
+          name: ['afp'],
+          username: 'fengmk2'
+        });
+
+        worker.start();
+        yield awaitEvent(worker, 'end');
+
+        const cdnKey = common.getUnpublishFileKey('afp');
+        const filePath = '/tmp/unpublish-package.json';
+        yield config.nfs.download(cdnKey, filePath);
+        const fileContent = yield fs.readFile(filePath, 'utf8');
+        assert(fileContent);
+      });
+    });
   });
 
   describe('sync from backup files', function () {
@@ -738,5 +757,44 @@ describe('test/controllers/sync_module_worker.test.js', () => {
         done();
       });
     });
+
+    describe('unpublish', () => {
+      before(function* () {
+        const filePath = '/tmp/unpublish-package.json';
+        const cdnKey = common.getUnpublishFileKey('afp');
+        yield fs.writeFile(filePath, JSON.stringify({
+          name: 'xinglie',
+          time: '2017-02-21T13:10:22.892Z',
+          tags: { latest: '0.0.1' },
+          maintainers:[{
+            name: 'xinglie',
+            email: 'kooboy_li@163.com'
+          }],
+          versions:["0.0.1"]
+        }));
+        yield config.nfs.upload(filePath, {
+          key: cdnKey,
+        });
+      });
+
+      it('should unpublished pkg', function* () {
+        const worker = new SyncModuleWorker({
+          name: ['afp'],
+          username: 'fengmk2',
+          syncFromBackupFile: true,
+        });
+        let unpublishPkg;
+        mm(worker, '_unpublished', function(pkg) {
+          unpublishPkg = pkg;
+          return Promise.resolve();
+        });
+
+        worker.start();
+        yield awaitEvent(worker, 'end');
+
+        assert(unpublishPkg === 'afp');
+      });
+    });
+
   });
 });
