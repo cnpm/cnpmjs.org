@@ -1760,7 +1760,9 @@ SyncModuleWorker.prototype._savePackageJsonBackup = function *(pkgName, version)
     // ...
   }
   // Version is from db, so mod can not be null
-  const mod = yield packageService.showPackage(pkgName, version);
+  const mod = yield packageService.showPackage(pkgName, version, {
+    protocol: config.backupProtocol,
+  });
 
   const file = JSON.stringify(mod.package);
   yield mzFs.writeFile(filePath, file);

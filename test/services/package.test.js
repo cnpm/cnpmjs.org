@@ -4,6 +4,7 @@ var should = require('should');
 var sleep = require('co-sleep');
 var Package = require('../../services/package');
 var utils = require('../utils');
+var common = require('../../services/common');
 
 describe('test/services/package.test.js', function () {
   describe('addModuleTag()', function () {
@@ -144,7 +145,7 @@ describe('test/services/package.test.js', function () {
       var alls = yield Package.listAllPublicModuleNames();
       alls.length.should.above(0);
       alls.forEach(function (name) {
-        name.should.not.containEql('@');
+        common.isPrivatePackage(name).should.equal(false);
       });
     });
   });
