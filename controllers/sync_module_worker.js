@@ -166,7 +166,7 @@ SyncModuleWorker.prototype.start = function () {
     }
     yield arr;
     that._saveLog();
-    that._saveBackupFiles();
+    yield that._saveBackupFiles();
   }).catch(function (err) {
     logger.error(err);
     that._saveLog();
