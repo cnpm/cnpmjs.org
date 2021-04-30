@@ -8,7 +8,7 @@ var os = require('os');
 var utility = require('utility');
 
 var version = require('../package.json').version;
-
+var Nfs = require('fs-cnpm');
 var root = path.dirname(__dirname);
 var dataDir = path.join(process.env.HOME || root, '.cnpmjs.org');
 
@@ -31,6 +31,9 @@ var config = {
   bindingHost: '127.0.0.1', // only binding on 127.0.0.1 for local access
   // default is ctx.protocol
   protocol: '',
+  // When sync package, cnpm not know the access protocol.
+  // So should set manually
+  backupProtocol: 'http',
 
   // debug mode
   // if in debug mode, some middleware like limit wont load
@@ -159,7 +162,7 @@ var config = {
   enableNpmAuditsProxy: true,
 
   // package tarball store in local filesystem by default
-  nfs: require('fs-cnpm')({
+  nfs: new Nfs({
     dir: path.join(dataDir, 'nfs')
   }),
   // if set true, will 302 redirect to `nfs.url(dist.key)`
@@ -219,6 +222,8 @@ var config = {
   // exist: only sync exist modules
   // all: sync all modules
   syncModel: 'none', // 'none', 'all', 'exist'
+  // sync package.json/dist-tag.json to sync dir
+  syncBackupFiles: false,
 
   syncConcurrency: 1,
   // sync interval, default is 10 minutes
