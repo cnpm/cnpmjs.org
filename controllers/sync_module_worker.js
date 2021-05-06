@@ -1708,7 +1708,7 @@ SyncModuleWorker.prototype._saveBackupFiles = function *() {
   const that = this;
   yield gather(pkgNames.map(function* (pkgName) {
     yield that._saveBackupFile(pkgName);
-  }));
+  }), 5);
 };
 
 SyncModuleWorker.prototype._saveBackupFile = function *(pkgName) {
@@ -1719,10 +1719,10 @@ SyncModuleWorker.prototype._saveBackupFile = function *(pkgName) {
   const that = this;
   yield gather(mods.map(function* (mod) {
     yield that._savePackageJsonBackup(pkgName, mod.version);
-  }));
+  }), 5);
   yield gather(tags.map(function* (tag) {
     yield that._saveDistTagBackup(pkgName, tag.tag, tag.version);
-  }));
+  }), 5);
   yield this._clearDeletedDistTags(pkgName, tags.map(t => t.tag));
 };
 
