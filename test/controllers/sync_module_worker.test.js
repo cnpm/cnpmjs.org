@@ -460,13 +460,15 @@ describe('test/controllers/sync_module_worker.test.js', () => {
   });
 
   describe('save backup files', function () {
+    const pkgName = 'backup-test';
+
     beforeEach(() => {
       mm(config, 'syncBackupFiles', true);
     });
 
     describe('package not exists', () => {
       const mockPackageJson = {
-        name: 'tnpm',
+        name: pkgName,
         version: '1.0.0',
         description: 'foo',
       };
@@ -474,7 +476,7 @@ describe('test/controllers/sync_module_worker.test.js', () => {
       beforeEach(() => {
         mm(packageService, 'listModulesByName', function* () {
           return [
-            { name: 'tnpm', version: '1.0.0' },
+            { name: pkgName, version: '1.0.0' },
           ];
         });
         mm(packageService, 'showPackage', function* () {
@@ -483,17 +485,17 @@ describe('test/controllers/sync_module_worker.test.js', () => {
       });
 
       afterEach(function* () {
-        yield config.nfs.remove(common.getPackageFileCDNKey('tnpm', '1.0.0'));
+        yield config.nfs.remove(common.getPackageFileCDNKey(pkgName, '1.0.0'));
       });
 
       it('should upload new file', function* () {
         var worker = new SyncModuleWorker({
-          name: 'tnpm',
+          name: pkgName,
           username: 'fengmk2',
         });
         yield worker._saveBackupFiles();
 
-        const cdnKey = common.getPackageFileCDNKey('tnpm', '1.0.0');
+        const cdnKey = common.getPackageFileCDNKey(pkgName, '1.0.0');
         const filePath = '/tmp/tnpm-1.0.0.json';
         yield config.nfs.download(cdnKey, filePath);
         const fileContent = yield fs.readFile(filePath, 'utf8');
@@ -515,17 +517,17 @@ describe('test/controllers/sync_module_worker.test.js', () => {
       });
 
       afterEach(function* () {
-        yield config.nfs.remove(common.getDistTagCDNKey('tnpm', 'latest'));
+        yield config.nfs.remove(common.getDistTagCDNKey(pkgName, 'latest'));
       });
 
       it('should create dist-tag file', function* () {
         var worker = new SyncModuleWorker({
-          name: 'tnpm',
+          name: pkgName,
           username: 'fengmk2',
         });
         yield worker._saveBackupFiles();
 
-        const cdnKey = common.getDistTagCDNKey('tnpm', 'latest');
+        const cdnKey = common.getDistTagCDNKey(pkgName, 'latest');
         const filePath = '/tmp/tnpm-dist-tag.json';
         yield config.nfs.download(cdnKey, filePath);
         const fileContent = yield fs.readFile(filePath, 'utf8');
@@ -541,7 +543,7 @@ describe('test/controllers/sync_module_worker.test.js', () => {
         mm(packageService, 'listModuleTags', function* () {
           return [];
         });
-        const cdnKey = common.getDistTagCDNKey('tnpm', 'latest');
+        const cdnKey = common.getDistTagCDNKey(pkgName, 'latest');
         const filePath = '/tmp/tnpm-dist-tag.json';
         yield fs.writeFile(filePath, '1.0.0');
         yield config.nfs.upload(filePath, {
@@ -551,17 +553,20 @@ describe('test/controllers/sync_module_worker.test.js', () => {
 
       it('should delete', function* () {
         var worker = new SyncModuleWorker({
-          name: 'tnpm',
+          name: pkgName,
           username: 'fengmk2',
         });
         yield worker._saveBackupFiles();
 
-        const cdnKey = common.getDistTagCDNKey('tnpm', 'latest');
+        const cdnKey = common.getDistTagCDNKey(pkgName, 'latest');
+        let err;
         try {
+          const filePath = '/tmp/tnpm-dist-tag.json';
           yield config.nfs.download(cdnKey, filePath);
         } catch (e) {
-          console.log('e: ', e);
+          err = e;
         }
+        assert(/ENOENT/.test(err));
       });
     });
 
@@ -575,7 +580,7 @@ describe('test/controllers/sync_module_worker.test.js', () => {
             { tag: 'latest', version: '1.0.1' },
           ];
         });
-        const cdnKey = common.getDistTagCDNKey('tnpm', 'latest');
+        const cdnKey = common.getDistTagCDNKey(pkgName, 'latest');
         const filePath = '/tmp/tnpm-dist-tag.json';
         yield fs.writeFile(filePath, '1.0.0');
         yield config.nfs.upload(filePath, {
@@ -584,17 +589,17 @@ describe('test/controllers/sync_module_worker.test.js', () => {
       });
 
       afterEach(function* () {
-        yield config.nfs.remove(common.getDistTagCDNKey('tnpm', 'latest'));
+        yield config.nfs.remove(common.getDistTagCDNKey(pkgName, 'latest'));
       });
 
       it('should update dist-tag file', function* () {
         var worker = new SyncModuleWorker({
-          name: 'tnpm',
+          name: pkgName,
           username: 'fengmk2',
         });
         yield worker._saveBackupFiles();
 
-        const cdnKey = common.getDistTagCDNKey('tnpm', 'latest');
+        const cdnKey = common.getDistTagCDNKey(pkgName, 'latest');
         const filePath = '/tmp/tnpm-dist-tag.json';
         yield config.nfs.download(cdnKey, filePath);
         const fileContent = yield fs.readFile(filePath, 'utf8');
@@ -622,23 +627,24 @@ describe('test/controllers/sync_module_worker.test.js', () => {
   });
 
   describe('sync from backup files', function () {
+    const pkgName = 'sync-from-backup-files';
     const publishTime100 = Date.now() - 1000 * 60;
     const publishTime101 = Date.now();
 
     afterEach(function* () {
-      yield config.nfs.remove(common.getDistTagCDNKey('tnpm', 'latest'));
-      yield config.nfs.remove(common.getDistTagCDNKey('tnpm', 'beta'));
-      yield config.nfs.remove(common.getPackageFileCDNKey('tnpm', '1.0.1'));
-      yield config.nfs.remove(common.getPackageFileCDNKey('tnpm', '1.0.0'));
+      yield config.nfs.remove(common.getDistTagCDNKey(pkgName, 'latest'));
+      yield config.nfs.remove(common.getDistTagCDNKey(pkgName, 'beta'));
+      yield config.nfs.remove(common.getPackageFileCDNKey(pkgName, '1.0.1'));
+      yield config.nfs.remove(common.getPackageFileCDNKey(pkgName, '1.0.0'));
     });
 
     beforeEach(function* () {
       mm(config, 'syncBackupFiles', true);
 
-      const packageFileCDNKey100 = common.getPackageFileCDNKey('tnpm', '1.0.0');
+      const packageFileCDNKey100 = common.getPackageFileCDNKey(pkgName, '1.0.0');
       const packageFilePath = '/tmp/tnpm-package.json';
       yield fs.writeFile(packageFilePath, JSON.stringify({
-        name: 'tnpm',
+        name: pkgName,
         version: '1.0.0',
         publish_time: publishTime100,
         description: 'mock desc',
@@ -655,9 +661,9 @@ describe('test/controllers/sync_module_worker.test.js', () => {
         key: packageFileCDNKey100,
       });
 
-      const packageFileCDNKey101 = common.getPackageFileCDNKey('tnpm', '1.0.1');
+      const packageFileCDNKey101 = common.getPackageFileCDNKey(pkgName, '1.0.1');
       yield fs.writeFile(packageFilePath, JSON.stringify({
-        name: 'tnpm',
+        name: pkgName,
         version: '1.0.1',
         publish_time: publishTime101,
         description: 'mock desc 101',
@@ -674,14 +680,14 @@ describe('test/controllers/sync_module_worker.test.js', () => {
         key: packageFileCDNKey101,
       });
 
-      const distTagCDNKey = common.getDistTagCDNKey('tnpm', 'latest');
+      const distTagCDNKey = common.getDistTagCDNKey(pkgName, 'latest');
       const distTagFilePath = '/tmp/tnpm-dist-tag.json';
       yield fs.writeFile(distTagFilePath, '1.0.0');
       yield config.nfs.upload(distTagFilePath, {
         key: distTagCDNKey,
       });
 
-      const distTagCDNKeyBeta = common.getDistTagCDNKey('tnpm', 'beta');
+      const distTagCDNKeyBeta = common.getDistTagCDNKey(pkgName, 'beta');
       yield fs.writeFile(distTagFilePath, '1.0.1');
       yield config.nfs.upload(distTagFilePath, {
         key: distTagCDNKeyBeta,
@@ -690,7 +696,7 @@ describe('test/controllers/sync_module_worker.test.js', () => {
 
     it('should create pkg', function (done) {
       var worker = new SyncModuleWorker({
-        name: 'tnpm',
+        name: pkgName,
         username: 'fengmk2',
         syncFromBackupFile: true,
       });
@@ -702,15 +708,15 @@ describe('test/controllers/sync_module_worker.test.js', () => {
       worker.start();
       worker.on('end', function () {
         assert.deepStrictEqual(worker.successes, [
-          'tnpm',
+          pkgName,
         ]);
 
         assert.deepStrictEqual(syncPkg, {
-          name: 'tnpm',
+          name: pkgName,
           'dist-tags': { beta: '1.0.1', latest: '1.0.0' },
           versions: {
             '1.0.0': {
-              name: 'tnpm',
+              name: pkgName,
               version: '1.0.0',
               publish_time: publishTime100,
               description: 'mock desc',
@@ -724,7 +730,7 @@ describe('test/controllers/sync_module_worker.test.js', () => {
               license: 'MIT'
             },
             '1.0.1': {
-              name: 'tnpm',
+              name: pkgName,
               version: '1.0.1',
               publish_time: publishTime101,
               description: 'mock desc 101',
