@@ -632,10 +632,14 @@ describe('test/controllers/sync_module_worker.test.js', () => {
     const publishTime101 = Date.now();
 
     afterEach(function* () {
-      yield config.nfs.remove(common.getDistTagCDNKey(pkgName, 'latest'));
-      yield config.nfs.remove(common.getDistTagCDNKey(pkgName, 'beta'));
-      yield config.nfs.remove(common.getPackageFileCDNKey(pkgName, '1.0.1'));
-      yield config.nfs.remove(common.getPackageFileCDNKey(pkgName, '1.0.0'));
+      try {
+        yield config.nfs.remove(common.getDistTagCDNKey(pkgName, 'latest'));
+        yield config.nfs.remove(common.getDistTagCDNKey(pkgName, 'beta'));
+        yield config.nfs.remove(common.getPackageFileCDNKey(pkgName, '1.0.1'));
+        yield config.nfs.remove(common.getPackageFileCDNKey(pkgName, '1.0.0'));
+      } catch (_) {
+        // ...
+      }
     });
 
     beforeEach(function* () {
