@@ -5,6 +5,8 @@ var urllib = require('urllib');
 var HttpAgent = require('agentkeepalive');
 var HttpsAgent = require('agentkeepalive').HttpsAgent;
 var config = require('../config');
+var url = require('url');
+var URL = require('url').URL;
 
 var httpAgent;
 var httpsAgent;
@@ -56,6 +58,27 @@ var client = urllib.create({
   agent: httpAgent,
   httpsAgent: httpsAgent
 });
+
+var request = urllib.HttpClient.prototype.request;
+
+function getAccelerateUrl(url) {
+  const urlObj = typeof url === 'string' ? new URL(url) : url;
+  const newHost = config.accelerateHostMap && config.accelerateHostMap[urlObj.host];
+  if (newHost) {
+    urlObj.host = newHost;
+  }
+  return urlObj.toString();
+}
+
+client.request = function (requestUrl, options) {
+  const accelerateUrl = getAccelerateUrl(requestUrl);
+  options = Object.assign({}, options, {
+    formatRedirectUrl: function (from, to) {
+      return getAccelerateUrl(url.resolve(from, to));
+    }
+  });
+  return Reflect.apply(request, client, [ accelerateUrl, options ]);
+};
 
 module.exports = client;
 module.exports.USER_AGENT = urllib.USER_AGENT;

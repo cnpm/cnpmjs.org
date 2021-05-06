@@ -316,6 +316,8 @@ var config = {
   formatCustomOnePackageVersion: (ctx, packageVersion) => {
     return packageVersion;
   },
+  // registry download accelerate map
+  accelerateHostMap: {},
 };
 
 if (process.env.NODE_ENV === 'test') {
