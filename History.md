@@ -1,8 +1,17 @@
+3.0.0-rc.43 / 2021-05-36
+==================
+
+**features**
+  * [[`a21aed0`](https://github.com/cnpm/cnpmjs.org/commit/a21aed08c5fe1ea09f4fda157ac3c12bd609781d)] - feat: impl sync to/from backup files (#1612) (killa <<killa123@126.com>>)
+
+**fixes**
+  * [[`2245dc2`](https://github.com/cnpm/cnpmjs.org/commit/2245dc2967ec070b8bcc618ebfad0cd4cd297fb8)] - feat: impl accelerate request (#1637) (killa <<killa123@126.com>>)
+
 3.0.0-rc.42 / 2021-04-30
 ==================
 
 **features**
-  * [[`a21aed0`](https://github.com/cnpm/cnpmjs.org/commit/a21aed08c5fe1ea09f4fda157ac3c12bd609781d)] - feat: impl sync to/from backup files (#1636) (#1612) (killa <<killa123@126.com>>)
+  * [[`a21aed0`](https://github.com/cnpm/cnpmjs.org/commit/a21aed08c5fe1ea09f4fda157ac3c12bd609781d)] - feat: impl sync to/from backup files (#1612) (killa <<killa123@126.com>>)
 
 3.0.0-rc.39 / 2021-01-14
 ==================
