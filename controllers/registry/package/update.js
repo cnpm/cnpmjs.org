@@ -4,6 +4,7 @@ var debug = require('debug')('cnpmjs.org:controllers:registry:package:update');
 var packageService = require('../../../services/package');
 var userService = require('../../../services/user');
 var config = require('../../../config');
+var hook = require('../../../services/hook');
 
 // PUT /:name/-rev/:rev
 //
@@ -158,6 +159,31 @@ function* updateMaintainers() {
 
   var r = yield packageService.updatePrivateModuleMaintainers(name, usernames);
   debug('result: %j', r);
+  if (r.add && r.add.length) {
+    const envelope = {
+      event: 'package:owner',
+      name: name,
+      type: 'package',
+      version: null,
+      hookOwner: null,
+      payload: null,
+      change: null,
+    };
+    hook.trigger(envelope);
+  }
+  if (r.remove && r.remove.length) {
+    const envelope = {
+      event: 'package:owner-rm',
+      name: name,
+      type: 'package',
+      version: null,
+      hookOwner: null,
+      payload: null,
+      change: null,
+    };
+    hook.trigger(envelope);
+  }
+
 
   this.status = 201;
   this.body = {

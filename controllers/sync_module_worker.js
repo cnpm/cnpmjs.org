@@ -360,10 +360,10 @@ SyncModuleWorker.prototype._syncByNameFromBackupFile = function* (concurrencyId,
     const distTagDirFiles = yield nfs.list(distTagDir);
     const distTagFileNames = distTagDirFiles.filter(fileName => common.isBackupTagFile(fileName));
 
-    packageJsons = yield packageJsonFileNames.map(function* (packageJsonFileName) {
+    packageJsons = yield gather(packageJsonFileNames.map(function* (packageJsonFileName) {
       const version = common.getVersionFromFileName(packageJsonFileName);
       return yield readPackage(name, version);
-    });
+    }), 5);
 
     packageJsons = packageJsons.sort((a, b) => {
       return a.publish_time - b.publish_time;

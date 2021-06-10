@@ -1,5 +1,6 @@
 'use strict';
 
+var assert = require('assert');
 var should = require('should');
 var request = require('supertest');
 var mm = require('mm');
@@ -154,6 +155,14 @@ describe('test/controllers/registry/package/update.test.js', function () {
     });
 
     it('should add new maintainers by admin', function (done) {
+      done = pedding(done, 2);
+      mm(config, 'globalHook', function* (envelope) {
+        assert(envelope.name === '@cnpmtest/testmodule-update-1');
+        assert(envelope.type === 'package');
+        assert(envelope.event === 'package:owner');
+        done();
+      });
+
       request(app)
       .put('/@cnpmtest/testmodule-update-1/-rev/1')
       .send({
@@ -171,6 +180,14 @@ describe('test/controllers/registry/package/update.test.js', function () {
     });
 
     it('should rm maintainers', function (done) {
+      done = pedding(done, 2);
+      mm(config, 'globalHook', function* (envelope) {
+        assert(envelope.name === '@cnpmtest/testmodule-update-1');
+        assert(envelope.type === 'package');
+        assert(envelope.event === 'package:owner-rm');
+        done();
+      });
+
       request(app)
       .put('/@cnpmtest/testmodule-update-1/-rev/1')
       .send({
