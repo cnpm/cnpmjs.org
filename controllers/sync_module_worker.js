@@ -360,22 +360,36 @@ SyncModuleWorker.prototype._syncByNameFromBackupFile = function* (concurrencyId,
     const distTagDirFiles = yield nfs.list(distTagDir);
     const distTagFileNames = distTagDirFiles.filter(fileName => common.isBackupTagFile(fileName));
 
-    packageJsons = yield packageJsonFileNames.map(function* (packageJsonFileName) {
+    const packageJsonRes = yield gather(packageJsonFileNames.map(function* (packageJsonFileName) {
       const version = common.getVersionFromFileName(packageJsonFileName);
       return yield readPackage(name, version);
+    }), 5);
+    packageJsons = packageJsonRes.map(({ isError, error, value}) => {
+      if (isError) {
+        error.message = '[sync] read package.json failed: ' + error.message;
+        throw error;
+      }
+      return value;
     });
 
     packageJsons = packageJsons.sort((a, b) => {
       return a.publish_time - b.publish_time;
     });
 
-    tags = yield distTagFileNames.map(function* (tagFileName) {
+    const tagRes = yield gather(distTagFileNames.map(function* (tagFileName) {
       const tag = common.getTagNameFromFileName(tagFileName);
       const version = yield readDistTag(name, tag);
       return {
         tag,
         version,
       };
+    }));
+    tags = tagRes.map(({ isError, error, value}) => {
+      if (isError) {
+        error.message = '[sync] read dist-tag failed: ' + error.message;
+        throw error;
+      }
+      return value;
     });
   } catch (err) {
     if (retryCount < 3) {
@@ -471,6 +485,7 @@ SyncModuleWorker.prototype._syncByNameFromBackupFile = function* (concurrencyId,
     try {
       yield nfs.download(packageJsonKey, filePath);
       const packageJSONFile = yield mzFs.readFile(filePath, 'utf8');
+      console.log('file: ', filePath, packageJSONFile);
       const packageJSON = JSON.parse(packageJSONFile);
       return packageJSON;
     } finally {
