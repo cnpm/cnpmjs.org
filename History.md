@@ -1,3 +1,9 @@
+3.0.0-rc.44 / 2021-06-11
+==================
+
+**features**
+  * [[`a1e8a82`](https://github.com/cnpm/cnpmjs.org/commit/a1e8a8289276275b995d15b3c254fbdbace6dbae)] - feat: impl npm owner hooks (#1645) (killa <<killa123@126.com>>)
+
 3.0.0-rc.43 / 2021-05-36
 ==================
 
