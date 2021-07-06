@@ -215,6 +215,20 @@ describe('test/controllers/registry/package/save.test.js', function () {
       .expect(403, done);
     });
 
+    it('should publish when maintainers dont contain current user in token mode', function (done) {
+      var token = yield tokenService.createToken(utils.admin);
+
+      var pkg = utils.getPackage('testmodule-new-1', '0.0.1', utils.admin);
+      pkg.versions['0.0.1'].maintainers[0].name += '-testuser';
+      request(app)
+      .put('/' + pkg.name)
+      .set('authorization', 'Bearer ' + token.token)
+      .send(pkg)
+      .expect(201);
+
+      yield tokenService.deleteToken(utils.admin, token.token);
+    });
+
     it('should 400 when attachments missing', function (done) {
       var pkg = utils.getPackage('testmodule-new-1', '0.0.1', utils.admin);
       delete pkg._attachments;

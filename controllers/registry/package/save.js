@@ -87,13 +87,34 @@ module.exports = function* save(next) {
         name: this.user.name,
         email: this.user.email,
       }];
+      // notice that admins can not publish to all modules
+      // (but admins can add self to maintainers first)
+
+      // make sure user in auth is in maintainers
+      // should never happened in normal request
+      var m = maintainers.filter(function (maintainer) {
+        return maintainer.name === username;
+      });
+      if (m.length === 0) {
+        this.status = 403;
+        const error = '[maintainers_error] ' + username + ' does not in maintainer list';
+        this.body = {
+          error,
+          reason: error,
+        };
+        return;
+      }
     } else {
-      maintainers = [];
+      // should never happened in normal request
+      this.status = 400;
+      const error = '[maintainers_error] request body need maintainers';
+      this.body = {
+        error,
+        reason: error,
+      };
+      return;
     }
   }
-
-  // notice that admins can not publish to all modules
-  // (but admins can add self to maintainers first)
 
   // TODO: add this info into some table
   versionPackage._publish_on_cnpm = true;
@@ -199,12 +220,10 @@ module.exports = function* save(next) {
   }
 
   // ensure maintainers exists
-  if (maintainers.length) {
-    var maintainerNames = maintainers.map(function (item) {
-      return item.name;
-    });
-    yield packageService.addPrivateModuleMaintainers(name, maintainerNames);
-  }
+  var maintainerNames = maintainers.map(function (item) {
+    return item.name;
+  });
+  yield packageService.addPrivateModuleMaintainers(name, maintainerNames);
 
   this.status = 201;
   this.body = {
