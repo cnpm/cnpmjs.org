@@ -9,7 +9,8 @@ describe('test/common/urllib.test.js', () => {
   describe('accelerate request', () => {
     beforeEach(() => {
       mm(config, 'accelerateHostMap', {
-        'www.alipay.com': 'www.antgroup.com'
+        'www.alipay.com': 'www.antgroup.com',
+        'www.google.com': 'www.google.com'
       });
     });
 
@@ -26,12 +27,12 @@ describe('test/common/urllib.test.js', () => {
 
     describe('redirect', () => {
       it('should work', function* () {
-        const res = yield urllib.request('http://alipay.com', {
+        const res = yield urllib.request('https://google.com', {
           followRedirect: true,
         });
         assert.deepStrictEqual(res.res.requestUrls, [
-          'http://alipay.com/',
-          'https://www.antgroup.com/',
+          'https://google.com/',
+          'https://www.google.com/',
         ]);
       });
     });

@@ -78,8 +78,8 @@ module.exports = function* save(next) {
   var versionPackage = pkg.versions[version];
   var maintainers = versionPackage.maintainers;
 
+  var authorizeType = common.getAuthorizeType(this);
   if (!maintainers) {
-    var authorizeType = common.getAuthorizeType(this);
     if (authorizeType === common.AuthorizeType.BEARER) {
       // With the token mode, pub lib with no maintainers
       // make the maintainer to be puber
@@ -104,17 +104,19 @@ module.exports = function* save(next) {
 
   // make sure user in auth is in maintainers
   // should never happened in normal request
-  var m = maintainers.filter(function (maintainer) {
-    return maintainer.name === username;
-  });
-  if (m.length === 0) {
-    this.status = 403;
-    const error = '[maintainers_error] ' + username + ' does not in maintainer list';
-    this.body = {
-      error,
-      reason: error,
-    };
-    return;
+  if (authorizeType !== common.AuthorizeType.BEARER) {
+    var m = maintainers.filter(function (maintainer) {
+      return maintainer.name === username;
+    });
+    if (m.length === 0) {
+      this.status = 403;
+      const error = '[maintainers_error] ' + username + ' does not in maintainer list';
+      this.body = {
+        error,
+        reason: error,
+      };
+      return;
+    }
   }
 
   // TODO: add this info into some table
