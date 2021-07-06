@@ -225,7 +225,10 @@ describe('test/controllers/registry/package/save.test.js', function () {
         .put('/' + pkg.name)
         .set('authorization', 'Bearer ' + token.token)
         .send(pkg)
-        .expect(201);
+        .expect({
+          error: '',
+          reason: ''
+        });
 
       yield tokenService.deleteToken(utils.admin, token.token);
     });
