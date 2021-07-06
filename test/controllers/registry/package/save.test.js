@@ -215,7 +215,7 @@ describe('test/controllers/registry/package/save.test.js', function () {
       .expect(403, done);
     });
 
-    it('should publish when maintainers dont contain current user in token mode', function (done) {
+    it('should publish when maintainers dont contain current user in token mode', function* (done) {
       var token = yield tokenService.createToken(utils.admin);
 
       var pkg = utils.getPackage('testmodule-new-1', '0.0.1', utils.admin);
