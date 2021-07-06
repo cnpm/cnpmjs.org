@@ -16,23 +16,23 @@ describe('test/common/urllib.test.js', () => {
 
     describe('direct', () => {
       it('should work', function* () {
-        const res = yield urllib.request('https://www.google.com', {
+        const res = yield urllib.request('https://www.alipay.com', {
           followRedirect: true,
         });
         assert.deepStrictEqual(res.res.requestUrls, [
-          'https://www.google.com/',
+          'https://www.antgroup.com/',
         ]);
       });
     });
 
     describe('redirect', () => {
       it('should work', function* () {
-        const res = yield urllib.request('http://alipay.com', {
+        const res = yield urllib.request('http://google.com', {
           followRedirect: true,
         });
         assert.deepStrictEqual(res.res.requestUrls, [
-          'http://alipay.com/',
-          'https://www.antgroup.com/',
+          'http://google.com/',
+          'https://www.google.com/',
         ]);
       });
     });
