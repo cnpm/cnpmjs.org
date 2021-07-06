@@ -218,7 +218,7 @@ describe('test/controllers/registry/package/save.test.js', function () {
     it('should publish when maintainers dont contain current user in token mode', function* () {
       var token = yield tokenService.createToken(utils.admin);
 
-      var pkg = utils.getPackageWithToken('testmodule-new-3', '0.0.1', utils.admin);
+      var pkg = utils.getPackage('testmodule-new-3', '0.0.1', utils.admin);
       pkg.versions['0.0.1'].maintainers[0].name += '-testuser';
 
       yield request(app)
