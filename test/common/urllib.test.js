@@ -27,7 +27,7 @@ describe('test/common/urllib.test.js', () => {
 
     describe('redirect', () => {
       it('should work', function* () {
-        const res = yield urllib.request('http://google.com', {
+        const res = yield urllib.request('https://google.com', {
           followRedirect: true,
         });
         assert.deepStrictEqual(res.res.requestUrls, [
