@@ -31,7 +31,7 @@ describe('test/common/urllib.test.js', () => {
           followRedirect: true,
         });
         assert.deepStrictEqual(res.res.requestUrls, [
-          'http://google.com/',
+          'https://google.com/',
           'https://www.google.com/',
         ]);
       });
