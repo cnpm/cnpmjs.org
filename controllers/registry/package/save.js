@@ -39,17 +39,21 @@ module.exports = function* save(next) {
     return;
   }
 
+  var authorizeType = common.getAuthorizeType(this);
+
   // check maintainers
-  var result = yield packageService.authMaintainer(name, username);
-  if (!result.isMaintainer) {
-    this.status = 403;
-    const error = '[forbidden] ' +  username + ' not authorized to modify ' + name +
-      ', please contact maintainers: ' + result.maintainers.join(', ');
-    this.body = {
-      error,
-      reason: error,
-    };
-    return;
+  if (authorizeType !== common.AuthorizeType.BEARER) {
+    var result = yield packageService.authMaintainer(name, username);
+    if (!result.isMaintainer) {
+      this.status = 403;
+      const error = '[forbidden] ' +  username + ' not authorized to modify ' + name +
+        ', please contact maintainers: ' + result.maintainers.join(', ');
+      this.body = {
+        error,
+        reason: error,
+      };
+      return;
+    }
   }
 
   if (!filename) {
@@ -78,7 +82,6 @@ module.exports = function* save(next) {
   var versionPackage = pkg.versions[version];
   var maintainers = versionPackage.maintainers;
 
-  var authorizeType = common.getAuthorizeType(this);
   if (!maintainers) {
     if (authorizeType === common.AuthorizeType.BEARER) {
       // With the token mode, pub lib with no maintainers
