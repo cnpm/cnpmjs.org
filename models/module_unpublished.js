@@ -28,11 +28,12 @@ CREATE TABLE IF NOT EXISTS `module_unpublished` (
  KEY `idx_gmt_modified` (`gmt_modified`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='module unpublished info';
  */
+const config = require('../config');
 
 module.exports = function (sequelize, DataTypes) {
   return sequelize.define('ModuleUnpublished', {
     name: {
-      type: DataTypes.STRING(214),
+      type: DataTypes.STRING(config.nameLen),
       allowNull: false,
       comment: 'module name',
     },

@@ -31,11 +31,12 @@
 // -- init `total` count
 // INSERT INTO total(name, gmt_modified) VALUES('total', now())
 //   ON DUPLICATE KEY UPDATE gmt_modified=now();
+const config = require('../config');
 
 module.exports = function (sequelize, DataTypes) {
   return sequelize.define('Total', {
     name: {
-      type: DataTypes.STRING(214),
+      type: DataTypes.STRING(config.nameLen),
       primaryKey: true,
       comment: 'total name'
     },

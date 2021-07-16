@@ -5,6 +5,8 @@ var sleep = require('co-sleep');
 var Package = require('../../services/package');
 var utils = require('../utils');
 var common = require('../../services/common');
+const config = require('../../config');
+const os = require('os');
 
 describe('test/services/package.test.js', function () {
   describe('addModuleTag()', function () {
@@ -26,6 +28,15 @@ describe('test/services/package.test.js', function () {
     it('should return null when module not exists', function* () {
       var tag = yield Package.addModuleTag('not-exists', 'latest', '1.0.0');
       should.not.exist(tag);
+    });
+
+    it('should return Error when tag length out of range', function* () {
+      const r = yield utils.createModule('test-addModuleTag-module-name', '1.0.0');
+      try {
+        yield Package.addModuleTag(r.name, Buffer.alloc(config.tagLen + 1, 'a'), r.version);
+      } catch (error) {
+        error.message.should.equal(`addModuleTag Error: length of tag(aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa) > 70${os.EOL}`);
+      }
     });
   });
 

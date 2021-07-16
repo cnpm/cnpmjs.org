@@ -19,17 +19,18 @@ CREATE TABLE IF NOT EXISTS `module_deps` (
  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'primary key',
  `gmt_create` datetime NOT NULL COMMENT 'create time',
  `name` varchar(214) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL COMMENT 'module name',
- `deps` varchar(214) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL COMMENT 'which module depend on this module',
+ `deps` varchar(100) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL COMMENT 'which module depend on this module',
  PRIMARY KEY (`id`),
  UNIQUE KEY `uk_name_deps` (`name`,`deps`),
  KEY `idx_name` (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='module deps';
  */
+const config = require('../config');
 
 module.exports = function (sequelize, DataTypes) {
   return sequelize.define('ModuleDependency', {
     name: {
-      type: DataTypes.STRING(214),
+      type: DataTypes.STRING(config.nameLen),
       allowNull: false,
       comment: 'module name',
     },

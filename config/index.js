@@ -16,6 +16,11 @@ var config = {
   version: version,
   dataDir: dataDir,
 
+  // overriding length should alter database table length
+  versionLen: 70, // semver max length
+  nameLen: 214, // name max length
+  tagLen: 70, // tag name max length
+
   /**
    * Cluster mode
    */
@@ -120,7 +125,7 @@ var config = {
    */
 
   database: {
-    db: 'cnpmjs_test',
+    db: 'cnpmjs',
     username: 'root',
     password: '',
 

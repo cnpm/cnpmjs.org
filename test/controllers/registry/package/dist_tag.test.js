@@ -96,6 +96,20 @@ describe('test/controllers/registry/package/dist_tag.test.js', function () {
       .expect(400, done);
     });
 
+    it.only('should 400 when set a version of 70+ length', function (done) {
+      const tag = Buffer.alloc(71, 'a').toString();
+      request(app)
+        .put(`/-/package/@cnpmtest/dist_tag_test_module_set/dist-tags/${tag}`)
+        .set('authorization', utils.otherUserAuth)
+        .set('content-type', 'application/json')
+        .send(JSON.stringify(`1.0.1`))
+        .expect({
+          error: '[version_error] @cnpmtest/dist_tag_test_module_set@1.0.1 not exists',
+          reason: '[version_error] @cnpmtest/dist_tag_test_module_set@1.0.1 not exists',
+        })
+        .expect(400, done);
+    });
+
     it('should 201 set exists tag', function (done) {
       request(app)
       .put('/-/package/@cnpmtest/dist_tag_test_module_set/dist-tags/exists')

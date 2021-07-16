@@ -1,5 +1,6 @@
 'use strict';
 
+var os = require('os');
 var semver = require('semver');
 var models = require('../models');
 var common = require('./common');
@@ -542,6 +543,23 @@ exports.removeModulesByNameAndVersions = function* (name, versions) {
 // tags
 
 exports.addModuleTag = function* (name, tag, version) {
+  if (name.length > config.nameLen
+    || tag.length > config.tagLen
+    || version.length > config.versionLen) {
+    let errorMsg = 'addModuleTag Error:';
+    if (name.length > config.nameLen) {
+      errorMsg = `${errorMsg} length of name(${name}) > ${config.nameLen}${os.EOL}`;
+    }
+    if (tag.length > config.tagLen) {
+      errorMsg = `${errorMsg} length of tag(${tag}) > ${config.tagLen}${os.EOL}`;
+    }
+    if (version.length > config.versionLen) {
+      errorMsg = `${errorMsg} length of version(${version}) > ${config.versionLen}${os.EOL}`;
+    }
+    console.info('errorMsg: ', errorMsg);
+    throw new Error(errorMsg);
+  }
+
   var mod = yield exports.getModule(name, version);
   if (!mod) {
     return null;

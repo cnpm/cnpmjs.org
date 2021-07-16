@@ -20,29 +20,30 @@ CREATE TABLE IF NOT EXISTS `tag` (
  `gmt_create` datetime NOT NULL COMMENT 'create time',
  `gmt_modified` datetime NOT NULL COMMENT 'modified time',
  `name` varchar(214) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL COMMENT 'module name',
- `tag` varchar(30) NOT NULL COMMENT 'tag name',
- `version` varchar(30) NOT NULL COMMENT 'module version',
+ `tag` varchar(70) NOT NULL COMMENT 'tag name',
+ `version` varchar(70) NOT NULL COMMENT 'module version',
  `module_id` bigint(20) unsigned NOT NULL COMMENT 'module id',
  PRIMARY KEY (`id`),
  UNIQUE KEY `uk_name` (`name`, `tag`),
  KEY `idx_gmt_modified` (`gmt_modified`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='module tag';
  */
+const config = require('../config');
 
 module.exports = function (sequelize, DataTypes) {
   return sequelize.define('Tag', {
     name: {
-      type: DataTypes.STRING(214),
+      type: DataTypes.STRING(config.nameLen),
       allowNull: false,
       comment: 'module name',
     },
     tag: {
-      type: DataTypes.STRING(30),
+      type: DataTypes.STRING(config.tagLen),
       allowNull: false,
       comment: 'tag name',
     },
     version: {
-      type: DataTypes.STRING(30),
+      type: DataTypes.STRING(config.versionLen),
       allowNull: false,
       comment: 'module version',
     },

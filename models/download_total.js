@@ -56,10 +56,12 @@
 //  KEY `idx_date` (`date`)
 // ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='module download total info';
 
+const config = require('../config');
+
 module.exports = function (sequelize, DataTypes) {
   return sequelize.define('DownloadTotal', {
     name: {
-      type: DataTypes.STRING(214),
+      type: DataTypes.STRING(config.nameLen),
       allowNull: false,
       comment: 'module name',
     },
