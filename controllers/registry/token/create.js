@@ -44,7 +44,9 @@ module.exports = function* createToken() {
     return;
   }
 
-  var token = yield tokenService.createToken(this.user.name, {
+  var tokenServiceImpl = this.tokenService || tokenService;
+
+  var token = yield tokenServiceImpl.createToken(this.user.name, {
     readonly: !!readonly,
     cidrWhitelist: cidrWhitelist || [],
   });
