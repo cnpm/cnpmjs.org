@@ -5,6 +5,7 @@ var request = require('supertest');
 var app = require('../../../../servers/registry');
 var tokenService = require('../../../../services/token');
 var TestUtil = require('../../../utils');
+var create = require('../../../../controllers/registry/token/create');
 
 describe('test/controllers/registry/token/create.test.js', function () {
   describe('POST /-/npm/v1/tokens', function () {
@@ -74,6 +75,30 @@ describe('test/controllers/registry/token/create.test.js', function () {
           })
           .expect(400, done);
       });
+    });
+  });
+
+  describe('inject tokenService', () => {
+    it('should work', function* () {
+      const ctx = {
+        request: {
+          body: {
+            readonly: false,
+            cidr_whitelist: [],
+            password: TestUtil.admin,
+          },
+        },
+        user: {
+          name: TestUtil.admin,
+        },
+        tokenService: {
+          createToken(userId) {
+            return `${userId}:token`
+          }
+        },
+      };
+      yield Reflect.apply(create, ctx, []);
+      ctx.body.should.equal(`${TestUtil.admin}:token`);
     });
   });
 });

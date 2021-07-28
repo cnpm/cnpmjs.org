@@ -697,7 +697,6 @@ function* _listStarUsers(modName) {
 }
 
 function* _saveNpmUser(username) {
-  var user = yield npmSerivce.getUser(username);
   if (!user) {
     var existsUser = yield User.findByName(username);
     if (existsUser && existsUser.isNpmUser) {
