@@ -1,3 +1,12 @@
+
+3.0.0-rc.45 / 2021-07-28
+==================
+
+**features**
+  * [[`d28af7f`](http://github.com/cnpm/cnpmjs.org/commit/d28af7fd7e1bf530ad2e5a73fa5a54d2caf5cf9b)] - feat: support custom tokenService (#1658) (killa <<killa123@126.com>>)
+
+**others**
+  * [[`e258241`](http://github.com/cnpm/cnpmjs.org/commit/e2582417fa06a82c2fbb4d08eaf764465683a00b)] - remove maintainers logic (#1654) (Solais <<924615994@qq.com>>)
 3.0.0-rc.44 / 2021-06-11
 ==================
 
