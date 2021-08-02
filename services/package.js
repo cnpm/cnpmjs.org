@@ -251,6 +251,18 @@ exports.listModulesByName = function* (moduleName, attributes) {
   return mods;
 };
 
+/**
+ * 显示所有的模块
+ */
+ exports.listAllModules = function* () {
+  var rows = yield Module.findAll({
+    attributes: [
+      'name', 'description', 'version',
+    ]
+  });
+  return rows;
+};
+
 exports.getModuleLastModified = function* (name) {
   var gmt_modified = yield Module.max('gmt_modified', {
     where: {

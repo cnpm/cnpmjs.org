@@ -9,7 +9,7 @@ $(function () {
   }
 
   $.getJSON('/total', function (data) {
-    $('#total-packages').html(humanize(data.doc_count));
+    $('#total-packages').html(`<a href="/all">${humanize(data.doc_count)}</a>`);
     $('#total-versions').html(humanize(data.doc_version_count));
     $('#total-deletes').html(humanize(data.doc_del_count));
 

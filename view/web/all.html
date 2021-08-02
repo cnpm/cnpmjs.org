@@ -1,0 +1,38 @@
+<style>
+#all .package {
+    padding: 10px;
+    font-size: 18px;
+    border-bottom: 1px solid #ddd;
+}
+
+#all .alert a {
+    font-size: 20px;
+}
+
+#all .package-description {
+    margin: 0.5em 0;
+    font-size: 16px;
+}
+</style>
+<div id="all">
+    <h1>All packages</h1>
+    <% if (!packages.length) { %>
+    <div class="alert alert-warning">
+        no package
+    </div>
+    <% } else {%>
+        <% const pkgNames = [];
+        for (var i = 0; i < packages.length; i++) {
+        var item = packages[i];
+        if (pkgNames.includes(item.name)) {
+            continue;
+        }
+        pkgNames.push(item.name);
+        %>
+        <div class="package">
+        <a href="/package/<%= item.name %>" class="package-name"><%= item.name %></a>
+        <p class="package-description"><%= item.description %></p>
+        </div>
+        <% } %>
+    <% } %>
+</div>
