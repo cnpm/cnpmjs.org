@@ -10,7 +10,7 @@
     "start": "./bin/nodejsctl start && cp History.md docs/web/history.md",
     "status": "./bin/nodejsctl status",
     "stop": "./bin/nodejsctl stop",
-    "ci": "make test-travis-all"
+    "ci": "make test-travis-mysql"
   },
   "bin": {
     "cnpmjs.org": "bin/cli.js"
@@ -129,7 +129,7 @@
     "command": {
       "github": "ci"
     },
-    "services": "postgresql, mysql"
+    "services": "mysql"
   },
   "license": "MIT"
 }
