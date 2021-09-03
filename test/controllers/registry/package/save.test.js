@@ -17,7 +17,7 @@ describe('test/controllers/registry/package/save.test.js', function () {
   describe('no @scoped package', function () {
     beforeEach(function () {
       mm(config, 'syncModel', 'all');
-      mm(config, 'privatePackages', ['testmodule-new-1', 'testmodule-new-2', 'testmodule-no-latest']);
+      mm(config, 'privatePackages', ['testmodule-new-1', 'testmodule-new-2', 'testmodule-no-latest', 'testmodule-new-4']);
     });
 
     before(function (done) {
@@ -228,6 +228,12 @@ describe('test/controllers/registry/package/save.test.js', function () {
         .expect(201);
 
       yield tokenService.deleteToken(utils.admin, token.token);
+
+      var maintainers = yield packageService.listMaintainers(pkg.name);
+      maintainers.should.eql([{
+        name: 'cnpmjstest10',
+        email: 'fengmk2@gmail.com',
+      }]);
     });
 
     it('should 400 when attachments missing', function (done) {
