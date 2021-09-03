@@ -102,21 +102,30 @@ module.exports = function* save(next) {
   // notice that admins can not publish to all modules
   // (but admins can add self to maintainers first)
 
+  var m = maintainers.filter(function (maintainer) {
+    return maintainer.name === username;
+  });
+
+  // package.json has maintainers and publisher in not in the list
+  if (authorizeType === common.AuthorizeType.BEARER && m.length === 0) {
+    var publisher = {
+      name: this.user.name,
+      email: this.user.email,
+    };
+    m = [ publisher ];
+    maintainers.push(publisher);
+  }
+
   // make sure user in auth is in maintainers
   // should never happened in normal request
-  if (authorizeType !== common.AuthorizeType.BEARER) {
-    var m = maintainers.filter(function (maintainer) {
-      return maintainer.name === username;
-    });
-    if (m.length === 0) {
-      this.status = 403;
-      const error = '[maintainers_error] ' + username + ' does not in maintainer list';
-      this.body = {
-        error,
-        reason: error,
-      };
-      return;
-    }
+  if (m.length === 0) {
+    this.status = 403;
+    const error = '[maintainers_error] ' + username + ' does not in maintainer list';
+    this.body = {
+      error,
+      reason: error,
+    };
+    return;
   }
 
   // TODO: add this info into some table

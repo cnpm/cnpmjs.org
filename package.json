@@ -9,7 +9,8 @@
     "test-local": "make test",
     "start": "./bin/nodejsctl start && cp History.md docs/web/history.md",
     "status": "./bin/nodejsctl status",
-    "stop": "./bin/nodejsctl stop"
+    "stop": "./bin/nodejsctl stop",
+    "ci": "make test-travis-all"
   },
   "bin": {
     "cnpmjs.org": "bin/cli.js"
@@ -76,6 +77,7 @@
     "autod": "*",
     "chunkstream": "*",
     "contributors": "*",
+    "egg-ci": "^1.18.0",
     "intelli-espower-loader": "^1.0.1",
     "istanbul": "*",
     "jshint": "*",
@@ -117,5 +119,17 @@
     "fengmk2 <fengmk2@gmail.com> (http://fengmk2.com)",
     "dead_horse <dead_horse@qq.com> (http://deadhorse.me)"
   ],
+  "ci": {
+    "type": "github",
+    "os": {
+      "github": "linux, macos"
+    },
+    "npminstall": true,
+    "version": "10, 12",
+    "command": {
+      "github": "ci"
+    },
+    "services": "postgresql, mysql"
+  },
   "license": "MIT"
 }
