@@ -7,7 +7,7 @@ var fs = require('fs');
 var os = require('os');
 
 var version = require('../package.json').version;
-
+var Nfs = require('fs-cnpm');
 var root = path.dirname(__dirname);
 var dataDir = process.env.CNPM_DATA_DIR ;
 
@@ -128,7 +128,7 @@ var config = {
   },
 
   // package tarball store in local filesystem by default
-  nfs: require('fs-cnpm')({
+  nfs: new Nfs({
     dir: path.join(dataDir, 'nfs')
   }),
   // if set true, will 302 redirect to `nfs.url(dist.key)`
