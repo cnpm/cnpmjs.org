@@ -1,4 +1,11 @@
 
+3.0.0-rc.46 / 2021-09-10
+==================
+
+**fixes**
+  * [[`596bca9`](http://github.com/cnpm/cnpmjs.org/commit/596bca908ee87504dfeb3dbf463b4d9a551d9f27)] - fix: fs-cnpm on dockerize config (#1656) (wxhuang <<wxhuang1985@gmail.com>>)
+  * [[`bbae9d3`](http://github.com/cnpm/cnpmjs.org/commit/bbae9d3bc3a565a59c397a63c4301272ac4509e9)] - fix: new publish with token should add user to maintainers (#1662) (killa <<killa123@126.com>>)
+
 3.0.0-rc.45 / 2021-07-28
 ==================
 
