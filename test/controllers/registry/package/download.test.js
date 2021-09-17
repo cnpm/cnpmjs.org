@@ -25,6 +25,12 @@ describe('test/controllers/registry/package/download.test.js', function () {
       .expect(200, done);
     });
 
+    it('should download a file with 200', function (done) {
+      request(app)
+        .get('/@cnpmtest/download-test-module/download/download-test-module-1.0.0.tgz')
+        .expect(200, done);
+    });
+
     it('should alias /:name/-/:filename to /:name/download/:filename', function (done) {
       request(app)
       .get('/@cnpmtest/download-test-module/-/@cnpmtest/download-test-module-1.0.0.tgz')
