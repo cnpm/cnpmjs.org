@@ -37,6 +37,12 @@ describe('test/controllers/registry/package/download.test.js', function () {
       .expect(200, done);
     });
 
+    it('should alias /:name/-/:filename to /:name/download/:filename', function (done) {
+      request(app)
+        .get('/@cnpmtest/download-test-module/-/download-test-module-1.0.0.tgz')
+        .expect(200, done);
+    });
+
     it('should 404 when package not exists', function (done) {
       request(app)
       .get('/@cnpmtest/download-test-module-not-exists/download/@cnpmtest/download-test-module-not-exists-1.0.0.tgz')
