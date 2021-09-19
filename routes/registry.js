@@ -88,8 +88,10 @@ function routes(app) {
 
   // need limit by ip
   app.get(/^\/(@[\w\-\.]+\/[\w\-\.]+)\/download\/(@[\w\-\.]+\/[\w\-\.]+)$/, limit, downloadPackage);
+  app.get(/^\/(@[\w\-\.]+\/[\w\-\.]+)\/download\/([\w\-\.]+)$/, limit, downloadPackage);
   app.get('/:name/download/:filename', limit, downloadPackage);
   app.get(/^\/(@[\w\-\.]+\/[\w\-\.]+)\/\-\/(@[\w\-\.]+\/[\w\-\.]+)$/, limit, downloadPackage);
+  app.get(/^\/(@[\w\-\.]+\/[\w\-\.]+)\/\-\/([\w\-\.]+)$/, limit, downloadPackage);
   app.get('/:name/-/:filename', limit, downloadPackage);
 
   // delete tarball and remove one version
