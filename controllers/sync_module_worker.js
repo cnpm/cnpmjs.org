@@ -902,7 +902,7 @@ SyncModuleWorker.prototype._sync = function* (name, pkg) {
   var diffNpmMaintainers = [];
 
   // [
-  //   { name, version, _hasShrinkwrap(boolean), peerDependenciesMeta(array), os(array), cpu(array), workspaces(array) }
+  //   { name, version, _hasShrinkwrap(boolean), peerDependenciesMeta(object), os(array), cpu(array), workspaces(array) }
   // ]
   var missingAbbreviatedMetadatas = [];
   // [
@@ -1089,8 +1089,9 @@ SyncModuleWorker.prototype._sync = function* (name, pkg) {
                 }, abbreviatedMetadata));
                 break;
               }
-            } else if (Array.isArray(value)) {
-              // array: os, cpu, peerDependenciesMeta, workspaces
+            } else if (Array.isArray(value) || (typeof value === 'object' && value)) {
+              // array: os, cpu, workspaces
+              // object: peerDependenciesMeta
               if (existsModuleAbbreviated && !(key in existsModuleAbbreviated.package)) {
                 missingAbbreviatedMetadatas.push(Object.assign({
                   id: exists.id,
