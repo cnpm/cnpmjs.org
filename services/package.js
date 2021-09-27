@@ -357,20 +357,9 @@ exports.findAllModuleAbbreviateds = function* (where, order, limit, offset) {
 // https://github.com/npm/registry/blob/master/docs/responses/package-metadata.md#abbreviated-version-object
 exports.saveModuleAbbreviated = function* (mod) {
   var pkg = JSON.stringify({
-    name: mod.package.name,
-    version: mod.package.version,
-    deprecated: mod.package.deprecated,
-    dependencies: mod.package.dependencies,
-    optionalDependencies: mod.package.optionalDependencies,
-    devDependencies: mod.package.devDependencies,
-    bundleDependencies: mod.package.bundleDependencies,
-    peerDependencies: mod.package.peerDependencies,
-    bin: mod.package.bin,
-    directories: mod.package.directories,
-    dist: mod.package.dist,
-    engines: mod.package.engines,
-    _hasShrinkwrap: mod.package._hasShrinkwrap,
-    _publish_on_cnpm: mod.package._publish_on_cnpm,
+    ...mod.package,
+    // ignore readme force
+    readme: undefined,
   });
   var publish_time = mod.publish_time || Date.now();
   var item = yield models.ModuleAbbreviated.findByNameAndVersion(mod.name, mod.version);
@@ -417,7 +406,7 @@ exports.updateModulePackageFields = function* (id, fields) {
 };
 
 exports.updateModuleAbbreviatedPackage = function* (item) {
-  // item => { id, name, version, _hasShrinkwrap }
+  // item => { id, name, version, _hasShrinkwrap, os, cpu, peerDependenciesMeta }
   var mod = yield models.ModuleAbbreviated.findByNameAndVersion(item.name, item.version);
   if (!mod) {
     return null;
