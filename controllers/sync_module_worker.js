@@ -863,8 +863,26 @@ SyncModuleWorker.prototype._sync = function* (name, pkg) {
         var versions = data && data.versions || {};
         for (var version in versions) {
           const item = versions[version];
-          if (item && typeof item._hasShrinkwrap === 'boolean') {
-            remoteAbbreviatedMetadatas[version] = { _hasShrinkwrap: item._hasShrinkwrap };
+          if (!item) {
+            continue;
+          }
+          let hasMetaData = false;
+          const metaData = {};
+          // _hasShrinkwrap maybe undefined, dont change it
+          if (typeof item._hasShrinkwrap === 'boolean') {
+            hasMetaData = true;
+            metaData._hasShrinkwrap = item._hasShrinkwrap;
+          }
+
+          const metaDataKeys = [ 'peerDependenciesMeta', 'os', 'cpu', 'workspaces' ];
+          for (const key of metaDataKeys) {
+            if (key in item) {
+              hasMetaData = true;
+              metaData[key] = item[key];
+            }
+          }
+          if (hasMetaData) {
+            remoteAbbreviatedMetadatas[version] = metaData;
           }
         }
       }
@@ -884,7 +902,7 @@ SyncModuleWorker.prototype._sync = function* (name, pkg) {
   var diffNpmMaintainers = [];
 
   // [
-  //   { name, version, _hasShrinkwrap }
+  //   { name, version, _hasShrinkwrap(boolean), peerDependenciesMeta(object), os(array), cpu(array), workspaces(array) }
   // ]
   var missingAbbreviatedMetadatas = [];
   // [
@@ -1056,16 +1074,32 @@ SyncModuleWorker.prototype._sync = function* (name, pkg) {
           });
           changedVersions[v] = 1;
         }
+
         // find missing abbreviatedMetadata
         if (abbreviatedMetadata) {
           for (var key in abbreviatedMetadata) {
-            if (!(key in exists.package) || abbreviatedMetadata[key] !== exists.package[key]) {
-              missingAbbreviatedMetadatas.push(Object.assign({
-                id: exists.id,
-                name: exists.package.name,
-                version: exists.package.version,
-              }, abbreviatedMetadata));
-              break;
+            const value = abbreviatedMetadata[key];
+            // boolean: _hasShrinkwrap
+            if (key === '_hasShrinkwrap' && typeof value === 'boolean') {
+              if (!(key in exists.package) || abbreviatedMetadata[key] !== exists.package[key]) {
+                missingAbbreviatedMetadatas.push(Object.assign({
+                  id: exists.id,
+                  name: exists.package.name,
+                  version: exists.package.version,
+                }, abbreviatedMetadata));
+                break;
+              }
+            } else if (Array.isArray(value) || (typeof value === 'object' && value)) {
+              // array: os, cpu, workspaces
+              // object: peerDependenciesMeta
+              if (existsModuleAbbreviated && !(key in existsModuleAbbreviated.package)) {
+                missingAbbreviatedMetadatas.push(Object.assign({
+                  id: exists.id,
+                  name: exists.package.name,
+                  version: exists.package.version,
+                }, abbreviatedMetadata));
+                break;
+              }
             }
           }
         }
