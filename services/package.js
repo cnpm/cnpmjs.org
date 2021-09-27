@@ -406,7 +406,7 @@ exports.updateModulePackageFields = function* (id, fields) {
 };
 
 exports.updateModuleAbbreviatedPackage = function* (item) {
-  // item => { id, name, version, _hasShrinkwrap, os, cpu, peerDependenciesMeta }
+  // item => { id, name, version, _hasShrinkwrap, os, cpu, peerDependenciesMeta, workspaces }
   var mod = yield models.ModuleAbbreviated.findByNameAndVersion(item.name, item.version);
   if (!mod) {
     return null;

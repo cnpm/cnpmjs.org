@@ -864,18 +864,23 @@ SyncModuleWorker.prototype._sync = function* (name, pkg) {
         for (var version in versions) {
           const item = versions[version];
           if (!item) continue;
-          if (typeof item._hasShrinkwrap === 'boolean'
-              || 'peerDependenciesMeta' in item
-              || 'os' in item
-              || 'cpu' in item
-              || 'workspaces' in item) {
-            remoteAbbreviatedMetadatas[version] = {
-              _hasShrinkwrap: item._hasShrinkwrap,
-              peerDependenciesMeta: item.peerDependenciesMeta,
-              os: item.os,
-              cpu: item.cpu,
-              workspaces: item.workspaces,
-            };
+          let hasMetaData = false;
+          const metaData = {};
+          // _hasShrinkwrap maybe undefined, dont change it
+          if (typeof item._hasShrinkwrap === 'boolean') {
+            hasMetaData = true;
+            metaData._hasShrinkwrap = item._hasShrinkwrap;
+          }
+
+          const metaDataKeys = [ 'peerDependenciesMeta', 'os', 'cpu', 'workspaces' ];
+          for (const key of metaDataKeys) {
+            if (key in item) {
+              hasMetaData = true;
+              metaData[key] = item[key];
+            }
+          }
+          if (hasMetaData) {
+            remoteAbbreviatedMetadatas[version] = metaData;
           }
         }
       }
