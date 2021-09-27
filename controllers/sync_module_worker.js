@@ -1078,7 +1078,7 @@ SyncModuleWorker.prototype._sync = function* (name, pkg) {
           for (var key in abbreviatedMetadata) {
             const value = abbreviatedMetadata[key];
             // boolean: _hasShrinkwrap
-            if (typeof value === 'boolean') {
+            if (key === '_hasShrinkwrap' && typeof value === 'boolean') {
               if (!(key in exists.package) || abbreviatedMetadata[key] !== exists.package[key]) {
                 missingAbbreviatedMetadatas.push(Object.assign({
                   id: exists.id,
@@ -1088,7 +1088,7 @@ SyncModuleWorker.prototype._sync = function* (name, pkg) {
                 break;
               }
             } else if (Array.isArray(value)) {
-              // array: os, cpu, peerDependenciesMeta
+              // array: os, cpu, peerDependenciesMeta, workspaces
               if (existsModuleAbbreviated && !(key in existsModuleAbbreviated.package)) {
                 missingAbbreviatedMetadatas.push(Object.assign({
                   id: exists.id,
