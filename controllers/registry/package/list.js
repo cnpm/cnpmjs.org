@@ -398,6 +398,7 @@ function* handleAbbreviatedMetaRequestWithFullMeta(ctx, name, modifiedTime, tags
       directories: row.package.directories,
       dist: row.package.dist,
       engines: row.package.engines,
+      workspaces: row.package.workspaces,
       _hasShrinkwrap: row.package._hasShrinkwrap,
       publish_time: row.package.publish_time || row.publish_time,
     };
