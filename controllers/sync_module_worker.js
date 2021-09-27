@@ -863,7 +863,9 @@ SyncModuleWorker.prototype._sync = function* (name, pkg) {
         var versions = data && data.versions || {};
         for (var version in versions) {
           const item = versions[version];
-          if (!item) continue;
+          if (!item) {
+            continue;
+          }
           let hasMetaData = false;
           const metaData = {};
           // _hasShrinkwrap maybe undefined, dont change it

@@ -356,11 +356,10 @@ exports.findAllModuleAbbreviateds = function* (where, order, limit, offset) {
 
 // https://github.com/npm/registry/blob/master/docs/responses/package-metadata.md#abbreviated-version-object
 exports.saveModuleAbbreviated = function* (mod) {
-  var pkg = JSON.stringify({
-    ...mod.package,
+  var pkg = JSON.stringify(Object.assign({}, mod.package, {
     // ignore readme force
     readme: undefined,
-  });
+  }));
   var publish_time = mod.publish_time || Date.now();
   var item = yield models.ModuleAbbreviated.findByNameAndVersion(mod.name, mod.version);
   if (!item) {

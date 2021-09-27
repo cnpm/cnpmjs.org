@@ -146,6 +146,79 @@ describe('test/controllers/sync_module_worker.test.js', () => {
     yield end();
   });
 
+  it('should sync mk2test-module-cnpmsync add os, cpu success', function* () {
+    mm(config, 'enableAbbreviatedMetadata', true);
+    mm(config, 'sourceNpmRegistry', 'https://registry.npmjs.com');
+    var log = yield logService.create({
+      name: 'mk2test-module-cnpmsync',
+      username: 'fengmk2',
+    });
+    log.id.should.above(0);
+    var worker = new SyncModuleWorker({
+      logId: log.id,
+      name: 'mk2test-module-cnpmsync',
+      username: 'fengmk2',
+      noDep: true,
+    });
+    worker.start();
+    var end = thunkify.event(worker, 'end');
+    yield end();
+
+    let pkg;
+    function checkResult() {
+      return function (done) {
+        request(app)
+        .get('/mk2test-module-cnpmsync')
+        .set('accept', 'application/vnd.npm.install-v1+json')
+        .expect(function (res) {
+          // console.log(JSON.stringify(res.body, null, 2));
+          pkg = res.body.versions['1.0.0'];
+          assert(pkg.os[0] === 'linux');
+          assert(pkg.cpu[0] === 'x64');
+        })
+        .expect(200, done);
+      };
+    }
+    yield checkResult();
+
+    // modify result
+    yield packageService.updateModuleAbbreviatedPackage({
+      name: pkg.name,
+      version: pkg.version,
+      os: undefined,
+      cpu: undefined,
+    });
+
+    function checkModifiyResult() {
+      return function (done) {
+        request(app)
+        .get('/mk2test-module-cnpmsync')
+        .set('accept', 'application/vnd.npm.install-v1+json')
+        .expect(function (res) {
+          // console.log(JSON.stringify(res.body, null, 2));
+          assert(!res.body.versions['1.0.0'].os);
+          assert(!res.body.versions['1.0.0'].cpu);
+        })
+        .expect(200, done);
+      };
+    }
+    yield checkModifiyResult();
+
+    // sync again
+    worker = new SyncModuleWorker({
+      logId: log.id,
+      name: 'mk2test-module-cnpmsync',
+      username: 'fengmk2',
+      noDep: true,
+    });
+    worker.start();
+    end = thunkify.event(worker, 'end');
+    yield end();
+
+    // check again still work
+    yield checkResult();
+  });
+
   it('should sync upstream first', function* () {
     mm(config, 'sourceNpmRegistryIsCNpm', true);
     var log = yield logService.create({
