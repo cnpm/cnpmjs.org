@@ -165,6 +165,7 @@ describe('test/controllers/sync_module_worker.test.js', () => {
     yield end();
 
     let pkg;
+    let pkgV2;
     function checkResult() {
       return function (done) {
         request(app)
@@ -175,6 +176,11 @@ describe('test/controllers/sync_module_worker.test.js', () => {
           pkg = res.body.versions['1.0.0'];
           assert(pkg.os[0] === 'linux');
           assert(pkg.cpu[0] === 'x64');
+          assert(!pkg.peerDependenciesMeta);
+          pkgV2 = res.body.versions['2.0.0'];
+          assert(pkgV2.os[0] === 'linux');
+          assert(pkgV2.cpu[0] === 'x64');
+          assert(pkgV2.peerDependenciesMeta);
         })
         .expect(200, done);
       };
@@ -187,6 +193,15 @@ describe('test/controllers/sync_module_worker.test.js', () => {
       version: pkg.version,
       os: undefined,
       cpu: undefined,
+      peerDependenciesMeta: undefined,
+    });
+
+    yield packageService.updateModuleAbbreviatedPackage({
+      name: pkgV2.name,
+      version: pkgV2.version,
+      os: undefined,
+      cpu: undefined,
+      peerDependenciesMeta: undefined,
     });
 
     function checkModifiyResult() {
@@ -198,6 +213,7 @@ describe('test/controllers/sync_module_worker.test.js', () => {
           // console.log(JSON.stringify(res.body, null, 2));
           assert(!res.body.versions['1.0.0'].os);
           assert(!res.body.versions['1.0.0'].cpu);
+          assert(!res.body.versions['2.0.0'].peerDependenciesMeta);
         })
         .expect(200, done);
       };
