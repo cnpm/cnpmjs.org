@@ -167,13 +167,14 @@ describe('test/controllers/sync_module_worker.test.js', () => {
     let pkg;
     let pkgV2;
     let pkgV3;
+    let lastResHeaders;
     function checkResult() {
       return function (done) {
         request(app)
         .get('/mk2test-module-cnpmsync')
         .set('accept', 'application/vnd.npm.install-v1+json')
         .expect(function (res) {
-          // console.log(JSON.stringify(res.body, null, 2));
+          lastResHeaders = res.headers;
           pkg = res.body.versions['1.0.0'];
           assert(pkg.os[0] === 'linux');
           assert(pkg.cpu[0] === 'x64');
@@ -191,6 +192,10 @@ describe('test/controllers/sync_module_worker.test.js', () => {
       };
     }
     yield checkResult();
+    const oldEtag = lastResHeaders.etag;
+    // check etag keep same again
+    yield checkResult();
+    assert(oldEtag == lastResHeaders.etag);
 
     // modify result
     yield packageService.updateModuleAbbreviatedPackage({
@@ -244,6 +249,12 @@ describe('test/controllers/sync_module_worker.test.js', () => {
 
     // check again still work
     yield checkResult();
+    const newEtag = lastResHeaders.etag;
+    assert(newEtag !== oldEtag);
+
+    // check etag keep same again
+    yield checkResult();
+    assert(newEtag == lastResHeaders.etag);
   });
 
   it('should sync upstream first', function* () {
