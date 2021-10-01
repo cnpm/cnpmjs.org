@@ -307,6 +307,10 @@ function* handleAbbreviatedMetaRequest(ctx, name, modifiedTime, tags, rows, cach
     if ((!distTags.latest && !latestMod) || distTags.latest === pkg.version) {
       latestMod = row;
     }
+    // abbreviatedMeta row maybe update by syncer on missing attributes add
+    if (!modifiedTime || row.gmt_modified > modifiedTime) {
+      modifiedTime = row.gmt_modified;
+    }
   }
 
   if (!latestMod) {
