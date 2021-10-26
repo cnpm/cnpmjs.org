@@ -5,6 +5,7 @@ var sleep = require('co-sleep');
 var Package = require('../../services/package');
 var utils = require('../utils');
 var common = require('../../services/common');
+var assert = require('assert');
 
 describe('test/services/package.test.js', function () {
   describe('addModuleTag()', function () {
@@ -542,6 +543,56 @@ describe('test/services/package.test.js', function () {
       users.should.eql([]);
       names = yield Package.listUserStarModuleNames('addStar-user');
       names.should.eql([]);
+    });
+  });
+  
+  describe('saveModuleAbbreviated()', function () {
+    it('should sork', function* () {
+      var sourcePackage = require('../fixtures/0.3.6.json');
+      var mod = {
+        version: sourcePackage.version,
+        name: sourcePackage.name,
+        package: sourcePackage,
+        author: 'unittest',
+        publish_time: sourcePackage.publish_time || Date.now(),
+      };
+      var dist = {
+        tarball: 'http://registry.npmjs.org/he/-/he-0.3.6.tgz',
+        shasum: '9d7bc446e77963933301dd602d5731cb861135e0',
+        size: 100,
+      };
+      mod.package.dist = dist;
+      var result = yield Package.saveModuleAbbreviated(mod);
+      result.id.should.be.a.Number();
+      var items = yield Package.findAllModuleAbbreviateds({
+        id: result.id,
+      });
+      var pkg = JSON.parse(items[0].package);
+      assert.deepStrictEqual(pkg, {
+        name: 'he',
+        version: '0.3.6',
+        dependencies: {},
+        devDependencies: {
+          grunt: '~0.4.1',
+          'grunt-shell': '~0.3.1',
+          'grunt-template': '~0.2.0',
+          istanbul: '~0.1.43',
+          jsesc: '~0.4.1',
+          lodash: '~1.3.1',
+          'qunit-clib': '~1.3.0',
+          qunitjs: '~1.11.0',
+          regenerate: '~0.5.2',
+          requirejs: '~2.1.8'
+        },
+        bin: { he: 'bin/he' },
+        directories: { test: 'tests' },
+        dist: {
+          tarball: 'http://registry.npmjs.org/he/-/he-0.3.6.tgz',
+          shasum: '9d7bc446e77963933301dd602d5731cb861135e0',
+          size: 100
+        },
+        scripts: { test: 'node tests/tests.js' }
+      });
     });
   });
 });

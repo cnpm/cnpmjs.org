@@ -348,7 +348,7 @@ exports.findAllModuleAbbreviateds = function* (where, order, limit, offset) {
     order,
     limit,
     offset,
-    attributes: [ 'name', 'version', 'publish_time', 'gmt_modified'  ],
+    attributes: [ 'name', 'version', 'publish_time', 'gmt_modified', 'package'  ],
   };
   const rows = yield models.ModuleAbbreviated.findAll(params);
   return rows;
