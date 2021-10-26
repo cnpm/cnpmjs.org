@@ -112,6 +112,7 @@ exports.createModule = function* (name, version, user, tag) {
     package: sourcePackage,
     author: user || 'unittest',
     publish_time: sourcePackage.publish_time,
+    scripts: { install: 'xxxxx' },
   };
   var dist = {
     tarball: 'http://registry.npmjs.org/' + name + '/-/' + name + '-' + version + '.tgz',
