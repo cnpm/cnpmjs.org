@@ -6,6 +6,7 @@ var Package = require('../../services/package');
 var utils = require('../utils');
 var common = require('../../services/common');
 var assert = require('assert');
+const { packagephobiaSupportPrivatePackage } = require('../../config');
 
 describe('test/services/package.test.js', function () {
   describe('addModuleTag()', function () {
@@ -571,6 +572,24 @@ describe('test/services/package.test.js', function () {
       assert.deepStrictEqual(pkg, {
         name: 'he',
         version: '0.3.6',
+        description: 'A robust HTML entities encoder/decoder with full Unicode support.',
+        homepage: 'http://mths.be/he',
+        main: 'he.js',
+        bin: { he: 'bin/he' },
+        man: [ 'man/he.1' ],
+        keywords: [
+          'string',  'entities',
+          'entity',  'html',
+          'encode',  'decode',
+          'unicode'
+        ],
+        licenses: [ { type: 'MIT', url: 'http://mths.be/mit' } ],
+        author: { name: 'Mathias Bynens', url: 'http://mathiasbynens.be/' },
+        repository: { type: 'git', url: 'https://github.com/mathiasbynens/he.git' },
+        bugs: { url: 'https://github.com/mathiasbynens/he/issues' },
+        files: [ 'LICENSE-MIT.txt', 'he.js', 'bin/', 'man/' ],
+        directories: { test: 'tests' },
+        scripts: { test: 'node tests/tests.js' },
         dependencies: {},
         devDependencies: {
           grunt: '~0.4.1',
@@ -584,14 +603,17 @@ describe('test/services/package.test.js', function () {
           regenerate: '~0.5.2',
           requirejs: '~2.1.8'
         },
-        bin: { he: 'bin/he' },
-        directories: { test: 'tests' },
+        readmeFilename: 'README.md',
+        _id: 'he@0.3.6',
         dist: {
           tarball: 'http://registry.npmjs.org/he/-/he-0.3.6.tgz',
           shasum: '9d7bc446e77963933301dd602d5731cb861135e0',
           size: 100
         },
-        scripts: { test: 'node tests/tests.js' }
+        _from: '.',
+        _npmVersion: '1.2.32',
+        _npmUser: { name: 'mathias', email: 'mathias@qiwi.be' },
+        maintainers: [ { name: 'mathias', email: 'mathias@qiwi.be' } ]
       });
     });
   });
