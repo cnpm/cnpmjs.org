@@ -95,7 +95,7 @@ exports.getDownloadTotal = function* (name) {
     }
   }
   if (name) {
-    download.total = yield downloadTotalService.getTotalByName();
+    download.total = yield downloadTotalService.getTotalByName(name);
   }
   return download;
 };
