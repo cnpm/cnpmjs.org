@@ -1,4 +1,15 @@
 
+3.0.0-rc.50 / 2021-11-04
+==================
+
+**features**
+  * [[`e4c3cd1`](http://github.com/cnpm/cnpmjs.org/commit/e4c3cd125ebe771ecc31b4a207ab926c13817f16)] - feat: package view add download total count (#1673) (Solais <<924615994@qq.com>>)
+  * [[`283f149`](http://github.com/cnpm/cnpmjs.org/commit/283f14976dae8ce9144d387533d1637a79c6cf12)] - feat: add missing abbreviated meta attibutes (#1668) (fengmk2 <<fengmk2@gmail.com>>)
+
+**fixes**
+  * [[`62fdbd4`](http://github.com/cnpm/cnpmjs.org/commit/62fdbd400a2259983c6793173ac8d816a732452c)] - fix: should update etag after abbreviated meta change (#1670) (fengmk2 <<fengmk2@gmail.com>>)
+  * [[`2e7354c`](http://github.com/cnpm/cnpmjs.org/commit/2e7354c647d78a41f033f2066c6eb60e270f2a6b)] - fix: allow download without scope filename (#1665) (killa <<killa123@126.com>>)
+
 3.0.0-rc.46 / 2021-09-10
 ==================
 
