@@ -386,6 +386,13 @@ function* handleAbbreviatedMetaRequestWithFullMeta(ctx, name, modifiedTime, tags
       continue;
     }
     // https://github.com/npm/registry/blob/master/docs/responses/package-metadata.md#abbreviated-version-object
+    var hasInstallScript;
+    if (row.package.scripts) {
+      // https://www.npmjs.com/package/fix-has-install-script
+      if (row.package.scripts.install || row.package.scripts.preinstall || row.package.scripts.postinstall) {
+        hasInstallScript = true;
+      }
+    }
     var pkg = {
       name: row.package.name,
       version: row.package.version,
@@ -404,6 +411,7 @@ function* handleAbbreviatedMetaRequestWithFullMeta(ctx, name, modifiedTime, tags
       engines: row.package.engines,
       workspaces: row.package.workspaces,
       _hasShrinkwrap: row.package._hasShrinkwrap,
+      hasInstallScript: hasInstallScript,
       publish_time: row.package.publish_time || row.publish_time,
     };
     common.setDownloadURL(pkg, ctx);

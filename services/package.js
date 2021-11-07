@@ -355,11 +355,22 @@ exports.findAllModuleAbbreviateds = function* (where, order, limit, offset) {
 };
 
 // https://github.com/npm/registry/blob/master/docs/responses/package-metadata.md#abbreviated-version-object
-exports.saveModuleAbbreviated = function* (mod) {
-  var pkg = JSON.stringify(Object.assign({}, mod.package, {
-    // ignore readme force
-    readme: undefined,
-  }));
+exports.saveModuleAbbreviated = function* (mod, remoteAbbreviatedVersion) {
+  // try to use remoteAbbreviatedVersion first
+  var pkg;
+  if (remoteAbbreviatedVersion) {
+    pkg = Object.assign({}, remoteAbbreviatedVersion, {
+      // override remote tarball
+      dist: Object.assign({}, remoteAbbreviatedVersion.dist, mod.package.dist, {
+        noattachment: undefined,
+      }),
+    });
+  } else {
+    pkg = Object.assign({}, mod.package, {
+      // ignore readme force
+      readme: undefined,
+    });
+  }
   var publish_time = mod.publish_time || Date.now();
   var item = yield models.ModuleAbbreviated.findByNameAndVersion(mod.name, mod.version);
   if (!item) {
@@ -369,7 +380,7 @@ exports.saveModuleAbbreviated = function* (mod) {
     });
   }
   item.publish_time = publish_time;
-  item.package = pkg;
+  item.package = JSON.stringify(pkg);
 
   if (item.changed()) {
     item = yield item.save();
