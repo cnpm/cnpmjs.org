@@ -30,7 +30,7 @@ Our goal is to provide a low cost maintenance, easy to use, and easy to scale so
 ## What can you do with `cnpmjs.org`?
 
 * Build a private npm for your own enterprise. ([alibaba](http://www.alibaba.com/) is using `cnpmjs.org` now)
-* Build a npm mirror. (we use it to build a mirror in China: [https://npm.taobao.org/](https://npm.taobao.org/))
+* Build a npm mirror. (we use it to build a mirror in China: [https://npmmirror.com/](https://npmmirror.com/))
 * Use the private npm service provided by Alibaba Cloud DevOps which build with cnpm. [https://packages.aliyun.com/](https://packages.aliyun.com/?channel=pd_cnpm_github)
 
 ## Features
@@ -66,7 +66,7 @@ you only need to change the registry in client config.
 
 * [node](http://nodejs.org) >= 8.0.0
 * Databases: only required one type
-  * [sqlite3](https://npm.taobao.org/package/sqlite3) >= 3.0.2, we use `sqlite3` by default
+  * [sqlite3](https://npmmirror.com/package/sqlite3) >= 3.0.2, we use `sqlite3` by default
   * [MySQL](http://dev.mysql.com/downloads/) >= 5.6.16, include `mysqld` and `mysql cli`. I test on `mysql@5.6.16`.
   * MariaDB
   * PostgreSQL

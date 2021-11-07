@@ -12,7 +12,7 @@ WORKDIR ${CNPM_DIR}
 
 COPY package.json ${CNPM_DIR}
 
-RUN npm set registry https://registry.npm.taobao.org
+RUN npm set registry https://registry.npmmirror.com
 
 RUN npm install --production
 

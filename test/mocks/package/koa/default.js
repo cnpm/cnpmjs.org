@@ -5,7 +5,7 @@ module.exports = {
     name: 'koa',
     version: '0.13.0',
     description: 'description: Koa web app framework',
-    registryUrl: 'https://registry.npm.taobao.org/koa',
+    registryUrl: 'https://registry.npmmirror.com/koa',
     engines: {
       node: {
         version: '>= 0.11.13',

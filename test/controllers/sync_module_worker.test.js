@@ -257,6 +257,49 @@ describe('test/controllers/sync_module_worker.test.js', () => {
     assert(newEtag == lastResHeaders.etag);
   });
 
+  it('should sync mk2test-module-cnpmsync-issue-1667 with remoteAbbreviatedVersion success', function* () {
+    mm(config, 'enableAbbreviatedMetadata', true);
+    mm(config, 'sourceNpmRegistry', 'https://registry.npmjs.com');
+    var log = yield logService.create({
+      name: 'mk2test-module-cnpmsync-issue-1667',
+      username: 'fengmk2',
+    });
+    log.id.should.above(0);
+    var worker = new SyncModuleWorker({
+      logId: log.id,
+      name: 'mk2test-module-cnpmsync-issue-1667',
+      username: 'fengmk2',
+      noDep: true,
+    });
+    worker.start();
+    var end = thunkify.event(worker, 'end');
+    yield end();
+
+    let pkg;
+    let pkgV2;
+    let pkgV3;
+    let lastResHeaders;
+    function checkResult() {
+      return function (done) {
+        request(app)
+        .get('/mk2test-module-cnpmsync-issue-1667')
+        .set('accept', 'application/vnd.npm.install-v1+json')
+        .expect(function (res) {
+          lastResHeaders = res.headers;
+          console.log('%j', res.body);
+          pkg = res.body.versions['3.0.0'];
+          assert(pkg.hasInstallScript === true);
+          // no scripts
+          assert(!pkg.scripts);
+          assert(pkg.dist.key === '/mk2test-module-cnpmsync-issue-1667/-/mk2test-module-cnpmsync-issue-1667-3.0.0.tgz');
+          assert(!('noattachment' in pkg.dist));
+        })
+        .expect(200, done);
+      };
+    }
+    yield checkResult();
+  });
+
   it('should sync upstream first', function* () {
     mm(config, 'sourceNpmRegistryIsCNpm', true);
     var log = yield logService.create({

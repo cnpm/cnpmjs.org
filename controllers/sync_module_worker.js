@@ -841,6 +841,8 @@ SyncModuleWorker.prototype._sync = function* (name, pkg) {
 
   // get package AbbreviatedMetadata
   var remoteAbbreviatedMetadatas = {};
+  // store remote abbreviated versions
+  var remoteAbbreviatedVersionsMap = {};
   if (config.enableAbbreviatedMetadata) {
     // use ?cache=0 tell registry dont use cache result
     var packageUrl = '/' + name.replace('/', '%2f') + '?cache=0&sync_timestamp=' + Date.now();
@@ -860,9 +862,9 @@ SyncModuleWorker.prototype._sync = function* (name, pkg) {
           name, err, result.headers, result.data);
       }
       if (data) {
-        var versions = data && data.versions || {};
-        for (var version in versions) {
-          const item = versions[version];
+        remoteAbbreviatedVersionsMap = data && data.versions || {};
+        for (var version in remoteAbbreviatedVersionsMap) {
+          const item = remoteAbbreviatedVersionsMap[version];
           if (!item) {
             continue;
           }
@@ -874,7 +876,8 @@ SyncModuleWorker.prototype._sync = function* (name, pkg) {
             metaData._hasShrinkwrap = item._hasShrinkwrap;
           }
 
-          const metaDataKeys = [ 'peerDependenciesMeta', 'os', 'cpu', 'workspaces' ];
+          // https://github.com/cnpm/cnpmjs.org/issues/1667
+          const metaDataKeys = [ 'peerDependenciesMeta', 'os', 'cpu', 'workspaces', 'hasInstallScript' ];
           for (const key of metaDataKeys) {
             if (key in item) {
               hasMetaData = true;
@@ -1079,8 +1082,8 @@ SyncModuleWorker.prototype._sync = function* (name, pkg) {
         if (abbreviatedMetadata) {
           for (var key in abbreviatedMetadata) {
             const value = abbreviatedMetadata[key];
-            // boolean: _hasShrinkwrap
-            if (key === '_hasShrinkwrap' && typeof value === 'boolean') {
+            // boolean: _hasShrinkwrap, hasInstallScript
+            if ((key === '_hasShrinkwrap' || key === 'hasInstallScript') && typeof value === 'boolean') {
               if (!(key in exists.package) || abbreviatedMetadata[key] !== exists.package[key]) {
                 missingAbbreviatedMetadatas.push(Object.assign({
                   id: exists.id,
@@ -1171,7 +1174,7 @@ SyncModuleWorker.prototype._sync = function* (name, pkg) {
     var tries = 3;
     while (true) {
       try {
-        yield that._syncOneVersion(index, syncModule);
+        yield that._syncOneVersion(index, syncModule, remoteAbbreviatedVersionsMap[syncModule.version]);
         syncedVersionNames.push(syncModule.version);
         break;
       } catch (err) {
@@ -1322,7 +1325,7 @@ SyncModuleWorker.prototype._sync = function* (name, pkg) {
     that.log('  [%s] saving %d missing moduleAbbreviateds', name, missingModuleAbbreviateds.length);
 
     var res = yield gather(missingModuleAbbreviateds.map(function (item) {
-      return packageService.saveModuleAbbreviated(item);
+      return packageService.saveModuleAbbreviated(item, remoteAbbreviatedVersionsMap[item.version]);
     }));
 
     for (var i = 0; i < res.length; i++) {
@@ -1541,7 +1544,7 @@ SyncModuleWorker.prototype._sync = function* (name, pkg) {
   return syncedVersionNames;
 };
 
-SyncModuleWorker.prototype._syncOneVersion = function *(versionIndex, sourcePackage) {
+SyncModuleWorker.prototype._syncOneVersion = function *(versionIndex, sourcePackage, remoteAbbreviatedVersion) {
   var delay = Date.now() - sourcePackage.publish_time;
   logger.syncInfo('[sync_module_worker] delay: %s ms, publish_time: %s, start sync %s@%s',
     delay, utility.logDate(new Date(sourcePackage.publish_time)),
@@ -1678,7 +1681,7 @@ SyncModuleWorker.prototype._syncOneVersion = function *(versionIndex, sourcePack
       throw err;
     }
     logger.syncInfo('[sync_module_worker] uploaded, saving %j to database', result);
-    var r = yield afterUpload(result);
+    var r = yield afterUpload(result, remoteAbbreviatedVersion);
     logger.syncInfo('[sync_module_worker] sync %s@%s done!',
       sourcePackage.name, sourcePackage.version);
     return r;
@@ -1687,7 +1690,7 @@ SyncModuleWorker.prototype._syncOneVersion = function *(versionIndex, sourcePack
     fs.unlink(filepath, utility.noop);
   }
 
-  function *afterUpload(result) {
+  function *afterUpload(result, remoteAbbreviatedVersion) {
     //make sure sync module have the correct author info
     //only if can not get maintainers, use the username
     var author = username;
@@ -1731,7 +1734,7 @@ SyncModuleWorker.prototype._syncOneVersion = function *(versionIndex, sourcePack
     var r = yield packageService.saveModule(mod);
     var moduleAbbreviatedId = null;
     if (config.enableAbbreviatedMetadata) {
-      var moduleAbbreviatedResult = yield packageService.saveModuleAbbreviated(mod);
+      var moduleAbbreviatedResult = yield packageService.saveModuleAbbreviated(mod, remoteAbbreviatedVersion);
       moduleAbbreviatedId = moduleAbbreviatedResult.id;
     }
 
