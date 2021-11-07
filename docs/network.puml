@@ -1,6 +1,6 @@
 @startuml
 
-title cnpmjs.org, npm.taobao.org Network
+title cnpmjs.org, npmmirror.com Network
 
 node "China User" {
   [cnpm cli]
@@ -11,8 +11,8 @@ node "OSS: aliyuncs.com" {
 }
 
 node "SLB: 114.55.80.225 Hangzhou" {
-  [npm.taobao.org]
-  [registry.npm.taobao.org]
+  [npmmirror.com]
+  [registry.npmmirror.com]
 }
 
 node "npmtaobao3: 121.41.*" {
@@ -38,7 +38,7 @@ node "cnpm6: 47.88.189.193 Singapore" {
 }
 
 node "Aliyun CDN" {
-  [cdn.npm.taobao.org]
+  [oss.npmmirror.com]
 }
 
 node "qiniu CDN" {
@@ -59,17 +59,17 @@ node "npmjs.com" {
   [www.npmjs.com]
 }
 
-[cnpm cli] -down-> [registry.npm.taobao.org]: Read, Write
-[cnpm cli] -down-> [cdn.npm.taobao.org]: Read tgz
-[cnpm cli] -down-> [npm.taobao.org]: "Read /mirrors"
+[cnpm cli] -down-> [registry.npmmirror.com]: Read, Write
+[cnpm cli] -down-> [oss.npmmirror.com]: Read tgz
+[cnpm cli] -down-> [npmmirror.com]: "Read /mirrors"
 
-[registry.npm.taobao.org] -down-> [nginx 5]
+[registry.npmmirror.com] -down-> [nginx 5]
 [nginx 5] -down-> [registry 5]
-[npm.taobao.org] -down-> [nginx 5]
+[npmmirror.com] -down-> [nginx 5]
 [nginx 5] -down-> [web 5]
-[registry.npm.taobao.org] -down-> [nginx 6]
+[registry.npmmirror.com] -down-> [nginx 6]
 [nginx 6] -down-> [registry 6]
-[npm.taobao.org] -down-> [nginx 6]
+[npmmirror.com] -down-> [nginx 6]
 [nginx 6] -down-> [web 6]
 
 [registry 5] -down-> [rds2860*.mysql.rds.aliyuncs.com]: Read, Write
@@ -92,7 +92,7 @@ node "npmjs.com" {
 [syncer 7] -down-> [cnpmjs.up.qiniu.com]: Write
 [syncer 7] -down-> [registry.npmjs.com]: Read
 
-[cdn.npm.taobao.org] -down-> [tnpm-hz.oss-cn-hangzhou]: Read
+[oss.npmmirror.com] -down-> [tnpm-hz.oss-cn-hangzhou]: Read
 [dn-cnpm.qbox.me] -down-> [cnpmjs.up.qiniu.com]: Read
 
 @enduml
