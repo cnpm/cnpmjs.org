@@ -10,7 +10,8 @@
     "start": "./bin/nodejsctl start && cp History.md docs/web/history.md",
     "status": "./bin/nodejsctl status",
     "stop": "./bin/nodejsctl stop",
-    "ci": "make test-travis-mysql"
+    "ci": "make test-travis-mysql",
+    "contributor": "git-contributor"
   },
   "bin": {
     "cnpmjs.org": "bin/cli.js"
@@ -78,6 +79,7 @@
     "chunkstream": "*",
     "contributors": "*",
     "egg-ci": "^1.18.0",
+    "git-contributor": "^1.0.10",
     "intelli-espower-loader": "^1.0.1",
     "istanbul": "*",
     "jshint": "*",
@@ -115,10 +117,6 @@
   "engines": {
     "node": ">= 8.0.0"
   },
-  "author": [
-    "fengmk2 <fengmk2@gmail.com> (http://fengmk2.com)",
-    "dead_horse <dead_horse@qq.com> (http://deadhorse.me)"
-  ],
   "ci": {
     "type": "github",
     "os": {

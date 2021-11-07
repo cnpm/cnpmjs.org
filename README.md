@@ -2,15 +2,13 @@ cnpmjs.org
 =======
 
 [![npm version][npm-image]][npm-url]
-[![build status][travis-image]][travis-url]
+[![Node.js CI](https://github.com/cnpm/cnpmjs.org/actions/workflows/nodejs.yml/badge.svg)](https://github.com/cnpm/cnpmjs.org/actions/workflows/nodejs.yml)
 [![Test coverage][codecov-image]][codecov-url]
 [![Known Vulnerabilities][snyk-image]][snyk-url]
 [![npm download][download-image]][download-url]
 
 [npm-image]: http://cnpmjs.org/badge/v/cnpmjs.org.svg?style=flat-square
 [npm-url]: http://cnpmjs.org/package/cnpmjs.org
-[travis-image]: https://img.shields.io/travis/cnpm/cnpmjs.org.svg?style=flat-square
-[travis-url]: https://travis-ci.org/cnpm/cnpmjs.org
 [codecov-image]: https://codecov.io/gh/cnpm/cnpmjs.org/branch/master/graph/badge.svg
 [codecov-url]: https://codecov.io/gh/cnpm/cnpmjs.org
 [snyk-image]: https://snyk.io/test/npm/cnpmjs.org/badge.svg?style=flat-square
@@ -157,19 +155,6 @@ $docker volume inspect cnpmjsorg_cnpm-db-volume
 
 Tips: make sure your code is following the [node-style-guide](https://github.com/felixge/node-style-guide).
 
-## Top contributors
-
-
-[![0](https://sourcerer.io/fame/fengmk2/cnpm/cnpmjs.org/images/0)](https://sourcerer.io/fame/fengmk2/cnpm/cnpmjs.org/links/0)
-[![1](https://sourcerer.io/fame/fengmk2/cnpm/cnpmjs.org/images/1)](https://sourcerer.io/fame/fengmk2/cnpm/cnpmjs.org/links/1)
-[![2](https://sourcerer.io/fame/fengmk2/cnpm/cnpmjs.org/images/2)](https://sourcerer.io/fame/fengmk2/cnpm/cnpmjs.org/links/2)
-[![3](https://sourcerer.io/fame/fengmk2/cnpm/cnpmjs.org/images/3)](https://sourcerer.io/fame/fengmk2/cnpm/cnpmjs.org/links/3)
-[![4](https://sourcerer.io/fame/fengmk2/cnpm/cnpmjs.org/images/4)](https://sourcerer.io/fame/fengmk2/cnpm/cnpmjs.org/links/4)
-[![5](https://sourcerer.io/fame/fengmk2/cnpm/cnpmjs.org/images/5)](https://sourcerer.io/fame/fengmk2/cnpm/cnpmjs.org/links/5)
-[![6](https://sourcerer.io/fame/fengmk2/cnpm/cnpmjs.org/images/6)](https://sourcerer.io/fame/fengmk2/cnpm/cnpmjs.org/links/6)
-[![7](https://sourcerer.io/fame/fengmk2/cnpm/cnpmjs.org/images/7)](https://sourcerer.io/fame/fengmk2/cnpm/cnpmjs.org/links/7)
-
-
 ## Sponsors
 
 - [![阿里云](https://static.aliyun.com/images/www-summerwind/logo.gif)](http://click.aliyun.com/m/4288/) [![阿里云云效](https://img.alicdn.com/tfs/TB116yt3fb2gK0jSZK9XXaEgFXa-106-20.png)](https://devops.aliyun.com/?channel=pd_cnpm_github) (2016.2 - now)
@@ -177,3 +162,17 @@ Tips: make sure your code is following the [node-style-guide](https://github.com
 ## License
 
 [MIT](LICENSE.txt)
+<!-- GITCONTRIBUTOR_START -->
+
+## Contributors
+
+|[<img src="https://avatars.githubusercontent.com/u/156269?v=4" width="100px;"/><br/><sub><b>fengmk2</b></sub>](https://github.com/fengmk2)<br/>|[<img src="https://avatars.githubusercontent.com/u/985607?v=4" width="100px;"/><br/><sub><b>dead-horse</b></sub>](https://github.com/dead-horse)<br/>|[<img src="https://avatars.githubusercontent.com/u/14790466?v=4" width="100px;"/><br/><sub><b>greenkeeperio-bot</b></sub>](https://github.com/greenkeeperio-bot)<br/>|[<img src="https://avatars.githubusercontent.com/u/543405?v=4" width="100px;"/><br/><sub><b>ibigbug</b></sub>](https://github.com/ibigbug)<br/>|[<img src="https://avatars.githubusercontent.com/u/6897780?v=4" width="100px;"/><br/><sub><b>killagu</b></sub>](https://github.com/killagu)<br/>|[<img src="https://avatars.githubusercontent.com/u/1147375?v=4" width="100px;"/><br/><sub><b>alsotang</b></sub>](https://github.com/alsotang)<br/>|
+| :---: | :---: | :---: | :---: | :---: | :---: |
+|[<img src="https://avatars.githubusercontent.com/u/2842176?v=4" width="100px;"/><br/><sub><b>XadillaX</b></sub>](https://github.com/XadillaX)<br/>|[<img src="https://avatars.githubusercontent.com/u/327019?v=4" width="100px;"/><br/><sub><b>JacksonTian</b></sub>](https://github.com/JacksonTian)<br/>|[<img src="https://avatars.githubusercontent.com/u/11251401?v=4" width="100px;"/><br/><sub><b>Solais</b></sub>](https://github.com/Solais)<br/>|[<img src="https://avatars.githubusercontent.com/u/1134761?v=4" width="100px;"/><br/><sub><b>4simple</b></sub>](https://github.com/4simple)<br/>|[<img src="https://avatars.githubusercontent.com/u/6622122?v=4" width="100px;"/><br/><sub><b>21paradox</b></sub>](https://github.com/21paradox)<br/>|[<img src="https://avatars.githubusercontent.com/u/1294440?v=4" width="100px;"/><br/><sub><b>albertZhang2013</b></sub>](https://github.com/albertZhang2013)<br/>|
+|[<img src="https://avatars.githubusercontent.com/u/6111524?v=4" width="100px;"/><br/><sub><b>ankurk91</b></sub>](https://github.com/ankurk91)<br/>|[<img src="https://avatars.githubusercontent.com/u/1935436?v=4" width="100px;"/><br/><sub><b>huangbowen521</b></sub>](https://github.com/huangbowen521)<br/>|[<img src="https://avatars.githubusercontent.com/u/5365267?v=4" width="100px;"/><br/><sub><b>gwenaelp</b></sub>](https://github.com/gwenaelp)<br/>|[<img src="https://avatars.githubusercontent.com/u/324440?v=4" width="100px;"/><br/><sub><b>KidkArolis</b></sub>](https://github.com/KidkArolis)<br/>|[<img src="https://avatars.githubusercontent.com/u/922240?v=4" width="100px;"/><br/><sub><b>tq0fqeu</b></sub>](https://github.com/tq0fqeu)<br/>|[<img src="https://avatars.githubusercontent.com/u/1587797?v=4" width="100px;"/><br/><sub><b>limianwang</b></sub>](https://github.com/limianwang)<br/>|
+|[<img src="https://avatars.githubusercontent.com/u/900947?v=4" width="100px;"/><br/><sub><b>LoicMahieu</b></sub>](https://github.com/LoicMahieu)<br/>|[<img src="https://avatars.githubusercontent.com/u/3949015?v=4" width="100px;"/><br/><sub><b>nimoc</b></sub>](https://github.com/nimoc)<br/>|[<img src="https://avatars.githubusercontent.com/u/1614482?v=4" width="100px;"/><br/><sub><b>paulvi</b></sub>](https://github.com/paulvi)<br/>|[<img src="https://avatars.githubusercontent.com/u/1422472?v=4" width="100px;"/><br/><sub><b>jpuncle</b></sub>](https://github.com/jpuncle)<br/>|[<img src="https://avatars.githubusercontent.com/u/20092391?v=4" width="100px;"/><br/><sub><b>vincentmrlau</b></sub>](https://github.com/vincentmrlau)<br/>|[<img src="https://avatars.githubusercontent.com/u/4470552?v=4" width="100px;"/><br/><sub><b>stoneChen</b></sub>](https://github.com/stoneChen)<br/>|
+[<img src="https://avatars.githubusercontent.com/u/2196373?v=4" width="100px;"/><br/><sub><b>dickeylth</b></sub>](https://github.com/dickeylth)<br/>|[<img src="https://avatars.githubusercontent.com/u/1941756?v=4" width="100px;"/><br/><sub><b>gniavaj</b></sub>](https://github.com/gniavaj)<br/>|[<img src="https://avatars.githubusercontent.com/u/5040076?v=4" width="100px;"/><br/><sub><b>liyangready</b></sub>](https://github.com/liyangready)<br/>|[<img src="https://avatars.githubusercontent.com/u/970903?v=4" width="100px;"/><br/><sub><b>anhulife</b></sub>](https://github.com/anhulife)<br/>|[<img src="https://avatars.githubusercontent.com/u/1578838?v=4" width="100px;"/><br/><sub><b>lvscar</b></sub>](https://github.com/lvscar)<br/>|[<img src="https://avatars.githubusercontent.com/u/87431?v=4" width="100px;"/><br/><sub><b>wenbing</b></sub>](https://github.com/wenbing)<br/>
+
+This project follows the git-contributor [spec](https://github.com/xudafeng/git-contributor), auto updated at `Sun Nov 07 2021 23:41:23 GMT+0800`.
+
+<!-- GITCONTRIBUTOR_END -->
