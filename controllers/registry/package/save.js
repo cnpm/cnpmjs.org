@@ -1,9 +1,10 @@
 'use strict';
 
 var debug = require('debug')('cnpmjs.org:controllers:registry:package:save');
-var crypto = require('crypto');
+var ssri = require('ssri');
 var deprecateVersions = require('./deprecate');
 var packageService = require('../../../services/package');
+var logger = require('../../../common/logger');
 var common = require('../../../lib/common');
 var nfs = require('../../../common/nfs');
 var config = require('../../../config');
@@ -16,14 +17,42 @@ var hook = require('../../../services/hook');
 //
 // new flows: only one request
 // PUT /:name
-// https://github.com/npm/npm-registry-client/blob/master/lib/publish.js#L84
+// old publish: https://github.com/npm/npm-registry-client/blob/master/lib/publish.js#L84
+// new publish: https://github.com/npm/libnpmpublish/blob/main/publish.js#L91
 module.exports = function* save(next) {
-  // 'dist-tags': { latest: '0.0.2' },
-  //  _attachments:
-  // { 'nae-sandbox-0.0.2.tgz':
-  //    { content_type: 'application/octet-stream',
-  //      data: 'H4sIAAAAA
-  //      length: 9883
+  // {
+  //   "_id": "@cnpm/foo",
+  //   "name": "@cnpm/foo",
+  //   "dist-tags": {
+  //     "latest": "1.0.0"
+  //   },
+  //   "versions": {
+  //     "1.0.0": {
+  //       "name": "@cnpm/foo",
+  //       "version": "1.0.0",
+  //       "dependencies": {
+  //         "xprofiler": "^1.2.6"
+  //       },
+  //       "readme": "ERROR: No README data found!",
+  //       "_id": "@cnpm/foo@1.0.0",
+  //       "_nodeVersion": "16.13.0",
+  //       "_npmVersion": "8.1.0",
+  //       "dist": {
+  //         "integrity": "sha512-7nm0vpDEWs7y+tTwlxd7YnGaBc+9Gk5KaPsx2cqQz6H84ndBXlw5nMxGtL4Uy0bCQIknPAZAVe+KNheInmmJrQ==",
+  //         "shasum": "afd05dcfb8759b9b1c7151492a04f2254365c602",
+  //         "tarball": "http://127.0.0.1:7001/@cnpm/foo/-/@cnpm/foo-1.0.0.tgz"
+  //       }
+  //     }
+  //   },
+  //   "access": null,
+  //   "_attachments": {
+  //     "@cnpm/foo-1.0.0.tgz": {
+  //       "content_type": "application/octet-stream",
+  //       "data": "H4sIAAAAAA...",
+  //       "length": 208
+  //     }
+  //   }
+  // }
   var pkg = this.request.body;
   var username = this.user.name;
   var name = this.params.name || this.params[0];
@@ -150,7 +179,6 @@ module.exports = function* save(next) {
     username, name, version, attachment.length, versionPackage.maintainers, distTags);
 
   var exists = yield packageService.getModule(name, version);
-  var shasum;
   if (exists) {
     this.status = 403;
     const error = '[forbidden] cannot modify pre-existing version: ' + version;
@@ -186,21 +214,60 @@ module.exports = function* save(next) {
     }
   }
 
-  shasum = crypto.createHash('sha1');
-  shasum.update(tarballBuffer);
-  shasum = shasum.digest('hex');
+  var originDist = versionPackage.dist || {};
+  var shasum;
+  var integrity = originDist.integrity;
+  // for content security reason
+  // check integrity
+  if (integrity) {
+    var algorithm = ssri.checkData(tarballBuffer, integrity);
+    if (!algorithm) {
+      logger.error('[registry:save:integrity:invalid] %s@%s, dist:%j', name, version, originDist);
+      this.status = 400;
+      const error = '[invalid] dist.integrity invalid';
+      this.body = {
+        error,
+        reason: error,
+      };
+      return;
+    }
+    var integrityObj = ssri.fromData(tarballBuffer, {
+      algorithms: ['sha1'],
+    });
+    shasum = integrityObj.sha1[0].hexDigest();
+  } else {
+    var integrityObj = ssri.fromData(tarballBuffer, {
+      algorithms: ['sha512', 'sha1'],
+    });
+    integrity = integrityObj.sha512[0].toString();
+    shasum = integrityObj.sha1[0].hexDigest();
+    if (originDist.shasum && originDist.shasum !== shasum) {
+      // if integrity not exists, check shasum
+      logger.error('[registry:save:shasum:invalid] %s@%s, dist:%j', name, version, originDist);
+      this.status = 400;
+      const error = '[invalid] dist.shasum invalid';
+      this.body = {
+        error,
+        reason: error,
+      };
+      return;
+    }
+  }
 
   var options = {
     key: common.getCDNKey(name, filename),
-    shasum: shasum
+    shasum: shasum,
+    integrity: integrity,
   };
   var uploadResult = yield nfs.uploadBuffer(tarballBuffer, options);
-  debug('upload %j', uploadResult);
+  debug('upload %j, options: %j', uploadResult, options);
 
-  var dist = {
+  var dist = Object.assign({}, originDist, {
+    tarball: '',
+    integrity: integrity,
     shasum: shasum,
-    size: attachment.length
-  };
+    size: attachment.length,
+  });
 
   // if nfs upload return a key, record it
   if (uploadResult.url) {

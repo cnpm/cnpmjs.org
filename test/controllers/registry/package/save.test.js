@@ -11,7 +11,7 @@ var app = require('../../../../servers/registry');
 var config = require('../../../../config');
 var utils = require('../../../utils');
 
-describe('test/controllers/registry/package/save.test.js', function () {
+describe('test/controllers/registry/package/save.test.js', () => {
   afterEach(mm.restore);
 
   describe('no @scoped package', function () {
@@ -46,20 +46,110 @@ describe('test/controllers/registry/package/save.test.js', function () {
       });
     });
 
-    it('should publish new version package and save dependencies', function (done) {
+    it('should publish new version package and save dependencies', done => {
       request(app)
       .get('/testmodule-new-1')
       .expect(200, function (err, res) {
-        should.not.exist(err);
+        assert(!err);
         var data = res.body;
-        data.name.should.equal('testmodule-new-1');
-        Object.keys(data.versions).should.eql(['0.0.1']);
-        data.versions['0.0.1'].dependencies.should.eql({
+        assert(data.name === 'testmodule-new-1');
+        assert.deepStrictEqual(Object.keys(data.versions), ['0.0.1']);
+        assert.deepStrictEqual(data.versions['0.0.1'].dependencies, {
           'bytetest-1': '~0.0.1',
           mocha: '~1.0.0'
         });
+        // should has integrity with sha512
+        assert(data.versions['0.0.1'].dist.integrity === 'sha512-n+4CQg0Rp1Qo0p9a0R5E5io67T9iD3Lcgg6exmpmt0s8kd4XcOoHu2kiu6U7xd69cGq0efkNGWUBP229ObfRSA==');
+        assert(data.versions['0.0.1'].dist.shasum === 'fa475605f88bab9b1127833633ca3ae0a477224c');
         done();
       });
+    });
+
+    it('should publish error on shasum invaild', done => {
+      mm(config, 'privatePackages', ['testmodule-new-1']);
+      var pkg = utils.getPackage('testmodule-new-1', '0.0.88', utils.admin);
+      pkg.versions['0.0.88'].dependencies = {
+        'bytetest-1': '~0.0.1',
+        mocha: '~1.0.0'
+      };
+      pkg.versions['0.0.88'].dist.shasum = 'fa475605f88bab9b1127833633ca3ae0a47wrong';
+      request(app)
+      .put('/' + pkg.name)
+      .set('authorization', utils.adminAuth)
+      .send(pkg)
+      .expect(400, function (err, res) {
+        assert(!err);
+        assert(res.body.error === '[invalid] dist.shasum invalid');
+        assert(res.body.reason === '[invalid] dist.shasum invalid');
+        done();
+      });
+    });
+
+    it('should publish error on integrity invaild', done => {
+      mm(config, 'privatePackages', ['testmodule-new-1']);
+      var pkg = utils.getPackage('testmodule-new-1', '0.0.88', utils.admin);
+      pkg.versions['0.0.88'].dependencies = {
+        'bytetest-1': '~0.0.1',
+        mocha: '~1.0.0'
+      };
+      pkg.versions['0.0.88'].dist.integrity = 'sha512-n+4CQg0Rp1Qo0p9a0R5E5io67T9iD3Lcgg6exmpmt0s8kd4XcOoHu2kiu6U7xd69cGq0efkNGWUBP229ObfBBB==';
+      request(app)
+      .put('/' + pkg.name)
+      .set('authorization', utils.adminAuth)
+      .send(pkg)
+      .expect(400, function (err, res) {
+        assert(!err);
+        assert(res.body.error === '[invalid] dist.integrity invalid');
+        assert(res.body.reason === '[invalid] dist.integrity invalid');
+        done();
+      });
+    });
+
+    it('should publish success with integrity and shasum', done => {
+      mm(config, 'privatePackages', ['testmodule-new-1']);
+      var pkg = utils.getPackage('testmodule-new-1', '0.0.88', utils.admin);
+      pkg.versions['0.0.88'].dependencies = {
+        'bytetest-1': '~0.0.1',
+        mocha: '~1.0.0'
+      };
+      pkg.versions['0.0.88'].dist.integrity = 'sha512-n+4CQg0Rp1Qo0p9a0R5E5io67T9iD3Lcgg6exmpmt0s8kd4XcOoHu2kiu6U7xd69cGq0efkNGWUBP229ObfRSA==';
+      request(app)
+      .put('/' + pkg.name)
+      .set('authorization', utils.adminAuth)
+      .send(pkg)
+      .expect(201, done);
+    });
+
+    it('should publish success with integrity and without shasum', done => {
+      mm(config, 'privatePackages', ['testmodule-new-1']);
+      var pkg = utils.getPackage('testmodule-new-1', '0.0.881', utils.admin);
+      pkg.versions['0.0.881'].dependencies = {
+        'bytetest-1': '~0.0.1',
+        mocha: '~1.0.0'
+      };
+      pkg.versions['0.0.881'].dist.integrity = 'sha512-n+4CQg0Rp1Qo0p9a0R5E5io67T9iD3Lcgg6exmpmt0s8kd4XcOoHu2kiu6U7xd69cGq0efkNGWUBP229ObfRSA==';
+      delete pkg.versions['0.0.881'].dist;
+      request(app)
+      .put('/' + pkg.name)
+      .set('authorization', utils.adminAuth)
+      .send(pkg)
+      .expect(201, done);
+    });
+
+    it('should publish success without integrity and without shasum', done => {
+      mm(config, 'privatePackages', ['testmodule-new-1']);
+      var pkg = utils.getPackage('testmodule-new-1', '0.0.882', utils.admin);
+      pkg.versions['0.0.882'].dependencies = {
+        'bytetest-1': '~0.0.1',
+        mocha: '~1.0.0'
+      };
+      delete pkg.versions['0.0.882'].dist.integrity;
+      delete pkg.versions['0.0.882'].dist;
+      request(app)
+      .put('/' + pkg.name)
+      .set('authorization', utils.adminAuth)
+      .send(pkg)
+      .expect(201, done);
     });
 
     it('should publish new package and fire globalHook', done => {

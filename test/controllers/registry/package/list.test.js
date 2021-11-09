@@ -20,7 +20,10 @@ describe('test/controllers/registry/package/list.test.js', () => {
     var pkg = utils.getPackage('@cnpmtest/testmodule-list-1', '0.0.1', utils.otherUser);
     pkg.versions['0.0.1'].dependencies = {
       bytetest: '~0.0.1',
-      mocha: '~1.0.0'
+      mocha: '~1.0.0',
+    };
+    pkg.versions['0.0.1'].scripts = {
+      install: 'node -v',
     };
     request(app)
     .put('/' + pkg.name)
@@ -348,6 +351,23 @@ describe('test/controllers/registry/package/list.test.js', () => {
             assert(pkg._publish_on_cnpm === undefined);
           }
           assert(/^W\/"\w{32}"$/.test(res.headers.etag));
+        });
+    });
+
+    it('should return abbreviated meta on private package and has hasInstallScript field', () => {
+      mm(config, 'enableAbbreviatedMetadata', true);
+      return request(app)
+        .get('/@cnpmtest/testmodule-list-1')
+        .set('Accept', 'application/vnd.npm.install-v1+json')
+        .expect(200)
+        .expect(res => {
+          const data = res.body;
+          // console.log(JSON.stringify(data, null, 2));
+          assert(data.name === '@cnpmtest/testmodule-list-1');
+          assert(data.modified);
+          assert(data['dist-tags'].latest);
+          assert(data.versions['0.0.1'].hasInstallScript === true);
+          assert(data.versions['0.0.1'].scripts === undefined);
         });
     });
 

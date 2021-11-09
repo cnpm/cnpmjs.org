@@ -1717,11 +1717,13 @@ SyncModuleWorker.prototype._syncOneVersion = function *(versionIndex, sourcePack
       mod.package._publish_on_cnpm = true;
     }
 
-    var dist = {
+    // keep orgin dist fields, like `integrity` and so on
+    var dist = Object.assign({}, sourcePackage.dist, {
+      tarball: '',
       shasum: shasum,
       size: dataSize,
       noattachment: dataSize === 0,
-    };
+    });
 
     if (result.url) {
       dist.tarball = result.url;
