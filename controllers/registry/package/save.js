@@ -20,12 +20,39 @@ var hook = require('../../../services/hook');
 // old publish: https://github.com/npm/npm-registry-client/blob/master/lib/publish.js#L84
 // new publish: https://github.com/npm/libnpmpublish/blob/main/publish.js#L91
 module.exports = function* save(next) {
-  // 'dist-tags': { latest: '0.0.2' },
-  //  _attachments:
-  // { 'nae-sandbox-0.0.2.tgz':
-  //    { content_type: 'application/octet-stream',
-  //      data: 'H4sIAAAAA
-  //      length: 9883
+  // {
+  //   "_id": "@cnpm/foo",
+  //   "name": "@cnpm/foo",
+  //   "dist-tags": {
+  //     "latest": "1.0.0"
+  //   },
+  //   "versions": {
+  //     "1.0.0": {
+  //       "name": "@cnpm/foo",
+  //       "version": "1.0.0",
+  //       "dependencies": {
+  //         "xprofiler": "^1.2.6"
+  //       },
+  //       "readme": "ERROR: No README data found!",
+  //       "_id": "@cnpm/foo@1.0.0",
+  //       "_nodeVersion": "16.13.0",
+  //       "_npmVersion": "8.1.0",
+  //       "dist": {
+  //         "integrity": "sha512-7nm0vpDEWs7y+tTwlxd7YnGaBc+9Gk5KaPsx2cqQz6H84ndBXlw5nMxGtL4Uy0bCQIknPAZAVe+KNheInmmJrQ==",
+  //         "shasum": "afd05dcfb8759b9b1c7151492a04f2254365c602",
+  //         "tarball": "http://127.0.0.1:7001/@cnpm/foo/-/@cnpm/foo-1.0.0.tgz"
+  //       }
+  //     }
+  //   },
+  //   "access": null,
+  //   "_attachments": {
+  //     "@cnpm/foo-1.0.0.tgz": {
+  //       "content_type": "application/octet-stream",
+  //       "data": "H4sIAAAAAA...",
+  //       "length": 208
+  //     }
+  //   }
+  // }
   var pkg = this.request.body;
   var username = this.user.name;
   var name = this.params.name || this.params[0];
@@ -226,7 +253,7 @@ module.exports = function* save(next) {
       return;
     }
   }
-  
+
   var options = {
     key: common.getCDNKey(name, filename),
     shasum: shasum,
