@@ -86,12 +86,9 @@ var config = {
   customReadmeFile: '', // you can use your custom readme file instead the cnpm one
   customFooter: '', // you can add copyright and site total script html here
   npmClientName: 'cnpm', // use `${name} install package`
-  packagePageContributorSearch: true, // package page contributor link to search, default is true
 
   // max handle number of package.json `dependencies` property
   maxDependencies: 200,
-  // backup filepath prefix
-  backupFilePrefix: '/cnpm/backup/',
 
   /**
    * database config
