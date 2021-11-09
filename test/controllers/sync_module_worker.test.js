@@ -298,6 +298,31 @@ describe('test/controllers/sync_module_worker.test.js', () => {
       };
     }
     yield checkResult();
+
+    function checkFullResult() {
+      return function (done) {
+        request(app)
+        .get('/mk2test-module-cnpmsync-issue-1667')
+        .set('accept', 'application/json')
+        .expect(function (res) {
+          lastResHeaders = res.headers;
+          console.log('%j', res.body);
+          pkg = res.body.versions['3.0.0'];
+          assert(pkg.hasInstallScript === true);
+          // has scripts
+          assert(pkg.scripts);
+          // console.log(pkg.dist);
+          assert(pkg.dist.key === '/mk2test-module-cnpmsync-issue-1667/-/mk2test-module-cnpmsync-issue-1667-3.0.0.tgz');
+          assert(pkg.dist.integrity === 'sha512-pwnnZyjvr29UxwFAIx7xHvVCkFpGVAYgaFllr/m5AZoD1CR2uHHPw16ISEO/A2rZ0WM3UoAghwd5bAZ4pYzD2Q==');
+          assert(pkg.dist.shasum === 'c31af371a6cdc10dd5b9ad26625a4c863249198d');
+          assert(pkg.dist.fileCount === 2);
+          assert(pkg.dist.unpackedSize === 232);
+          assert(pkg.dist.size === 271);
+        })
+        .expect(200, done);
+      };
+    }
+    yield checkFullResult();
   });
 
   it('should sync upstream first', function* () {

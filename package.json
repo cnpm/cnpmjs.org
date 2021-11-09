@@ -66,6 +66,7 @@
     "rimraf": "^2.6.2",
     "semver": "^5.4.1",
     "sequelize": "^3.23.4",
+    "ssri": "^8.0.1",
     "thunkify-wrap": "^1.0.4",
     "treekill": "^1.0.0",
     "tunnel-agent": "^0.6.0",
