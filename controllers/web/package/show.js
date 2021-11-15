@@ -106,6 +106,7 @@ module.exports = function* show(next) {
   }
 
   pkg.package.fromNow = moment(pkg.publish_time).fromNow();
+  pkg.package.author = pkg.author;
   pkg = pkg.package;
   pkg.users = users;
   pkg.versions = versions;
