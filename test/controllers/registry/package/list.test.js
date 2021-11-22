@@ -454,7 +454,7 @@ describe('test/controllers/registry/package/list.test.js', () => {
             // assert('_hasShrinkwrap' in pkg);
             assert(pkg.publish_time && typeof pkg.publish_time === 'number');
             assert(pkg._publish_on_cnpm === undefined);
-            assert(pkg.dist.tarball.includes('.tgz?bucket=foo-us1&admin=1&other_urls=http'));
+            assert(pkg.dist.tarball.endsWith('.tgz'));
           }
           assert(/^W\/"\w{32}"$/.test(res.headers.etag));
         });

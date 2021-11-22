@@ -25,7 +25,7 @@ describe('test/common/urllib.test.js', () => {
       });
     });
 
-    describe('redirect', () => {
+    describe.skip('redirect', () => {
       it('should work', function* () {
         const res = yield urllib.request('https://google.com', {
           followRedirect: true,
