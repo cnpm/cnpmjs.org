@@ -6,6 +6,7 @@ var request = require('supertest');
 var mm = require('mm');
 var pedding = require('pedding');
 var packageService = require('../../../../services/package');
+var blocklistService = require('../../../../services/blocklist');
 var app = require('../../../../servers/registry');
 var utils = require('../../../utils');
 var config = require('../../../../config');
@@ -41,6 +42,63 @@ describe('test/controllers/registry/package/list.test.js', () => {
       .set('authorization', utils.otherUserAuth)
       .send(pkg)
       .expect(201, done);
+    });
+  });
+
+  describe('block versions', () => {
+    before(function* () {
+      var pkg = utils.getPackage('@cnpmtest/testmodule-list-block', '0.0.1', utils.otherUser);
+      pkg.versions['0.0.1'].dependencies = {
+        bytetest: '~0.0.1',
+        mocha: '~1.0.0',
+      };
+      pkg.versions['0.0.1'].scripts = {
+        install: 'node -v',
+      };
+      yield request(app)
+        .put('/' + pkg.name)
+        .set('authorization', utils.otherUserAuth)
+        .send(pkg)
+        .expect(201);
+      
+      pkg = utils.getPackage('@cnpmtest/testmodule-list-block', '1.0.0', utils.otherUser);
+      pkg.versions['1.0.0'].dependencies = {
+        bytetest: '~0.0.1',
+        mocha: '~1.0.0'
+      };
+      yield request(app)
+        .put('/' + pkg.name)
+        .set('authorization', utils.otherUserAuth)
+        .send(pkg)
+        .expect(201);
+    });
+
+    it('should block one version and all versions', function* () {
+      yield blocklistService.blockPackageVersion('@cnpmtest/testmodule-list-block', '0.0.1', 'unittest');
+      let res = yield request(app)
+        .get('/@cnpmtest/testmodule-list-block')
+        .expect(200);
+      let data = res.body;
+      assert(Object.keys(data.versions).length === 1);
+      assert(data.versions['1.0.0']);
+      assert(!data.versions['0.0.1']);
+
+      res = yield request(app)
+        .get('/@cnpmtest/testmodule-list-block')
+        .set('Accept', 'application/vnd.npm.install-v1+json')
+        .expect(200);
+      data = res.body;
+      assert(Object.keys(data.versions).length === 1);
+      assert(data.versions['1.0.0']);
+      assert(!data.versions['0.0.1']);
+
+      yield blocklistService.blockPackageVersion('@cnpmtest/testmodule-list-block', '*', 'unittest');
+      res = yield request(app)
+        .get('/@cnpmtest/testmodule-list-block')
+        .expect(451);
+      data = res.body;
+      console.log(data);
+      assert(data.error === '[block] package was blocked, reason: unittest');
     });
   });
 
