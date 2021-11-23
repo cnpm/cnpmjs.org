@@ -1,18 +1,4 @@
-/**!
- * cnpmjs.org - models/download_total.js
- *
- * Copyright(c) fengmk2 and other contributors.
- * MIT Licensed
- *
- * Authors:
- *   fengmk2 <fengmk2@gmail.com> (http://fengmk2.github.com)
- */
-
 'use strict';
-
-/**
- * Module dependencies.
- */
 
 // CREATE TABLE IF NOT EXISTS `downloads` (
 //  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'primary key',

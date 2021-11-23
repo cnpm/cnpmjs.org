@@ -3,6 +3,7 @@
 var debug = require('debug')('cnpmjs.org:controllers:registry:package:list');
 var utility = require('utility');
 var packageService = require('../../../services/package');
+var blocklistService = require('../../../services/blocklist');
 var common = require('../../../lib/common');
 var SyncModuleWorker = require('../../sync_module_worker');
 var config = require('../../../config');
@@ -13,6 +14,13 @@ const logger = require('../../../common/logger');
 // should set weak etag avoid nginx remove it
 function etag(objs) {
   return 'W/"' + utility.md5(JSON.stringify(objs)) + '"';
+}
+
+function filterBlockVerions(rows, blocks) {
+  if (!blocks) {
+    return rows;
+  }
+  return rows.filter(row => !blocks[row.version]);
 }
 
 /**
@@ -63,9 +71,22 @@ module.exports = function* list() {
   var rs = yield [
     packageService.getModuleLastModified(name),
     packageService.listModuleTags(name),
+    blocklistService.findBlockPackageVersions(name),
   ];
   var modifiedTime = rs[0];
   var tags = rs[1];
+  var blocks = rs[2];
+
+  if (blocks && blocks['*']) {
+    this.status = 451;
+    const error = `[block] package was blocked, reason: ${blocks['*'].reason}`;
+    this.jsonp = {
+      name,
+      error,
+      reason: error,
+    };
+    return;
+  }
 
   debug('show %s, last modified: %s, tags: %j', name, modifiedTime, tags);
   if (modifiedTime) {
@@ -89,11 +110,13 @@ module.exports = function* list() {
 
   if (needAbbreviatedMeta) {
     var rows = yield packageService.listModuleAbbreviatedsByName(name);
+    rows = filterBlockVerions(rows, blocks);
     if (rows.length > 0) {
       yield handleAbbreviatedMetaRequest(this, name, modifiedTime, tags, rows, cacheKey);
       return;
     }
     var fullRows = yield packageService.listModulesByName(name);
+    fullRows = filterBlockVerions(fullRows, blocks);
     if (fullRows.length > 0) {
       // no abbreviated meta rows, use the full meta convert to abbreviated meta
       yield handleAbbreviatedMetaRequestWithFullMeta(this, name, modifiedTime, tags, fullRows);
@@ -106,7 +129,7 @@ module.exports = function* list() {
     packageService.listStarUserNames(name),
     packageService.listMaintainers(name),
   ];
-  var rows = r[0];
+  var rows = filterBlockVerions(r[0], blocks);
   var starUsers = r[1];
   var maintainers = r[2];
 

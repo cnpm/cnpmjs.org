@@ -287,6 +287,9 @@ var config = {
   // if enable this option, must create module_abbreviated and package_readme table in database
   enableAbbreviatedMetadata: false,
 
+  // enable package or package version block list, must create package_version_blocklist table in database
+  enableBlockPackageVersion: false,
+
   // global hook function: function* (envelope) {}
   // envelope format please see https://github.com/npm/registry/blob/master/docs/hooks/hooks-payload.md#payload
   globalHook: null,
@@ -334,6 +337,8 @@ if (process.env.NODE_ENV === 'test') {
       yield next;
     };
   });
+
+  config.enableBlockPackageVersion = true;
 }
 
 if (process.env.NODE_ENV !== 'test') {

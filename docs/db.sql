@@ -333,3 +333,14 @@ CREATE TABLE IF NOT EXISTS `token` (
  UNIQUE KEY `uk_token` (`token`),
  KEY `idx_user` (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='token info';
+
+CREATE TABLE IF NOT EXISTS `package_version_blocklist` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'primary key',
+  `gmt_create` datetime(3) NOT NULL COMMENT 'create time',
+  `gmt_modified` datetime(3) NOT NULL COMMENT 'modified time',
+  `name` varchar(214) NOT NULL COMMENT 'package name',
+  `version` varchar(30) NOT NULL COMMENT 'package version, "*" meaning all versions',
+  `reason` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL COMMENT 'block reason',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_name_version` (`name`, `version`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='package version block list';
