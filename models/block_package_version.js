@@ -8,7 +8,7 @@ module.exports = function (sequelize, DataTypes) {
       comment: 'package name'
     },
     version: {
-      type: DataTypes.STRING(256),
+      type: DataTypes.STRING(30),
       allowNull: false,
       comment: 'package version'
     },
