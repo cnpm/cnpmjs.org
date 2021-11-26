@@ -4,6 +4,7 @@ var debug = require('debug')('cnpmjs.org:controllers:registry:package:list');
 var utility = require('utility');
 var packageService = require('../../../services/package');
 var blocklistService = require('../../../services/blocklist');
+var bugVersionService = require('../../../services/bug_version');
 var common = require('../../../lib/common');
 var SyncModuleWorker = require('../../sync_module_worker');
 var config = require('../../../config');
@@ -30,26 +31,27 @@ function filterBlockVerions(rows, blocks) {
 module.exports = function* list() {
   const name = this.params.name || this.params[0];
   // sync request will contain this query params
-  let noCache = this.query.cache === '0';
-  if (!noCache) {
+  let isSyncWorkerRequest = this.query.cache === '0';
+  if (!isSyncWorkerRequest) {
     const ua = this.headers['user-agent'] || '';
     // old sync client will request with these user-agent
     if (ua.indexOf('npm_service.cnpmjs.org/') !== -1) {
-      noCache = true;
+      isSyncWorkerRequest = true;
     }
   }
   const isJSONPRequest = this.query.callback;
-  let cacheKey;
+  let cacheKey = '';
   let needAbbreviatedMeta = false;
   let abbreviatedMetaType = 'application/vnd.npm.install-v1+json';
   if (config.enableAbbreviatedMetadata && this.accepts([ 'json', abbreviatedMetaType ]) === abbreviatedMetaType) {
     needAbbreviatedMeta = true;
-    if (cache && !isJSONPRequest) {
+    // don't cache result on sync request
+    if (cache && !isJSONPRequest && !isSyncWorkerRequest) {
       cacheKey = `list-${name}-v1`;
     }
   }
-
-  if (cacheKey && !noCache) {
+  
+  if (cacheKey) {
     const values = yield cache.hmget(cacheKey, 'etag', 'body');
     if (values && values[0] && values[1]) {
       this.body = values[1];
@@ -112,12 +114,20 @@ module.exports = function* list() {
     var rows = yield packageService.listModuleAbbreviatedsByName(name);
     rows = filterBlockVerions(rows, blocks);
     if (rows.length > 0) {
+      // don't use bug-versions hotfix on sync request
+      if (!isSyncWorkerRequest) {
+        yield bugVersionService.hotfix(rows);
+      }
       yield handleAbbreviatedMetaRequest(this, name, modifiedTime, tags, rows, cacheKey);
       return;
     }
     var fullRows = yield packageService.listModulesByName(name);
     fullRows = filterBlockVerions(fullRows, blocks);
     if (fullRows.length > 0) {
+      // don't use bug-versions hotfix on sync request
+      if (!isSyncWorkerRequest) {
+        yield bugVersionService.hotfix(fullRows);
+      }
       // no abbreviated meta rows, use the full meta convert to abbreviated meta
       yield handleAbbreviatedMetaRequestWithFullMeta(this, name, modifiedTime, tags, fullRows);
       return;
