@@ -290,8 +290,8 @@ var config = {
   // enable package or package version block list, must create package_version_blocklist table in database
   enableBlockPackageVersion: false,
 
-  // enable bug versions hotfix by https://github.com/cnpm/bug-versions
-  enableBugVersions: false,
+  // enable bug version hotfix by https://github.com/cnpm/bug-versions
+  enableBugVersion: false,
 
   // global hook function: function* (envelope) {}
   // envelope format please see https://github.com/npm/registry/blob/master/docs/hooks/hooks-payload.md#payload
@@ -342,7 +342,7 @@ if (process.env.NODE_ENV === 'test') {
   });
 
   config.enableBlockPackageVersion = true;
-  config.enableBugVersions = true;
+  config.enableBugVersion = true;
 }
 
 if (process.env.NODE_ENV !== 'test') {

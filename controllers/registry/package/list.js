@@ -30,15 +30,7 @@ function filterBlockVerions(rows, blocks) {
  */
 module.exports = function* list() {
   const name = this.params.name || this.params[0];
-  // sync request will contain this query params
-  let isSyncWorkerRequest = this.query.cache === '0';
-  if (!isSyncWorkerRequest) {
-    const ua = this.headers['user-agent'] || '';
-    // old sync client will request with these user-agent
-    if (ua.indexOf('npm_service.cnpmjs.org/') !== -1) {
-      isSyncWorkerRequest = true;
-    }
-  }
+  const isSyncWorkerRequest = common.isSyncWorkerRequest(this);
   const isJSONPRequest = this.query.callback;
   let cacheKey = '';
   let needAbbreviatedMeta = false;
@@ -192,6 +184,9 @@ module.exports = function* list() {
     debug('start sync %s, get log id %s', name, logId);
 
     return this.redirect(config.officialNpmRegistry + this.url);
+  }
+  if (!isSyncWorkerRequest) {
+    yield bugVersionService.hotfix(rows);
   }
 
   var latestMod = null;

@@ -10,6 +10,7 @@ var logger = require('../../../common/logger');
 var common = require('../../../lib/common');
 var downloadAsReadStream = require('../../utils').downloadAsReadStream;
 var packageService = require('../../../services/package');
+var bugVersionService = require('../../../services/bug_version');
 var downloadTotalService = require('../../../services/download_total');
 var config = require('../../../config');
 
@@ -25,7 +26,6 @@ module.exports = function* download(next) {
     filename = `${scope}/${filename}`;
   }
 
-
   var version = filename.slice(name.length + 1, -4);
   // can not get dist
   var url = null;
@@ -33,6 +33,17 @@ module.exports = function* download(next) {
   var query = this.query || {};
   // allow download from specific store bucket
   var options = query.bucket ? { bucket: query.bucket } : null;
+
+  // don't hotfix sync worker request
+  const isSyncWorkerRequest = common.isSyncWorkerRequest(this);
+  if (!isSyncWorkerRequest) {
+    const hotfixVersion = yield bugVersionService.getHotfixVersion(name, version);
+    if (hotfixVersion) {
+      debug('download hotfix version: %s => %s', version, hotfixVersion);
+      filename = filename.replace(`-${version}.tgz`, `-${hotfixVersion}.tgz`);
+      version = hotfixVersion;
+    }
+  }
 
   if (typeof nfs.url === 'function') {
     if (is.generatorFunction(nfs.url)) {

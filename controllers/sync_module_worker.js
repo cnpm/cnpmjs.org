@@ -530,7 +530,7 @@ SyncModuleWorker.prototype.syncByName = function* (concurrencyId, name, registry
 
   let realRegistry = registry;
   // get from npm, don't cache
-  const packageUrl = '/' + name.replace('/', '%2f') + '?sync_timestamp=' + Date.now();
+  const packageUrl = '/' + name.replace('/', '%2f') + '?cache=0&sync_timestamp=' + Date.now();
   try {
     var result = yield npmSerivce.request(packageUrl, { registry: registry });
     pkg = result.data;
@@ -1553,6 +1553,12 @@ SyncModuleWorker.prototype._syncOneVersion = function *(versionIndex, sourcePack
   var username = this.username;
   var downurl = sourcePackage.dist.tarball;
   var urlobj = urlparse(downurl);
+  // let cnpmjs.org registry know this request send from sync worker
+  if (downurl.indexOf('?') > 0) {
+    downurl = `${downurl}&cache=0&sync_timestamp=${Date.now()}`;
+  } else {
+    downurl = `${downurl}?cache=0&sync_timestamp=${Date.now()}`;
+  }
   var filename = path.basename(urlobj.pathname);
   var filepath = common.getTarballFilepath(sourcePackage.name, sourcePackage.version, filename);
   var ws = fs.createWriteStream(filepath);

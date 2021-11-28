@@ -5,7 +5,7 @@ const packageService = require('./package');
 
 // replace bug version and set deprecated property for cli tooltip
 exports.hotfix = function* (rows) {
-  if (!config.enableBugVersions) {
+  if (!config.enableBugVersion) {
     return;
   }
   let row = rows[0];
@@ -25,33 +25,45 @@ exports.hotfix = function* (rows) {
     return;
   }
   const bugVersions = moduleRow.package['bug-versions'];
-  const bugs = bugVersions[row.package.name];
+  const bugs = bugVersions && bugVersions[row.package.name];
   if (!bugs) {
     return;
   }
-  const hotfixVersions = {};
-  for (const key in bugs) {
-    const bug = bugs[key];
-    if (!hotfixVersions[bug.version]) {
-      hotfixVersions[bug.version] = {};
-    }
-  }
+
+  const existsVerionsMap = {};
   for (row of rows) {
-    if (hotfixVersions[row.package.version]) {
-      hotfixVersions[row.package.version] = row.package;
-    }
+    existsVerionsMap[row.version] = true;
   }
 
   for (row of rows) {
-    if (!row.package) {
-      continue;
+    const bug = bugs[row.version];
+    if (bug && bug.version && existsVerionsMap[bug.version]) {
+      const hotfixDeprecated = `[WARNING] Use ${bug.version} instead of ${row.version}, reason: ${bug.reason}`;
+      row.package.deprecated = row.package.deprecated ? `${row.package.deprecated} (${hotfixDeprecated})` : hotfixDeprecated;
     }
-    const bug = bugs[row.package.version];
-    if (bug && hotfixVersions[bug.version]) {
-      const hotfixDeprecated = `[WARNING] Use ${bug.version} instead of ${row.package.version}, reason: ${bug.reason}`;
-      const deprecated = row.package.deprecated ? `${row.package.deprecated} (${hotfixDeprecated})` : hotfixDeprecated;
-      // keep version don't change
-      row.package = Object.assign({}, hotfixVersions[bug.version], { version: row.package.version, deprecated });
+  }
+};
+
+exports.getHotfixVersion = function* (name, version) {
+  if (!config.enableBugVersion) {
+    return;
+  }
+  const moduleRow = yield packageService.getLatestModule('bug-versions');
+  if (!moduleRow) {
+    return;
+  }
+  const bugVersions = moduleRow.package['bug-versions'];
+  const bugs = bugVersions && bugVersions[name];
+  if (!bugs) {
+    return;
+  }
+
+  const bug = bugs[version];
+  if (bug && bug.version) {
+    // make sure hotfix version exists
+    const row = yield packageService.getModule(name, bug.version);
+    if (row) {
+      return row.version;
     }
   }
 };

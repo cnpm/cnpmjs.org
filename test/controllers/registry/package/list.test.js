@@ -45,6 +45,236 @@ describe('test/controllers/registry/package/list.test.js', () => {
     });
   });
 
+  describe('config.enableBugVersion = true', () => {
+    before(done => {
+      mm(config, 'syncModel', 'all');
+      mm(config, 'enableAbbreviatedMetadata', true);
+      utils.sync('base62', done);
+    });
+
+    before(function* () {
+      let pkg = utils.getPackage('bug-versions', '1.0.0', utils.admin);
+      const packageJSON = pkg.versions['1.0.0'];
+      packageJSON['bug-versions'] = {
+        "base62": {
+          "1.2.5": {
+            "version": "1.2.1",
+            "reason": "ignore post-install script https://github.com/andrew/base62.js/commits/master"
+          }
+        },
+        "request": {
+          "2.84.0": {
+            "version": "2.85.0",
+            "reason": "https://github.com/cnpm/bug-versions/issues/3"
+          }
+        },
+        "@cnpmtest/testmodule-list-bugversion": {
+          "4.14.0": {
+            "version": "4.13.2",
+            "reason": "https://github.com/ali-sdk/ali-oss/pull/382"
+          },
+          "4.14.1": {
+            "version": "4.13.2",
+            "reason": "https://github.com/ali-sdk/ali-oss/pull/382"
+          },
+          "4.14.2": {
+            "version": "1.0.0",
+            "reason": "https://github.com/ali-sdk/ali-oss/pull/382"
+          }
+        }
+      };
+      yield request(app)
+        .put('/' + pkg.name)
+        .set('authorization', utils.adminAuth)
+        .send(pkg)
+        .expect(201);
+
+      pkg = utils.getPackage('@cnpmtest/testmodule-list-bugversion', '4.14.0', utils.otherUser);
+      pkg.versions['4.14.0'].deprecated = 'mock deprecated exists here';
+      yield request(app)
+        .put('/' + pkg.name)
+        .set('authorization', utils.otherUserAuth)
+        .send(pkg)
+        .expect(201);
+      pkg = utils.getPackage('@cnpmtest/testmodule-list-bugversion', '4.14.1', utils.otherUser);
+      yield request(app)
+        .put('/' + pkg.name)
+        .set('authorization', utils.otherUserAuth)
+        .send(pkg)
+        .expect(201);
+      pkg = utils.getPackage('@cnpmtest/testmodule-list-bugversion', '4.14.2', utils.otherUser);
+      yield request(app)
+        .put('/' + pkg.name)
+        .set('authorization', utils.otherUserAuth)
+        .send(pkg)
+        .expect(201);
+      pkg = utils.getPackage('@cnpmtest/testmodule-list-bugversion', '4.13.2', utils.otherUser);
+      yield request(app)
+        .put('/' + pkg.name)
+        .set('authorization', utils.otherUserAuth)
+        .send(pkg)
+        .expect(201);
+    });
+
+    it('should replace base62\'s bug version 1.2.5 to 1.2.1', function* () {
+      mm(config, 'syncModel', 'all');
+      mm(config, 'enableAbbreviatedMetadata', true);
+      mm(config, 'enableBugVersion', true);
+      mm(config.nfs, 'url', function* (key) {
+        return 'http://foo.test.com' + key;
+      });
+      mm(config, 'downloadRedirectToNFS', true);
+      // https://github.com/cnpm/bug-versions/blob/master/package.json#L201
+      let res = yield request(app)
+        .get('/base62')
+        .expect(200);
+      let data = res.body;
+      assert(data.versions['1.2.5']);
+      assert(data.versions['1.2.1']);
+      assert(data.versions['1.2.5']);
+      assert(data.versions['1.2.1']);
+      assert(data.versions['1.2.5'].version === '1.2.5');
+      assert(data.versions['1.2.5'].deprecated === '[WARNING] Use 1.2.1 instead of 1.2.5, reason: ignore post-install script https://github.com/andrew/base62.js/commits/master');
+      assert(!data.versions['1.2.1'].deprecated);
+
+      res = yield request(app)
+        .get('/base62')
+        .set('Accept', 'application/vnd.npm.install-v1+json')
+        .expect(200);
+      data = res.body;
+      assert(data.versions['1.2.5']);
+      assert(data.versions['1.2.1']);
+      assert(data.versions['1.2.5'].version === '1.2.5');
+      assert(data.versions['1.2.5'].deprecated === '[WARNING] Use 1.2.1 instead of 1.2.5, reason: ignore post-install script https://github.com/andrew/base62.js/commits/master');
+      assert(!data.versions['1.2.1'].deprecated);
+
+      yield request(app)
+        .get('/base62/download/base62-1.2.5.tgz')
+        .expect('location', 'http://foo.test.com/base62/-/base62-1.2.1.tgz')
+        .expect(302);
+
+      // ignore when enableBugVersion = false
+      mm(config, 'enableBugVersion', false);
+      res = yield request(app)
+        .get('/base62')
+        .set('Accept', 'application/vnd.npm.install-v1+json')
+        .expect(200);
+      data = res.body;
+      assert(data.versions['1.2.5']);
+      assert(data.versions['1.2.1']);
+      assert(data.versions['1.2.5'].version === '1.2.5');
+      assert(!data.versions['1.2.5'].deprecated);
+
+      yield request(app)
+        .get('/base62/download/base62-1.2.5.tgz')
+        .expect('location', 'http://foo.test.com/base62/-/base62-1.2.5.tgz')
+        .expect(302);
+    });
+
+    it('should replace @cnpmtest/testmodule-list-bugversion bug versions', function* () {
+      mm(config, 'enableBugVersion', true);
+      mm(config, 'enableAbbreviatedMetadata', true);
+      mm(config.nfs, 'url', function* (key) {
+        return 'http://foo.test.com' + key;
+      });
+      mm(config, 'downloadRedirectToNFS', true);
+      // https://github.com/cnpm/bug-versions/blob/master/package.json#L201
+      let res = yield request(app)
+        .get('/@cnpmtest/testmodule-list-bugversion')
+        .expect(200);
+      let data = res.body;
+      assert(data.versions['4.14.0']);
+      assert(data.versions['4.14.1']);
+      assert(data.versions['4.14.2']);
+      assert(data.versions['4.13.2']);
+      assert(data.versions['4.14.0'].version === '4.14.0');
+      assert(data.versions['4.14.1'].version === '4.14.1');
+      assert(data.versions['4.14.0'].deprecated === 'mock deprecated exists here ([WARNING] Use 4.13.2 instead of 4.14.0, reason: https://github.com/ali-sdk/ali-oss/pull/382)');
+      assert(data.versions['4.14.1'].deprecated === '[WARNING] Use 4.13.2 instead of 4.14.1, reason: https://github.com/ali-sdk/ali-oss/pull/382');
+      // 4.14.2 replace bug version 1.0.0 dont exists, dont replace
+      assert(!data.versions['4.14.2'].deprecated);
+      assert(!data.versions['4.13.2'].deprecated);
+
+      yield request(app)
+        .get('/@cnpmtest/testmodule-list-bugversion/download/@cnpmtest/testmodule-list-bugversion-4.14.0.tgz')
+        .expect('location', 'http://foo.test.com/@cnpmtest/testmodule-list-bugversion/-/@cnpmtest/testmodule-list-bugversion-4.13.2.tgz')
+        .expect(302);
+
+      res = yield request(app)
+        .get('/@cnpmtest/testmodule-list-bugversion')
+        .set('Accept', 'application/vnd.npm.install-v1+json')
+        .expect(200);
+      data = res.body;
+      assert(data.versions['4.14.0']);
+      assert(data.versions['4.14.1']);
+      assert(data.versions['4.14.2']);
+      assert(data.versions['4.13.2']);
+      assert(data.versions['4.14.0'].version === '4.14.0');
+      assert(data.versions['4.14.1'].version === '4.14.1');
+      assert(data.versions['4.14.0'].deprecated === 'mock deprecated exists here ([WARNING] Use 4.13.2 instead of 4.14.0, reason: https://github.com/ali-sdk/ali-oss/pull/382)');
+      assert(data.versions['4.14.1'].deprecated === '[WARNING] Use 4.13.2 instead of 4.14.1, reason: https://github.com/ali-sdk/ali-oss/pull/382');
+      // 4.14.2 replace bug version 1.0.0 dont exists, dont replace
+      assert(!data.versions['4.14.2'].deprecated);
+      assert(!data.versions['4.13.2'].deprecated);
+
+      yield request(app)
+        .get('/@cnpmtest/testmodule-list-bugversion/download/@cnpmtest/testmodule-list-bugversion-4.14.0.tgz')
+        .expect('location', 'http://foo.test.com/@cnpmtest/testmodule-list-bugversion/-/@cnpmtest/testmodule-list-bugversion-4.13.2.tgz')
+        .expect(302);
+      yield request(app)
+        .get('/@cnpmtest/testmodule-list-bugversion/download/@cnpmtest/testmodule-list-bugversion-4.14.1.tgz')
+        .expect('location', 'http://foo.test.com/@cnpmtest/testmodule-list-bugversion/-/@cnpmtest/testmodule-list-bugversion-4.13.2.tgz')
+        .expect(302);
+      yield request(app)
+        .get('/@cnpmtest/testmodule-list-bugversion/download/@cnpmtest/testmodule-list-bugversion-4.14.2.tgz')
+        .expect('location', 'http://foo.test.com/@cnpmtest/testmodule-list-bugversion/-/@cnpmtest/testmodule-list-bugversion-4.14.2.tgz')
+        .expect(302);
+      // ignore sync worker request
+      yield request(app)
+        .get('/@cnpmtest/testmodule-list-bugversion/download/@cnpmtest/testmodule-list-bugversion-4.14.0.tgz?cache=0')
+        .expect('location', 'http://foo.test.com/@cnpmtest/testmodule-list-bugversion/-/@cnpmtest/testmodule-list-bugversion-4.14.0.tgz')
+        .expect(302);
+
+      // ignore when enableBugVersion = false
+      mm(config, 'enableBugVersion', false);
+      res = yield request(app)
+        .get('/@cnpmtest/testmodule-list-bugversion')
+        .expect(200);
+      data = res.body;
+      assert(data.versions['4.14.0']);
+      assert(data.versions['4.14.1']);
+      assert(data.versions['4.14.2']);
+      assert(data.versions['4.13.2']);
+      assert(data.versions['4.14.0'].version === '4.14.0');
+      assert(data.versions['4.14.1'].version === '4.14.1');
+      assert(data.versions['4.14.0'].deprecated === 'mock deprecated exists here');
+      assert(!data.versions['4.14.1'].deprecated);
+      assert(!data.versions['4.14.2'].deprecated);
+      assert(!data.versions['4.13.2'].deprecated);
+
+      res = yield request(app)
+        .get('/@cnpmtest/testmodule-list-bugversion')
+        .set('Accept', 'application/vnd.npm.install-v1+json')
+        .expect(200);
+      data = res.body;
+      assert(data.versions['4.14.0']);
+      assert(data.versions['4.14.1']);
+      assert(data.versions['4.14.2']);
+      assert(data.versions['4.13.2']);
+      assert(data.versions['4.14.0'].version === '4.14.0');
+      assert(data.versions['4.14.1'].version === '4.14.1');
+      assert(data.versions['4.14.0'].deprecated === 'mock deprecated exists here');
+      assert(!data.versions['4.14.1'].deprecated);
+      assert(!data.versions['4.14.2'].deprecated);
+      assert(!data.versions['4.13.2'].deprecated);
+
+      yield request(app)
+        .get('/@cnpmtest/testmodule-list-bugversion/download/@cnpmtest/testmodule-list-bugversion-4.14.0.tgz')
+        .expect('location', 'http://foo.test.com/@cnpmtest/testmodule-list-bugversion/-/@cnpmtest/testmodule-list-bugversion-4.14.0.tgz')
+        .expect(302);
+    });
+  });
+
   describe('block versions', () => {
     before(function* () {
       var pkg = utils.getPackage('@cnpmtest/testmodule-list-block', '0.0.1', utils.otherUser);
