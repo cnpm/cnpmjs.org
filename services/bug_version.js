@@ -39,9 +39,9 @@ exports.hotfix = function* (rows) {
     const bug = bugs[row.package.version];
     if (bug && bug.version && existsVerionsMap[bug.version]) {
       const packageJSON = JSON.parse(JSON.stringify(existsVerionsMap[bug.version]));
-      const hotfixDeprecated = `[WARNING] Use ${bug.version} instead of ${row.version}, reason: ${bug.reason}`;
+      const hotfixDeprecated = `[WARNING] Use ${bug.version} instead of ${row.package.version}, reason: ${bug.reason}`;
       packageJSON.deprecated = row.package.deprecated ? `${row.package.deprecated} (${hotfixDeprecated})` : hotfixDeprecated;
-      // dont change version
+      // don't change version
       packageJSON.version = row.package.version;
       Object.assign(row.package, packageJSON);
     }
