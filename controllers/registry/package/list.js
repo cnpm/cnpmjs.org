@@ -4,6 +4,7 @@ var debug = require('debug')('cnpmjs.org:controllers:registry:package:list');
 var utility = require('utility');
 var packageService = require('../../../services/package');
 var blocklistService = require('../../../services/blocklist');
+var bugVersionService = require('../../../services/bug_version');
 var common = require('../../../lib/common');
 var SyncModuleWorker = require('../../sync_module_worker');
 var config = require('../../../config');
@@ -29,27 +30,20 @@ function filterBlockVerions(rows, blocks) {
  */
 module.exports = function* list() {
   const name = this.params.name || this.params[0];
-  // sync request will contain this query params
-  let noCache = this.query.cache === '0';
-  if (!noCache) {
-    const ua = this.headers['user-agent'] || '';
-    // old sync client will request with these user-agent
-    if (ua.indexOf('npm_service.cnpmjs.org/') !== -1) {
-      noCache = true;
-    }
-  }
+  const isSyncWorkerRequest = common.isSyncWorkerRequest(this);
   const isJSONPRequest = this.query.callback;
-  let cacheKey;
+  let cacheKey = '';
   let needAbbreviatedMeta = false;
   let abbreviatedMetaType = 'application/vnd.npm.install-v1+json';
   if (config.enableAbbreviatedMetadata && this.accepts([ 'json', abbreviatedMetaType ]) === abbreviatedMetaType) {
     needAbbreviatedMeta = true;
-    if (cache && !isJSONPRequest) {
+    // don't cache result on sync request
+    if (cache && !isJSONPRequest && !isSyncWorkerRequest) {
       cacheKey = `list-${name}-v1`;
     }
   }
-
-  if (cacheKey && !noCache) {
+  
+  if (cacheKey) {
     const values = yield cache.hmget(cacheKey, 'etag', 'body');
     if (values && values[0] && values[1]) {
       this.body = values[1];
@@ -112,14 +106,14 @@ module.exports = function* list() {
     var rows = yield packageService.listModuleAbbreviatedsByName(name);
     rows = filterBlockVerions(rows, blocks);
     if (rows.length > 0) {
-      yield handleAbbreviatedMetaRequest(this, name, modifiedTime, tags, rows, cacheKey);
+      yield handleAbbreviatedMetaRequest(this, name, modifiedTime, tags, rows, cacheKey, isSyncWorkerRequest);
       return;
     }
     var fullRows = yield packageService.listModulesByName(name);
     fullRows = filterBlockVerions(fullRows, blocks);
     if (fullRows.length > 0) {
       // no abbreviated meta rows, use the full meta convert to abbreviated meta
-      yield handleAbbreviatedMetaRequestWithFullMeta(this, name, modifiedTime, tags, fullRows);
+      yield handleAbbreviatedMetaRequestWithFullMeta(this, name, modifiedTime, tags, fullRows, isSyncWorkerRequest);
       return;
     }
   }
@@ -228,6 +222,9 @@ module.exports = function* list() {
       createdTime = t;
     }
   }
+  if (!isSyncWorkerRequest) {
+    yield bugVersionService.hotfix(rows);
+  }
 
   if (modifiedTime && createdTime) {
     var ts = {
@@ -303,8 +300,9 @@ module.exports = function* list() {
   }
 };
 
-function* handleAbbreviatedMetaRequest(ctx, name, modifiedTime, tags, rows, cacheKey) {
-  debug('show %s got %d rows, %d tags, modifiedTime: %s', name, rows.length, tags.length, modifiedTime);
+function* handleAbbreviatedMetaRequest(ctx, name, modifiedTime, tags, rows, cacheKey, isSyncWorkerRequest) {
+  debug('show %s got %d rows, %d tags, modifiedTime: %s, cacheKey: %s, isSyncWorkerRequest: %s',
+    name, rows.length, tags.length, modifiedTime, cacheKey, isSyncWorkerRequest);
   const isJSONPRequest = ctx.query.callback;
   var latestMod = null;
   // set tags
@@ -334,6 +332,10 @@ function* handleAbbreviatedMetaRequest(ctx, name, modifiedTime, tags, rows, cach
     if (!modifiedTime || row.gmt_modified > modifiedTime) {
       modifiedTime = row.gmt_modified;
     }
+  }
+  // don't use bug-versions hotfix on sync request
+  if (!isSyncWorkerRequest) {
+    yield bugVersionService.hotfix(rows);
   }
 
   if (!latestMod) {
@@ -388,9 +390,9 @@ function* handleAbbreviatedMetaRequest(ctx, name, modifiedTime, tags, rows, cach
   }
 }
 
-function* handleAbbreviatedMetaRequestWithFullMeta(ctx, name, modifiedTime, tags, rows) {
-  debug('show %s got %d rows, %d tags',
-    name, rows.length, tags.length);
+function* handleAbbreviatedMetaRequestWithFullMeta(ctx, name, modifiedTime, tags, rows, isSyncWorkerRequest) {
+  debug('show %s got %d rows, %d tags, isSyncWorkerRequest: %s',
+    name, rows.length, tags.length, isSyncWorkerRequest);
   var latestMod = null;
   // set tags
   var distTags = {};
@@ -440,11 +442,15 @@ function* handleAbbreviatedMetaRequestWithFullMeta(ctx, name, modifiedTime, tags
     common.setDownloadURL(pkg, ctx);
 
     versions[pkg.version] = pkg;
+    row.package = pkg;
     allVersionString += pkg.version + ',';
 
     if ((!distTags.latest && !latestMod) || distTags.latest === pkg.version) {
       latestMod = row;
     }
+  }
+  if (!isSyncWorkerRequest) {
+    yield bugVersionService.hotfix(rows);
   }
 
   if (!latestMod) {

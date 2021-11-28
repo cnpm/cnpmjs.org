@@ -25,7 +25,6 @@ module.exports = function* download(next) {
     filename = `${scope}/${filename}`;
   }
 
-
   var version = filename.slice(name.length + 1, -4);
   // can not get dist
   var url = null;
