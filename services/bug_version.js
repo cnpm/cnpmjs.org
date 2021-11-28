@@ -32,38 +32,18 @@ exports.hotfix = function* (rows) {
 
   const existsVerionsMap = {};
   for (row of rows) {
-    existsVerionsMap[row.version] = true;
+    existsVerionsMap[row.package.version] = row.package;
   }
 
   for (row of rows) {
-    const bug = bugs[row.version];
+    const bug = bugs[row.package.version];
     if (bug && bug.version && existsVerionsMap[bug.version]) {
+      const packageJSON = JSON.parse(JSON.stringify(existsVerionsMap[bug.version]));
       const hotfixDeprecated = `[WARNING] Use ${bug.version} instead of ${row.version}, reason: ${bug.reason}`;
-      row.package.deprecated = row.package.deprecated ? `${row.package.deprecated} (${hotfixDeprecated})` : hotfixDeprecated;
-    }
-  }
-};
-
-exports.getHotfixVersion = function* (name, version) {
-  if (!config.enableBugVersion) {
-    return;
-  }
-  const moduleRow = yield packageService.getLatestModule('bug-versions');
-  if (!moduleRow) {
-    return;
-  }
-  const bugVersions = moduleRow.package['bug-versions'];
-  const bugs = bugVersions && bugVersions[name];
-  if (!bugs) {
-    return;
-  }
-
-  const bug = bugs[version];
-  if (bug && bug.version) {
-    // make sure hotfix version exists
-    const row = yield packageService.getModule(name, bug.version);
-    if (row) {
-      return row.version;
+      packageJSON.deprecated = row.package.deprecated ? `${row.package.deprecated} (${hotfixDeprecated})` : hotfixDeprecated;
+      // dont change version
+      packageJSON.version = row.package.version;
+      Object.assign(row.package, packageJSON);
     }
   }
 };

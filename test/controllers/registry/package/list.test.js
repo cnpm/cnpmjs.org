@@ -135,6 +135,7 @@ describe('test/controllers/registry/package/list.test.js', () => {
       assert(data.versions['1.2.1']);
       assert(data.versions['1.2.5'].version === '1.2.5');
       assert(data.versions['1.2.5'].deprecated === '[WARNING] Use 1.2.1 instead of 1.2.5, reason: ignore post-install script https://github.com/andrew/base62.js/commits/master');
+      assert(data.versions['1.2.5'].dist.tarball.endsWith('/base62-1.2.1.tgz'));
       assert(!data.versions['1.2.1'].deprecated);
 
       res = yield request(app)
@@ -146,11 +147,13 @@ describe('test/controllers/registry/package/list.test.js', () => {
       assert(data.versions['1.2.1']);
       assert(data.versions['1.2.5'].version === '1.2.5');
       assert(data.versions['1.2.5'].deprecated === '[WARNING] Use 1.2.1 instead of 1.2.5, reason: ignore post-install script https://github.com/andrew/base62.js/commits/master');
+      assert(data.versions['1.2.5'].dist.tarball.endsWith('/base62-1.2.1.tgz'));
       assert(!data.versions['1.2.1'].deprecated);
 
+      // dont change download url
       yield request(app)
         .get('/base62/download/base62-1.2.5.tgz')
-        .expect('location', 'http://foo.test.com/base62/-/base62-1.2.1.tgz')
+        .expect('location', 'http://foo.test.com/base62/-/base62-1.2.5.tgz')
         .expect(302);
 
       // ignore when enableBugVersion = false
@@ -163,6 +166,7 @@ describe('test/controllers/registry/package/list.test.js', () => {
       assert(data.versions['1.2.5']);
       assert(data.versions['1.2.1']);
       assert(data.versions['1.2.5'].version === '1.2.5');
+      assert(data.versions['1.2.5'].dist.tarball.endsWith('/base62-1.2.5.tgz'));
       assert(!data.versions['1.2.5'].deprecated);
 
       yield request(app)
@@ -191,13 +195,17 @@ describe('test/controllers/registry/package/list.test.js', () => {
       assert(data.versions['4.14.1'].version === '4.14.1');
       assert(data.versions['4.14.0'].deprecated === 'mock deprecated exists here ([WARNING] Use 4.13.2 instead of 4.14.0, reason: https://github.com/ali-sdk/ali-oss/pull/382)');
       assert(data.versions['4.14.1'].deprecated === '[WARNING] Use 4.13.2 instead of 4.14.1, reason: https://github.com/ali-sdk/ali-oss/pull/382');
+      assert(data.versions['4.14.0'].dist.tarball.endsWith('/@cnpmtest/testmodule-list-bugversion-4.13.2.tgz'));
+      assert(data.versions['4.14.1'].dist.tarball.endsWith('/@cnpmtest/testmodule-list-bugversion-4.13.2.tgz'));
+      assert(data.versions['4.14.2'].dist.tarball.endsWith('/@cnpmtest/testmodule-list-bugversion-4.14.2.tgz'));
       // 4.14.2 replace bug version 1.0.0 dont exists, dont replace
       assert(!data.versions['4.14.2'].deprecated);
       assert(!data.versions['4.13.2'].deprecated);
 
+      // dont change download url
       yield request(app)
         .get('/@cnpmtest/testmodule-list-bugversion/download/@cnpmtest/testmodule-list-bugversion-4.14.0.tgz')
-        .expect('location', 'http://foo.test.com/@cnpmtest/testmodule-list-bugversion/-/@cnpmtest/testmodule-list-bugversion-4.13.2.tgz')
+        .expect('location', 'http://foo.test.com/@cnpmtest/testmodule-list-bugversion/-/@cnpmtest/testmodule-list-bugversion-4.14.0.tgz')
         .expect(302);
 
       res = yield request(app)
@@ -213,27 +221,12 @@ describe('test/controllers/registry/package/list.test.js', () => {
       assert(data.versions['4.14.1'].version === '4.14.1');
       assert(data.versions['4.14.0'].deprecated === 'mock deprecated exists here ([WARNING] Use 4.13.2 instead of 4.14.0, reason: https://github.com/ali-sdk/ali-oss/pull/382)');
       assert(data.versions['4.14.1'].deprecated === '[WARNING] Use 4.13.2 instead of 4.14.1, reason: https://github.com/ali-sdk/ali-oss/pull/382');
+      assert(data.versions['4.14.0'].dist.tarball.endsWith('/@cnpmtest/testmodule-list-bugversion-4.13.2.tgz'));
+      assert(data.versions['4.14.1'].dist.tarball.endsWith('/@cnpmtest/testmodule-list-bugversion-4.13.2.tgz'));
+      assert(data.versions['4.14.2'].dist.tarball.endsWith('/@cnpmtest/testmodule-list-bugversion-4.14.2.tgz'));
       // 4.14.2 replace bug version 1.0.0 dont exists, dont replace
       assert(!data.versions['4.14.2'].deprecated);
       assert(!data.versions['4.13.2'].deprecated);
-
-      yield request(app)
-        .get('/@cnpmtest/testmodule-list-bugversion/download/@cnpmtest/testmodule-list-bugversion-4.14.0.tgz')
-        .expect('location', 'http://foo.test.com/@cnpmtest/testmodule-list-bugversion/-/@cnpmtest/testmodule-list-bugversion-4.13.2.tgz')
-        .expect(302);
-      yield request(app)
-        .get('/@cnpmtest/testmodule-list-bugversion/download/@cnpmtest/testmodule-list-bugversion-4.14.1.tgz')
-        .expect('location', 'http://foo.test.com/@cnpmtest/testmodule-list-bugversion/-/@cnpmtest/testmodule-list-bugversion-4.13.2.tgz')
-        .expect(302);
-      yield request(app)
-        .get('/@cnpmtest/testmodule-list-bugversion/download/@cnpmtest/testmodule-list-bugversion-4.14.2.tgz')
-        .expect('location', 'http://foo.test.com/@cnpmtest/testmodule-list-bugversion/-/@cnpmtest/testmodule-list-bugversion-4.14.2.tgz')
-        .expect(302);
-      // ignore sync worker request
-      yield request(app)
-        .get('/@cnpmtest/testmodule-list-bugversion/download/@cnpmtest/testmodule-list-bugversion-4.14.0.tgz?cache=0')
-        .expect('location', 'http://foo.test.com/@cnpmtest/testmodule-list-bugversion/-/@cnpmtest/testmodule-list-bugversion-4.14.0.tgz')
-        .expect(302);
 
       // ignore when enableBugVersion = false
       mm(config, 'enableBugVersion', false);
@@ -264,14 +257,12 @@ describe('test/controllers/registry/package/list.test.js', () => {
       assert(data.versions['4.14.0'].version === '4.14.0');
       assert(data.versions['4.14.1'].version === '4.14.1');
       assert(data.versions['4.14.0'].deprecated === 'mock deprecated exists here');
+      assert(data.versions['4.14.0'].dist.tarball.endsWith('/@cnpmtest/testmodule-list-bugversion-4.14.0.tgz'));
+      assert(data.versions['4.14.1'].dist.tarball.endsWith('/@cnpmtest/testmodule-list-bugversion-4.14.1.tgz'));
+      assert(data.versions['4.14.2'].dist.tarball.endsWith('/@cnpmtest/testmodule-list-bugversion-4.14.2.tgz'));
       assert(!data.versions['4.14.1'].deprecated);
       assert(!data.versions['4.14.2'].deprecated);
       assert(!data.versions['4.13.2'].deprecated);
-
-      yield request(app)
-        .get('/@cnpmtest/testmodule-list-bugversion/download/@cnpmtest/testmodule-list-bugversion-4.14.0.tgz')
-        .expect('location', 'http://foo.test.com/@cnpmtest/testmodule-list-bugversion/-/@cnpmtest/testmodule-list-bugversion-4.14.0.tgz')
-        .expect(302);
     });
   });
 

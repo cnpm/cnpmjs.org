@@ -106,22 +106,14 @@ module.exports = function* list() {
     var rows = yield packageService.listModuleAbbreviatedsByName(name);
     rows = filterBlockVerions(rows, blocks);
     if (rows.length > 0) {
-      // don't use bug-versions hotfix on sync request
-      if (!isSyncWorkerRequest) {
-        yield bugVersionService.hotfix(rows);
-      }
-      yield handleAbbreviatedMetaRequest(this, name, modifiedTime, tags, rows, cacheKey);
+      yield handleAbbreviatedMetaRequest(this, name, modifiedTime, tags, rows, cacheKey, isSyncWorkerRequest);
       return;
     }
     var fullRows = yield packageService.listModulesByName(name);
     fullRows = filterBlockVerions(fullRows, blocks);
     if (fullRows.length > 0) {
-      // don't use bug-versions hotfix on sync request
-      if (!isSyncWorkerRequest) {
-        yield bugVersionService.hotfix(fullRows);
-      }
       // no abbreviated meta rows, use the full meta convert to abbreviated meta
-      yield handleAbbreviatedMetaRequestWithFullMeta(this, name, modifiedTime, tags, fullRows);
+      yield handleAbbreviatedMetaRequestWithFullMeta(this, name, modifiedTime, tags, fullRows, isSyncWorkerRequest);
       return;
     }
   }
@@ -185,9 +177,6 @@ module.exports = function* list() {
 
     return this.redirect(config.officialNpmRegistry + this.url);
   }
-  if (!isSyncWorkerRequest) {
-    yield bugVersionService.hotfix(rows);
-  }
 
   var latestMod = null;
   var readme = null;
@@ -232,6 +221,9 @@ module.exports = function* list() {
     if (!createdTime || t < createdTime) {
       createdTime = t;
     }
+  }
+  if (!isSyncWorkerRequest) {
+    yield bugVersionService.hotfix(rows);
   }
 
   if (modifiedTime && createdTime) {
@@ -308,8 +300,9 @@ module.exports = function* list() {
   }
 };
 
-function* handleAbbreviatedMetaRequest(ctx, name, modifiedTime, tags, rows, cacheKey) {
-  debug('show %s got %d rows, %d tags, modifiedTime: %s', name, rows.length, tags.length, modifiedTime);
+function* handleAbbreviatedMetaRequest(ctx, name, modifiedTime, tags, rows, cacheKey, isSyncWorkerRequest) {
+  debug('show %s got %d rows, %d tags, modifiedTime: %s, cacheKey: %s, isSyncWorkerRequest: %s',
+    name, rows.length, tags.length, modifiedTime, cacheKey, isSyncWorkerRequest);
   const isJSONPRequest = ctx.query.callback;
   var latestMod = null;
   // set tags
@@ -339,6 +332,10 @@ function* handleAbbreviatedMetaRequest(ctx, name, modifiedTime, tags, rows, cach
     if (!modifiedTime || row.gmt_modified > modifiedTime) {
       modifiedTime = row.gmt_modified;
     }
+  }
+  // don't use bug-versions hotfix on sync request
+  if (!isSyncWorkerRequest) {
+    yield bugVersionService.hotfix(rows);
   }
 
   if (!latestMod) {
@@ -393,9 +390,9 @@ function* handleAbbreviatedMetaRequest(ctx, name, modifiedTime, tags, rows, cach
   }
 }
 
-function* handleAbbreviatedMetaRequestWithFullMeta(ctx, name, modifiedTime, tags, rows) {
-  debug('show %s got %d rows, %d tags',
-    name, rows.length, tags.length);
+function* handleAbbreviatedMetaRequestWithFullMeta(ctx, name, modifiedTime, tags, rows, isSyncWorkerRequest) {
+  debug('show %s got %d rows, %d tags, isSyncWorkerRequest: %s',
+    name, rows.length, tags.length, isSyncWorkerRequest);
   var latestMod = null;
   // set tags
   var distTags = {};
@@ -445,11 +442,15 @@ function* handleAbbreviatedMetaRequestWithFullMeta(ctx, name, modifiedTime, tags
     common.setDownloadURL(pkg, ctx);
 
     versions[pkg.version] = pkg;
+    row.package = pkg;
     allVersionString += pkg.version + ',';
 
     if ((!distTags.latest && !latestMod) || distTags.latest === pkg.version) {
       latestMod = row;
     }
+  }
+  if (!isSyncWorkerRequest) {
+    yield bugVersionService.hotfix(rows);
   }
 
   if (!latestMod) {
