@@ -55,7 +55,8 @@ describe('test/controllers/registry/package/list.test.js', () => {
     before(function* () {
       let pkg = utils.getPackage('bug-versions', '1.0.0', utils.admin);
       const packageJSON = pkg.versions['1.0.0'];
-      packageJSON['bug-versions'] = {
+      packageJSON.config = {};
+      packageJSON.config['bug-versions'] = {
         "base62": {
           "1.2.5": {
             "version": "1.2.1",

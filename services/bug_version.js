@@ -13,18 +13,19 @@ exports.hotfix = function* (rows) {
     return;
   }
   // https://github.com/cnpm/bug-versions/blob/master/package.json#L118
-  // "bug-versions": {
-  //   "gifsicle": {
-  //     "5.3.0": {
-  //       "version": "5.2.1",
-  //       "reason": "https://github.com/imagemin/gifsicle-bin/issues/133"
-  //     }
-  //   },
+  // "config": {
+  //   "bug-versions": {
+  //     "gifsicle": {
+  //       "5.3.0": {
+  //         "version": "5.2.1",
+  //         "reason": "https://github.com/imagemin/gifsicle-bin/issues/133"
+  //       }
+  //     },
   const moduleRow = yield packageService.getLatestModule('bug-versions');
   if (!moduleRow) {
     return;
   }
-  const bugVersions = moduleRow.package['bug-versions'];
+  const bugVersions = moduleRow.package.config && moduleRow.package.config['bug-versions'];
   const bugs = bugVersions && bugVersions[row.package.name];
   if (!bugs) {
     return;
