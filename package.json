@@ -10,8 +10,7 @@
     "start": "./bin/nodejsctl start && cp History.md docs/web/history.md",
     "status": "./bin/nodejsctl status",
     "stop": "./bin/nodejsctl stop",
-    "ci": "make test-travis-mysql",
-    "contributor": "git-contributor"
+    "ci": "make test-travis-mysql"
   },
   "bin": {
     "cnpmjs.org": "bin/cli.js"
@@ -78,9 +77,7 @@
   "devDependencies": {
     "autod": "*",
     "chunkstream": "*",
-    "contributors": "*",
     "egg-ci": "^1.18.0",
-    "git-contributor": "^1.0.10",
     "intelli-espower-loader": "^1.0.1",
     "istanbul": "*",
     "jshint": "*",
