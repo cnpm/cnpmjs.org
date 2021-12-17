@@ -16,6 +16,7 @@ var block = require('../middleware/block');
 var auth = require('../middleware/auth');
 var staticCache = require('../middleware/static');
 var notFound = require('../middleware/registry_not_found');
+var models = require('../models');
 var cors = require('kcors');
 var proxyToNpm = require('../middleware/proxy_to_npm');
 var maxrequests = require('koa-maxrequests');
@@ -52,6 +53,7 @@ app.use(notFound);
 app.use(conditional());
 app.use(etag());
 
+app.models = models;
 for (const middleware of config.customRegistryMiddlewares) {
   app.use(middleware(app));
 }

@@ -18,6 +18,13 @@ let globalDownloads = new Map();
 module.exports = function* download(next) {
   var name = this.params.name || this.params[0];
   var filename = this.params.filename || this.params[1];
+  // scope pkg and download with out scope
+  if (name.startsWith('@') && !filename.startsWith('@')) {
+    var scope = name.slice(0, name.indexOf('/'));
+    // fix filename with scope
+    filename = `${scope}/${filename}`;
+  }
+
   var version = filename.slice(name.length + 1, -4);
   // can not get dist
   var url = null;

@@ -1,13 +1,16 @@
 'use strict';
 
 var assert = require('assert');
+var awaitEvent = require('await-event');
 var should = require('should');
 var mm = require('mm');
 var thunkify = require('thunkify-wrap');
 var request = require('supertest');
 var urllib = require('urllib');
 var urlparse = require('url').parse;
+var fs = require('mz/fs');
 var config = require('../../config');
+var common = require('../../lib/common');
 var SyncModuleWorker = require('../../controllers/sync_module_worker');
 var logService = require('../../services/module_log');
 var packageService = require('../../services/package');
@@ -141,6 +144,185 @@ describe('test/controllers/sync_module_worker.test.js', () => {
     worker.start();
     end = thunkify.event(worker, 'end');
     yield end();
+  });
+
+  it('should sync mk2test-module-cnpmsync add os, cpu success', function* () {
+    mm(config, 'enableAbbreviatedMetadata', true);
+    mm(config, 'sourceNpmRegistry', 'https://registry.npmjs.com');
+    var log = yield logService.create({
+      name: 'mk2test-module-cnpmsync',
+      username: 'fengmk2',
+    });
+    log.id.should.above(0);
+    var worker = new SyncModuleWorker({
+      logId: log.id,
+      name: 'mk2test-module-cnpmsync',
+      username: 'fengmk2',
+      noDep: true,
+    });
+    worker.start();
+    var end = thunkify.event(worker, 'end');
+    yield end();
+
+    let pkg;
+    let pkgV2;
+    let pkgV3;
+    let lastResHeaders;
+    function checkResult() {
+      return function (done) {
+        request(app)
+        .get('/mk2test-module-cnpmsync')
+        .set('accept', 'application/vnd.npm.install-v1+json')
+        .expect(function (res) {
+          lastResHeaders = res.headers;
+          pkg = res.body.versions['1.0.0'];
+          assert(pkg.os[0] === 'linux');
+          assert(pkg.cpu[0] === 'x64');
+          assert(!pkg.peerDependenciesMeta);
+          pkgV2 = res.body.versions['2.0.0'];
+          assert(pkgV2.os[0] === 'linux');
+          assert(pkgV2.cpu[0] === 'x64');
+          assert(pkgV2.peerDependenciesMeta);
+          pkgV3 = res.body.versions['3.0.0'];
+          assert(!pkgV3.os);
+          assert(!pkgV3.cpu);
+          assert(pkgV3.peerDependenciesMeta);
+        })
+        .expect(200, done);
+      };
+    }
+    yield checkResult();
+    const oldEtag = lastResHeaders.etag;
+    // check etag keep same again
+    yield checkResult();
+    assert(oldEtag == lastResHeaders.etag);
+
+    // modify result
+    yield packageService.updateModuleAbbreviatedPackage({
+      name: pkg.name,
+      version: pkg.version,
+      os: undefined,
+      cpu: undefined,
+      peerDependenciesMeta: undefined,
+    });
+
+    yield packageService.updateModuleAbbreviatedPackage({
+      name: pkgV2.name,
+      version: pkgV2.version,
+      os: undefined,
+      cpu: undefined,
+      peerDependenciesMeta: undefined,
+    });
+    yield packageService.updateModuleAbbreviatedPackage({
+      name: pkgV3.name,
+      version: pkgV3.version,
+      peerDependenciesMeta: undefined,
+    });
+
+    function checkModifiyResult() {
+      return function (done) {
+        request(app)
+        .get('/mk2test-module-cnpmsync')
+        .set('accept', 'application/vnd.npm.install-v1+json')
+        .expect(function (res) {
+          // console.log(JSON.stringify(res.body, null, 2));
+          assert(!res.body.versions['1.0.0'].os);
+          assert(!res.body.versions['1.0.0'].cpu);
+          assert(!res.body.versions['2.0.0'].peerDependenciesMeta);
+          assert(!res.body.versions['3.0.0'].peerDependenciesMeta);
+        })
+        .expect(200, done);
+      };
+    }
+    yield checkModifiyResult();
+
+    // sync again
+    worker = new SyncModuleWorker({
+      logId: log.id,
+      name: 'mk2test-module-cnpmsync',
+      username: 'fengmk2',
+      noDep: true,
+    });
+    worker.start();
+    end = thunkify.event(worker, 'end');
+    yield end();
+
+    // check again still work
+    yield checkResult();
+    const newEtag = lastResHeaders.etag;
+    assert(newEtag !== oldEtag);
+
+    // check etag keep same again
+    yield checkResult();
+    assert(newEtag == lastResHeaders.etag);
+  });
+
+  it('should sync mk2test-module-cnpmsync-issue-1667 with remoteAbbreviatedVersion success', function* () {
+    mm(config, 'enableAbbreviatedMetadata', true);
+    mm(config, 'sourceNpmRegistry', 'https://registry.npmjs.com');
+    var log = yield logService.create({
+      name: 'mk2test-module-cnpmsync-issue-1667',
+      username: 'fengmk2',
+    });
+    log.id.should.above(0);
+    var worker = new SyncModuleWorker({
+      logId: log.id,
+      name: 'mk2test-module-cnpmsync-issue-1667',
+      username: 'fengmk2',
+      noDep: true,
+    });
+    worker.start();
+    var end = thunkify.event(worker, 'end');
+    yield end();
+
+    let pkg;
+    let pkgV2;
+    let pkgV3;
+    let lastResHeaders;
+    function checkResult() {
+      return function (done) {
+        request(app)
+        .get('/mk2test-module-cnpmsync-issue-1667')
+        .set('accept', 'application/vnd.npm.install-v1+json')
+        .expect(function (res) {
+          lastResHeaders = res.headers;
+          console.log('%j', res.body);
+          pkg = res.body.versions['3.0.0'];
+          assert(pkg.hasInstallScript === true);
+          // no scripts
+          assert(!pkg.scripts);
+          assert(pkg.dist.key === '/mk2test-module-cnpmsync-issue-1667/-/mk2test-module-cnpmsync-issue-1667-3.0.0.tgz');
+          assert(!('noattachment' in pkg.dist));
+        })
+        .expect(200, done);
+      };
+    }
+    yield checkResult();
+
+    function checkFullResult() {
+      return function (done) {
+        request(app)
+        .get('/mk2test-module-cnpmsync-issue-1667')
+        .set('accept', 'application/json')
+        .expect(function (res) {
+          lastResHeaders = res.headers;
+          console.log('%j', res.body);
+          pkg = res.body.versions['3.0.0'];
+          assert(pkg.hasInstallScript === true);
+          // has scripts
+          assert(pkg.scripts);
+          // console.log(pkg.dist);
+          assert(pkg.dist.key === '/mk2test-module-cnpmsync-issue-1667/-/mk2test-module-cnpmsync-issue-1667-3.0.0.tgz');
+          assert(pkg.dist.integrity === 'sha512-pwnnZyjvr29UxwFAIx7xHvVCkFpGVAYgaFllr/m5AZoD1CR2uHHPw16ISEO/A2rZ0WM3UoAghwd5bAZ4pYzD2Q==');
+          assert(pkg.dist.shasum === 'c31af371a6cdc10dd5b9ad26625a4c863249198d');
+          assert(pkg.dist.fileCount === 2);
+          assert(pkg.dist.unpackedSize === 232);
+          assert(pkg.dist.size === 271);
+        })
+        .expect(200, done);
+      };
+    }
+    yield checkFullResult();
   });
 
   it('should sync upstream first', function* () {
@@ -454,5 +636,354 @@ describe('test/controllers/sync_module_worker.test.js', () => {
         should.not.exists(user);
       });
     });
+  });
+
+  describe('save backup files', function () {
+    const pkgName = 'backup-test';
+
+    beforeEach(() => {
+      mm(config, 'syncBackupFiles', true);
+    });
+
+    describe('package not exists', () => {
+      const mockPackageJson = {
+        name: pkgName,
+        version: '1.0.0',
+        description: 'foo',
+      };
+
+      beforeEach(() => {
+        mm(packageService, 'listModulesByName', function* () {
+          return [
+            { name: pkgName, version: '1.0.0' },
+          ];
+        });
+        mm(packageService, 'showPackage', function* () {
+          return { package: mockPackageJson };
+        });
+      });
+
+      afterEach(function* () {
+        yield config.nfs.remove(common.getPackageFileCDNKey(pkgName, '1.0.0'));
+      });
+
+      it('should upload new file', function* () {
+        var worker = new SyncModuleWorker({
+          name: pkgName,
+          username: 'fengmk2',
+        });
+        yield worker._saveBackupFiles();
+
+        const cdnKey = common.getPackageFileCDNKey(pkgName, '1.0.0');
+        const filePath = '/tmp/tnpm-1.0.0.json';
+        yield config.nfs.download(cdnKey, filePath);
+        const fileContent = yield fs.readFile(filePath, 'utf8');
+        const packageJson = JSON.parse(fileContent);
+        assert.deepStrictEqual(packageJson, mockPackageJson);
+      });
+    });
+
+    describe('new dist tag', () => {
+      beforeEach(() => {
+        mm(packageService, 'listModulesByName', function* () {
+          return [];
+        });
+        mm(packageService, 'listModuleTags', function* () {
+          return [
+            { tag: 'latest', version: '1.0.0' },
+          ];
+        });
+      });
+
+      afterEach(function* () {
+        yield config.nfs.remove(common.getDistTagCDNKey(pkgName, 'latest'));
+      });
+
+      it('should create dist-tag file', function* () {
+        var worker = new SyncModuleWorker({
+          name: pkgName,
+          username: 'fengmk2',
+        });
+        yield worker._saveBackupFiles();
+
+        const cdnKey = common.getDistTagCDNKey(pkgName, 'latest');
+        const filePath = '/tmp/tnpm-dist-tag.json';
+        yield config.nfs.download(cdnKey, filePath);
+        const fileContent = yield fs.readFile(filePath, 'utf8');
+        assert(fileContent === '1.0.0');
+      });
+    });
+
+    describe('remove dist tag', () => {
+      beforeEach(function* () {
+        mm(packageService, 'listModulesByName', function* () {
+          return [];
+        });
+        mm(packageService, 'listModuleTags', function* () {
+          return [];
+        });
+        const cdnKey = common.getDistTagCDNKey(pkgName, 'latest');
+        const filePath = '/tmp/tnpm-dist-tag.json';
+        yield fs.writeFile(filePath, '1.0.0');
+        yield config.nfs.upload(filePath, {
+          key: cdnKey,
+        });
+      });
+
+      it('should delete', function* () {
+        var worker = new SyncModuleWorker({
+          name: pkgName,
+          username: 'fengmk2',
+        });
+        yield worker._saveBackupFiles();
+
+        const cdnKey = common.getDistTagCDNKey(pkgName, 'latest');
+        let err;
+        try {
+          const filePath = '/tmp/tnpm-dist-tag.json';
+          yield config.nfs.download(cdnKey, filePath);
+        } catch (e) {
+          err = e;
+        }
+        assert(/ENOENT/.test(err));
+      });
+    });
+
+    describe('update dist tag', () => {
+      beforeEach(function* () {
+        mm(packageService, 'listModulesByName', function* () {
+          return [];
+        });
+        mm(packageService, 'listModuleTags', function* () {
+          return [
+            { tag: 'latest', version: '1.0.1' },
+          ];
+        });
+        const cdnKey = common.getDistTagCDNKey(pkgName, 'latest');
+        const filePath = '/tmp/tnpm-dist-tag.json';
+        yield fs.writeFile(filePath, '1.0.0');
+        yield config.nfs.upload(filePath, {
+          key: cdnKey,
+        });
+      });
+
+      afterEach(function* () {
+        yield config.nfs.remove(common.getDistTagCDNKey(pkgName, 'latest'));
+      });
+
+      it('should update dist-tag file', function* () {
+        var worker = new SyncModuleWorker({
+          name: pkgName,
+          username: 'fengmk2',
+        });
+        yield worker._saveBackupFiles();
+
+        const cdnKey = common.getDistTagCDNKey(pkgName, 'latest');
+        const filePath = '/tmp/tnpm-dist-tag.json';
+        yield config.nfs.download(cdnKey, filePath);
+        const fileContent = yield fs.readFile(filePath, 'utf8');
+        assert(fileContent === '1.0.1');
+      });
+    });
+
+    describe('package unpublished', () => {
+      it('should sync unpublished info', function* () {
+        var worker = new SyncModuleWorker({
+          name: ['afp'],
+          username: 'fengmk2'
+        });
+
+        worker.start();
+        yield awaitEvent(worker, 'end');
+
+        const cdnKey = common.getUnpublishFileKey('afp');
+        const filePath = '/tmp/unpublish-package.json';
+        yield config.nfs.download(cdnKey, filePath);
+        const fileContent = yield fs.readFile(filePath, 'utf8');
+        assert(fileContent);
+      });
+    });
+  });
+
+  describe('sync from backup files', function () {
+    const pkgName = 'sync-from-backup-files';
+    const publishTime100 = Date.now() - 1000 * 60;
+    const publishTime101 = Date.now();
+
+    afterEach(function* () {
+      try {
+        yield config.nfs.remove(common.getDistTagCDNKey(pkgName, 'latest'));
+        yield config.nfs.remove(common.getDistTagCDNKey(pkgName, 'beta'));
+        yield config.nfs.remove(common.getPackageFileCDNKey(pkgName, '1.0.1'));
+        yield config.nfs.remove(common.getPackageFileCDNKey(pkgName, '1.0.0'));
+      } catch (_) {
+        // ...
+      }
+    });
+
+    beforeEach(function* () {
+      mm(config, 'syncBackupFiles', true);
+
+      const packageFileCDNKey100 = common.getPackageFileCDNKey(pkgName, '1.0.0');
+      const packageFilePath = '/tmp/tnpm-package.json';
+      yield fs.writeFile(packageFilePath, JSON.stringify({
+        name: pkgName,
+        version: '1.0.0',
+        publish_time: publishTime100,
+        description: 'mock desc',
+        maintainers: [],
+        author: {},
+        repository: {},
+        readme: 'mock readme',
+        readmeFilename: 'README.md',
+        homepage: 'mock home page',
+        bugs: {},
+        license: 'MIT',
+      }));
+      yield config.nfs.upload(packageFilePath, {
+        key: packageFileCDNKey100,
+      });
+
+      const packageFileCDNKey101 = common.getPackageFileCDNKey(pkgName, '1.0.1');
+      yield fs.writeFile(packageFilePath, JSON.stringify({
+        name: pkgName,
+        version: '1.0.1',
+        publish_time: publishTime101,
+        description: 'mock desc 101',
+        maintainers: [],
+        author: {},
+        repository: {},
+        readme: 'mock readme 101',
+        readmeFilename: 'README.md',
+        homepage: 'mock home page 101',
+        bugs: {},
+        license: 'MIT',
+      }));
+      yield config.nfs.upload(packageFilePath, {
+        key: packageFileCDNKey101,
+      });
+
+      const distTagCDNKey = common.getDistTagCDNKey(pkgName, 'latest');
+      const distTagFilePath = '/tmp/tnpm-dist-tag.json';
+      yield fs.writeFile(distTagFilePath, '1.0.0');
+      yield config.nfs.upload(distTagFilePath, {
+        key: distTagCDNKey,
+      });
+
+      const distTagCDNKeyBeta = common.getDistTagCDNKey(pkgName, 'beta');
+      yield fs.writeFile(distTagFilePath, '1.0.1');
+      yield config.nfs.upload(distTagFilePath, {
+        key: distTagCDNKeyBeta,
+      });
+    });
+
+    it('should create pkg', function (done) {
+      var worker = new SyncModuleWorker({
+        name: pkgName,
+        username: 'fengmk2',
+        syncFromBackupFile: true,
+      });
+      var syncPkg;
+      mm(worker, '_sync', function* (name, pkg) {
+        syncPkg = pkg;
+        return [ '1.0.0' ];
+      })
+      worker.start();
+      worker.on('end', function () {
+        assert.deepStrictEqual(worker.successes, [
+          pkgName,
+        ]);
+
+        assert.deepStrictEqual(syncPkg, {
+          name: pkgName,
+          'dist-tags': { beta: '1.0.1', latest: '1.0.0' },
+          versions: {
+            '1.0.0': {
+              name: pkgName,
+              version: '1.0.0',
+              publish_time: publishTime100,
+              description: 'mock desc',
+              maintainers: [],
+              author: {},
+              repository: {},
+              readme: 'mock readme',
+              readmeFilename: 'README.md',
+              homepage: 'mock home page',
+              bugs: {},
+              license: 'MIT'
+            },
+            '1.0.1': {
+              name: pkgName,
+              version: '1.0.1',
+              publish_time: publishTime101,
+              description: 'mock desc 101',
+              maintainers: [],
+              author: {},
+              repository: {},
+              readme: 'mock readme 101',
+              readmeFilename: 'README.md',
+              homepage: 'mock home page 101',
+              bugs: {},
+              license: 'MIT'
+            }
+          },
+          time: {
+            modified: new Date(publishTime101),
+            created: new Date(publishTime100),
+            '1.0.0': new Date(publishTime100),
+            '1.0.1': new Date(publishTime101),
+          },
+          description: 'mock desc 101',
+          maintainers: [],
+          author: {},
+          repository: {},
+          readme: 'mock readme 101',
+          readmeFilename: 'README.md',
+          homepage: 'mock home page 101',
+          bugs: {},
+          license: 'MIT'
+        });
+        done();
+      });
+    });
+
+    describe('unpublish', () => {
+      before(function* () {
+        const filePath = '/tmp/unpublish-package.json';
+        const cdnKey = common.getUnpublishFileKey('afp');
+        yield fs.writeFile(filePath, JSON.stringify({
+          name: 'xinglie',
+          time: '2017-02-21T13:10:22.892Z',
+          tags: { latest: '0.0.1' },
+          maintainers:[{
+            name: 'xinglie',
+            email: 'kooboy_li@163.com'
+          }],
+          versions:["0.0.1"]
+        }));
+        yield config.nfs.upload(filePath, {
+          key: cdnKey,
+        });
+      });
+
+      it('should unpublished pkg', function* () {
+        const worker = new SyncModuleWorker({
+          name: ['afp'],
+          username: 'fengmk2',
+          syncFromBackupFile: true,
+        });
+        let unpublishPkg;
+        mm(worker, '_unpublished', function(pkg) {
+          unpublishPkg = pkg;
+          return Promise.resolve();
+        });
+
+        worker.start();
+        yield awaitEvent(worker, 'end');
+
+        assert(unpublishPkg === 'afp');
+      });
+    });
+
   });
 });

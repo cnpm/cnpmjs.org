@@ -2,15 +2,13 @@ cnpmjs.org
 =======
 
 [![npm version][npm-image]][npm-url]
-[![build status][travis-image]][travis-url]
+[![Node.js CI](https://github.com/cnpm/cnpmjs.org/actions/workflows/nodejs.yml/badge.svg)](https://github.com/cnpm/cnpmjs.org/actions/workflows/nodejs.yml)
 [![Test coverage][codecov-image]][codecov-url]
 [![Known Vulnerabilities][snyk-image]][snyk-url]
 [![npm download][download-image]][download-url]
 
 [npm-image]: http://cnpmjs.org/badge/v/cnpmjs.org.svg?style=flat-square
 [npm-url]: http://cnpmjs.org/package/cnpmjs.org
-[travis-image]: https://img.shields.io/travis/cnpm/cnpmjs.org.svg?style=flat-square
-[travis-url]: https://travis-ci.org/cnpm/cnpmjs.org
 [codecov-image]: https://codecov.io/gh/cnpm/cnpmjs.org/branch/master/graph/badge.svg
 [codecov-url]: https://codecov.io/gh/cnpm/cnpmjs.org
 [snyk-image]: https://snyk.io/test/npm/cnpmjs.org/badge.svg?style=flat-square
@@ -30,7 +28,8 @@ Our goal is to provide a low cost maintenance, easy to use, and easy to scale so
 ## What can you do with `cnpmjs.org`?
 
 * Build a private npm for your own enterprise. ([alibaba](http://www.alibaba.com/) is using `cnpmjs.org` now)
-* Build a npm mirror. (we use it to build a mirror in China: [https://npm.taobao.org/](https://npm.taobao.org/))
+* Build a npm mirror. (we use it to build a mirror in China: [https://npmmirror.com/](https://npmmirror.com/))
+* Use the private npm service provided by Alibaba Cloud DevOps which build with cnpm. [https://packages.aliyun.com/](https://packages.aliyun.com/?channel=pd_cnpm_github)
 
 ## Features
 
@@ -65,7 +64,7 @@ you only need to change the registry in client config.
 
 * [node](http://nodejs.org) >= 8.0.0
 * Databases: only required one type
-  * [sqlite3](https://npm.taobao.org/package/sqlite3) >= 3.0.2, we use `sqlite3` by default
+  * [sqlite3](https://npmmirror.com/package/sqlite3) >= 3.0.2, we use `sqlite3` by default
   * [MySQL](http://dev.mysql.com/downloads/) >= 5.6.16, include `mysqld` and `mysql cli`. I test on `mysql@5.6.16`.
   * MariaDB
   * PostgreSQL
@@ -156,23 +155,14 @@ $docker volume inspect cnpmjsorg_cnpm-db-volume
 
 Tips: make sure your code is following the [node-style-guide](https://github.com/felixge/node-style-guide).
 
-## Top contributors
-
-
-[![0](https://sourcerer.io/fame/fengmk2/cnpm/cnpmjs.org/images/0)](https://sourcerer.io/fame/fengmk2/cnpm/cnpmjs.org/links/0)
-[![1](https://sourcerer.io/fame/fengmk2/cnpm/cnpmjs.org/images/1)](https://sourcerer.io/fame/fengmk2/cnpm/cnpmjs.org/links/1)
-[![2](https://sourcerer.io/fame/fengmk2/cnpm/cnpmjs.org/images/2)](https://sourcerer.io/fame/fengmk2/cnpm/cnpmjs.org/links/2)
-[![3](https://sourcerer.io/fame/fengmk2/cnpm/cnpmjs.org/images/3)](https://sourcerer.io/fame/fengmk2/cnpm/cnpmjs.org/links/3)
-[![4](https://sourcerer.io/fame/fengmk2/cnpm/cnpmjs.org/images/4)](https://sourcerer.io/fame/fengmk2/cnpm/cnpmjs.org/links/4)
-[![5](https://sourcerer.io/fame/fengmk2/cnpm/cnpmjs.org/images/5)](https://sourcerer.io/fame/fengmk2/cnpm/cnpmjs.org/links/5)
-[![6](https://sourcerer.io/fame/fengmk2/cnpm/cnpmjs.org/images/6)](https://sourcerer.io/fame/fengmk2/cnpm/cnpmjs.org/links/6)
-[![7](https://sourcerer.io/fame/fengmk2/cnpm/cnpmjs.org/images/7)](https://sourcerer.io/fame/fengmk2/cnpm/cnpmjs.org/links/7)
-
-
 ## Sponsors
 
-- [![阿里云](https://static.aliyun.com/images/www-summerwind/logo.gif)](http://click.aliyun.com/m/4288/) (2016.2 - now)
+- [![阿里云](https://static.aliyun.com/images/www-summerwind/logo.gif)](http://click.aliyun.com/m/4288/) [![阿里云云效](https://img.alicdn.com/tfs/TB116yt3fb2gK0jSZK9XXaEgFXa-106-20.png)](https://devops.aliyun.com/?channel=pd_cnpm_github) (2016.2 - now)
 
 ## License
 
 [MIT](LICENSE.txt)
+
+## Contributors
+
+[![](https://badges.implements.io/api/contributors?org=cnpm&repo=cnpmjs.org&width=1250&size=96&padding=6)](https://github.com/cnpm/cnpmjs.org/graphs/contributors)

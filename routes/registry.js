@@ -29,6 +29,12 @@ var listPackagesByUser = require('../controllers/registry/package/list_by_user')
 var addUser = require('../controllers/registry/user/add');
 var showUser = require('../controllers/registry/user/show');
 var updateUser = require('../controllers/registry/user/update');
+var whoami = require('../controllers/registry/user/whoami');
+var ping = require('../controllers/registry/user/ping');
+
+var createToken = require('../controllers/registry/token/create');
+var delToken = require('../controllers/registry/token/del');
+var listToken = require('../controllers/registry/token/list');
 
 var sync = require('../controllers/sync');
 var userPackage = require('../controllers/registry/user_package');
@@ -53,6 +59,9 @@ function routes(app) {
   app.get('/-/short', listShorts);
 
   app.get('/-/allversions', listAllPackageVersions);
+
+  app.get('/-/whoami', login, whoami);
+  app.get('/-/ping', login, ping);
 
   // module
   // scope package: params: [$name]
@@ -79,8 +88,10 @@ function routes(app) {
 
   // need limit by ip
   app.get(/^\/(@[\w\-\.]+\/[\w\-\.]+)\/download\/(@[\w\-\.]+\/[\w\-\.]+)$/, limit, downloadPackage);
+  app.get(/^\/(@[\w\-\.]+\/[\w\-\.]+)\/download\/([\w\-\.]+)$/, limit, downloadPackage);
   app.get('/:name/download/:filename', limit, downloadPackage);
   app.get(/^\/(@[\w\-\.]+\/[\w\-\.]+)\/\-\/(@[\w\-\.]+\/[\w\-\.]+)$/, limit, downloadPackage);
+  app.get(/^\/(@[\w\-\.]+\/[\w\-\.]+)\/\-\/([\w\-\.]+)$/, limit, downloadPackage);
   app.get('/:name/-/:filename', limit, downloadPackage);
 
   // delete tarball and remove one version
@@ -101,6 +112,11 @@ function routes(app) {
   app.put('/-/user/org.couchdb.user::name', addUser);
   app.get('/-/user/org.couchdb.user::name', showUser);
   app.put('/-/user/org.couchdb.user::name/-rev/:rev', login, updateUser);
+
+  // token api
+  app.get('/-/npm/v1/tokens', login, listToken);
+  app.post('/-/npm/v1/tokens', login, createToken);
+  app.delete('/-/npm/v1/tokens/token/:UUID', login, delToken);
 
   // list all packages of user
   app.get('/-/by-user/:user', userPackage.list);

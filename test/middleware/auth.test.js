@@ -5,11 +5,12 @@ var app = require('../../servers/registry');
 var mm = require('mm');
 var config = require('../../config');
 var userService = require('../../services/user');
+var tokenService = require('../../services/token');
 
 describe('test/middleware/auth.test.js', function () {
   afterEach(mm.restore);
 
-  describe('auth()', function () {
+  describe('basic auth', function () {
     it('should pass if no authorization', function (done) {
       request(app)
       .get('/-/user/org.couchdb.user:cnpmjstest10')
@@ -60,6 +61,25 @@ describe('test/middleware/auth.test.js', function () {
         })
         .expect(401, done);
       });
+    });
+  });
+
+  describe('bearer auth', function () {
+    var token;
+
+    beforeEach(function* () {
+      token = yield tokenService.createToken('cnpmjstest10');
+    });
+
+    afterEach(function* () {
+      yield tokenService.deleteToken('cnpmjstest10', token.token);
+    });
+
+    it('should ok', function (done) {
+      request(app)
+        .get('/-/user/org.couchdb.user:cnpmjstest10')
+        .set('authorization', 'Bearer ' + token.token)
+        .expect(200, done);
     });
   });
 

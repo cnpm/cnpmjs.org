@@ -3,6 +3,8 @@
 var debug = require('debug')('cnpmjs.org:controllers:registry:package:list');
 var utility = require('utility');
 var packageService = require('../../../services/package');
+var blocklistService = require('../../../services/blocklist');
+var bugVersionService = require('../../../services/bug_version');
 var common = require('../../../lib/common');
 var SyncModuleWorker = require('../../sync_module_worker');
 var config = require('../../../config');
@@ -15,33 +17,33 @@ function etag(objs) {
   return 'W/"' + utility.md5(JSON.stringify(objs)) + '"';
 }
 
+function filterBlockVerions(rows, blocks) {
+  if (!blocks) {
+    return rows;
+  }
+  return rows.filter(row => !blocks[row.version]);
+}
+
 /**
  * list all version of a module
  * GET /:name
  */
 module.exports = function* list() {
   const name = this.params.name || this.params[0];
-  // sync request will contain this query params
-  let noCache = this.query.cache === '0';
-  if (!noCache) {
-    const ua = this.headers['user-agent'] || '';
-    // old sync client will request with these user-agent
-    if (ua.indexOf('npm_service.cnpmjs.org/') !== -1) {
-      noCache = true;
-    }
-  }
+  const isSyncWorkerRequest = common.isSyncWorkerRequest(this);
   const isJSONPRequest = this.query.callback;
-  let cacheKey;
+  let cacheKey = '';
   let needAbbreviatedMeta = false;
   let abbreviatedMetaType = 'application/vnd.npm.install-v1+json';
   if (config.enableAbbreviatedMetadata && this.accepts([ 'json', abbreviatedMetaType ]) === abbreviatedMetaType) {
     needAbbreviatedMeta = true;
-    if (cache && !isJSONPRequest) {
+    // don't cache result on sync request
+    if (cache && !isJSONPRequest && !isSyncWorkerRequest) {
       cacheKey = `list-${name}-v1`;
     }
   }
-
-  if (cacheKey && !noCache) {
+  
+  if (cacheKey) {
     const values = yield cache.hmget(cacheKey, 'etag', 'body');
     if (values && values[0] && values[1]) {
       this.body = values[1];
@@ -63,9 +65,22 @@ module.exports = function* list() {
   var rs = yield [
     packageService.getModuleLastModified(name),
     packageService.listModuleTags(name),
+    blocklistService.findBlockPackageVersions(name),
   ];
   var modifiedTime = rs[0];
   var tags = rs[1];
+  var blocks = rs[2];
+
+  if (blocks && blocks['*']) {
+    this.status = 451;
+    const error = `[block] package was blocked, reason: ${blocks['*'].reason}`;
+    this.jsonp = {
+      name,
+      error,
+      reason: error,
+    };
+    return;
+  }
 
   debug('show %s, last modified: %s, tags: %j', name, modifiedTime, tags);
   if (modifiedTime) {
@@ -89,14 +104,16 @@ module.exports = function* list() {
 
   if (needAbbreviatedMeta) {
     var rows = yield packageService.listModuleAbbreviatedsByName(name);
+    rows = filterBlockVerions(rows, blocks);
     if (rows.length > 0) {
-      yield handleAbbreviatedMetaRequest(this, name, modifiedTime, tags, rows, cacheKey);
+      yield handleAbbreviatedMetaRequest(this, name, modifiedTime, tags, rows, cacheKey, isSyncWorkerRequest);
       return;
     }
     var fullRows = yield packageService.listModulesByName(name);
+    fullRows = filterBlockVerions(fullRows, blocks);
     if (fullRows.length > 0) {
       // no abbreviated meta rows, use the full meta convert to abbreviated meta
-      yield handleAbbreviatedMetaRequestWithFullMeta(this, name, modifiedTime, tags, fullRows);
+      yield handleAbbreviatedMetaRequestWithFullMeta(this, name, modifiedTime, tags, fullRows, isSyncWorkerRequest);
       return;
     }
   }
@@ -106,7 +123,7 @@ module.exports = function* list() {
     packageService.listStarUserNames(name),
     packageService.listMaintainers(name),
   ];
-  var rows = r[0];
+  var rows = filterBlockVerions(r[0], blocks);
   var starUsers = r[1];
   var maintainers = r[2];
 
@@ -205,6 +222,9 @@ module.exports = function* list() {
       createdTime = t;
     }
   }
+  if (!isSyncWorkerRequest) {
+    yield bugVersionService.hotfix(rows);
+  }
 
   if (modifiedTime && createdTime) {
     var ts = {
@@ -258,6 +278,10 @@ module.exports = function* list() {
   info.bugs = pkg.bugs;
   info.license = pkg.license;
 
+  if (typeof config.formatCustomFullPackageInfoAndVersions === 'function') {
+    info = config.formatCustomFullPackageInfoAndVersions(this, info);
+  }
+
   debug('show module %s: %s, latest: %s', name, rev, latestMod.version);
   this.jsonp = info;
   // use faster etag
@@ -276,8 +300,9 @@ module.exports = function* list() {
   }
 };
 
-function* handleAbbreviatedMetaRequest(ctx, name, modifiedTime, tags, rows, cacheKey) {
-  debug('show %s got %d rows, %d tags, modifiedTime: %s', name, rows.length, tags.length, modifiedTime);
+function* handleAbbreviatedMetaRequest(ctx, name, modifiedTime, tags, rows, cacheKey, isSyncWorkerRequest) {
+  debug('show %s got %d rows, %d tags, modifiedTime: %s, cacheKey: %s, isSyncWorkerRequest: %s',
+    name, rows.length, tags.length, modifiedTime, cacheKey, isSyncWorkerRequest);
   const isJSONPRequest = ctx.query.callback;
   var latestMod = null;
   // set tags
@@ -303,6 +328,14 @@ function* handleAbbreviatedMetaRequest(ctx, name, modifiedTime, tags, rows, cach
     if ((!distTags.latest && !latestMod) || distTags.latest === pkg.version) {
       latestMod = row;
     }
+    // abbreviatedMeta row maybe update by syncer on missing attributes add
+    if (!modifiedTime || row.gmt_modified > modifiedTime) {
+      modifiedTime = row.gmt_modified;
+    }
+  }
+  // don't use bug-versions hotfix on sync request
+  if (!isSyncWorkerRequest) {
+    yield bugVersionService.hotfix(rows);
   }
 
   if (!latestMod) {
@@ -357,9 +390,9 @@ function* handleAbbreviatedMetaRequest(ctx, name, modifiedTime, tags, rows, cach
   }
 }
 
-function* handleAbbreviatedMetaRequestWithFullMeta(ctx, name, modifiedTime, tags, rows) {
-  debug('show %s got %d rows, %d tags',
-    name, rows.length, tags.length);
+function* handleAbbreviatedMetaRequestWithFullMeta(ctx, name, modifiedTime, tags, rows, isSyncWorkerRequest) {
+  debug('show %s got %d rows, %d tags, isSyncWorkerRequest: %s',
+    name, rows.length, tags.length, isSyncWorkerRequest);
   var latestMod = null;
   // set tags
   var distTags = {};
@@ -378,6 +411,13 @@ function* handleAbbreviatedMetaRequestWithFullMeta(ctx, name, modifiedTime, tags
       continue;
     }
     // https://github.com/npm/registry/blob/master/docs/responses/package-metadata.md#abbreviated-version-object
+    var hasInstallScript;
+    if (row.package.scripts) {
+      // https://www.npmjs.com/package/fix-has-install-script
+      if (row.package.scripts.install || row.package.scripts.preinstall || row.package.scripts.postinstall) {
+        hasInstallScript = true;
+      }
+    }
     var pkg = {
       name: row.package.name,
       version: row.package.version,
@@ -387,21 +427,30 @@ function* handleAbbreviatedMetaRequestWithFullMeta(ctx, name, modifiedTime, tags
       devDependencies: row.package.devDependencies,
       bundleDependencies: row.package.bundleDependencies,
       peerDependencies: row.package.peerDependencies,
+      peerDependenciesMeta: row.package.peerDependenciesMeta,
       bin: row.package.bin,
+      os: row.package.os,
+      cpu: row.package.cpu,
       directories: row.package.directories,
       dist: row.package.dist,
       engines: row.package.engines,
+      workspaces: row.package.workspaces,
       _hasShrinkwrap: row.package._hasShrinkwrap,
+      hasInstallScript: hasInstallScript,
       publish_time: row.package.publish_time || row.publish_time,
     };
     common.setDownloadURL(pkg, ctx);
 
     versions[pkg.version] = pkg;
+    row.package = pkg;
     allVersionString += pkg.version + ',';
 
     if ((!distTags.latest && !latestMod) || distTags.latest === pkg.version) {
       latestMod = row;
     }
+  }
+  if (!isSyncWorkerRequest) {
+    yield bugVersionService.hotfix(rows);
   }
 
   if (!latestMod) {

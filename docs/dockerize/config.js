@@ -7,7 +7,7 @@ var fs = require('fs');
 var os = require('os');
 
 var version = require('../package.json').version;
-
+var Nfs = require('fs-cnpm');
 var root = path.dirname(__dirname);
 var dataDir = process.env.CNPM_DATA_DIR ;
 
@@ -86,12 +86,9 @@ var config = {
   customReadmeFile: '', // you can use your custom readme file instead the cnpm one
   customFooter: '', // you can add copyright and site total script html here
   npmClientName: 'cnpm', // use `${name} install package`
-  packagePageContributorSearch: true, // package page contributor link to search, default is true
 
   // max handle number of package.json `dependencies` property
   maxDependencies: 200,
-  // backup filepath prefix
-  backupFilePrefix: '/cnpm/backup/',
 
   /**
    * database config
@@ -128,7 +125,7 @@ var config = {
   },
 
   // package tarball store in local filesystem by default
-  nfs: require('fs-cnpm')({
+  nfs: new Nfs({
     dir: path.join(dataDir, 'nfs')
   }),
   // if set true, will 302 redirect to `nfs.url(dist.key)`
@@ -168,7 +165,7 @@ var config = {
   // sync source, upstream registry
   // If you want to directly sync from official npm's registry
   // please drop them an email first
-  sourceNpmRegistry: 'https://registry.npm.taobao.org',
+  sourceNpmRegistry: 'https://registry.npmmirror.com',
 
   // upstream registry is base on cnpm/cnpmjs.org or not
   // if your upstream is official npm registry, please turn it off
@@ -229,6 +226,7 @@ var config = {
   // global hook function: function* (envelope) {}
   // envelope format please see https://github.com/npm/registry/blob/master/docs/hooks/hooks-payload.md#payload
   globalHook: null,
+  accelerateHostMap: {},
 };
 
 if (process.env.NODE_ENV !== 'test') {

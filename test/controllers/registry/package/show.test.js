@@ -1,5 +1,6 @@
 'use strict';
 
+var assert = require('assert');
 var should = require('should');
 var request = require('supertest');
 var mm = require('mm');
@@ -141,7 +142,7 @@ describe('test/controllers/registry/package/show.test.js', function () {
     });
   });
 
-  it('should return other_urls on query exists', function (done) {
+  it('should ignore query', function (done) {
     request(app)
     .get('/@cnpmtest/testmodule-show/latest?bucket=us1')
     .expect(200, function (err, res) {
@@ -152,7 +153,7 @@ describe('test/controllers/registry/package/show.test.js', function () {
       data['dist-tags'].should.eql({
         latest: '1.1.0',
       });
-      data.dist.tarball.should.equal('http://r.cnpmjs.org/@cnpmtest/testmodule-show/download/@cnpmtest/testmodule-show-1.1.0.tgz?bucket=us1&other_urls=http%3A%2F%2Fr.cnpmjs.org%2F%40cnpmtest%2Ftestmodule-show%2Fdownload%2F%40cnpmtest%2Ftestmodule-show-1.1.0.tgz');
+      data.dist.tarball.should.equal('http://r.cnpmjs.org/@cnpmtest/testmodule-show/download/@cnpmtest/testmodule-show-1.1.0.tgz');
       done();
     });
   });
@@ -182,6 +183,20 @@ describe('test/controllers/registry/package/show.test.js', function () {
     request(app)
     .get('/@cnpmtest/testmodule-show-not-exists/latest')
     .expect(404, done);
+  });
+
+  it('should config.formatCustomOnePackageVersion work', async () => {
+    mm(config, 'formatCustomOnePackageVersion', (ctx, packageVersion) => {
+      console.log('%s %s, query: %j', ctx.method, ctx.url, ctx.query);
+      packageVersion.description = '';
+      packageVersion.readme = '';
+      return packageVersion;
+    });
+    const res = await request(app)
+      .get('/@cnpmtest/testmodule-show/0.0.1?b=123123');
+    assert(res.status === 200);
+    assert(res.body.description === '');
+    assert(res.body.readme === '');
   });
 
   describe('show sync package', function () {

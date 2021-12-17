@@ -17,6 +17,7 @@ var auth = require('../middleware/auth');
 var proxyToNpm = require('../middleware/proxy_to_npm');
 var routes = require('../routes/web');
 var config = require('../config');
+var models = require('../models');
 var jsonp = require('koa-safe-jsonp');
 var path = require('path');
 var http = require('http');
@@ -42,6 +43,8 @@ if (config.pagemock) {
   }));
 }
 
+// add app.models, let middleware can access models ref
+app.models = models;
 for (const mw of config.customWebMiddlewares) {
   app.use(mw(app));
 }
@@ -71,7 +74,8 @@ var footer = config.customFooter || fs.readFileSync(path.join(viewDir, 'footer.h
 var layout = fs.readFileSync(path.join(viewDir, 'layout.html'), 'utf8')
   .replace('{{footer}}', footer)
   .replace('{{logoURL}}', config.logoURL)
-  .replace('{{adBanner}}', config.adBanner || '');
+  .replace('{{adBanner}}', config.adBanner || '')
+  .replace('{{customHeader}}', config.customHeader || '');
 fs.writeFileSync(layoutFile, layout);
 
 // custom web readme home page support

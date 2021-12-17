@@ -1,6 +1,6 @@
 {
   "name": "cnpmjs.org",
-  "version": "3.0.0-rc.32",
+  "version": "3.0.0-rc.55",
   "description": "Private npm registry and web for Enterprise, base on MySQL and Simple Store Service",
   "main": "index.js",
   "scripts": {
@@ -9,7 +9,8 @@
     "test-local": "make test",
     "start": "./bin/nodejsctl start && cp History.md docs/web/history.md",
     "status": "./bin/nodejsctl status",
-    "stop": "./bin/nodejsctl stop"
+    "stop": "./bin/nodejsctl stop",
+    "ci": "make test-travis-mysql"
   },
   "bin": {
     "cnpmjs.org": "bin/cli.js"
@@ -28,7 +29,7 @@
     "copy-to": "^2.0.1",
     "debug": "^3.0.0",
     "error-formater": "^1.0.3",
-    "fs-cnpm": "^1.2.0",
+    "fs-cnpm": "^2.1.0",
     "giturl": "^1.0.0",
     "graceful": "^1.0.1",
     "gravatar": "^1.6.0",
@@ -36,6 +37,7 @@
     "humanize-ms": "^1.2.1",
     "humanize-number": "~0.0.2",
     "ioredis": "^4.6.2",
+    "ip-regex": "^4.1.0",
     "is-type-of": "^1.2.0",
     "kcors": "^1.2.1",
     "koa": "^1.2.0",
@@ -63,17 +65,19 @@
     "rimraf": "^2.6.2",
     "semver": "^5.4.1",
     "sequelize": "^3.23.4",
+    "ssri": "^8.0.1",
     "thunkify-wrap": "^1.0.4",
     "treekill": "^1.0.0",
     "tunnel-agent": "^0.6.0",
     "urllib": "^2.24.0",
     "utility": "^1.12.0",
+    "uuid": "^8.3.0",
     "xss": "^0.3.3"
   },
   "devDependencies": {
     "autod": "*",
     "chunkstream": "*",
-    "contributors": "*",
+    "egg-ci": "^1.18.0",
     "intelli-espower-loader": "^1.0.1",
     "istanbul": "*",
     "jshint": "*",
@@ -111,9 +115,17 @@
   "engines": {
     "node": ">= 8.0.0"
   },
-  "author": [
-    "fengmk2 <fengmk2@gmail.com> (http://fengmk2.com)",
-    "dead_horse <dead_horse@qq.com> (http://deadhorse.me)"
-  ],
+  "ci": {
+    "type": "github",
+    "os": {
+      "github": "linux, macos"
+    },
+    "npminstall": true,
+    "version": "10, 12",
+    "command": {
+      "github": "ci"
+    },
+    "services": "mysql"
+  },
   "license": "MIT"
 }

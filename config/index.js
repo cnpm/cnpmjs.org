@@ -8,7 +8,7 @@ var os = require('os');
 var utility = require('utility');
 
 var version = require('../package.json').version;
-
+var Nfs = require('fs-cnpm');
 var root = path.dirname(__dirname);
 var dataDir = path.join(process.env.HOME || root, '.cnpmjs.org');
 
@@ -31,6 +31,9 @@ var config = {
   bindingHost: '127.0.0.1', // only binding on 127.0.0.1 for local access
   // default is ctx.protocol
   protocol: '',
+  // When sync package, cnpm not know the access protocol.
+  // So should set manually
+  backupProtocol: 'http',
 
   // debug mode
   // if in debug mode, some middleware like limit wont load
@@ -101,15 +104,13 @@ var config = {
 
   logoURL: 'https://os.alipayobjects.com/rmsportal/oygxuIUkkrRccUz.jpg', // cnpm logo image url
   adBanner: '',
+  customHeader: '',
   customReadmeFile: '', // you can use your custom readme file instead the cnpm one
   customFooter: '', // you can add copyright and site total script html here
   npmClientName: 'cnpm', // use `${name} install package`
-  packagePageContributorSearch: true, // package page contributor link to search, default is true
 
   // max handle number of package.json `dependencies` property
   maxDependencies: 200,
-  // backup filepath prefix
-  backupFilePrefix: '/cnpm/backup/',
 
   /**
    * database config
@@ -153,11 +154,15 @@ var config = {
     logging: !!process.env.SQL_DEBUG,
   },
 
+  // return total modules and versions, default is true
+  // it will use `SELECT count(DISTINCT name) FROM module` SQL on Database
+  enableTotalCount: true,
+
   // enable proxy npm audits request or not
   enableNpmAuditsProxy: true,
 
   // package tarball store in local filesystem by default
-  nfs: require('fs-cnpm')({
+  nfs: new Nfs({
     dir: path.join(dataDir, 'nfs')
   }),
   // if set true, will 302 redirect to `nfs.url(dist.key)`
@@ -202,8 +207,8 @@ var config = {
   // sync source, upstream registry
   // If you want to directly sync from official npm's registry
   // please drop them an email first
-  sourceNpmRegistry: 'https://registry.npm.taobao.org',
-  sourceNpmWeb: 'https://npm.taobao.org',
+  sourceNpmRegistry: 'https://registry.npmmirror.com',
+  sourceNpmWeb: 'https://npmmirror.com',
 
   // upstream registry is base on cnpm/cnpmjs.org or not
   // if your upstream is official npm registry, please turn it off
@@ -217,6 +222,8 @@ var config = {
   // exist: only sync exist modules
   // all: sync all modules
   syncModel: 'none', // 'none', 'all', 'exist'
+  // sync package.json/dist-tag.json to sync dir
+  syncBackupFiles: false,
 
   syncConcurrency: 1,
   // sync interval, default is 10 minutes
@@ -283,6 +290,12 @@ var config = {
   // if enable this option, must create module_abbreviated and package_readme table in database
   enableAbbreviatedMetadata: false,
 
+  // enable package or package version block list, must create package_version_blocklist table in database
+  enableBlockPackageVersion: false,
+
+  // enable bug version hotfix by https://github.com/cnpm/bug-versions
+  enableBugVersion: false,
+
   // global hook function: function* (envelope) {}
   // envelope format please see https://github.com/npm/registry/blob/master/docs/hooks/hooks-payload.md#payload
   globalHook: null,
@@ -296,23 +309,43 @@ var config = {
     enable: false,
     connectOptions: null,
   },
+
+  // custom format full package list
+  // change `GET /:name` request response body
+  // use on `controllers/registry/list.js`
+  formatCustomFullPackageInfoAndVersions: (ctx, packageInfo) => {
+    return packageInfo;
+  },
+  // custom format one package version
+  // change `GET /:name/:version` request response body
+  // use on `controllers/registry/show.js`
+  formatCustomOnePackageVersion: (ctx, packageVersion) => {
+    return packageVersion;
+  },
+  // registry download accelerate map
+  accelerateHostMap: {},
 };
 
 if (process.env.NODE_ENV === 'test') {
   config.enableAbbreviatedMetadata = true;
-  config.customRegistryMiddlewares.push(() => {
+  config.customRegistryMiddlewares.push((app) => {
     return function* (next) {
       this.set('x-custom-middleware', 'true');
+      this.set('x-custom-app-models', typeof app.models.query === 'function' ? 'true' : 'false');
       yield next;
     };
   });
 
-  config.customWebMiddlewares.push(() => {
+  config.customWebMiddlewares.push((app) => {
     return function* (next) {
       this.set('x-custom-web-middleware', 'true');
+      this.set('x-custom-web-app-models', typeof app.models.query === 'function' ? 'true' : 'false');
       yield next;
     };
   });
+
+  config.enableBlockPackageVersion = true;
+  config.enableBugVersion = true;
 }
 
 if (process.env.NODE_ENV !== 'test') {

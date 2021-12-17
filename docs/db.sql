@@ -83,7 +83,7 @@ CREATE TABLE IF NOT EXISTS `module` (
  `name` varchar(214) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL COMMENT 'module name',
  `version` varchar(30) NOT NULL COMMENT 'module version',
  `description` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci COMMENT 'module description',
- `package` longtext CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT 'package.json',
+ `package` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci COMMENT 'package.json',
  `dist_shasum` varchar(100) DEFAULT NULL COMMENT 'module dist SHASUM',
  `dist_tarball` varchar(2048) DEFAULT NULL COMMENT 'module dist tarball',
  `dist_size` int(10) unsigned NOT NULL DEFAULT '0' COMMENT 'module dist size',
@@ -92,7 +92,8 @@ CREATE TABLE IF NOT EXISTS `module` (
  UNIQUE KEY `uk_name` (`name`,`version`),
  KEY `idx_gmt_modified` (`gmt_modified`),
  KEY `idx_publish_time` (`publish_time`),
- KEY `idx_author` (`author`)
+ KEY `idx_author` (`author`),
+ KEY `idx_name_gmt_modified` (`name`,`gmt_modified`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='module info';
 -- ALTER TABLE `module` ADD `description` longtext;
 -- ALTER TABLE `module` ADD `publish_time` bigint(20) unsigned, ADD KEY `publish_time` (`publish_time`);
@@ -318,3 +319,28 @@ CREATE TABLE IF NOT EXISTS `dist_file` (
 -- ALTER TABLE `dist_file`
 --   CHANGE `name` `name` varchar(214) NOT NULL COMMENT 'file name',
 --   CHANGE `parent` `parent` varchar(214) NOT NULL COMMENT 'parent dir' DEFAULT '/';
+
+CREATE TABLE IF NOT EXISTS `token` (
+ `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'primary key',
+ `gmt_create` datetime NOT NULL COMMENT 'create time',
+ `gmt_modified` datetime NOT NULL COMMENT 'modified time',
+ `token` varchar(100) NOT NULL COMMENT 'token',
+ `user_id` varchar(100) NOT NULL COMMENT 'user name',
+ `readonly` tinyint NOT NULL DEFAULT 0 COMMENT 'readonly or not, 1: true, other: false',
+ `token_key` varchar(200) NOT NULL COMMENT 'token sha512 hash',
+ `cidr_whitelist` varchar(500) NOT NULL COMMENT 'ip list, ["127.0.0.1"]',
+ PRIMARY KEY (`id`),
+ UNIQUE KEY `uk_token` (`token`),
+ KEY `idx_user` (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='token info';
+
+CREATE TABLE IF NOT EXISTS `package_version_blocklist` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'primary key',
+  `gmt_create` datetime(3) NOT NULL COMMENT 'create time',
+  `gmt_modified` datetime(3) NOT NULL COMMENT 'modified time',
+  `name` varchar(214) NOT NULL COMMENT 'package name',
+  `version` varchar(30) NOT NULL COMMENT 'package version, "*" meaning all versions',
+  `reason` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL COMMENT 'block reason',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_name_version` (`name`, `version`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='package version block list';

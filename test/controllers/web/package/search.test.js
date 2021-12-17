@@ -41,8 +41,8 @@ describe('test/controllers/web/package/search.test.js', function () {
       .expect(200)
       .expect({
         keyword: '@cnpmtest/testmodule-web-search',
-        match: { name: '@cnpmtest/testmodule-web-search', description: '' },
-        packages: [ { name: '@cnpmtest/testmodule-web-search', description: '' } ],
+        match: { name: '@cnpmtest/testmodule-web-search', description: 'mk2testmodule version description here' },
+        packages: [ { name: '@cnpmtest/testmodule-web-search', description: 'mk2testmodule version description here' } ],
         keywords: []
       })
       .expect('content-type', 'application/json; charset=utf-8', done);
@@ -52,7 +52,7 @@ describe('test/controllers/web/package/search.test.js', function () {
       request(app)
       .get('/browse/keyword/@cnpmtest/testmodule-web-search?type=json&callback=foo')
       .expect(200)
-      .expect('/**/ typeof foo === \'function\' && foo({"keyword":"@cnpmtest/testmodule-web-search","match":{"name":"@cnpmtest/testmodule-web-search","description":""},"packages":[{"name":"@cnpmtest/testmodule-web-search","description":""}],"keywords":[]});')
+      .expect('/**/ typeof foo === \'function\' && foo({"keyword":"@cnpmtest/testmodule-web-search","match":{"name":"@cnpmtest/testmodule-web-search","description":"mk2testmodule version description here"},"packages":[{"name":"@cnpmtest/testmodule-web-search","description":"mk2testmodule version description here"}],"keywords":[]});')
       .expect('content-type', 'application/javascript; charset=utf-8', done);
     });
 
@@ -87,8 +87,8 @@ describe('test/controllers/web/package/search.test.js', function () {
           .expect({
             keyword: '@cnpmtest/testmodule-web-searc',
             match: null,
-            packages: [ { name: '@cnpmtest/testmodule-web-search', description: '' },
-            { name: '@cnpmtest/testmodule-web-search_a', description: '' }],
+            packages: [ { name: '@cnpmtest/testmodule-web-search', description: 'mk2testmodule version description here' },
+            { name: '@cnpmtest/testmodule-web-search_a', description: 'mk2testmodule version description here' }],
             keywords: []
           })
           .expect('content-type', 'application/json; charset=utf-8', done);
@@ -101,7 +101,7 @@ describe('test/controllers/web/package/search.test.js', function () {
           .expect({
             keyword: '@cnpmtest/testmodule-web-searc',
             match: null,
-            packages: [ { name: '@cnpmtest/testmodule-web-search', description: '' }],
+            packages: [ { name: '@cnpmtest/testmodule-web-search', description: 'mk2testmodule version description here' }],
             keywords: []
           })
           .expect('content-type', 'application/json; charset=utf-8', done);

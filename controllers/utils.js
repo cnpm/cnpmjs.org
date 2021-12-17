@@ -69,6 +69,7 @@ exports.getDownloadTotal = function* (name) {
     lastday: 0,
     lastweek: 0,
     lastmonth: 0,
+    total: 0,
   };
 
   for (var i = 0; i < rows.length; i++) {
@@ -92,6 +93,9 @@ exports.getDownloadTotal = function* (name) {
     if (r.date >= start && r.date <= lastmonthEnd) {
       download.lastmonth += r.count;
     }
+  }
+  if (name) {
+    download.total = yield downloadTotalService.getTotalByName(name);
   }
   return download;
 };

@@ -10,6 +10,7 @@ function load(name) {
 
 var _ModuleAbbreviated = config.enableAbbreviatedMetadata ? load('module_abbreviated') : null;
 var _PackageReadme = config.enableAbbreviatedMetadata ? load('package_readme') : null;
+var _BlockPackageVersion = config.enableBlockPackageVersion ? load('block_package_version') : null;
 
 module.exports = {
   sequelize: sequelize,
@@ -26,6 +27,7 @@ module.exports = {
   User: load('user'),
   Total: load('total'),
   DownloadTotal: load('download_total'),
+  Token: load('token'),
 
   query: function* (sql, args) {
     var options = { replacements: args };
@@ -59,4 +61,14 @@ module.exports = {
     }
     return _PackageReadme;
   },
+
+  get BlockPackageVersion() {
+    if (!config.enableBlockPackageVersion) {
+      return null;
+    }
+    if (!_BlockPackageVersion) {
+      _BlockPackageVersion = load('block_package_version');
+    }
+    return _BlockPackageVersion;
+  }
 };

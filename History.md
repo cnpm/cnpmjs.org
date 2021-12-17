@@ -1,4 +1,149 @@
 
+3.0.0-rc.50 / 2021-11-04
+==================
+
+**features**
+  * [[`e4c3cd1`](http://github.com/cnpm/cnpmjs.org/commit/e4c3cd125ebe771ecc31b4a207ab926c13817f16)] - feat: package view add download total count (#1673) (Solais <<924615994@qq.com>>)
+  * [[`283f149`](http://github.com/cnpm/cnpmjs.org/commit/283f14976dae8ce9144d387533d1637a79c6cf12)] - feat: add missing abbreviated meta attibutes (#1668) (fengmk2 <<fengmk2@gmail.com>>)
+
+**fixes**
+  * [[`62fdbd4`](http://github.com/cnpm/cnpmjs.org/commit/62fdbd400a2259983c6793173ac8d816a732452c)] - fix: should update etag after abbreviated meta change (#1670) (fengmk2 <<fengmk2@gmail.com>>)
+  * [[`2e7354c`](http://github.com/cnpm/cnpmjs.org/commit/2e7354c647d78a41f033f2066c6eb60e270f2a6b)] - fix: allow download without scope filename (#1665) (killa <<killa123@126.com>>)
+
+3.0.0-rc.46 / 2021-09-10
+==================
+
+**fixes**
+  * [[`596bca9`](http://github.com/cnpm/cnpmjs.org/commit/596bca908ee87504dfeb3dbf463b4d9a551d9f27)] - fix: fs-cnpm on dockerize config (#1656) (wxhuang <<wxhuang1985@gmail.com>>)
+  * [[`bbae9d3`](http://github.com/cnpm/cnpmjs.org/commit/bbae9d3bc3a565a59c397a63c4301272ac4509e9)] - fix: new publish with token should add user to maintainers (#1662) (killa <<killa123@126.com>>)
+
+3.0.0-rc.45 / 2021-07-28
+==================
+
+**features**
+  * [[`d28af7f`](http://github.com/cnpm/cnpmjs.org/commit/d28af7fd7e1bf530ad2e5a73fa5a54d2caf5cf9b)] - feat: support custom tokenService (#1658) (killa <<killa123@126.com>>)
+
+**others**
+  * [[`e258241`](http://github.com/cnpm/cnpmjs.org/commit/e2582417fa06a82c2fbb4d08eaf764465683a00b)] - remove maintainers logic (#1654) (Solais <<924615994@qq.com>>)
+3.0.0-rc.44 / 2021-06-11
+==================
+
+**features**
+  * [[`a1e8a82`](https://github.com/cnpm/cnpmjs.org/commit/a1e8a8289276275b995d15b3c254fbdbace6dbae)] - feat: impl npm owner hooks (#1645) (killa <<killa123@126.com>>)
+
+3.0.0-rc.43 / 2021-05-36
+==================
+
+**features**
+  * [[`a21aed0`](https://github.com/cnpm/cnpmjs.org/commit/a21aed08c5fe1ea09f4fda157ac3c12bd609781d)] - feat: impl sync to/from backup files (#1612) (killa <<killa123@126.com>>)
+
+**fixes**
+  * [[`2245dc2`](https://github.com/cnpm/cnpmjs.org/commit/2245dc2967ec070b8bcc618ebfad0cd4cd297fb8)] - feat: impl accelerate request (#1637) (killa <<killa123@126.com>>)
+
+3.0.0-rc.42 / 2021-04-30
+==================
+
+**features**
+  * [[`a21aed0`](https://github.com/cnpm/cnpmjs.org/commit/a21aed08c5fe1ea09f4fda157ac3c12bd609781d)] - feat: impl sync to/from backup files (#1612) (killa <<killa123@126.com>>)
+
+3.0.0-rc.39 / 2021-01-14
+==================
+
+**features**
+  * [[`33dd355`](http://github.com/cnpm/cnpmjs.org/commit/33dd3554f5daf13de33f04128be6853ce120636f)] - feat: impl dist-tag hooks (#1612) (killa <<killa123@126.com>>)
+
+3.0.0-rc.38 / 2021-01-12
+==================
+
+**features**
+  * [[`c6040b`](http://github.com/cnpm/cnpmjs.org/commit/1c6040bc95610e23b4756baa09e8119cda2fe01e)] - performance: optimise query pkg latestModified  (#1611) (killa <<killa123@126.com>>)
+
+
+3.0.0-rc.37 / 2020-10-21
+==================
+
+**features**
+  * [[`39c3223`](http://github.com/cnpm/cnpmjs.org/commit/39c322332ffafc512bf56c1679d2904fece2ae07)] - feat: new registry api (#1597) (killa <<killa123@126.com>>)
+  * [[`45f2f8b`](http://github.com/cnpm/cnpmjs.org/commit/45f2f8b31f095eeadf0f47e234d6eb225e6b197f)] - feat: impl registry token api (#1590) (killa <<killa123@126.com>>)
+  * [[`e97835f`](http://github.com/cnpm/cnpmjs.org/commit/e97835f7020e945e59fa7a84b14ab58c580add1e)] - feat: support custom web middlewares (#1563) (fengmk2 <<fengmk2@gmail.com>>)
+  * [[`3cb3fe0`](http://github.com/cnpm/cnpmjs.org/commit/3cb3fe02f01dd669ad4bd3aebca51c44eb9e5938)] - feat: list all package versions by date (#1557) (fengmk2 <<fengmk2@gmail.com>>)
+  * [[`a8ff647`](http://github.com/cnpm/cnpmjs.org/commit/a8ff647aa0f73076f4625e395e5da8ced9f61680)] - feat: retry sync fail on cnpm registry (#1547) (fengmk2 <<fengmk2@gmail.com>>)
+  * [[`2c511f2`](http://github.com/cnpm/cnpmjs.org/commit/2c511f2209329e95b0cbe7603fa98a7f93c66474)] - feat: add unpublishRemoveTarball mode (#1536) (Khaidi Chu <<i@2333.moe>>)
+  * [[`19563f5`](http://github.com/cnpm/cnpmjs.org/commit/19563f58517ffaebed8006630bd467f15b71d9ff)] - feat: allow to disable npm audits proxy (#1430) (fengmk2 <<fengmk2@gmail.com>>)
+  * [[`8e2367e`](http://github.com/cnpm/cnpmjs.org/commit/8e2367ee1676bd36a4112cf0f6dce2c4f422806e)] - feat: dont check db data on tgz download request (#1477) (fengmk2 <<fengmk2@gmail.com>>)
+  * [[`be05886`](http://github.com/cnpm/cnpmjs.org/commit/be05886452803d46f614bdde497ccdec8e9ed734)] - feat: add vary header on cdn (fengmk2 <<fengmk2@gmail.com>>)
+  * [[`ea46399`](http://github.com/cnpm/cnpmjs.org/commit/ea46399265615c70ee33d9cab9ba5d5ce312fb67)] - feat: allow disable search page (fengmk2 <<fengmk2@gmail.com>>)
+  * [[`581925d`](http://github.com/cnpm/cnpmjs.org/commit/581925db9733d295be02e75f0090db05fd6bae75)] - feat: support cache-control header on registry request (#1468) (fengmk2 <<fengmk2@gmail.com>>)
+  * [[`7f0c141`](http://github.com/cnpm/cnpmjs.org/commit/7f0c141ac2f7679b5322aadd537c5ff1bef0b032)] - feat: allow config request protocol (fengmk2 <<fengmk2@gmail.com>>)
+  * [[`807187e`](http://github.com/cnpm/cnpmjs.org/commit/807187ebeb0b266828a59724234e1a99c3238eb3)] - feat: add redis cache to import list all versions api perf (#1441) (fengmk2 <<fengmk2@gmail.com>>)
+  * [[`99c4c3f`](http://github.com/cnpm/cnpmjs.org/commit/99c4c3fe35a9fde805751ef3d44413413f053f45)] - feat: support customized middlewares (#1436) (Khaidi Chu <<i@2333.moe>>)
+  * [[`4b57c11`](http://github.com/cnpm/cnpmjs.org/commit/4b57c118a0b044f41b1c98eaf92449221c984c15)] - feat: can override tgz download options (fengmk2 <<fengmk2@gmail.com>>)
+  * [[`b395c66`](http://github.com/cnpm/cnpmjs.org/commit/b395c666be3ae6b237803239fae8678647f3b70b)] - feat: proxy npm audit request (#1419) (alsotang <<alsotang@gmail.com>>)
+  * [[`a4a25f9`](http://github.com/cnpm/cnpmjs.org/commit/a4a25f9e381aa20e1ef1e709f320aae41f3ae466)] - feat: use faster etag instead of koa-etag (#1409) (fengmk2 <<fengmk2@gmail.com>>)
+  * [[`90580a7`](http://github.com/cnpm/cnpmjs.org/commit/90580a72e56c69f8f03bbdb64d79b4b1b139fbbf)] - feat: configurable view directory (#1400) (Khaidi Chu <<i@2333.moe>>)
+  * [[`ad2d341`](http://github.com/cnpm/cnpmjs.org/commit/ad2d341d2c9317b062a25363f4805aedfef3913b)] - feat: sync downloads total <= 10000 unpublish package (fengmk2 <<fengmk2@gmail.com>>)
+  * [[`25a9030`](http://github.com/cnpm/cnpmjs.org/commit/25a90300473e6ac437e393de139cebde1e354e8c)] - feat: allow to close mysql trace (fengmk2 <<fengmk2@gmail.com>>)
+  * [[`017af69`](http://github.com/cnpm/cnpmjs.org/commit/017af69cce23c870694d124f4a865864e5c061cd)] - feat: add badgeService define on config (#1387) (fengmk2 <<fengmk2@gmail.com>>)
+  * [[`842c031`](http://github.com/cnpm/cnpmjs.org/commit/842c0316ede2b19b76d9c1ca790902de467c82e9)] - feat: show versions list on package page (#1386) (fengmk2 <<fengmk2@gmail.com>>)
+  * [[`bd87907`](http://github.com/cnpm/cnpmjs.org/commit/bd87907b69d3e65aa544930b5c7f04e75bdbc773)] - feat: auto retry if download tgz error (#1363) (fengmk2 <<fengmk2@gmail.com>>)
+  * [[`533c27f`](http://github.com/cnpm/cnpmjs.org/commit/533c27fa78323ee50fcd549115034915ea3017ef)] - feat: support nfs.url return multi urls (#1344) (fengmk2 <<fengmk2@gmail.com>>)
+  * [[`e61c7fa`](http://github.com/cnpm/cnpmjs.org/commit/e61c7fa32bdc54ef4474a071da686c70e512b009)] - feat: support pass through querystring to tgz url (#1334) (fengmk2 <<fengmk2@gmail.com>>)
+  * [[`34d3a1e`](http://github.com/cnpm/cnpmjs.org/commit/34d3a1eabe927dc5c8c87436e2b644c70a7abc2a)] - feat: auto sync delete packages which deleted in 24 hours (#1315) (fengmk2 <<fengmk2@gmail.com>>)
+  * [[`4210b7b`](http://github.com/cnpm/cnpmjs.org/commit/4210b7bdf8bfe8dfa2578802fd1d14e7411d4ea6)] - feat: can config to not sync deleted versions (#1282) (fengmk2 <<fengmk2@gmail.com>>)
+  * [[`56c9457`](http://github.com/cnpm/cnpmjs.org/commit/56c945740f545abe9ba55759f6b1502a3abc453d)] - feat: let opensearch host can be config (#1258) (fengmk2 <<fengmk2@gmail.com>>)
+
+**fixes**
+  * [[`b7089d3`](http://github.com/cnpm/cnpmjs.org/commit/b7089d33d400f9fd4fc398479d4dac5aab26b633)] - fix: set maintainer to current user if maintainer is undefined (#1592) (killa <<killa123@126.com>>)
+  * [[`2b74e00`](http://github.com/cnpm/cnpmjs.org/commit/2b74e00cb9ae20e9cf2f06c54ef8dbe6a36b4066)] - fix: release 3.0.0-rc.35 fix npm include functions dir (fengmk2 <<fengmk2@gmail.com>>)
+  * [[`61549b4`](http://github.com/cnpm/cnpmjs.org/commit/61549b47a2f49c163bef6994f1e0f5f761317975)] - fix: avoid "ENAMETOOLONG: name too long" error (#1583) (fengmk2 <<fengmk2@gmail.com>>)
+  * [[`e7bafb2`](http://github.com/cnpm/cnpmjs.org/commit/e7bafb2ee9d80ce3ef4087a6b69bc17517f85ec5)] - fix: audit proxy test cases (#1537) (Khaidi Chu <<i@2333.moe>>)
+  * [[`92b7216`](http://github.com/cnpm/cnpmjs.org/commit/92b72169a89cec333177d1ba65205a31e60ebbb2)] - fix: maintainer permission greater than scope (#1494) (Khaidi Chu <<i@2333.moe>>)
+  * [[`f084eba`](http://github.com/cnpm/cnpmjs.org/commit/f084ebae2106c8d4435dc0385e493fe18c6cec8a)] - fix: cpu usage 100% in node@6.x (#1470) (Yiman Liu <<413893093@qq.com>>)
+  * [[`8d57216`](http://github.com/cnpm/cnpmjs.org/commit/8d572169b7293a33035257d3525c66b0abb5b679)] - fix: add cache on total (fengmk2 <<fengmk2@gmail.com>>)
+  * [[`585f55b`](http://github.com/cnpm/cnpmjs.org/commit/585f55bbcc0ce257bfab2f0f545dd8a89c66ca49)] - fix: download url pathname (fengmk2 <<fengmk2@gmail.com>>)
+  * [[`da2f964`](http://github.com/cnpm/cnpmjs.org/commit/da2f9640b87f1b110210b7b8caaf26b4b854ede8)] - fix: dont override exists weburl (fengmk2 <<fengmk2@gmail.com>>)
+  * [[`b094f56`](http://github.com/cnpm/cnpmjs.org/commit/b094f5692f83700f152dd6ea9eb65f67385f6b5f)] - fix: changes stream syncer without deps (fengmk2 <<fengmk2@gmail.com>>)
+  * [[`65bca46`](http://github.com/cnpm/cnpmjs.org/commit/65bca46f3c275bac5dc7497eb266d84605f6f8f8)] - fix: don't cache npm_service.cnpmjs.org request (fengmk2 <<fengmk2@gmail.com>>)
+  * [[`f9d4858`](http://github.com/cnpm/cnpmjs.org/commit/f9d4858862a4b70cb989c3c60478c2424ca2c139)] - fix: avoid toString as downloads count key (#1438) (fengmk2 <<fengmk2@gmail.com>>)
+  * [[`8a2f744`](http://github.com/cnpm/cnpmjs.org/commit/8a2f744749fc9f1297ff298fafe14deacf67efea)] - fix: don't update __all__ downloads every times (#1417) (fengmk2 <<fengmk2@gmail.com>>)
+  * [[`9bdb695`](http://github.com/cnpm/cnpmjs.org/commit/9bdb695375a800464636d70981f433b7a11dd82d)] - fix: proxy to source registry when package is public scoped with encoded path (#1415) (Albert Zhang <<label4king@163.com>>)
+  * [[`8bd0a2d`](http://github.com/cnpm/cnpmjs.org/commit/8bd0a2d49195734afa988cce69804d8540bbda19)] - fix: swap compress middleware and notFound position (#1413) (alsotang <<alsotang@gmail.com>>)
+  * [[`93d5def`](http://github.com/cnpm/cnpmjs.org/commit/93d5def8ac8882edbd526e5a7341e07c99463b25)] - fix: show package when non-semver version of semver tag (#1411) (Khaidi Chu <<i@2333.moe>>)
+  * [[`6a8434e`](http://github.com/cnpm/cnpmjs.org/commit/6a8434e0cae391981579af1a0b533aff0008904f)] - fix: Don't display sync info when the sync mode is none (#1410) (XingKai Zhang <<jack_zhxk@163.com>>)
+  * [[`4a3a851`](http://github.com/cnpm/cnpmjs.org/commit/4a3a851256483d438753b154d80d28c12c1d625c)] - fix: use <%- instead of <%= in user profile page (#1404) (Khaidi Chu <<i@2333.moe>>)
+  * [[`3497bae`](http://github.com/cnpm/cnpmjs.org/commit/3497bae2b94237664716911de965a4b27afc083a)] - fix: Obfuscate email address (#1391) (Ankur Kumar <<ankurk91@users.noreply.github.com>>)
+  * [[`9b8491b`](http://github.com/cnpm/cnpmjs.org/commit/9b8491b736ebcb98df02d26c41334cf7fce306dc)] - fix: use https://cdn.staticfile.org (fengmk2 <<fengmk2@gmail.com>>)
+  * [[`fc79930`](http://github.com/cnpm/cnpmjs.org/commit/fc799304d8c6710e71364bdf1d1ed0961b9e8695)] - fix: should return `[done] Sync {name}` string when task finished (#1382) (fengmk2 <<fengmk2@gmail.com>>)
+  * [[`3c20267`](http://github.com/cnpm/cnpmjs.org/commit/3c20267b22491cd2ac2d751ccc459cf1f4fb0f1f)] - fix: don't retry to save log when db error (#1381) (fengmk2 <<fengmk2@gmail.com>>)
+  * [[`5149aa5`](http://github.com/cnpm/cnpmjs.org/commit/5149aa5a1eb01dfc17f8de1cb6c6abfecca0ed96)] - fix: proxy public package from source registry (#1375) (fengmk2 <<fengmk2@gmail.com>>)
+  * [[`fc07a38`](http://github.com/cnpm/cnpmjs.org/commit/fc07a38bde81bd93ef9067f3aacb06ae8e76e12b)] - fix: make sure replicate pkg is the latest pkg (#1347) (fengmk2 <<fengmk2@gmail.com>>)
+  * [[`17f8b66`](http://github.com/cnpm/cnpmjs.org/commit/17f8b6648b2cf8cb4cf17daef2a2477f74a671e8)] - fix: retry from registry when no_db_file error on replicate (fengmk2 <<fengmk2@gmail.com>>)
+  * [[`d1fe6ce`](http://github.com/cnpm/cnpmjs.org/commit/d1fe6cede7b5a082eabfe9eb94225c9af9399e62)] - fix: add other_urls on download dist tarball (#1345) (fengmk2 <<fengmk2@gmail.com>>)
+  * [[`8fbad39`](http://github.com/cnpm/cnpmjs.org/commit/8fbad397f3ab7177c6e6c9b458b4b0bf3d24fbd7)] - fix: use rimraf instead of fs.unlink (#1338) (Yiyu He <<dead_horse@qq.com>>)
+  * [[`0121de3`](http://github.com/cnpm/cnpmjs.org/commit/0121de31a3b7a8da38e31fca4e10d973c07d79e7)] - fix: no need to resync again (#1336) (fengmk2 <<fengmk2@gmail.com>>)
+  * [[`84a3037`](http://github.com/cnpm/cnpmjs.org/commit/84a3037d90d4b3a316752eda7440ff5c73b0872f)] - fix: avoid query too frequently (#1329) (fengmk2 <<fengmk2@gmail.com>>)
+  * [[`1f60a01`](http://github.com/cnpm/cnpmjs.org/commit/1f60a0136c5f2e4a33827d1f36b38c49e1e3dec6)] - fix: replicate request error, try to request from official registry (#1316) (fengmk2 <<fengmk2@gmail.com>>)
+  * [[`6f656a0`](http://github.com/cnpm/cnpmjs.org/commit/6f656a0736c7d1d8b58288ff97590d7cb1317ecd)] - fix: save sync last time when successes > 1000 (fengmk2 <<fengmk2@gmail.com>>)
+  * [[`1b30146`](http://github.com/cnpm/cnpmjs.org/commit/1b30146e94e7e72f9e762947b1ecdbd176d64532)] - fix: npm >= v5.5.0 login need not `email` (#1275) (#1304) (wmzy <<1256573276@qq.com>>)
+  * [[`820ae23`](http://github.com/cnpm/cnpmjs.org/commit/820ae23454f0f9755456681f3ced03e634cb3109)] - fix: control sync frequency (fengmk2 <<fengmk2@gmail.com>>)
+  * [[`bfb29f8`](http://github.com/cnpm/cnpmjs.org/commit/bfb29f82c967cb68f4de3a314200d95a8c59baff)] - fix: use _npmUser reset the maintainers (fengmk2 <<fengmk2@gmail.com>>)
+  * [[`95aa035`](http://github.com/cnpm/cnpmjs.org/commit/95aa035a275089b50dfc2590497e3bc7319f4f6b)] - fix: make sure maintainers exists on sync worker (liang feng <<anhulife@gmail.com>>)
+  * [[`6c69a38`](http://github.com/cnpm/cnpmjs.org/commit/6c69a38a508812f0320866d70b555de02e1fc204)] - fix: if replicate error, retry from official registry (#1230) (fengmk2 <<fengmk2@gmail.com>>)
+  * [[`43ffa99`](http://github.com/cnpm/cnpmjs.org/commit/43ffa995cb8a724e8cd04224c2f137d407bfe014)] - fix: "start" should wait for "stop" to remove the pid file(using Promise) (#1220) (cloudstone <<baby31529@gmail.com>>)
+  * [[`6c019de`](http://github.com/cnpm/cnpmjs.org/commit/6c019de514c9f4a62db1a1814ca2359408609074)] - fix: changes_stream_syncer log url should not contain sync_upstream=true (fengmk2 <<fengmk2@gmail.com>>)
+
+**others**
+  * [[`522ad11`](http://github.com/cnpm/cnpmjs.org/commit/522ad11124f168788b28dd925417ae37eb9d3991)] - update readme for now situation (#1506) (alsotang <<alsotang@gmail.com>>)
+  * [[`0c59791`](http://github.com/cnpm/cnpmjs.org/commit/0c59791e50ef9d3080d5a2ab3e24b5899bd91446)] - Release Release 3.0.0-rc.19 (fengmk2 <<fengmk2@gmail.com>>)
+  * [[`79fb163`](http://github.com/cnpm/cnpmjs.org/commit/79fb163a3b12f1b9c4c9eafad7f2041e7c4c4dbf)] - chore: README fix typo ( not to use plural for code ) (#1448) (Paul Verest <<enide.github@gmail.com>>)
+  * [[`be00b65`](http://github.com/cnpm/cnpmjs.org/commit/be00b6557359d328c851e538827d6c681c2c3416)] - refactor: add detail message to error and keep reason (#1445) (alsotang <<alsotang@gmail.com>>)
+  * [[`f7e9670`](http://github.com/cnpm/cnpmjs.org/commit/f7e9670025c6e7f09d8aa88c676938a2cf4849b5)] - Release Release 3.0.0-rc.14 (fengmk2 <<fengmk2@gmail.com>>)
+  * [[`d0c3f1b`](http://github.com/cnpm/cnpmjs.org/commit/d0c3f1b19e46e73ce389e78413304a1542811b5f)] - test: shouldjs change from getter to function call (#1420) (alsotang <<alsotang@gmail.com>>)
+  * [[`d889eba`](http://github.com/cnpm/cnpmjs.org/commit/d889ebafbd6ff1bc15fbf277fd8e143a57e6cac6)] - deps: use agentkeepalive@4 (fengmk2 <<fengmk2@gmail.com>>)
+  * [[`938a14d`](http://github.com/cnpm/cnpmjs.org/commit/938a14d0a13b711c7b91d795151a7266b0a43c5a)] - chore: Hall of Fame integration on README (#1388) (Gwenael Pluchon <<gwenael.pluchon+github@gmail.com>>)
+  * [[`26d7147`](http://github.com/cnpm/cnpmjs.org/commit/26d7147562a1ae21db8bfec26983daf311353d96)] - refactor: normalize database structure (#1376) (Khaidi Chu <<i@2333.moe>>)
+  * [[`5334375`](http://github.com/cnpm/cnpmjs.org/commit/53343751f7c0a34ea0a346172bff0818d27864dd)] - chore: add latest-3 tag (fengmk2 <<fengmk2@gmail.com>>)
+
 3.0.0-alpha.8 / 2017-06-15
 ==================
 

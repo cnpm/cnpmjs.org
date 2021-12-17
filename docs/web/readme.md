@@ -7,7 +7,8 @@ So `cnpm` is meaning: **Company npm**.
 - Our public registry: [r.cnpmjs.org](https://r.cnpmjs.org), syncing from [registry.npmjs.com](https://registry.npmjs.com)
 - [cnpmjs.org](/) version: <span id="app-version"></span>
 - [Node.js](https://nodejs.org) version: <span id="node-version"></span>
-- For developers in China, please visit [the China mirror](https://npm.taobao.org). 中国用户请访问[国内镜像站点](https://npm.taobao.org)。
+- For developers in China, please visit [the China mirror](https://npmmirror.com). 中国用户请访问[国内镜像站点](https://npmmirror.com)。
+- Use the private npm service provided by Alibaba Cloud DevOps which build with cnpm. [https://packages.aliyun.com/](https://packages.aliyun.com/?channel=pd_cnpm_github)
 
 <div class="ant-table">
 <table class="downloads">
@@ -80,21 +81,21 @@ Badge URL: `https://cnpmjs.org/badge/d/cnpmjs.org.svg` ![cnpmjs.org-download-bad
 use our npm client [cnpm](https://github.com/cnpm/cnpm)(More suitable with cnpmjs.org and gzip support), you can get our client through npm:
 
 ```bash
-$ npm install -g cnpm --registry=https://registry.npm.taobao.org
+$ npm install -g cnpm --registry=https://registry.npmmirror.com
 ```
 
 Or you can alias NPM to use it:
 
 ```bash
-alias cnpm="npm --registry=https://registry.npm.taobao.org \
+alias cnpm="npm --registry=https://registry.npmmirror.com \
 --cache=$HOME/.npm/.cache/cnpm \
---disturl=https://npm.taobao.org/mirrors/node \
+--disturl=https://npmmirror.com/mirrors/node \
 --userconfig=$HOME/.cnpmrc"
 
 #Or alias it in .bashrc or .zshrc
-$ echo '\n#alias for cnpm\nalias cnpm="npm --registry=https://registry.npm.taobao.org \
+$ echo '\n#alias for cnpm\nalias cnpm="npm --registry=https://registry.npmmirror.com \
   --cache=$HOME/.npm/.cache/cnpm \
-  --disturl=https://npm.taobao.org/mirrors/node \
+  --disturl=https://npmmirror.com/mirrors/node \
   --userconfig=$HOME/.cnpmrc"' >> ~/.zshrc && source ~/.zshrc
 ```
 
@@ -117,7 +118,7 @@ $ cnpm sync connect
 sync package on web: [sync/connect](/sync/connect)
 
 ```bash
-$ open http://registry.npm.taobao.org/sync/connect
+$ open http://registry.npmmirror.com/sync/connect
 ```
 
 ### publish / unpublish
@@ -145,11 +146,11 @@ $ cnpm info cnpm
 
 Release [History](/history).
 
-## npmjs.org, cnpmjs.org and npm.taobao.org relation
+## npmjs.org, cnpmjs.org and npmmirror.com relation
 
 ![npm&cnpm](https://cloud.githubusercontent.com/assets/543405/21505401/fd0b6220-cca1-11e6-86ed-599cc81bb03b.png)
 
 ## Sponsors
 
-- [![阿里云](https://static.aliyun.com/images/www-summerwind/logo.gif)](http://click.aliyun.com/m/4288/) (2016.2 - now)
+- [![阿里云](https://static.aliyun.com/images/www-summerwind/logo.gif)](http://click.aliyun.com/m/4288/) [![阿里云云效](https://img.alicdn.com/tfs/TB116yt3fb2gK0jSZK9XXaEgFXa-106-20.png)](https://devops.aliyun.com/?channel=pd_cnpm_github) (2016.2 - now)
 - [![UCloud云计算](https://www.ucloud.cn/static/style/images/about/logo.png)](http://www.ucloud.cn?sem=sdk-CNPMJS) (2015.3 - 2016.3)

@@ -1,6 +1,6 @@
 TESTS = $(shell ls -S `find test -type f -name "*.test.js" -print`)
 REPORTER = spec
-TIMEOUT = 60000
+TIMEOUT = 600000
 MOCHA_OPTS =
 DB = sqlite
 
@@ -11,8 +11,8 @@ init-database:
 	@NODE_ENV=test node test/init_db.js
 
 init-mysql:
-	@mysql -uroot -e 'DROP DATABASE IF EXISTS cnpmjs_test;'
-	@mysql -uroot -e 'CREATE DATABASE cnpmjs_test;'
+	@mysql -uroot -h 127.0.0.1 --port 3306 -e 'DROP DATABASE IF EXISTS cnpmjs_test;'
+	@mysql -uroot -h 127.0.0.1 --port 3306 -e 'CREATE DATABASE cnpmjs_test;'
 
 init-pg:
 	@psql -c 'DROP DATABASE IF EXISTS cnpmjs_test;'
@@ -61,7 +61,7 @@ test-cov-mysql: init-mysql
 	@$(MAKE) test-cov DB=mysql
 
 test-travis: init-database
-	@NODE_ENV=test DB=${DB} CNPM_SOURCE_NPM=https://registry.npmjs.com CNPM_SOURCE_NPM_ISCNPM=false \
+	@NODE_ENV=test DB=${DB} \
 		node \
 		node_modules/.bin/istanbul cover \
 		node_modules/.bin/_mocha \

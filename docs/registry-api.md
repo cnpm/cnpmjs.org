@@ -50,12 +50,18 @@ Status: 4xx
 
 ## Authentication
 
-There is only one way to authenticate through the API.
+There are two ways to authenticate through the API.
 
 ## Basic Authentication
 
 ```bash
 $ curl -u "username:password" https://registry.npmjs.org
+```
+
+## Bearer Authentication
+
+```bash
+$ curl -H "Authorization: Bearer ${UUId}" https://registry.npmjs.org
 ```
 
 ## Failed login limit
@@ -903,7 +909,8 @@ Status: 201 Created
 {
   "ok": true,
   "id": "org.couchdb.user:fengmk2",
-  "rev": "32-984ee97e01aea166dcab6d1517c730e3"
+  "rev": "32-984ee97e01aea166dcab6d1517c730e3",
+  "token": "85d32fad-bd43-4dd7-9451-4f7d907313a2"
 }
 ```
 
@@ -956,3 +963,76 @@ Status: 201 Created
 ```
 
 ## Search
+
+## Token
+
+- [Create token](/docs/registry-api.md#create-token)
+- [List token](/docs/registry-api.md#list-token)
+- [Delete token](/docs/registry-api.md#delete-token)
+
+### Create token
+
+* Authentication required.
+
+```
+POST /-/npm/v1/tokens
+```
+
+#### Input
+```json
+{
+  "password": "123",
+  "readonly": false,
+  "cidr_whitelist": [
+    "127.0.0.1"
+  ]
+}
+```
+
+#### Response 200
+```json
+HTTP/1.1 200 OK
+
+{
+  "token": "85d32fad-bd43-4dd7-9451-4f7d907313a2",
+  "key": "d06309a210570ef71cd9c7bd4849e7e96eeaa841976e63326436f6fd320dc4bbd452710e4e0fedc2efc2ea4a793b7159e95e9596e85e00dee26adc3f8afbb97f",
+  "cidr_whitelist": [ "127.0.0.1" ],
+  "created": "2015-01-04T08:28:51.378Z",
+  "updated": "2015-01-04T08:28:51.378Z",
+  "readonly": false
+}
+```
+
+### List token
+* Authentication required.
+
+```
+GET /-/npm/v1/tokens
+```
+
+### Input
+perPage=10&page=0
+
+#### Response 200
+```json
+{
+  "objects": [{
+    "token": "85d32f...7313a2",
+    "key": "d06309a210570ef71cd9c7bd4849e7e96eeaa841976e63326436f6fd320dc4bbd452710e4e0fedc2efc2ea4a793b7159e95e9596e85e00dee26adc3f8afbb97f",
+    "cidr_whitelist": [ "127.0.0.1" ],
+    "created": "2015-01-04T08:28:51.378Z",
+    "updated": "2015-01-04T08:28:51.378Z",
+    "readonly": false
+  }]
+}
+```
+
+### Delete token
+
+* Authentication required.
+
+```
+GET /-/npm/v1/tokens/token/:UUID
+```
+
+#### Response 204
