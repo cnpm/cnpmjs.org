@@ -5,6 +5,16 @@ var config = require('../config');
 
 module.exports = function (options) {
   var redirectUrl = config.sourceNpmRegistry;
+  var privateUrls = [
+    // see routes/registry.js
+    new RegExp('/-/all'),
+    new RegExp('/-/all/since'),
+    new RegExp('/-/short'),
+    new RegExp('/-/allversions'),
+    new RegExp('/-/whoami'),
+    new RegExp('/-/ping'),
+  ];
+
   var proxyUrls = [
     // /:pkg, dont contains scoped package
     // /:pkg/:versionOrTag
@@ -19,6 +29,7 @@ module.exports = function (options) {
   ];
   if (options && options.isWeb) {
     redirectUrl = config.sourceNpmWeb || redirectUrl.replace('//registry.', '//');
+    privateUrls = [];
     proxyUrls = [
       // /package/:pkg
       /^\/package\/[\w\-\.]+/,
@@ -41,6 +52,20 @@ module.exports = function (options) {
     }
 
     var pathname =  decodeURIComponent(this.path);
+
+    var isPrivate = false;
+    // check private urls
+    for (var i = 0; i < privateUrls.length; i++) {
+      isPrivate = privateUrls[i].test(pathname);
+      if (isPrivate) {
+        break;
+      }
+    }
+
+    // don't proxy private url to source npm 
+    if (isPrivate) {
+      return yield next;
+    }
 
     var isScoped = false;
     var isPublichScoped = false;
