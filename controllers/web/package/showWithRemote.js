@@ -21,7 +21,7 @@ module.exports = function* showWithRemote(ctx, next) {
     gzip: true,
   });
   if (result.status !== 200) {
-    return yield next();
+    return yield next;
   }
   const manifest = result.data;
 
@@ -30,7 +30,7 @@ module.exports = function* showWithRemote(ctx, next) {
   const versionsMap = manifest.versions || {};
   const pkg = versionsMap[realVersion];
   if (!pkg) {
-    return yield next();
+    return yield next;
   }
 
   const maintainers = manifest.maintainers;
