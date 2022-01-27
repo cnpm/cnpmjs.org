@@ -43,6 +43,8 @@ module.exports = function* showWithRemote(ctx, next) {
     }
     pkg.maintainers = maintainers;
   }
+
+  const timeMap = manifest.time || {};
   
   pkg.readme = manifest.readme || '';
   if (typeof pkg.readme !== 'string') {
@@ -51,12 +53,12 @@ module.exports = function* showWithRemote(ctx, next) {
     pkg.readme = renderMarkdown(pkg.readme);
   }
   
-  pkg.fromNow = moment(pkg.publish_time).fromNow();
+  pkg.fromNow = moment(new Date(timeMap[pkg.version])).fromNow();
   // [ {tag, version, fromNow} ]
   const tags = [];
   for (const tag in distTags) {
     const version = distTags[tag];
-    const time = manifest.time && manifest.time[version];
+    const time = timeMap[version];
     if (time) {
       const fromNow = moment(new Date(time)).fromNow();
       tags.push({ tag, version, fromNow });
@@ -70,7 +72,7 @@ module.exports = function* showWithRemote(ctx, next) {
     versions.push({
       version,
       deprecated: item.deprecated,
-      fromNow: moment(item.publish_time).fromNow(),
+      fromNow: moment(new Date(timeMap[version])).fromNow(),
     });
   }
   pkg.versions = versions;
