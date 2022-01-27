@@ -13,7 +13,7 @@ module.exports = function* showWithRemote(ctx, next) {
   const versionOrTag = params.version || params[1] || 'latest';
   debug('display %s with %j', fullname, params);
 
-  const url = `${config.webDataRemoteRegistry}/${encodeURIComponent(fullname)}`;
+  const url = `${config.webDataRemoteRegistry}/${fullname}`;
   const result = yield urllib.request(url, {
     dataType: 'json',
     timeout: 20000,
