@@ -207,6 +207,10 @@ var config = {
   sourceNpmRegistry: 'https://registry.npmmirror.com',
   sourceNpmWeb: 'https://npmmirror.com',
 
+  // set remote registry to show web page data
+  enableWebDataRemoteRegistry: false,
+  webDataRemoteRegistry: '',
+
   // upstream registry is base on cnpm/cnpmjs.org or not
   // if your upstream is official npm registry, please turn it off
   sourceNpmRegistryIsCNpm: true,

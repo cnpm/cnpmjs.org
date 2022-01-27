@@ -229,7 +229,11 @@ SyncModuleWorker.prototype.syncUpstream = function* (name) {
   if (this.type === 'user') {
     syncname = this.type + ':' + syncname;
   }
-  var url = config.sourceNpmRegistry + '/' + syncname + '/sync?sync_upstream=true';
+  var sourceNpmRegistry = config.sourceNpmRegistry;
+  if (config.enableWebDataRemoteRegistry) {
+    sourceNpmRegistry = config.webDataRemoteRegistry;
+  }
+  var url = sourceNpmRegistry + '/' + syncname + '/sync?sync_upstream=true';
   if (this.noDep) {
     url += '&nodeps=true';
   }
@@ -248,7 +252,7 @@ SyncModuleWorker.prototype.syncUpstream = function* (name) {
       url, r.status, r.data);
   }
 
-  var logURL = config.sourceNpmRegistry + '/' + name + '/sync/log/' + r.data.logId;
+  var logURL = sourceNpmRegistry + '/' + name + '/sync/log/' + r.data.logId;
   var offset = 0;
   this.log('----------------- Syncing upstream %s -------------------', logURL);
 

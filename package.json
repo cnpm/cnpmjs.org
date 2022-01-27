@@ -77,7 +77,6 @@
   "devDependencies": {
     "autod": "*",
     "chunkstream": "*",
-    "egg-ci": "^1.18.0",
     "intelli-espower-loader": "^1.0.1",
     "istanbul": "*",
     "jshint": "*",
