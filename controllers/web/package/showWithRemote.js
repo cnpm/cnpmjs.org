@@ -73,6 +73,9 @@ module.exports = function* showWithRemote(ctx, next) {
     });
   }
   pkg.versions = versions;
+
+  pkg.registryUrl = '//' + config.registryHost + '/' + pkg.name;
+  pkg.registryPackageUrl = '//' + config.registryHost + '/' + pkg.name + '/' + pkg.version;
   yield ctx.render('package', {
     title: 'Package - ' + manifest.name,
     package: pkg,

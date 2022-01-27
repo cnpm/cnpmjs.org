@@ -52,7 +52,7 @@
 
         <% if (package.repository) { %>
           <% if (package.license) {%> &middot; <% } %>
-          <a href="<%= package.repository.weburl %>" target="_blank">Repository</a>
+          <a href="<%= package.repository.weburl || package.repository.url %>" target="_blank">Repository</a>
         <% } %>
 
         <% if (package.bugs && package.bugs.url) { %>
