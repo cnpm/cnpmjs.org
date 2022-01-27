@@ -3,6 +3,7 @@
 const debug = require('debug')('cnpmjs.org:controllers:web:package:showWithRemote');
 const moment = require('moment');
 const gravatar = require('gravatar');
+const giturl = require('giturl');
 const urllib = require('../../../common/urllib');
 const config = require('../../../config');
 const renderMarkdown = require('../../../common/markdown').render;
@@ -76,6 +77,16 @@ module.exports = function* showWithRemote(ctx, next) {
 
   pkg.registryUrl = '//' + config.registryHost + '/' + pkg.name;
   pkg.registryPackageUrl = '//' + config.registryHost + '/' + pkg.name + '/' + pkg.version;
+
+  if (pkg.repository === 'undefined') {
+    pkg.repository = null;
+  }
+  if (pkg.repository && pkg.repository.url) {
+    if (!pkg.repository.weburl) {
+      pkg.repository.weburl = /^https?:\/\//.test(pkg.repository.url) ? pkg.repository.url : (giturl.parse(pkg.repository.url) || pkg.repository.url);
+    }
+  }
+
   yield ctx.render('package', {
     title: 'Package - ' + manifest.name,
     package: pkg,
