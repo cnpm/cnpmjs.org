@@ -20,7 +20,7 @@ exports.sync = function* () {
   var noDep = this.query.nodeps === 'true';
   var syncUpstreamFirst = this.query.sync_upstream === 'true';
   var syncFromBackupFile = this.query.sync_from_backup === 'true';
-  if (!config.sourceNpmRegistryIsCNpm) {
+  if (!config.enableWebDataRemoteRegistry && !config.sourceNpmRegistryIsCNpm) {
     syncUpstreamFirst = false;
   }
   debug('sync %s with query: %j, syncUpstreamFirst: %s', name, this.query, syncUpstreamFirst);

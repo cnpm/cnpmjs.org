@@ -14,8 +14,12 @@ var renderMarkdown = require('../../../common/markdown').render;
 var packageService = require('../../../services/package');
 var blocklistService = require('../../../services/blocklist');
 var downloadTotalService = require('../../../services/download_total');
+var showWithRemote = require('./showWithRemote');
 
 module.exports = function* show(next) {
+  if (config.enableWebDataRemoteRegistry) {
+    return yield showWithRemote(this, next);
+  }
   var params = this.params;
   // normal: {name: $name, version: $version}
   // scope: [$name, $version]

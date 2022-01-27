@@ -20,7 +20,9 @@
           <% for (var k in package.engines) {
             var engine = package.engines[k];
           %>
+            <% if (engine.badgeURL) { %>
             <img title="<%= engine.title %>" src="<%- engine.badgeURL %>">
+            <% } %>
         <% }
         } %>
         <% if (package.snyk) { %>
@@ -44,7 +46,7 @@
             </div>
         <% } %>
 
-        <% if (package.license) { %>
+        <% if (package.license && package.license.url) { %>
           <a href="<%= package.license.url %>" target="_blank"><%= package.license.name %></a>
         <% } %>
 
@@ -53,12 +55,12 @@
           <a href="<%= package.repository.weburl %>" target="_blank">Repository</a>
         <% } %>
 
-        <% if (package.bugs.url) { %>
+        <% if (package.bugs && package.bugs.url) { %>
           <% if (package.license || package.repository) {%> &middot; <% } %>
           <a href="<%= package.bugs.url %>" target="_blank">Bugs</a>
         <% } %>
 
-        <% if (package.license || package.repository || package.bugs.url) {%> &middot; <% } %>
+        <% if (package.license || package.repository || (package.bugs && package.bugs.url)) {%> &middot; <% } %>
 
         <% if (!package.isPrivate) { %>
         <a href="https://www.npmjs.org/package/<%= package.name %>/v/<%= package.version %>" target="_blank">Original npm</a>
@@ -159,6 +161,7 @@
       </div>
     </div>
 
+    <% if (download) { %>
     <div class="pack-downloads cols-box-item">
       <div class="cols-box-title">
         Downloads
@@ -194,6 +197,8 @@
         </div>
       </div>
     </div>
+    <% } %>
+
     <div class="pack-dep cols-box-item">
       <div class="cols-box-title">
         <%
@@ -243,6 +248,7 @@
       <% } %>
     </div>
 
+    <% if (package.dependents) { %>
     <div class="pack-dep cols-box-item">
       <div class="cols-box-title">
         <%
@@ -266,6 +272,7 @@
         None
       <% } %>
     </div>
+    <% } %>
 
   </div>
 </div>

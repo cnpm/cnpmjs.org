@@ -218,18 +218,24 @@ SyncModuleWorker.prototype._doneOne = function* (concurrencyId, name, success) {
 };
 
 SyncModuleWorker.prototype.syncUpstream = function* (name) {
-  if (config.sourceNpmRegistry.indexOf('registry.npmjs.org') >= 0 ||
-      config.sourceNpmRegistry.indexOf('registry.npmjs.com') >= 0 ||
-      config.sourceNpmRegistry.indexOf('replicate.npmjs.com') >= 0) {
+  var sourceNpmRegistry = config.sourceNpmRegistry;
+  if (config.enableWebDataRemoteRegistry) {
+    sourceNpmRegistry = config.webDataRemoteRegistry;
+  }
+
+  if (sourceNpmRegistry.indexOf('registry.npmjs.org') >= 0 ||
+      sourceNpmRegistry.indexOf('registry.npmjs.com') >= 0 ||
+      sourceNpmRegistry.indexOf('replicate.npmjs.com') >= 0) {
     this.log('----------------- upstream is npm registry: %s, ignore it -------------------',
-      config.sourceNpmRegistry);
+      sourceNpmRegistry);
     return;
   }
   var syncname = name;
   if (this.type === 'user') {
     syncname = this.type + ':' + syncname;
   }
-  var url = config.sourceNpmRegistry + '/' + syncname + '/sync?sync_upstream=true';
+
+  var url = sourceNpmRegistry + '/' + syncname + '/sync?sync_upstream=true';
   if (this.noDep) {
     url += '&nodeps=true';
   }
@@ -248,7 +254,7 @@ SyncModuleWorker.prototype.syncUpstream = function* (name) {
       url, r.status, r.data);
   }
 
-  var logURL = config.sourceNpmRegistry + '/' + name + '/sync/log/' + r.data.logId;
+  var logURL = sourceNpmRegistry + '/' + name + '/sync/log/' + r.data.logId;
   var offset = 0;
   this.log('----------------- Syncing upstream %s -------------------', logURL);
 
