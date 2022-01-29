@@ -1,5 +1,7 @@
 'use strict';
 
+var config = require('../../config');
+
 module.exports = function* showSync() {
   var name = this.params.name || this.params[0] || this.query.name;
   if (!name) {
