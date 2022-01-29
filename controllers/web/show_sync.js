@@ -11,9 +11,11 @@ module.exports = function* showSync() {
     name = splits[1];
     type = splits[0];
   }
+  var syncTaskUrl = config.enableWebDataRemoteRegistry ? `${config.webDataRemoteRegistry}/${name}/sync` : null;
   yield this.render('sync', {
     type: type,
     name: name,
     title: 'Sync ' + type + ' - ' + name,
+    syncTaskUrl,
   });
 };
