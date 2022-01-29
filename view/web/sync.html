@@ -78,12 +78,13 @@
         }
         if (syncDone) {
           log += '\nSync ' + name + ' complete!';
+          var logLink = data.logUrl ? (' <a href="' + data.logUrl + '" target="_blank">' + data.logUrl + '</a>') : '';
           if (hasFail) {
             log += ' But some packages sync failed, you can refresh to sync again.';
             location.hash = '';
-            $notify.html('<div class="ant-alert ant-alert-error">Sync failed.</div>');
+            $notify.html('<div class="ant-alert ant-alert-error">Sync failed.' + logLink + '</div>');
           } else {
-            $notify.html('<div class="ant-alert ant-alert-success">Sync success.</div>');
+            $notify.html('<div class="ant-alert ant-alert-success">Sync success.' + logLink + '</div>');
           }
           clearInterval(timer);
         }
