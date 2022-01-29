@@ -15,7 +15,11 @@
   if (type !== 'package') {
     name = type + ':' + name;
   }
+  <% if (syncTaskUrl) { %>
+  var resourceURL = '<%= syncTaskUrl %>';
+  <% } else { %>
   var resourceURL = '/sync/' + name;
+  <% } %>
   $(function() {
     var checkLogId = location.hash.match(/logid=(\d+)/);
     var logid = checkLogId ? checkLogId[1] : '';
@@ -26,6 +30,7 @@
       url: resourceURL + '?sync_upstream=true',
       type: 'PUT',
       dataType: 'json',
+      crossDomain: true,
       success: handleSyncSucess,
       error: function (err) {
         var alert = $('<div class="ant-alert ant-alert-error"></div>');
@@ -57,6 +62,7 @@
     $.ajax({
       url: resourceURL + '/log/' + id,
       type: 'GET',
+      crossDomain: true,
       dataType: 'json',
       success: function (data) {
         if (!data.ok) {
@@ -72,12 +78,13 @@
         }
         if (syncDone) {
           log += '\nSync ' + name + ' complete!';
+          var logLink = data.logUrl ? (' <a href="' + data.logUrl + '" target="_blank">' + data.logUrl + '</a>') : '';
           if (hasFail) {
             log += ' But some packages sync failed, you can refresh to sync again.';
             location.hash = '';
-            $notify.html('<div class="ant-alert ant-alert-error">Sync failed.</div>');
+            $notify.html('<div class="ant-alert ant-alert-error">Sync failed.' + logLink + '</div>');
           } else {
-            $notify.html('<div class="ant-alert ant-alert-success">Sync success.</div>');
+            $notify.html('<div class="ant-alert ant-alert-success">Sync success.' + logLink + '</div>');
           }
           clearInterval(timer);
         }
