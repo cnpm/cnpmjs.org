@@ -21,7 +21,7 @@
   var resourceURL = '/sync/' + name;
   <% } %>
   $(function() {
-    var checkLogId = location.hash.match(/logid=(\d+)/);
+    var checkLogId = location.hash.match(/logid=(\w+)/);
     var logid = checkLogId ? checkLogId[1] : '';
     if (logid) {
       return getSyncLog(logid);
