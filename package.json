@@ -4,6 +4,7 @@
   "description": "Private npm registry and web for Enterprise, base on MySQL and Simple Store Service",
   "main": "index.js",
   "scripts": {
+    "contributor": "git-contributor",
     "dev": "DEBUG=cnpm* node dispatch.js",
     "test": "make jshint && make test",
     "test-local": "make test",
@@ -77,6 +78,7 @@
   "devDependencies": {
     "autod": "*",
     "chunkstream": "*",
+    "git-contributor": "^1.0.10",
     "intelli-espower-loader": "^1.0.1",
     "istanbul": "*",
     "jshint": "*",
