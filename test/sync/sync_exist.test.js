@@ -1,18 +1,4 @@
-/*!
- * cnpmjs.org - test/sync/sync_exist.test.js
- *
- * Copyright(c) cnpmjs.org and other contributors.
- * MIT Licensed
- *
- * Authors:
- *  dead_horse <dead_horse@qq.com> (http://deadhorse.me)
- */
-
 'use strict';
-
-/**
- * Module dependencies.
- */
 
 var mm = require('mm');
 var config = require('../../config');
@@ -34,37 +20,45 @@ describe('test/sync/sync_exist.test.js', function () {
     });
 
     it('should sync first time ok', function *() {
-      mm.data(npmService, 'getShort', ['byte']);
+      mm.data(npmService, 'listChanges', [
+        {
+          seq: 1,
+          id: 'byte',
+        }
+      ]);
       mm.data(totalService, 'getTotalInfo', {last_exist_sync_time: 0});
       var data = yield sync();
       data.successes[0].should.equal('byte');
     });
 
     it('should sync common ok', function *() {
-      mm.data(npmService, 'getAllSince', {
-        _updated: Date.now(),
-        byte: {},
-      });
-      mm.data(totalService, 'getTotalInfo', {last_exist_sync_time: Date.now()});
-      var data = yield sync();
-      data.successes[0].should.equal('byte');
-
-      mm.data(npmService, 'getAllSince', []);
-      var data = yield sync();
-      data.successes.should.eql([]);
-    });
-
-    it('should sync with array format data', function *() {
-      mm.data(npmService, 'getAllSince', [
+      mm.data(npmService, 'listChanges', [
         {
-          name: 'byte',
+          seq: 2,
+          id: 'byte',
         }
       ]);
       mm.data(totalService, 'getTotalInfo', {last_exist_sync_time: Date.now()});
       var data = yield sync();
       data.successes[0].should.equal('byte');
 
-      mm.data(npmService, 'getAllSince', []);
+      mm.data(npmService, 'listChanges', []);
+      var data = yield sync();
+      data.successes.should.eql([]);
+    });
+
+    it('should sync with array format data', function *() {
+      mm.data(npmService, 'listChanges', [
+        {
+          seq: 3,
+          id: 'byte',
+        }
+      ]);
+      mm.data(totalService, 'getTotalInfo', {last_exist_sync_time: Date.now()});
+      var data = yield sync();
+      data.successes[0].should.equal('byte');
+
+      mm.data(npmService, 'listChanges', []);
       var data = yield sync();
       data.successes.should.eql([]);
     });
