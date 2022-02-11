@@ -59,9 +59,7 @@ module.exports = function* sync() {
   var packages = intersection(existPackages, updatesPackages);
   debug('Total %d packages to sync, top 10: %j', packages.length, packages.slice(0, 10));
   if (!packages.length) {
-    if (changes.length > 0) {
-      yield totalService.setLastExistSyncTime(lastSeq);
-    }
+    yield totalService.setLastExistSyncTime(lastSeq);
     debug('no packages need be sync, lastSeq: %s, changes: %s', lastSeq, changes.length);
     return {
       successes: [],
