@@ -6,6 +6,7 @@ cnpmjs.org
 [![Test coverage][codecov-image]][codecov-url]
 [![Known Vulnerabilities][snyk-image]][snyk-url]
 [![npm download][download-image]][download-url]
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fcnpm%2Fcnpmjs.org.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fcnpm%2Fcnpmjs.org?ref=badge_shield)
 
 [npm-image]: http://cnpmjs.org/badge/v/cnpmjs.org.svg?style=flat-square
 [npm-url]: http://cnpmjs.org/package/cnpmjs.org
@@ -164,6 +165,9 @@ Tips: make sure your code is following the [node-style-guide](https://github.com
 [MIT](LICENSE.txt)
 
 <!-- GITCONTRIBUTOR_START -->
+
+
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fcnpm%2Fcnpmjs.org.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Fcnpm%2Fcnpmjs.org?ref=badge_large)
 
 ## Contributors
 
