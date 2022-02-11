@@ -153,7 +153,7 @@ exports.getAllToday = function* (timeout) {
 };
 
 exports.getShort = function* (timeout) {
-  const registry = config.sourceNpmRegistryIsCNpm ? config.sourceNpmRegistry : 'https://r.cnpmjs.org';
+  const registry = config.sourceNpmRegistryIsCNpm ? config.sourceNpmRegistry : 'https://registry.npmmirror.com';
   var r = yield request('/-/short', {
     timeout: timeout || 300000,
     // registry.npmjs.org/-/short is 404 now therefore have a fallback
@@ -197,4 +197,44 @@ exports.getPopular = function* (top, timeout) {
   .filter(function (r) {
     return r[0];
   });
+};
+
+exports.getChangesUpdateSeq = function* () {
+  const registry = config.sourceNpmRegistryIsCNpm ? config.sourceNpmRegistry : 'https://registry.npmmirror.com';
+  const r = yield request('/', {
+    timeout: 30000,
+    registry: registry,
+  });
+  const data = r.data || {};
+  if (r.status !== 200) {
+    if (data.code && data.message) {
+      const url = registry + '/';
+      const err = new Error(data.message + ', url: ' + url);
+      err.name = data.code;
+      err.url = url;
+      throw err;
+    }
+  }
+  return data.update_seq || 0;
+};
+
+exports.listChanges = function* (updateSeq) {
+  const registry = config.sourceNpmRegistryIsCNpm ? config.sourceNpmRegistry : 'https://registry.npmmirror.com';
+  const changesUrl = `/_changes?since=${updateSeq}`;
+  const r = yield request(changesUrl, {
+    timeout: 30000,
+    registry: registry,
+  });
+  const data = r.data || {};
+  if (r.status !== 200) {
+    if (data.code && data.message) {
+      const url = registry + changesUrl;
+      const err = new Error(data.message + ', url: ' + url);
+      err.name = data.code;
+      err.url = url;
+      throw err;
+    }
+  }
+  // {"results":[{"seq":1988653,"type":"PACKAGE_VERSION_ADDED","id":"dsr-package-mercy-magot-thorp-sward","changes":[{"version":"1.0.1"}]},
+  return data.results || [];
 };

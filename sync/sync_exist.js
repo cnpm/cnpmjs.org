@@ -34,35 +34,40 @@ module.exports = function* sync() {
     throw new Error('can not found total info');
   }
 
-  var allPackages;
-  if (!info.last_exist_sync_time) {
-    var pkgs = yield npmService.getShort();
-    debug('First time sync all packages from official registry, got %d packages', pkgs.length);
-    if (info.last_sync_module) {
-      // start from last success
-      var lastIndex = pkgs.indexOf(info.last_sync_module);
-      if (lastIndex > 0) {
-        pkgs = pkgs.slice(lastIndex);
-        debug('recover from %d: %s', lastIndex, info.last_sync_module);
-      }
-    }
-    allPackages = pkgs;
-  } else {
-    debug('sync new module from last exist sync time: %s', info.last_exist_sync_time);
-    var result = yield npmService.fetchUpdatesSince(info.last_exist_sync_time);
-    allPackages = result.names;
-    syncTime = result.lastModified;
+  var lastSeq = info.last_exist_sync_time;
+  if (lastSeq && lastSeq > 132897820073) {
+    // ignore exists timestamp
+    lastSeq = null;
   }
-
-  var packages = intersection(existPackages, allPackages);
-  if (!packages.length) {
+  if (!lastSeq) {
+    lastSeq = yield npmService.getChangesUpdateSeq();
+  }
+  if (!lastSeq) {
     debug('no packages need be sync');
     return {
       successes: [],
       fails: []
     };
   }
+
+  var updatesPackages = [];
+  var changes = yield npmService.listChanges(lastSeq);
+  changes.forEach(change => {
+    updatesPackages.push(change.id);
+    lastSeq = change.seq;
+  });
+  var packages = intersection(existPackages, updatesPackages);
   debug('Total %d packages to sync, top 10: %j', packages.length, packages.slice(0, 10));
+  if (!packages.length) {
+    if (changes.length > 0) {
+      yield totalService.setLastExistSyncTime(lastSeq);
+    }
+    debug('no packages need be sync, lastSeq: %s, changes: %s', lastSeq, changes.length);
+    return {
+      successes: [],
+      fails: []
+    };
+  }
 
   var worker = new SyncModuleWorker({
     username: 'admin',
@@ -75,10 +80,10 @@ module.exports = function* sync() {
   var end = thunkify.event(worker);
   yield end();
 
-  debug('All packages sync done, successes %d, fails %d',
-    worker.successes.length, worker.fails.length);
+  debug('All packages sync done, successes %d, fails %d, lastSeq: %s, changes: %s',
+    worker.successes.length, worker.fails.length, lastSeq, changes.length);
 
-  yield totalService.setLastExistSyncTime(syncTime);
+  yield totalService.setLastExistSyncTime(lastSeq);
   return {
     successes: worker.successes,
     fails: worker.fails
