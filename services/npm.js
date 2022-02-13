@@ -238,3 +238,13 @@ exports.listChanges = function* (updateSeq) {
   // {"results":[{"seq":1988653,"type":"PACKAGE_VERSION_ADDED","id":"dsr-package-mercy-magot-thorp-sward","changes":[{"version":"1.0.1"}]},
   return data.results || [];
 };
+
+exports.getScopePackagesShort = function* (scope, registry) {
+  var response = yield* request('/browse/keyword/' + scope, {
+    timeout: 3000,
+    registry: registry,
+    dataType: 'text'
+  });
+  var res = response.data.match(/class="package-name">(\S*)<\/a>/g)
+  return res ? res.map(a => a.match(/class="package-name">(\S*)<\/a>/)[1]).filter(name => name.indexOf(`${scope}/`) === 0) : []
+};

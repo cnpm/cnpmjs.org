@@ -1,0 +1,124 @@
+<div id="scopeSync">
+  <h2>Scope Packages Sync</h2>
+  <div>
+    <div><%= scope %></div>
+    <div>source registry ：<%= sourceCnpmRegistry %></div>
+    <div>scope package number：<%= packages.length %> </div>
+    <div id="last-sync-time">Last Sync Time: </div>
+    <button id='start-button' onclick="startAllSync()">Start sync all scope packages</button>
+  </div>
+  <ul>
+    <% for(var i=0;i<packages.length;i++){ %>
+      <li id="sync-result-<%= packages[i] %>"><%= packages[i] %>： wait sync</li>
+    <% } %>
+  </ul>
+  <h2>Log</h2>
+  <div id="sync-logs">
+    <% for(var i=0;i<packages.length;i++){ %>
+      <h2>Sync <span style="color:#09f;"><%= packages[i] %></span></h2>
+      <div id="sync-notify-<%= packages[i] %>">
+        <div class="ant-alert ant-alert-success">Sync started, please wait patiently.</div>
+      </div>
+      <pre style="min-height: 400px;" id="sync-log-<%= packages[i] %>"></pre>
+    <% } %>
+  </div>
+</div>
+<script>
+  var scope = '<%= scope %>';
+  var packages = '<%= packages %>';
+  var excutePackages = packages.split(',').map(function (name) {
+    var logId = localStorage.getItem(name)
+    var obj = {
+      name: name,
+      logTimer: '',
+      logId: logId,
+      syncDone: false,
+      hasFail: false
+    }
+    logId && getSyncLog(obj)
+
+    return obj
+  })
+
+  var lastSyncStartTime = localStorage.getItem(`${scope}_last_sync_start_time`)
+  lastSyncStartTime && $(document.getElementById('last-sync-time')).html('<div class="ant-alert ant-alert-success">本浏览器上次同步时间为：' + lastSyncStartTime + '</div>')
+
+  function startAllSync () {
+    if (lastSyncStartTime) {
+      if (!window.confirm(`laste sync time is ${lastSyncStartTime}，are you sure restart ?`)) return
+    }
+
+    $.ajax({
+        url: `/scopeSync/${scope}`,
+        type: 'PUT',
+        dataType: 'json',
+        success: function (data) {
+          if (!data.ok) {
+            console.log(data)
+            alert('Sync request error.')
+            return
+          }
+          localStorage.setItem(`${scope}_last_sync_start_time`, new Date())
+
+          data.logIds.forEach(({ name, logId }) => {
+            localStorage.setItem(name, logId)
+            $(document.getElementById('sync-result-' + name)).html(name + '---------------- Syncing ----------------')
+            var obj = excutePackages.find(obj => obj.name === name)
+            obj.logId = logId
+            obj.logTimer = setInterval(function () { getSyncLog(obj) }, 2000);
+          })
+        },
+        error: function (err) {
+          console.log(err)
+          alert(JSON.stringify(err))
+        }
+      });
+  }
+
+  function getSyncLog(obj) {
+    var name = obj.name
+    var id = obj.logId
+    var timer = obj.logTimer
+    var $log = $(document.getElementById('sync-log-' + name));
+    var $notify = $(document.getElementById('sync-notify-' + name));
+    var $syncResult = $(document.getElementById('sync-result-' + name));
+
+    $.ajax({
+      url: '/sync/' + name + '/log/' + id,
+      type: 'GET',
+      dataType: 'json',
+      success: function (data) {
+        if (!data.ok) {
+          return;
+        }
+
+        var log = data.log || '';
+
+        obj.syncDone = data.syncDone;
+
+        if (log.indexOf('Fail: [') >= 0) {
+          var failInfo = log.match(/Fail: \[ (.*?) \]/);
+          if (failInfo && failInfo[1]) {
+            obj.hasFail = true;
+          }
+        }
+        if (obj.syncDone) {
+          log += '\nSync ' + name + ' complete!';
+          if (obj.hasFail) {
+            log += ' scome package sync faile，you can try cleae localStorage and restart sync';
+            location.hash = '';
+            $notify.html('<div class="ant-alert ant-alert-error">～～～～～～sync failed～～～～～～</div>');
+            $syncResult.html('<div style="color: red">' + name + '：Sync failed!!!!!!!!!!!!!' + '</div>')
+          } else {
+            $notify.html('<div class="ant-alert ant-alert-success">Sync success.</div>');
+            $syncResult.html('<div style="color: #4deb4d">' + name + '：Sync success' + '</div>')
+          }
+          clearInterval(timer);
+        } else {
+          $syncResult.html(name + '---------------- Syncing ----------------')
+        }
+        $log.html(log);
+      }
+    });
+  }
+</script>

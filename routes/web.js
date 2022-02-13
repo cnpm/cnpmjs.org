@@ -5,6 +5,7 @@ var searchPackage = require('../controllers/web/package/search');
 var searchRange = require('../controllers/web/package/search_range');
 var listPrivates = require('../controllers/web/package/list_privates');
 var showSync = require('../controllers/web/show_sync');
+var showScopeSync = require('../controllers/web/show_scope_sync');
 var showUser = require('../controllers/web/user/show');
 var sync = require('../controllers/sync');
 var showTotal = require('../controllers/total');
@@ -34,6 +35,9 @@ function routes(app) {
   app.get('/sync', showSync);
   app.put(/\/sync\/(@[\w\-\.]+\/[\w\-\.]+)$/, sync.sync);
   app.put('/sync/:name', sync.sync);
+
+  app.get('/scopeSync/:scope', showScopeSync);
+  app.put('/scopeSync/:scope', sync.scopeSync);
 
   app.get(/\/sync\/(@[\w\-\.]+\/[\w\-\.]+)\/log\/(\d+)$/, sync.getSyncLog);
   app.get('/sync/:name/log/:id', sync.getSyncLog);

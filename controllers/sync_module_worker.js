@@ -49,6 +49,8 @@ function SyncModuleWorker(options) {
   this.names = options.name;
   this.startName = this.names[0];
 
+  this.syncPrivatePackage = options.syncPrivatePackage;
+
   this.username = options.username;
   this.concurrency = options.concurrency || 1;
   this._publish = options.publish === true; // _publish_on_cnpm
@@ -319,14 +321,21 @@ SyncModuleWorker.prototype.next = function* (concurrencyId) {
     return setImmediate(this.finish.bind(this));
   }
 
-  if (config.syncModel === 'none') {
+  const defineRegistry = this.getPrivatePackageDefineRegistry(name)
+
+  if (!defineRegistry && config.syncModel === 'none') {
     this.log('[c#%d] [%s] syncModel is none, ignore',
-      concurrencyId, name);
+     concurrencyId, name);
     return this.finish();
   }
 
-  // try to sync from official replicate when source npm registry is not cnpmjs.org
-  const registry = config.sourceNpmRegistryIsCNpm ? config.sourceNpmRegistry : config.officialNpmReplicate;
+  // try to sync from official replicate when no defineRegistry or source npm registry is not cnpmjs.org
+  let registry
+  if (defineRegistry) {
+    registry = defineRegistry
+  } else {
+    registry = config.sourceNpmRegistryIsCNpm ? config.sourceNpmRegistry : config.officialNpmReplicate;
+  }
 
   yield this.syncByName(concurrencyId, name, registry);
 };
@@ -526,8 +535,9 @@ SyncModuleWorker.prototype.syncByName = function* (concurrencyId, name, registry
 
   this.log('----------------- Syncing %s -------------------', name);
 
+  const isNeedSyncPrivatePackage = this.getPrivatePackageDefineRegistry(name)
   // ignore private scoped package
-  if (common.isPrivateScopedPackage(name)) {
+  if (!isNeedSyncPrivatePackage && common.isPrivateScopedPackage(name)) {
     this.log('[c#%d] [%s] ignore sync private scoped %j package',
       concurrencyId, name, config.scopes);
     yield this._doneOne(concurrencyId, name, true);
@@ -693,6 +703,21 @@ SyncModuleWorker.prototype.syncByName = function* (concurrencyId, name, registry
   return versions;
 };
 
+SyncModuleWorker.prototype.getPrivatePackageDefineRegistry = function (name) {
+  if (typeof name !== 'string') return false
+  return this.syncPrivatePackage && this.syncPrivatePackage[name.split('/')[0]]
+}
+
+SyncModuleWorker.prototype.isLocalModule = function (mods) {
+  var res = common.isLocalModule(mods)
+  if (!this.syncPrivatePackage) return res
+  if (!mods[0] || !mods[0].package || !mods[0].package.name) return res
+
+  if (this.getPrivatePackageDefineRegistry(mods[0].package.name)) return false
+
+  return res
+}
+
 function* _listStarUsers(modName) {
   var users = yield packageService.listStarUserNames(modName);
   var userMap = {};
@@ -733,7 +758,7 @@ SyncModuleWorker.prototype._unpublished = function* (name, unpublishedInfo) {
   var mods = yield packageService.listModulesByName(name);
   this.log('  [%s] start unpublished %d versions from local cnpm registry',
     name, mods.length);
-  if (common.isLocalModule(mods)) {
+  if (this.isLocalModule(mods)) {
     // publish on cnpm, dont sync this version package
     this.log('  [%s] publish on local cnpm registry, don\'t sync', name);
     return [];
@@ -801,7 +826,7 @@ SyncModuleWorker.prototype._sync = function* (name, pkg) {
   var existsNpmMaintainers = result[3];
   var existsModuleAbbreviateds = result[4];
 
-  if (common.isLocalModule(moduleRows)) {
+  if (this.isLocalModule(moduleRows)) {
     // publish on cnpm, dont sync this version package
     that.log('  [%s] publish on local cnpm registry, don\'t sync', name);
     return [];
@@ -1913,6 +1938,7 @@ SyncModuleWorker.sync = function* (name, username, options) {
     publish: options.publish,
     syncUpstreamFirst: options.syncUpstreamFirst,
     syncFromBackupFile: options.syncFromBackupFile,
+    syncPrivatePackage: options.syncPrivatePackage
   });
   worker.start();
   return result.id;

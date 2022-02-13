@@ -2,6 +2,7 @@
 
 var debug = require('debug')('cnpmjs.org:controllers:sync');
 var Log = require('../services/module_log');
+var npmService = require('../services/npm');
 var SyncModuleWorker = require('./sync_module_worker');
 var config = require('../config');
 
@@ -49,6 +50,55 @@ exports.sync = function* () {
   this.body = {
     ok: true,
     logId: logId
+  };
+};
+
+exports.scopeSync = function* () {
+  var scope = this.params.scope;
+
+  var scopeConfig = (config.syncScopeConfig || []).find(function (item) {
+    return item.scope === scope
+  })
+
+  if (!scopeConfig) {
+    this.status = 404;
+    this.body = {
+      error: 'no_scope',
+      reason: 'only has syncScopeConfig config can use this feature'
+    };
+    return;
+  }
+
+  var scopeCnpmWeb = scopeConfig.sourceCnpmWeb
+  var scopeCnpmRegistry = scopeConfig.sourceCnpmRegistry
+  var packages = yield* npmService.getScopePackagesShort(scope, scopeCnpmWeb)
+
+  debug('scopeSync %s with query: %j', scope, this.query);
+
+  var packageSyncWorkers = []
+
+  for (let i = 0; i < packages.length; i++) {
+    packageSyncWorkers.push(function* () {
+      var name = packages[i]
+      var logId = yield* SyncModuleWorker.sync(name, 'admin', {
+        type: 'package',
+        publish: true,
+        noDep: true,
+        syncUpstreamFirst: false,
+        syncPrivatePackage: { [scope]: scopeCnpmRegistry }
+      })
+      return { name: name, logId: logId }
+    })
+  }
+
+  var logIds = yield packageSyncWorkers
+
+  debug('scopeSync %s got log id %j', scope, logIds);
+
+  this.status = 201;
+  this.body = {
+    ok: true,
+    logIds: logIds
   };
 };
 

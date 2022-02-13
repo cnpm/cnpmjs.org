@@ -7,20 +7,21 @@ var cfork = require('cfork');
 var config = require('./config');
 var workerPath = path.join(__dirname, 'worker.js');
 var syncPath = path.join(__dirname, 'sync');
+var scopeSyncPath = path.join(__dirname, 'sync/sync_scope');
 
 console.log('Starting cnpmjs.org ...\ncluster: %s\nadmins: %j\nscopes: %j\nsourceNpmRegistry: %s\nsyncModel: %s',
   config.enableCluster, config.admins, config.scopes, config.sourceNpmRegistry, config.syncModel);
 
 if (config.enableCluster) {
   forkWorker();
-  if (config.syncModel !== 'none') {
-    forkSyncer();
-  }
+  config.syncModel !== 'none' && forkSyncer();
+  // scync assign pravate scope package
+  config.syncScope && forkScopeSyncer();
 } else {
   require(workerPath);
-  if (config.syncModel !== 'none') {
-    require(syncPath);
-  }
+  config.syncModel !== 'none' && require(syncPath);
+  // scync assign pravate scope package
+  config.syncScope && require(scopeSyncPath);
 }
 
 function forkWorker() {
@@ -50,5 +51,17 @@ function forkSyncer() {
     console.error('[%s] [master:%s] syncer exit: %s: %s',
       Date(), process.pid, err.name, err.message);
     setTimeout(forkSyncer, 1000);
+  });
+}
+
+function forkScopeSyncer() {
+  var syncer = childProcess.fork(scopeSyncPath);
+  syncer.on('exit', function (code, signal) {
+    var err = new Error(util.format('syncer %s died (code: %s, signal: %s, stdout: %s, stderr: %s)',
+      syncer.pid, code, signal, syncer.stdout, syncer.stderr));
+    err.name = 'SyncerWorkerDiedError';
+    console.error('[%s] [master:%s] syncer exit: %s: %s',
+      Date(), process.pid, err.name, err.message);
+    setTimeout(forkScopeSyncer, 1000);
   });
 }
