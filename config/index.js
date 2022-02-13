@@ -248,6 +248,20 @@ var config = {
   syncDownloadOptions: {
     // formatRedirectUrl: function (url, location)
   },
+
+  // all syncModel cannot sync scope pacakge, you can use this model to sync scope package from any resgitry
+  syncScope: false,
+  syncScopeInterval: '12h',
+  // scope package sync config
+  /**
+ * sync scope package from assign registry
+ * @param {Array<scope>} scopes
+ * @param {String} scope.scope scope name
+ * @param {String} scope.sourceCnpmWeb source cnpm registry web url for get scope all packages name
+ * @param {String} scope.sourceCnpmRegistry source cnpm registry url for sync packages
+ */
+  syncScopeConfig: [],
+
   handleSyncRegistry: 'http://127.0.0.1:7001',
 
   // default badge subject
