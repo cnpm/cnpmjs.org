@@ -44,7 +44,7 @@ function onerror(err) {
 function* getOtherCnpmDefineScopePackages(scopes) {
   var arr = []
   for (var i = 0; i < scopes.length; i++) {
-    var packageList = yield* npmService.getScopePackagesShort(scopes[i].scope, scopes[i].sourceCnpmWeb)
+    var packageList = yield npmService.getScopePackagesShort(scopes[i].scope, scopes[i].sourceCnpmWeb)
     arr = arr.concat(packageList)
   }
   return arr
@@ -55,7 +55,7 @@ function* sync() {
   if (!scopeConfig || scopeConfig.length === 0) {
     process.exit(0);
   }
-  var packages = yield* getOtherCnpmDefineScopePackages(scopeConfig);
+  var packages = yield getOtherCnpmDefineScopePackages(scopeConfig);
 
   if (!packages.length) {
     return;

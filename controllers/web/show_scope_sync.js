@@ -12,7 +12,7 @@ module.exports = function* showScopeSync () {
     return this.redirect('/');
   }
 
-  var packages = yield* npmService.getScopePackagesShort(scope, scopeConfig.sourceCnpmWeb)
+  var packages = yield npmService.getScopePackagesShort(scope, scopeConfig.sourceCnpmWeb)
 
   yield this.render('scope_sync', {
     packages: packages,

@@ -240,7 +240,7 @@ exports.listChanges = function* (updateSeq) {
 };
 
 exports.getScopePackagesShort = function* (scope, registry) {
-  var response = yield* request('/browse/keyword/' + scope, {
+  var response = yield request('/browse/keyword/' + scope, {
     timeout: 3000,
     registry: registry,
     dataType: 'text'

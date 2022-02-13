@@ -71,7 +71,7 @@ exports.scopeSync = function* () {
 
   var scopeCnpmWeb = scopeConfig.sourceCnpmWeb
   var scopeCnpmRegistry = scopeConfig.sourceCnpmRegistry
-  var packages = yield* npmService.getScopePackagesShort(scope, scopeCnpmWeb)
+  var packages = yield npmService.getScopePackagesShort(scope, scopeCnpmWeb)
 
   debug('scopeSync %s with query: %j', scope, this.query);
 
@@ -80,7 +80,7 @@ exports.scopeSync = function* () {
   for (let i = 0; i < packages.length; i++) {
     packageSyncWorkers.push(function* () {
       var name = packages[i]
-      var logId = yield* SyncModuleWorker.sync(name, 'admin', {
+      var logId = yield SyncModuleWorker.sync(name, 'admin', {
         type: 'package',
         publish: true,
         noDep: true,
