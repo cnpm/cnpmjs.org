@@ -15,12 +15,12 @@ console.log('Starting cnpmjs.org ...\ncluster: %s\nadmins: %j\nscopes: %j\nsourc
 if (config.enableCluster) {
   forkWorker();
   config.syncModel !== 'none' && forkSyncer();
-  // scync assign pravate scope package
+  // sync assign private scope package
   config.syncScope && forkScopeSyncer();
 } else {
   require(workerPath);
   config.syncModel !== 'none' && require(syncPath);
-  // scync assign pravate scope package
+  // sync assign private scope package
   config.syncScope && require(scopeSyncPath);
 }
 
