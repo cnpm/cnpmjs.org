@@ -4,6 +4,13 @@ TIMEOUT = 600000
 MOCHA_OPTS =
 DB = sqlite
 
+all: install
+
+install: install-dependency init-database
+
+install-dependency:
+	@npm install
+
 jshint:
 	@node_modules/.bin/jshint .
 

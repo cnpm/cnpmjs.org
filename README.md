@@ -76,8 +76,8 @@ you only need to change the registry in client config.
 # clone from git
 $ git clone https://github.com/cnpm/cnpmjs.org.git
 
-# install dependencies
-$ make install
+# install dependencies && init sqlite3 database
+$ make
 
 # test
 $ make test
