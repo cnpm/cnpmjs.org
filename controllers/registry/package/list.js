@@ -431,6 +431,7 @@ function* handleAbbreviatedMetaRequestWithFullMeta(ctx, name, modifiedTime, tags
       bin: row.package.bin,
       os: row.package.os,
       cpu: row.package.cpu,
+      libc: row.package.libc,
       directories: row.package.directories,
       dist: row.package.dist,
       engines: row.package.engines,
