@@ -31,7 +31,7 @@ describe('test/controllers/registry/user/show.test.js, GET /-/user/org.couchdb.u
     });
   });
 
-  it('should return npm user info', function (done) {
+  it.skip('should return npm user info', function (done) {
     request(app)
     .get('/-/user/org.couchdb.user:fengmk2')
     .expect(200, function (err, res) {
@@ -57,7 +57,7 @@ describe('test/controllers/registry/user/show.test.js, GET /-/user/org.couchdb.u
       mm(config, 'customUserService', true);
     });
 
-    it('should show npm user', function (done) {
+    it.skip('should show npm user', function (done) {
       request(app)
       .get('/-/user/org.couchdb.user:fengmk2')
       .expect(200, function (err, res) {
