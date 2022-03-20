@@ -18,6 +18,7 @@ describe('test/common/urllib.test.js', () => {
       it('should work', function* () {
         const res = yield urllib.request('https://www.alipay.com', {
           followRedirect: true,
+          timeout: 30000,
         });
         assert.deepStrictEqual(res.res.requestUrls, [
           'https://www.antgroup.com/',
@@ -29,6 +30,7 @@ describe('test/common/urllib.test.js', () => {
       it('should work', function* () {
         const res = yield urllib.request('https://google.com', {
           followRedirect: true,
+          timeout: 30000,
         });
         assert.deepStrictEqual(res.res.requestUrls, [
           'https://google.com/',

@@ -786,7 +786,7 @@ describe('test/controllers/sync_module_worker.test.js', () => {
       });
     });
 
-    describe('package unpublished', () => {
+    describe.skip('package unpublished', () => {
       it('should sync unpublished info', function* () {
         var worker = new SyncModuleWorker({
           name: ['afp'],

@@ -908,7 +908,9 @@ SyncModuleWorker.prototype._sync = function* (name, pkg) {
           }
 
           // https://github.com/cnpm/cnpmjs.org/issues/1667
-          const metaDataKeys = [ 'peerDependenciesMeta', 'os', 'cpu', 'workspaces', 'hasInstallScript' ];
+          const metaDataKeys = [
+            'peerDependenciesMeta', 'os', 'cpu', 'libc', 'workspaces', 'hasInstallScript',
+          ];
           for (const key of metaDataKeys) {
             if (key in item) {
               hasMetaData = true;
@@ -1124,7 +1126,7 @@ SyncModuleWorker.prototype._sync = function* (name, pkg) {
                 break;
               }
             } else if (Array.isArray(value) || (typeof value === 'object' && value)) {
-              // array: os, cpu, workspaces
+              // array: os, cpu, workspaces, libc
               // object: peerDependenciesMeta
               if (existsModuleAbbreviated && !(key in existsModuleAbbreviated.package)) {
                 missingAbbreviatedMetadatas.push(Object.assign({
