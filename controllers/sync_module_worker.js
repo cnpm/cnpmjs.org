@@ -909,7 +909,7 @@ SyncModuleWorker.prototype._sync = function* (name, pkg) {
 
           // https://github.com/cnpm/cnpmjs.org/issues/1667
           const metaDataKeys = [
-            'peerDependenciesMeta', 'os', 'cpu', 'libc', 'workspaces', 'hasInstallScript', 'deprecated',
+            'peerDependenciesMeta', 'os', 'cpu', 'libc', 'workspaces', 'hasInstallScript',
           ];
           for (const key of metaDataKeys) {
             if (key in item) {
