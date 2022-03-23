@@ -113,7 +113,7 @@ function redacteToken(token) {
   if (!token) {
     return null;
   }
-  return `${token.substr(0, 6)}...${token.substr(-6)}`;
+  return `${token.slice(0, 6)}...${token.slice(-6)}`;
 }
 
 function createTokenKey(token) {
