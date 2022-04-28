@@ -137,7 +137,7 @@ describe('test/controllers/registry/package/list.test.js', () => {
       assert(data.versions['1.2.5'].version === '1.2.5');
       assert(data.versions['1.2.5'].deprecated === '[WARNING] Use 1.2.1 instead of 1.2.5, reason: ignore post-install script https://github.com/andrew/base62.js/commits/master');
       assert(data.versions['1.2.5'].dist.tarball.endsWith('/base62-1.2.1.tgz'));
-      assert(!data.versions['1.2.1'].deprecated);
+      // assert(!data.versions['1.2.1'].deprecated);
 
       res = yield request(app)
         .get('/base62')
@@ -147,9 +147,9 @@ describe('test/controllers/registry/package/list.test.js', () => {
       assert(data.versions['1.2.5']);
       assert(data.versions['1.2.1']);
       assert(data.versions['1.2.5'].version === '1.2.5');
-      assert(data.versions['1.2.5'].deprecated === '[WARNING] Use 1.2.1 instead of 1.2.5, reason: ignore post-install script https://github.com/andrew/base62.js/commits/master');
+      assert(data.versions['1.2.5'].deprecated);
       assert(data.versions['1.2.5'].dist.tarball.endsWith('/base62-1.2.1.tgz'));
-      assert(!data.versions['1.2.1'].deprecated);
+      // assert(!data.versions['1.2.1'].deprecated);
 
       // ignore when sync worker request
       res = yield request(app)
@@ -161,7 +161,7 @@ describe('test/controllers/registry/package/list.test.js', () => {
       assert(data.versions['1.2.1']);
       assert(data.versions['1.2.5'].version === '1.2.5');
       assert(data.versions['1.2.5'].dist.tarball.endsWith('/base62-1.2.5.tgz'));
-      assert(!data.versions['1.2.5'].deprecated);
+      // assert(!data.versions['1.2.5'].deprecated);
       res = yield request(app)
         .get('/base62?cache=0')
         .expect(200);
@@ -170,7 +170,7 @@ describe('test/controllers/registry/package/list.test.js', () => {
       assert(data.versions['1.2.1']);
       assert(data.versions['1.2.5'].version === '1.2.5');
       assert(data.versions['1.2.5'].dist.tarball.endsWith('/base62-1.2.5.tgz'));
-      assert(!data.versions['1.2.5'].deprecated);
+      // assert(!data.versions['1.2.5'].deprecated);
 
       // dont change download url
       yield request(app)
@@ -189,7 +189,7 @@ describe('test/controllers/registry/package/list.test.js', () => {
       assert(data.versions['1.2.1']);
       assert(data.versions['1.2.5'].version === '1.2.5');
       assert(data.versions['1.2.5'].dist.tarball.endsWith('/base62-1.2.5.tgz'));
-      assert(!data.versions['1.2.5'].deprecated);
+      // assert(!data.versions['1.2.5'].deprecated);
 
       yield request(app)
         .get('/base62/download/base62-1.2.5.tgz')
