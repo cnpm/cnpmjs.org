@@ -23,10 +23,14 @@ module.exports = function* notFound(next) {
   }
 
   // package not found
-  m = /^\/package\/([\w\-\_\.]+)\/?$/.exec(this.url);
+  m = /^\/package\/([\w\-\_\.]+)\/?$/.exec(this.path);
   if (!m) {
     // scoped packages
     m = /^\/package\/(@[\w\-\.]+\/[\w\-\.]+)$/.exec(this.path);
+    // maybe encode url: /package/%40foo%2Fawdawda
+    if (!m && this.path.startsWith('/package/%40')) {
+      m = /^\/package\/(@[\w\-\.]+\/[\w\-\.]+)$/.exec(decodeURIComponent(this.path));
+    }
   }
   var name = null;
   var title = '404: Page Not Found';

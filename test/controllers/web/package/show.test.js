@@ -124,6 +124,16 @@ describe('test/controllers/web/package/show.test.js', () => {
         .expect(/Can not found package match @cnpmtest\/testmodule-repo-short-https-404/, done);
     });
 
+    it('should get 404 show sync button on scoped package with encode url', done => {
+      mm(config, 'syncModel', 'all');
+      request(app)
+        .get('/package/%40foo%2Fawdawda')
+        .expect(404)
+        .expect('content-type', 'text/html; charset=utf-8')
+        .expect(/>SYNC<\/a> from official npm registry/)
+        .expect(/Can not found package match @foo\/awdawda/, done);
+    });
+
     it('should get 404 show sync button on non-scoped package', done => {
       mm(config, 'syncModel', 'all');
       request(app)
