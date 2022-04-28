@@ -58,11 +58,10 @@ describe('test/controllers/web/package/search.test.js', function () {
 
     it('should list no match ok', function (done) {
       request(app)
-      .get('/browse/keyword/notexistpackage')
-      .expect(200)
-      .expect(/Can not found package match notexistpackage/, done);
+        .get('/browse/keyword/notexistpackage')
+        .expect(200)
+        .expect(/Can not found package match notexistpackage/, done);
     });
-
 
     describe('GET /browse/keyword/:word searchlist', function () {
 

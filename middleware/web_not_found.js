@@ -23,7 +23,11 @@ module.exports = function* notFound(next) {
   }
 
   // package not found
-  m = /\/package\/([\w\-\_\.]+)\/?$/.exec(this.url);
+  m = /^\/package\/([\w\-\_\.]+)\/?$/.exec(this.url);
+  if (!m) {
+    // scoped packages
+    m = /^\/package\/(@[\w\-\.]+\/[\w\-\.]+)$/.exec(this.path);
+  }
   var name = null;
   var title = '404: Page Not Found';
   if (m) {

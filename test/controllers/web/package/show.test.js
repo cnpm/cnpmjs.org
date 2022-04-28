@@ -113,6 +113,26 @@ describe('test/controllers/web/package/show.test.js', () => {
       .get('/package/@cnpmtest/not-exist-module')
       .expect(404, done);
     });
+
+    it('should get 404 show sync button on scoped package', done => {
+      mm(config, 'syncModel', 'all');
+      request(app)
+        .get('/package/@cnpmtest/testmodule-repo-short-https-404')
+        .expect(404)
+        .expect('content-type', 'text/html; charset=utf-8')
+        .expect(/>SYNC<\/a> from official npm registry/)
+        .expect(/Can not found package match @cnpmtest\/testmodule-repo-short-https-404/, done);
+    });
+
+    it('should get 404 show sync button on non-scoped package', done => {
+      mm(config, 'syncModel', 'all');
+      request(app)
+        .get('/package/testmodule-repo-short-https-404')
+        .expect(404)
+        .expect('content-type', 'text/html; charset=utf-8')
+        .expect(/>SYNC<\/a> from official npm registry/)
+        .expect(/Can not found package match testmodule-repo-short-https-404/, done);
+    });
   });
 
   describe('GET /package/:name/:version', function () {
