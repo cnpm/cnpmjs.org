@@ -153,27 +153,19 @@ exports.listModulesByUser = function* (username) {
 exports.listModuleNamesByUser = function* (username) {
   var sql = 'SELECT distinct(name) AS name FROM module WHERE author=?;';
   var rows = yield models.query(sql, [username]);
-  var map = {};
   var names = rows.map(function (r) {
     return r.name;
   });
 
   // find from npm module maintainer table
   var moduleNames = yield NpmModuleMaintainer.listModuleNamesByUser(username);
-  moduleNames.forEach(function (name) {
-    if (!map[name]) {
-      names.push(name);
-    }
-  });
-
   // find from private module maintainer table
-  moduleNames = yield PrivateModuleMaintainer.listModuleNamesByUser(username);
-  moduleNames.forEach(function (name) {
-    if (!map[name]) {
-      names.push(name);
-    }
-  });
-  return names;
+  var privateModuleNames = yield PrivateModuleMaintainer.listModuleNamesByUser(username);
+  return Array.from(new Set([
+    ...names,
+    ...moduleNames,
+    ...privateModuleNames,
+  ]));
 };
 
 exports.listPublicModulesByUser = function* (username) {
