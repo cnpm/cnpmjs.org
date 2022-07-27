@@ -198,19 +198,19 @@ exports.listPublicModuleNamesByUser = function* (username) {
   return names;
 };
 
-exports.listModuleSince = function* listModuleSince(start, limit, cursorId) {
+exports.listTagSince = function* listTagSince(start, limit, cursorId) {
   if (!(start instanceof Date)) {
     start = new Date(Number(start));
   }
 
   var findCondition = {
-    attributes: ['id', 'name', 'version', 'gmt_modified'],
+    attributes: ['id', 'name', 'version', 'tag', 'gmt_modified'],
     where: {
       gmt_modified: {
         gt: start
       },
     },
-    order: [['id', 'ASC']],
+    order: [['gmt_modified', 'ASC'], ['id', 'ASC']],
   };
   if (limit) {
     findCondition.limit = limit;
@@ -221,7 +221,7 @@ exports.listModuleSince = function* listModuleSince(start, limit, cursorId) {
       gt: cursorId,
     };
   }
-  var rows = yield Module.findAll(findCondition);
+  var rows = yield Tag.findAll(findCondition);
   return rows;
 }
 

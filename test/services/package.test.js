@@ -130,6 +130,38 @@ describe('test/services/package.test.js', function () {
     });
   });
 
+  describe('listModuleSince()', function () {
+    it('should got those module names', function* () {
+      yield utils.createModule('test-listModuleSince-module-0', '1.0.0');
+      yield sleep(1100);
+      var start = Date.now() - 1000;
+      yield utils.createModule('test-listModuleSince-module-1', '1.0.0');
+      yield utils.createModule('test-listModuleSince-module-1', '1.0.1', null, 'beta');
+      yield utils.createModule('test-listModuleSince-module-2', '1.0.0');
+      var tags = yield Package.listTagSince(start);
+
+      var modules = tags.map(function (item) {
+        return { name: item.name, tag: item.tag };
+      });
+      modules
+        .should.eql([
+          { name: "test-listModuleSince-module-1", tag: "latest" },
+          { name: "test-listModuleSince-module-1", tag: "beta" },
+          { name: "test-listModuleSince-module-2", tag: "latest" },
+        ]);
+
+      tags = yield Package.listTagSince(start, 2);
+      modules = tags.map(function (item) {
+        return { name: item.name, tag: item.tag };
+      });
+      modules
+        .should.eql([
+          { name: "test-listModuleSince-module-1", tag: "latest" },
+          { name: "test-listModuleSince-module-1", tag: "beta" },
+        ]);
+    });
+  });
+
   describe('listPublicModuleNamesSince(), listAllPublicModuleNames()', function () {
     it('should got those module names', function* () {
       yield utils.createModule('test-listPublicModuleNamesSince-module-0', '1.0.0');

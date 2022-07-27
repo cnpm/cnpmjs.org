@@ -8,8 +8,9 @@ var packageService = require('../../../services/package');
 // Similar with https://replicate.npmjs.com/_changes?since=7139538
 module.exports = function* listSince() {
   var query = this.query;
-  var result = { _updated: query.since };
-  var modules = yield packageService.listModuleSince(query.since, query.limit || 1000, query.cursorId);
+  var since = query.since || '0';
+  var result = { _updated: since};
+  var modules = yield packageService.listTagSince(since, query.limit || 1000, query.cursorId);
   result.modules = modules;
 
   this.body = result;
