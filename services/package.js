@@ -198,6 +198,33 @@ exports.listPublicModuleNamesByUser = function* (username) {
   return names;
 };
 
+exports.listModuleSince = function* listModuleSince(start, limit, cursorId) {
+  if (!(start instanceof Date)) {
+    start = new Date(Number(start));
+  }
+
+  var findCondition = {
+    attributes: ['id', 'name', 'version', 'gmt_modified'],
+    where: {
+      gmt_modified: {
+        gt: start
+      },
+    },
+    order: [['id', 'ASC']],
+  };
+  if (limit) {
+    findCondition.limit = limit;
+  }
+
+  if (cursorId) {
+    findCondition.where.id = {
+      gt: cursorId,
+    };
+  }
+  var rows = yield Module.findAll(findCondition);
+  return rows;
+}
+
 // start must be a date or timestamp
 exports.listPublicModuleNamesSince = function* listPublicModuleNamesSince(start) {
   if (!(start instanceof Date)) {

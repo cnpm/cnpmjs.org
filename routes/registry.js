@@ -14,6 +14,7 @@ var listAll = require('../controllers/registry/package/list_all');
 var listAllPackageVersions = require('../controllers/registry/package/list_versions');
 var listShorts = require('../controllers/registry/package/list_shorts');
 var listSince = require('../controllers/registry/package/list_since');
+var changes = require('../controllers/registry/package/changes');
 var listAllVersions = require('../controllers/registry/package/list');
 var listDependents = require('../controllers/registry/package/list_dependents');
 var getOneVersion = require('../controllers/registry/package/show');
@@ -50,10 +51,10 @@ function routes(app) {
   }
 
   app.get('/', jsonp, showTotal);
-
   // before /:name/:version
   // get all modules, for npm search
   app.get('/-/all', listAll);
+  app.get('/-/all/changes', changes);
   app.get('/-/all/since', listSince);
   // get all module names, for auto completion
   app.get('/-/short', listShorts);
