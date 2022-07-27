@@ -12,31 +12,39 @@ describe('test/controllers/registry/package/changes.test.js', function () {
   var since;
   before(function (done) {
     since = Date.now();
-    var pkg = utils.getPackage('@cnpmtest/test_changes', '0.0.1', utils.admin, 'alpha');
-    request(app)
-    .put('/' + pkg.name)
-    .set('authorization', utils.adminAuth)
-    .send(pkg)
-    .expect(201, done);
-
-    pkg = utils.getPackage('@cnpmtest/test_changes_gogo', '0.0.2', utils.admin, 'beta');
-    request(app)
-    .put('/' + pkg.name)
-    .set('authorization', utils.adminAuth)
-    .send(pkg)
-    .expect(201, done);
+    setTimeout(function() {
+      var pkg = utils.getPackage('@cnpmtest/test_changes', '0.0.1', utils.admin, 'alpha');
+      request(app)
+      .put('/' + pkg.name)
+      .set('authorization', utils.adminAuth)
+      .send(pkg)
+      .expect(201, function() {
+        setTimeout(function() {
+          pkg = utils.getPackage('@cnpmtest/test_changes_gogo', '0.0.2', utils.admin, 'beta');
+          request(app)
+          .put('/' + pkg.name)
+          .set('authorization', utils.adminAuth)
+          .send(pkg)
+          .expect(201, done);
+        }, 1000);
+      });
+    }, 1000);
   });
 
   describe('GET /-/all/changes', function () {
     it('should 200', function (done) {
       request(app)
-      .get('/-/all/changes?since=' + since)
+      .get('/-/all/changes?since=1')
       .expect(200, function (err, res) {
-        should.not.exist(err);
-        res.body.modules.should.be.an.Array();
-        res.body._updated.should.be.a.String();
-        res.body.modules.length.should.equal(4);
-        done();
+        request(app)
+        .get('/-/all/changes?since=' + since)
+        .expect(200, function (err, res) {
+          should.not.exist(err);
+          res.body.modules.should.be.an.Array();
+          res.body._updated.should.be.a.String();
+          res.body.modules.length.should.equal(4);
+          done();
+        });
       });
     });
 

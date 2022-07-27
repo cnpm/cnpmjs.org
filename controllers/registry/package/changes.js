@@ -1,6 +1,5 @@
 'use strict';
 
-const logger = require('../../../common/logger');
 var packageService = require('../../../services/package');
 
 // GET /-/_changes?since={timestamp}&limit={number}&cursorId={number}
@@ -9,8 +8,12 @@ var packageService = require('../../../services/package');
 module.exports = function* listSince() {
   var query = this.query;
   var since = query.since || '0';
+  var limit = Number(query.limit);
+  if (Number.isNaN(limit)) {
+    limit = 1000;
+  }
   var result = { _updated: since};
-  var modules = yield packageService.listTagSince(since, query.limit || 1000, query.cursorId);
+  var modules = yield packageService.listTagSince(since, limit, query.cursorId);
   result.modules = modules;
 
   this.body = result;
