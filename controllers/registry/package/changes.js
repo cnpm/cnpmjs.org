@@ -21,7 +21,7 @@ var gather = require('co-gather');
 // use gmt_modified cinstead of seqId
 module.exports = function* listSince() {
   var query = this.query;
-  var since = query.since || "0";
+  var since = query.since;
   var limit = Number(query.limit);
 
   // ensure limit
@@ -30,8 +30,8 @@ module.exports = function* listSince() {
   }
   var queryResults = yield gather(
     [
-      "listTagSince",
       "listVersionSince",
+      "listTagSince",
       "listUnpublishedModuleSince",
       "listBlockVersionSince",
     ].map(function (method) {

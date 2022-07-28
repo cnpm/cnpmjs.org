@@ -203,7 +203,7 @@ exports.listPublicModuleNamesByUser = function* (username) {
 };
 
 exports.listModelSince = function(Model, attributes, mapper) {
-  return function*(since, limit, cursorId) {
+  return function*(since, limit) {
     var start = ensureSinceIsDate(since);
     var findCondition = {
       attributes: attributes,
@@ -216,11 +216,6 @@ exports.listModelSince = function(Model, attributes, mapper) {
     };
     if (limit) {
       findCondition.limit = limit;
-    }
-    if (cursorId) {
-      findCondition.where.id = {
-        gt: cursorId,
-      };
     }
     var rows = yield Model.findAll(findCondition);
     return rows.map(mapper);
