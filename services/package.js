@@ -209,7 +209,7 @@ exports.listModelSince = function(Model, attributes, mapper) {
       attributes: attributes,
       where: {
         gmt_modified: {
-          gt: start
+          gte: start
         },
       },
       order: [['gmt_modified', 'ASC'], ['id', 'ASC']],

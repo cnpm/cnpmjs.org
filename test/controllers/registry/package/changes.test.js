@@ -5,6 +5,7 @@ var request = require('supertest');
 var mm = require('mm');
 var app = require('../../../../servers/registry');
 var utils = require('../../../utils');
+var CHANGE_TYPE = require('../../../../services/common').CHANGE_TYPE;
 
 describe('test/controllers/registry/package/changes.test.js', function () {
   afterEach(mm.restore);
@@ -34,18 +35,27 @@ describe('test/controllers/registry/package/changes.test.js', function () {
   describe('GET /-/all/changes', function () {
     it('should 200', function (done) {
       request(app)
-      .get('/-/all/changes?since=1')
-      .expect(200, function (err, res) {
-        request(app)
-        .get('/-/all/changes?since=' + since)
+        .get("/-/all/changes?since=1")
         .expect(200, function (err, res) {
           should.not.exist(err);
-          res.body.modules.should.be.an.Array();
-          res.body._updated.should.be.a.String();
-          res.body.modules.length.should.equal(4);
-          done();
+          res.body.results.should.be.an.Array();
+          res.body.results
+            .filter(function (item) {
+              return item.type === CHANGE_TYPE.PACKAGE_VERSION_ADDED;
+            })
+            .length.should.equal(2);
+          res.body.results
+            .filter(function (item) {
+              return item.type === CHANGE_TYPE.PACKAGE_VERSION_ADDED;
+            })
+            .length.should.equal(2);
+
+          request(app)
+            .get("/-/all/changes?since=" + since)
+            .expect(200, function (err, res) {
+              done();
+            });
         });
-      });
     });
 
     it('since should work', function (done) {
@@ -53,9 +63,8 @@ describe('test/controllers/registry/package/changes.test.js', function () {
       .get('/-/all/changes?since=' + Date.now())
       .expect(200, function (err, res) {
         should.not.exist(err);
-        res.body.modules.should.be.an.Array();
-        res.body._updated.should.be.a.String();
-        res.body.modules.length.should.equal(0);
+        res.body.results.should.be.an.Array();
+        res.body.results.length.should.equal(0);
         done();
       });
     });
@@ -65,35 +74,11 @@ describe('test/controllers/registry/package/changes.test.js', function () {
       .get('/-/all/changes?limit=1&since=' + since)
       .expect(200, function (err, res) {
         should.not.exist(err);
-        res.body.modules.should.be.an.Array();
-        res.body._updated.should.be.a.String();
-        res.body.modules.length.should.equal(1);
+        res.body.results.should.be.an.Array();
+        res.body.results.length.should.equal(1);
         done();
       });
     });
 
-    it('cursorId should work', function (done) {
-      var count;
-      var cursorId;
-      request(app)
-      .get('/-/all/changes?cursorId=1&since=' + since)
-      .expect(200, function (err, res) {
-        should.not.exist(err);
-        res.body.modules.should.be.an.Array();
-        res.body._updated.should.be.a.String();
-        count = res.body.modules.length;
-        cursorId = res.body.modules[0].id;
-
-        request(app)
-        .get('/-/all/changes?cursorId=' + cursorId + '&since=' + since)
-        .expect(200, function (err, res) {
-          should.not.exist(err);
-          res.body.modules.should.be.an.Array();
-          res.body._updated.should.be.a.String();
-          res.body.modules.length.should.equal(count - 1);
-          done();
-        })
-      });
-    });
   });
 });
