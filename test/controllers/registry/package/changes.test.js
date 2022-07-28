@@ -12,8 +12,8 @@ describe('test/controllers/registry/package/changes.test.js', function () {
 
   var since;
   before(function (done) {
-    since = Date.now();
-    setTimeout(function() {
+    setTimeout(() => {
+      since = Date.now();
       var pkg = utils.getPackage('@cnpmtest/test_changes', '0.0.1', utils.admin, 'alpha');
       request(app)
       .put('/' + pkg.name)
@@ -27,7 +27,7 @@ describe('test/controllers/registry/package/changes.test.js', function () {
           .set('authorization', utils.adminAuth)
           .send(pkg)
           .expect(201, done);
-        }, 1000);
+        }, 2000);
       });
     }, 1000);
   });
@@ -35,7 +35,7 @@ describe('test/controllers/registry/package/changes.test.js', function () {
   describe('GET /-/all/changes', function () {
     it('should 200', function (done) {
       request(app)
-        .get("/-/all/changes?since=1")
+        .get("/-/all/changes?since=" + since)
         .expect(200, function (err, res) {
           should.not.exist(err);
           res.body.results.should.be.an.Array();
@@ -49,24 +49,20 @@ describe('test/controllers/registry/package/changes.test.js', function () {
               return item.type === CHANGE_TYPE.PACKAGE_VERSION_ADDED;
             })
             .length.should.equal(2);
-
-          request(app)
-            .get("/-/all/changes?since=" + since)
-            .expect(200, function (err, res) {
-              done();
-            });
+          done();
         });
     });
 
     it('since should work', function (done) {
+      var now = Date.now();
       request(app)
-      .get('/-/all/changes?since=' + Date.now())
-      .expect(200, function (err, res) {
-        should.not.exist(err);
-        res.body.results.should.be.an.Array();
-        res.body.results.length.should.equal(0);
-        done();
-      });
+        .get("/-/all/changes?since=" + now + 5000)
+        .expect(200, function (err, res) {
+          should.not.exist(err);
+          res.body.results.should.be.an.Array();
+          res.body.results.length.should.equal(0);
+          done();
+        });
     });
 
     it('limit should work', function (done) {

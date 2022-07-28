@@ -133,7 +133,7 @@ describe('test/services/package.test.js', function () {
   describe('listModelSince()', function () {
     it('list tags since', function* () {
       yield utils.createModule('test-listModuleSince-module-0', '1.0.0');
-      yield sleep(1100);
+      yield sleep(2100);
       var start = Date.now() - 1000;
       yield utils.createModule('test-listModuleSince-module-1', '1.0.0');
       yield utils.createModule('test-listModuleSince-module-1', '1.0.1', null, 'beta');
@@ -163,7 +163,7 @@ describe('test/services/package.test.js', function () {
     });
     it('list package version since', function* () {
       yield utils.createModule('test-listModuleSince-module-0', '1.0.0');
-      yield sleep(1100);
+      yield sleep(2100);
       var start = Date.now() - 1000;
       yield utils.createModule('test-listModuleSince-module-1', '1.0.0');
       yield utils.createModule('test-listModuleSince-module-1', '1.0.1', null, 'beta');
