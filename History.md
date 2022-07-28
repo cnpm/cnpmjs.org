@@ -1,4 +1,40 @@
 
+3.0.0-rc.62 / 2022-07-28
+==================
+
+**features**
+  * [[`d8b5c9f`](http://github.com/cnpm/cnpmjs.org/commit/d8b5c9f7a9a4648460415936e492ee0bb9cba9b0)] - feat: add changes api (#1734) (elrrrrrrr <<elrrrrrrr@gmail.com>>)
+  * [[`f52e9c3`](http://github.com/cnpm/cnpmjs.org/commit/f52e9c3382ef3583a9cac9be5510e11a3ab17b8c)] - feat: support sync private package from define registry (#1701) (XXBeii <<36651530+XXBeii@users.noreply.github.com>>)
+  * [[`97d501c`](http://github.com/cnpm/cnpmjs.org/commit/97d501c088aee43af30e31aef279b3036a7cc5f7)] - feat: support bug-versions on server (#1684) (fengmk2 <<fengmk2@gmail.com>>)
+  * [[`3c5bc9d`](http://github.com/cnpm/cnpmjs.org/commit/3c5bc9dc5ef46c567e718705d18edc1f57009b5e)] - feat: support package version block list (#1683) (fengmk2 <<fengmk2@gmail.com>>)
+  * [[`abc1723`](http://github.com/cnpm/cnpmjs.org/commit/abc1723bef5eb12168d084cc16916998288e879b)] - feat: support dist.integrity (#1677) (fengmk2 <<fengmk2@gmail.com>>)
+
+**fixes**
+  * [[`4d534ca`](http://github.com/cnpm/cnpmjs.org/commit/4d534cad024f08923b7d4df57d87d14fa96a975a)] - fix: listModulesByUser map error (#1731) (Ke Wu <<gemwuu@163.com>>)
+  * [[`b7bbf84`](http://github.com/cnpm/cnpmjs.org/commit/b7bbf84ea31b5c15a48edd596bbb87a72f7de595)] - fix: add missing config property for bug-versions (#1685) (fengmk2 <<fengmk2@gmail.com>>)
+  * [[`74d408d`](http://github.com/cnpm/cnpmjs.org/commit/74d408d006b1c7a08283b178e842ef98f850fcf2)] - fix: database dialect config detect error (#1503) (alsotang <<alsotang@gmail.com>>)
+  * [[`37ba629`](http://github.com/cnpm/cnpmjs.org/commit/37ba6290284f260230e6d4461311bb8739088191)] - fix: get count missing name (#1674) (Solais <<924615994@qq.com>>)
+
+**others**
+  * [[`f8bcca1`](http://github.com/cnpm/cnpmjs.org/commit/f8bcca1ea0c0ad952fffd0539b625de69b9099f0)] - 🐛 FIX: path url maybe encode (#1729) (fengmk2 <<fengmk2@gmail.com>>)
+  * [[`8663e21`](http://github.com/cnpm/cnpmjs.org/commit/8663e215f038b812b74948e28a05b704d5d7780c)] - 🐛 FIX: Should show sync button on scoped package not exists (#1728) (fengmk2 <<fengmk2@gmail.com>>)
+  * [[`8573c4a`](http://github.com/cnpm/cnpmjs.org/commit/8573c4a600077585681ac1eddcebc4b2abff4f8e)] - 📖 DOC: DEPRECATED, please use https://github.com/cnpm/cnpmcore instead (fengmk2 <<fengmk2@gmail.com>>)
+  * [[`83497f2`](http://github.com/cnpm/cnpmjs.org/commit/83497f20521dd5016c119500aff0ccb64cf5a929)] - 👌 IMPROVE: Return libc field on abbreviated manifests (#1721) (fengmk2 <<fengmk2@gmail.com>>)
+  * [[`1e0f7e0`](http://github.com/cnpm/cnpmjs.org/commit/1e0f7e06bb7df40f1dca309b7e8e533130293ab6)] - 📖 DOC: Modify comments (#1710) (AN <<455454007@qq.com>>)
+  * [[`e682e7a`](http://github.com/cnpm/cnpmjs.org/commit/e682e7a0a39f750c61d7a2a46de862d118e61e73)] - 📖 DOC: Update contributors (fengmk2 <<fengmk2@gmail.com>>)
+  * [[`19e5c3d`](http://github.com/cnpm/cnpmjs.org/commit/19e5c3def257f4ceab3256a1c9d615d002c5fe49)] - chore: Add license scan report and status (#1708) (fossabot <<badges@fossa.io>>)
+  * [[`9f8dca4`](http://github.com/cnpm/cnpmjs.org/commit/9f8dca4ac0292ba87c59149972f0f635bd17ec37)] - refactor: Sync exists package from cnpmcore changes stream (#1707) (fengmk2 <<fengmk2@gmail.com>>)
+  * [[`f2c4b9f`](http://github.com/cnpm/cnpmjs.org/commit/f2c4b9f1c8d0b97b0b1890ac3aec058a99f0b224)] - 📖 DOC: Use git-contributor instead (fengmk2 <<fengmk2@gmail.com>>)
+  * [[`ac07b21`](http://github.com/cnpm/cnpmjs.org/commit/ac07b215a73f80aa11e9631d3e6c9be4c4db87a2)] - 🐛 FIX: Support new bson logId (fengmk2 <<fengmk2@gmail.com>>)
+  * [[`559d5ba`](http://github.com/cnpm/cnpmjs.org/commit/559d5baccfc3f5fa582461856f7048927aac3f23)] - 📦 NEW: sync web support webDataRemoteRegistry (#1697) (fengmk2 <<fengmk2@gmail.com>>)
+  * [[`e5c5179`](http://github.com/cnpm/cnpmjs.org/commit/e5c5179e9e12be054aa733a5b0befbb064f32a44)] - 📦 NEW: Support set registry to new cnpmcore registry (#1696) (fengmk2 <<fengmk2@gmail.com>>)
+  * [[`ad622d5`](http://github.com/cnpm/cnpmjs.org/commit/ad622d55e384743b48e79bb6aec574a7f354ee9f)] - chore: update contributors (fengmk2 <<fengmk2@gmail.com>>)
+  * [[`c6973a9`](http://github.com/cnpm/cnpmjs.org/commit/c6973a98cef8207b56219e1b813575f7efe13653)] - fix(db.sql): use utf8mb4 on description column (#1681) (hellojukay <<hellojukay@163.com>>)
+  * [[`f22a3e7`](http://github.com/cnpm/cnpmjs.org/commit/f22a3e7370792eef1c7b613188411af2354e59a6)] - refactor: dist tarbar url don't contains querystring (#1682) (fengmk2 <<fengmk2@gmail.com>>)
+  * [[`a49deec`](http://github.com/cnpm/cnpmjs.org/commit/a49deec3b2e1e8483801dea757c727054df34b34)] - chore: remove unused config (#1495) (alsotang <<alsotang@gmail.com>>)
+  * [[`7f0aa2a`](http://github.com/cnpm/cnpmjs.org/commit/7f0aa2ad95dedef7ec50fbebeb6df92839b42621)] - chore: update contributors (fengmk2 <<fengmk2@gmail.com>>)
+  * [[`39cf77a`](http://github.com/cnpm/cnpmjs.org/commit/39cf77ae0f676584d93ada77c6ea61c3d044b267)] - refactor: use remote abbreviated version data (#1675) (fengmk2 <<fengmk2@gmail.com>>)
+
 3.0.0-rc.50 / 2021-11-04
 ==================
 
