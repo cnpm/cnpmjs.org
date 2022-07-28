@@ -5,6 +5,8 @@ var models = require('../models');
 var common = require('./common');
 var libCommon = require('../lib/common');
 var config = require('../config');
+var { ensureSinceIsDate } = require('../controllers/utils');
+var { BlockPackageVersion } = require('../models');
 var Tag = models.Tag;
 var User = models.User;
 var Module = models.Module;
@@ -14,6 +16,8 @@ var PrivateModuleMaintainer = models.ModuleMaintainer;
 var ModuleDependency = models.ModuleDependency;
 var ModuleUnpublished = models.ModuleUnpublished;
 var NpmModuleMaintainer = models.NpmModuleMaintainer;
+
+var CHANGE_TYPE = common.CHANGE_TYPE;
 
 // module
 var _parseRow = function (row) {
@@ -198,32 +202,81 @@ exports.listPublicModuleNamesByUser = function* (username) {
   return names;
 };
 
-exports.listTagSince = function* listTagSince(start, limit, cursorId) {
-  if (!(start instanceof Date)) {
-    start = new Date(Number(start));
-  }
-
-  var findCondition = {
-    attributes: ['id', 'name', 'version', 'tag', 'gmt_modified'],
-    where: {
-      gmt_modified: {
-        gt: start
+exports.listModelSince = function(Model, attributes, mapper) {
+  return function*(since, limit, cursorId) {
+    var start = ensureSinceIsDate(since);
+    var findCondition = {
+      attributes: attributes,
+      where: {
+        gmt_modified: {
+          gt: start
+        },
       },
-    },
-    order: [['gmt_modified', 'ASC'], ['id', 'ASC']],
-  };
-  if (limit) {
-    findCondition.limit = limit;
+      order: [['gmt_modified', 'ASC'], ['id', 'ASC']],
+    };
+    if (limit) {
+      findCondition.limit = limit;
+    }
+    if (cursorId) {
+      findCondition.where.id = {
+        gt: cursorId,
+      };
+    }
+    var rows = yield Model.findAll(findCondition);
+    return rows.map(mapper);
   }
+}
 
-  if (cursorId) {
-    findCondition.where.id = {
-      gt: cursorId,
+exports.listTagSince = this.listModelSince(
+  Tag,
+  ['id', 'name', 'tag', 'gmt_modified'],
+  function (row) {
+    return {
+      type: CHANGE_TYPE.PACKAGE_TAG_ADDED,
+      id: row.name,
+      changes: [{tag: row.tag}],
+      gmt_modified: row.gmt_modified,
     };
   }
-  var rows = yield Tag.findAll(findCondition);
-  return rows;
-}
+);
+
+exports.listVersionSince = this.listModelSince(
+  Module,
+  ['id', 'name', 'version', 'gmt_modified'],
+  function (row) {
+    return {
+      type: CHANGE_TYPE.PACKAGE_VERSION_ADDED,
+      id: row.name,
+      changes: [{version: row.version}],
+      gmt_modified: row.gmt_modified,
+    };
+  }
+);
+
+exports.listUnpublishedModuleSince = this.listModelSince(
+  ModuleUnpublished,
+  ['id', 'name', 'gmt_modified'],
+  function(row) {
+    return {
+      type: CHANGE_TYPE.PACKAGE_UNPUBLISHED,
+      id: row.name,
+      gmt_modified: row.gmt_modified,
+    };
+  }
+);
+
+exports.listBlockVersionSince = this.listModelSince(
+  BlockPackageVersion,
+  ['id', 'name', 'version', 'gmt_modified'],
+  function(row) {
+    return {
+      type: CHANGE_TYPE.PACKAGE_VERSION_BLOCKED,
+      id: row.name,
+      gmt_modified: row.gmt_modified,
+    };
+  }
+);
+
 
 // start must be a date or timestamp
 exports.listPublicModuleNamesSince = function* listPublicModuleNamesSince(start) {

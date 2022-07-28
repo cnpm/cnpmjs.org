@@ -159,3 +159,10 @@ exports.getOssLicenseUrlFromName = function (name) {
   return licenseMap[name.toLowerCase()] ?
     base + licenseMap[name.toLowerCase()] : base + name;
 };
+
+exports.ensureSinceIsDate = function(since) {
+  if (!(since instanceof Date)) {
+    return new Date(Number(since));
+  }
+  return since;
+}
