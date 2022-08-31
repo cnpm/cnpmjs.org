@@ -11,7 +11,6 @@ var gather = require('co-gather');
 // 1. ✅ PACKAGE_VERSION_ADDED
 // 2. ✅ PACKAGE_TAG_ADDED
 // 3. 🆕 PACKAGE_UNPUBLISHED
-// 4. 🆕 PACKAGE_VERSION_BLOCKED
 // 5. ❎ PACKAGE_MAINTAINER_REMOVED
 // 6. ❎ PACKAGE_MAINTAINER_CHANGED
 // 7. ❎ PACKAGE_TAG_CHANGED
@@ -33,7 +32,6 @@ module.exports = function* listSince() {
       "listVersionSince",
       "listTagSince",
       "listUnpublishedModuleSince",
-      "listBlockVersionSince",
     ].map(function (method) {
       return packageService[method](since, limit);
     })
