@@ -1,4 +1,10 @@
 
+3.0.0-rc.63 / 2022-08-31
+==================
+
+**features**
+  * [[`1964d66`](http://github.com/cnpm/cnpmjs.org/commit/1964d66abf3a78bc97022db2bfd1b88fa2c1fa37)] - feat: remove block version changes (#1737) (elrrrrrrr <<elrrrrrrr@gmail.com>>)
+
 3.0.0-rc.62 / 2022-07-28
 ==================
 
