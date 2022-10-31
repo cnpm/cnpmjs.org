@@ -5,6 +5,8 @@ var sleep = require('co-sleep');
 var Package = require('../../services/package');
 var utils = require('../utils');
 var common = require('../../services/common');
+var config = require('../../config');
+var mm = require('mm');
 
 describe('test/services/package.test.js', function () {
   describe('addModuleTag()', function () {
@@ -132,6 +134,7 @@ describe('test/services/package.test.js', function () {
 
   describe('listModelSince()', function () {
     it('list tags since', function* () {
+      mm(config, 'changesDelay', 0);
       yield utils.createModule('test-listModuleSince-module-0', '1.0.0');
       yield sleep(2100);
       var start = Date.now() - 1000;
@@ -162,6 +165,7 @@ describe('test/services/package.test.js', function () {
         ]);
     });
     it('list package version since', function* () {
+      mm(config, 'changesDelay', 0);
       yield utils.createModule('test-listModuleSince-module-0', '1.0.0');
       yield sleep(2100);
       var start = Date.now() - 1000;
