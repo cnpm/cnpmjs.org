@@ -3,6 +3,7 @@
 var should = require('should');
 var request = require('supertest');
 var mm = require('mm');
+var config = require('../../../../config');
 var app = require('../../../../servers/registry');
 var utils = require('../../../utils');
 var CHANGE_TYPE = require('../../../../services/common').CHANGE_TYPE;
@@ -12,6 +13,7 @@ describe('test/controllers/registry/package/changes.test.js', function () {
 
   var since;
   before(function (done) {
+    mm(config, 'changesDelay', 0);
     setTimeout(() => {
       since = Date.now();
       var pkg = utils.getPackage('@cnpmtest/test_changes', '0.0.1', utils.admin, 'alpha');
@@ -39,6 +41,7 @@ describe('test/controllers/registry/package/changes.test.js', function () {
         .expect(200, function (err, res) {
           should.not.exist(err);
           res.body.results.should.be.an.Array();
+
           res.body.results
             .filter(function (item) {
               return item.type === CHANGE_TYPE.PACKAGE_VERSION_ADDED;
@@ -52,6 +55,22 @@ describe('test/controllers/registry/package/changes.test.js', function () {
           done();
         });
     });
+
+    it('changes delay should work', function(done) {
+      mm(config, 'changesDelay', 10000);
+      request(app)
+        .get("/-/all/changes?since=" + since)
+        .expect(200, function (err, res) {
+          should.not.exist(err);
+          res.body.results.should.be.an.Array();
+          res.body.results
+            .filter(function (item) {
+              return item.type === CHANGE_TYPE.PACKAGE_VERSION_ADDED;
+            })
+            .length.should.equal(0);
+          done();
+        });
+    })
 
     it('since should work', function (done) {
       var now = Date.now();
@@ -66,6 +85,7 @@ describe('test/controllers/registry/package/changes.test.js', function () {
     });
 
     it('limit should work', function (done) {
+      mm(config, 'changesDelay', 0);
       request(app)
       .get('/-/all/changes?limit=1&since=' + since)
       .expect(200, function (err, res) {

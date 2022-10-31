@@ -205,6 +205,7 @@ exports.listPublicModuleNamesByUser = function* (username) {
 exports.listModelSince = function(Model, attributes, mapper) {
 
   return function*(since, limit) {
+
     var start = ensureSinceIsDate(since);
     var findCondition = {
       attributes: attributes,
