@@ -201,6 +201,11 @@ var config = {
   officialNpmReplicate: 'https://replicate.npmjs.com',
   cnpmRegistry: 'https://r.cnpmjs.com',
 
+  // /-/all/changes
+  // since different changes are aggregated through many tables
+  // prevent changesStream changes collisions
+  changesDelay: 5000,
+
   // sync source, upstream registry
   // If you want to directly sync from official npm's registry
   // please drop them an email first

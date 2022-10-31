@@ -203,16 +203,22 @@ exports.listPublicModuleNamesByUser = function* (username) {
 };
 
 exports.listModelSince = function(Model, attributes, mapper) {
+
   return function*(since, limit) {
     var start = ensureSinceIsDate(since);
     var findCondition = {
       attributes: attributes,
       where: {
         gmt_modified: {
-          gte: start
+          gte: start,
+          // 添加延时，防止同一时间多个数据未同步
+          lte: new Date(Date.now() - config.changesDelay || 5000),
         },
       },
-      order: [['gmt_modified', 'ASC'], ['id', 'ASC']],
+      order: [
+        ["gmt_modified", "ASC"],
+        ["id", "ASC"],
+      ],
     };
     if (limit) {
       findCondition.limit = limit;
