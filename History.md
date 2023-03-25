@@ -1,4 +1,14 @@
 
+3.0.0-rc.66 / 2023-03-25
+==================
+
+**features**
+  * [[`a289d7d`](http://github.com/cnpm/cnpmjs.org/commit/a289d7dd5ec4881e86c6f500c72cab134388782b)] - feat: ignore sync private pkg (#1747) (elrrrrrrr <<elrrrrrrr@gmail.com>>)
+  * [[`af9f5f7`](http://github.com/cnpm/cnpmjs.org/commit/af9f5f749979d1f389d61e98eab7dfbf639c995b)] - feat: add changes delay (#1739) (elrrrrrrr <<elrrrrrrr@gmail.com>>)
+
+**fixes**
+  * [[`6769a46`](http://github.com/cnpm/cnpmjs.org/commit/6769a46d71508a24f4e2d4dc14aa4aebd826bf38)] - fix: download row create error (#1749) (elrrrrrrr <<elrrrrrrr@gmail.com>>)
+
 3.0.0-rc.63 / 2022-08-31
 ==================
 
