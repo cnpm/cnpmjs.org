@@ -130,9 +130,12 @@ defer.setInterval(function* () {
         err.message += '; name: ' + name + ', count: ' + count + ', date: ' + date;
         logger.error(err);
       }
-      // save back to globalDownloads, try again next time
-      count = (globalDownloads.get(name) || 0) + count;
-      globalDownloads.set(name, count);
+      var pkgExist = yield packageService.getModuleLastModified(name);
+      if (pkgExist) {
+        // save back to globalDownloads, try again next time
+        count = (globalDownloads.get(name) || 0) + count;
+        globalDownloads.set(name, count);
+      }
     }
   }
   saving = false;
